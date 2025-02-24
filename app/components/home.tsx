@@ -271,9 +271,6 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    localStorage.clear();
-    deleteAllCookies();
-
     if (window.ReactNativeWebView) {
       try {
         const message = {
