@@ -173,6 +173,7 @@ export const useAppConfig = createPersistStore(
     },
 
     setOmeToken(omeToken: string) {
+      console.log("setOmeToken", omeToken);
       set((state) => ({ ...state, omeToken }));
     },
 
