@@ -172,9 +172,12 @@ export const useAppConfig = createPersistStore(
       set(() => ({ ...DEFAULT_CONFIG, omeToken }));
     },
 
-    setOmeToken(omeToken: string) {
-      console.log("setOmeToken", omeToken);
-      set((state) => ({ ...state, omeToken }));
+    setOmeToken(newToken: string) {
+      console.log("setOmeToken", newToken);
+      set((state) => ({ ...state, newToken }));
+
+      const { omeToken } = get();
+      console.log("Updated omeToken:", omeToken); // 检查最新值
     },
 
     mergeModels(newModels: LLMModel[]) {
