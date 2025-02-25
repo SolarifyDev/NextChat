@@ -334,17 +334,24 @@ export function supportsCustomSize(model: string): boolean {
 
 export function showPlugins(provider: ServiceProvider, model: string) {
   if (
-    provider == ServiceProvider.OpenAI ||
-    provider == ServiceProvider.Azure ||
-    provider == ServiceProvider.Moonshot ||
-    provider == ServiceProvider.ChatGLM
+    provider.toLowerCase() == ServiceProvider.OpenAI.toLowerCase() ||
+    provider.toLowerCase() == ServiceProvider.Azure.toLowerCase() ||
+    provider.toLowerCase() == ServiceProvider.Moonshot.toLowerCase() ||
+    provider.toLowerCase() == ServiceProvider.ChatGLM.toLowerCase() ||
+    provider.toLowerCase() == ServiceProvider.DeepSeek.toLowerCase()
   ) {
     return true;
   }
-  if (provider == ServiceProvider.Anthropic && !model.includes("claude-2")) {
+  if (
+    provider.toLowerCase() == ServiceProvider.Anthropic.toLowerCase() &&
+    !model.includes("claude-2")
+  ) {
     return true;
   }
-  if (provider == ServiceProvider.Google && !model.includes("vision")) {
+  if (
+    provider.toLowerCase() == ServiceProvider.Google.toLowerCase() &&
+    !model.includes("vision")
+  ) {
     return true;
   }
   return false;
