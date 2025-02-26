@@ -10,6 +10,7 @@ import MaskIcon from "../icons/mask.svg";
 import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
 import DiscoveryIcon from "../icons/discovery.svg";
+import SettingsIcon from "../icons/settings.svg";
 
 import Locale from "../locales";
 
@@ -23,7 +24,7 @@ import {
   Path,
 } from "../constant";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
 import { Selector, showConfirm } from "./ui-lib";
@@ -324,7 +325,7 @@ export function SideBar(props: { className?: string }) {
                 }}
               />
             </div>
-            {/* <div className={styles["sidebar-action"]}>
+            <div className={styles["sidebar-action"]}>
               <Link to={Path.Settings}>
                 <IconButton
                   aria={Locale.Settings.Title}
@@ -332,7 +333,7 @@ export function SideBar(props: { className?: string }) {
                   shadow
                 />
               </Link>
-            </div> */}
+            </div>
           </>
         }
         secondaryAction={
