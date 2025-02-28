@@ -103,14 +103,27 @@ export function ChatItem(props: {
 }
 
 export function ChatList(props: { narrow?: boolean }) {
-  const [sessions, selectedIndex, selectSession, moveSession] = useChatStore(
-    (state) => [
-      state.sessions,
-      state.currentSessionIndex,
-      state.selectSession,
-      state.moveSession,
-    ],
-  );
+  const [
+    sessions,
+    selectedIndex,
+    selectSession,
+    moveSession,
+    newSecctions,
+    newCurrentSessionIndex,
+    newMessage,
+    getData,
+    changeNewCurrentSessionIndex,
+  ] = useChatStore((state) => [
+    state.sessions,
+    state.currentSessionIndex,
+    state.selectSession,
+    state.moveSession,
+    state.newSecctions,
+    state.newCurrentSessionIndex,
+    state.newMessage,
+    state.getData,
+    state.changeNewCurrentSessionIndex,
+  ]);
   const chatStore = useChatStore();
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
@@ -131,6 +144,12 @@ export function ChatList(props: { narrow?: boolean }) {
     moveSession(source.index, destination.index);
   };
 
+  useEffect(() => {
+    if (chatStore._hasHydrated) {
+      getData();
+    }
+  }, [chatStore._hasHydrated]);
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="chat-list">
@@ -140,7 +159,7 @@ export function ChatList(props: { narrow?: boolean }) {
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
-            {sessions.map((item, i) => (
+            {newSecctions.map((item, i) => (
               <ChatItem
                 title={item.topic}
                 time={new Date(item.lastUpdate).toLocaleString()}
@@ -148,10 +167,12 @@ export function ChatList(props: { narrow?: boolean }) {
                 key={item.id}
                 id={item.id}
                 index={i}
-                selected={i === selectedIndex}
+                selected={i === newCurrentSessionIndex}
+                // selected={i === selectedIndex}
                 onClick={() => {
                   navigate(Path.Chat);
-                  selectSession(i);
+                  // selectSession(i);
+                  changeNewCurrentSessionIndex(i);
                 }}
                 onDelete={async () => {
                   if (

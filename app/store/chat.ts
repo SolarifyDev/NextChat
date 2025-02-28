@@ -39,6 +39,136 @@ import { createEmptyMask, Mask } from "./mask";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
 
+const data: ChatSession[] = [
+  {
+    id: "OQUqwpaDpcLuTl63N0AWD",
+    topic: "新的聊天",
+    memoryPrompt: "",
+    messages: [],
+    stat: {
+      tokenCount: 0,
+      wordCount: 0,
+      charCount: 1360,
+    },
+    lastUpdate: 1740465702082,
+    lastSummarizeIndex: 0,
+    mask: {
+      id: "xynUrxn49IouorL-Imfm-",
+      avatar: "gpt-bot",
+      name: "新的聊天",
+      context: [],
+      syncGlobalConfig: true,
+      modelConfig: {
+        model: "gpt-4o-mini",
+        providerName: "OpenAI",
+        temperature: 0.5,
+        top_p: 1,
+        max_tokens: 4000,
+        presence_penalty: 0,
+        frequency_penalty: 0,
+        sendMemory: true,
+        historyMessageCount: 4,
+        compressMessageLengthThreshold: 1000,
+        compressModel: "",
+        compressProviderName: "",
+        enableInjectSystemPrompts: true,
+        template: "{{input}}",
+        size: "1024x1024",
+        quality: "standard",
+        style: "vivid",
+      },
+      lang: "cn",
+      builtin: false,
+      createdAt: 1740448232818,
+      plugin: ["ikAbgA1Miq34iB7tZ9OY5"],
+    },
+  },
+  {
+    id: "lt_ab6Q_8i4NhHLf6YxI8",
+    topic: "AI文生图",
+    memoryPrompt: "",
+    messages: [
+      {
+        id: "xz03XUbkKFzPeOB_K1B62",
+        date: "2025/2/26 10:16:37",
+        role: "user",
+        content: "123",
+      },
+      {
+        id: "QhlqN8GRqTmCrEIloxFla",
+        date: "2025/2/26 10:16:37",
+        role: "assistant",
+        content:
+          '\n\n😆 对话遇到了一些问题，不用慌:\n        1️⃣ 想要零配置开箱即用，[点击这里立刻开启对话 🚀](https://nextchat.club?utm=github)\n        2️⃣ 如果你正在使用私有部署版本，点击[这里](/#/auth)输入访问秘钥 🔑\n        3️⃣ 如果你想消耗自己的 OpenAI 资源，点击[这里](/#/settings)修改设置 ⚙️\n       \n\n```json\n{\n  "error": true,\n  "msg": "empty access code"\n}\n```',
+        streaming: false,
+        model: "gpt-4o-mini",
+      },
+    ],
+    stat: {
+      tokenCount: 0,
+      wordCount: 0,
+      charCount: 272,
+    },
+    lastUpdate: 1740536197336,
+    lastSummarizeIndex: 0,
+    mask: {
+      avatar: "1f5bc-fe0f",
+      name: "AI文生图",
+      context: [
+        {
+          id: "text-to-pic-0",
+          role: "system",
+          content:
+            "You are a useful Assistant that won't refuse to draw picture, instead, you will output specific markdown code for picture description, but don't use code block.",
+          date: "",
+        },
+        {
+          id: "text-to-pic-1",
+          role: "user",
+          content: "Can you draw some pictures for me?",
+          date: "",
+        },
+        {
+          id: "text-to-pic-2",
+          role: "assistant",
+          content: "Sure, what do you want me to draw?",
+          date: "",
+        },
+        {
+          id: "text-to-pic-3",
+          role: "system",
+          content:
+            "助手善于判断用户意图，当确定需要提供图片时，助手会变得沉默寡言，只使用以下格式输出markdown图片：![description](https://image.pollinations.ai/prompt/description?nologo=true)，因为这个语法可以自动按照提示生成并渲染图片。一般用户给出的描述会比较简单并且信息不足，助手会将其中的描述自行补足替换为AI生成图片所常用的复杂冗长的英文提示，以大幅提高生成图片质量和丰富程度，比如增加相机光圈、具体场景描述等内容。助手会避免用代码块或原始块包围markdown标记，因为那样只会渲染出代码块或原始块而不是图片。url中的空格等符号需要转义。",
+          date: "",
+        },
+      ],
+      modelConfig: {
+        model: "gpt-4o-mini",
+        providerName: "OpenAi",
+        temperature: 1,
+        top_p: 1,
+        max_tokens: 2000,
+        presence_penalty: 0,
+        frequency_penalty: 0,
+        sendMemory: true,
+        historyMessageCount: 32,
+        compressMessageLengthThreshold: 1000,
+        compressModel: "",
+        compressProviderName: "",
+        enableInjectSystemPrompts: true,
+        template: "{{input}}",
+        size: "1024x1024",
+        quality: "standard",
+        style: "vivid",
+      },
+      lang: "cn",
+      builtin: true,
+      createdAt: 1688899480510,
+      id: 100000,
+    },
+  },
+];
+
 const localStorage = safeLocalStorage();
 
 export type ChatMessageTool = {
@@ -223,10 +353,21 @@ async function getMcpSystemPrompt(): Promise<string> {
   return MCP_SYSTEM_TEMPLATE.replace("{{ MCP_TOOLS }}", toolsStr);
 }
 
-const DEFAULT_CHAT_STATE = {
+const DEFAULT_CHAT_STATE: {
+  sessions: ChatSession[];
+  currentSessionIndex: number;
+  lastInput: string;
+
+  newSecctions: ChatSession[];
+  newCurrentSessionIndex: number;
+  newMessage: ChatMessage[];
+} = {
   sessions: [createEmptySession()],
   currentSessionIndex: 0,
   lastInput: "",
+  newSecctions: [],
+  newCurrentSessionIndex: 0,
+  newMessage: [],
 };
 
 export const useChatStore = createPersistStore(
@@ -240,7 +381,43 @@ export const useChatStore = createPersistStore(
     }
 
     const methods = {
+      async getData() {
+        setTimeout(() => {
+          set({
+            newSecctions: [],
+          });
+        }, 1500);
+      },
+
+      changeNewCurrentSessionIndex(index: number) {
+        set({
+          newCurrentSessionIndex: index,
+        });
+      },
+
+      async getNewMessage() {
+        setTimeout(() => {
+          set({
+            // newMessage: data[1].messages,
+            newMessage: [],
+          });
+        }, 1500);
+      },
+
+      deleteMessage(msgId?: string) {
+        // chatStore.updateTargetSession(
+        //   session,
+        //   (session) =>
+        //     (session.messages = session.messages.filter((m) => m.id !== msgId)),
+        // );
+        set({
+          newMessage: get().newMessage.filter((m) => m.id !== msgId),
+        });
+      },
+
       forkSession() {
+        // 用接口处理应该不用这么麻烦
+
         // 获取当前会话
         const currentSession = get().currentSession();
         if (!currentSession) return;
@@ -274,8 +451,11 @@ export const useChatStore = createPersistStore(
       },
 
       selectSession(index: number) {
+        // set({
+        //   currentSessionIndex: index,
+        // });
         set({
-          currentSessionIndex: index,
+          newCurrentSessionIndex: index,
         });
       },
 
@@ -323,14 +503,21 @@ export const useChatStore = createPersistStore(
 
         set((state) => ({
           currentSessionIndex: 0,
-          sessions: [session].concat(state.sessions),
+          newCurrentSessionIndex: 0,
+          sessions: [session].concat(state.newSecctions),
+          newSecctions: [session].concat(state.newSecctions),
         }));
       },
 
       nextSession(delta: number) {
-        const n = get().sessions.length;
+        // const n = get().sessions.length;
+        // const limit = (x: number) => (x + n) % n;
+        // const i = get().currentSessionIndex;
+        // get().selectSession(limit(i + delta));
+
+        const n = get().newSecctions.length;
         const limit = (x: number) => (x + n) % n;
-        const i = get().currentSessionIndex;
+        const i = get().newCurrentSessionIndex;
         get().selectSession(limit(i + delta));
       },
 
@@ -378,8 +565,11 @@ export const useChatStore = createPersistStore(
       },
 
       currentSession() {
-        let index = get().currentSessionIndex;
-        const sessions = get().sessions;
+        // let index = get().currentSessionIndex;
+        // const sessions = get().sessions;
+
+        let index = get().newCurrentSessionIndex;
+        const sessions = get().newSecctions;
 
         if (index < 0 || index >= sessions.length) {
           index = Math.min(sessions.length - 1, Math.max(0, index));
@@ -393,15 +583,19 @@ export const useChatStore = createPersistStore(
 
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
         get().updateTargetSession(targetSession, (session) => {
-          session.messages = session.messages.concat();
+          // session.messages = session.messages.concat();
           session.lastUpdate = Date.now();
         });
 
-        get().updateStat(message, targetSession);
+        set(() => ({
+          newMessage: get().newMessage.concat(),
+        }));
 
-        get().checkMcpJson(message);
+        get().updateStat(message, targetSession); // 更新字节长度
 
-        get().summarizeSession(false, targetSession);
+        get().checkMcpJson(message); // 可以不处理
+
+        // get().summarizeSession(false, targetSession); // 总结
       },
 
       async onUserInput(
@@ -445,16 +639,27 @@ export const useChatStore = createPersistStore(
         const messageIndex = session.messages.length + 1;
 
         // save user's and bot's message
-        get().updateTargetSession(session, (session) => {
-          const savedUserMessage = {
-            ...userMessage,
-            content: mContent,
-          };
-          session.messages = session.messages.concat([
-            savedUserMessage,
-            botMessage,
-          ]);
-        });
+        // get().updateTargetSession(session, (session) => {
+        //   const savedUserMessage = {
+        //     ...userMessage,
+        //     content: mContent,
+        //   };
+
+        //   session.messages = session.messages.concat([
+        //     savedUserMessage,
+        //     botMessage,
+        //   ]);
+        //   console.log(session.messages, savedUserMessage, botMessage);
+        // });
+
+        const savedUserMessage = {
+          ...userMessage,
+          content: mContent,
+        };
+
+        set(() => ({
+          newMessage: get().newMessage.concat([savedUserMessage, botMessage]),
+        }));
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
         // make request
@@ -466,9 +671,13 @@ export const useChatStore = createPersistStore(
             if (message) {
               botMessage.content = message;
             }
-            get().updateTargetSession(session, (session) => {
-              session.messages = session.messages.concat();
-            });
+            // get().updateTargetSession(session, (session) => {
+            //   session.messages = session.messages.concat();
+            // });
+
+            set(() => ({
+              newMessage: get().newMessage.concat(),
+            }));
           },
           async onFinish(message) {
             botMessage.streaming = false;
@@ -806,11 +1015,17 @@ export const useChatStore = createPersistStore(
         targetSession: ChatSession,
         updater: (session: ChatSession) => void,
       ) {
-        const sessions = get().sessions;
-        const index = sessions.findIndex((s) => s.id === targetSession.id);
+        // const sessions = get().sessions;
+        // const index = sessions.findIndex((s) => s.id === targetSession.id);
+        // if (index < 0) return;
+        // updater(sessions[index]);
+        // set(() => ({ sessions }));
+
+        const newSecctions = get().newSecctions;
+        const index = newSecctions.findIndex((s) => s.id === targetSession.id);
         if (index < 0) return;
-        updater(sessions[index]);
-        set(() => ({ sessions }));
+        updater(newSecctions[index]);
+        set(() => ({ newSecctions }));
       },
       async clearAllData() {
         await indexedDBStorage.clear();

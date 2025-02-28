@@ -248,20 +248,21 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   const clientConfig = getClientConfig();
 
   function getConfig() {
-    const modelConfig = chatStore.currentSession().mask.modelConfig;
-    const isGoogle = modelConfig.providerName === ServiceProvider.Google;
-    const isAzure = modelConfig.providerName === ServiceProvider.Azure;
-    const isAnthropic = modelConfig.providerName === ServiceProvider.Anthropic;
-    const isBaidu = modelConfig.providerName == ServiceProvider.Baidu;
-    const isByteDance = modelConfig.providerName === ServiceProvider.ByteDance;
-    const isAlibaba = modelConfig.providerName === ServiceProvider.Alibaba;
-    const isMoonshot = modelConfig.providerName === ServiceProvider.Moonshot;
-    const isIflytek = modelConfig.providerName === ServiceProvider.Iflytek;
-    const isDeepSeek = modelConfig.providerName === ServiceProvider.DeepSeek;
-    const isXAI = modelConfig.providerName === ServiceProvider.XAI;
-    const isChatGLM = modelConfig.providerName === ServiceProvider.ChatGLM;
+    const modelConfig =
+      chatStore.currentSession()?.mask?.modelConfig || undefined;
+    const isGoogle = modelConfig?.providerName === ServiceProvider.Google;
+    const isAzure = modelConfig?.providerName === ServiceProvider.Azure;
+    const isAnthropic = modelConfig?.providerName === ServiceProvider.Anthropic;
+    const isBaidu = modelConfig?.providerName == ServiceProvider.Baidu;
+    const isByteDance = modelConfig?.providerName === ServiceProvider.ByteDance;
+    const isAlibaba = modelConfig?.providerName === ServiceProvider.Alibaba;
+    const isMoonshot = modelConfig?.providerName === ServiceProvider.Moonshot;
+    const isIflytek = modelConfig?.providerName === ServiceProvider.Iflytek;
+    const isDeepSeek = modelConfig?.providerName === ServiceProvider.DeepSeek;
+    const isXAI = modelConfig?.providerName === ServiceProvider.XAI;
+    const isChatGLM = modelConfig?.providerName === ServiceProvider.ChatGLM;
     const isSiliconFlow =
-      modelConfig.providerName === ServiceProvider.SiliconFlow;
+      modelConfig?.providerName === ServiceProvider.SiliconFlow;
     const isEnabledAccessControl = accessStore.enabledAccessControl();
     const apiKey = isGoogle
       ? accessStore.googleApiKey
@@ -351,7 +352,9 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   }
   console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
 
-  headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
+  headers["OME-METIS-Authorization"] =
+    appConfig.omeToken ||
+    "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiYXQrand0IiwiY3R5IjoiSldUIn0.lprBbY-PDAxvH8Cd6URG4e2N0MaIiU4C7mXADfMtU8ZyUJ6b_QtDY4pIgSJ4Qu-oBAFFEWposxk1k-PmqmpWx7Vlh8dfLPz_.xRsmNeV2YAb04nIRiOLFVw.9UWWDIkH5MtlWM_jLBtsWJOHSUAwX3-zRoUJIoAmHN90qYcegoppYx2LOYWEj61KrDq72ZVb22rnu2NmcydzYpCca29-fBaUs9Fw62uttywNrsy8nQWRMkh9MqXdTcMqzFVaMi6Let-ySPYqH32stvVO42jaOXyKwWIvaNHzCgzpXvXWZUp4PuzdYUK8fxRG7qGcNDZBq5GJRrU_CWT6V1aDeLSp7E6zZdMsAZDdkIdaynGPsPnVfYJ2ijGQ3CPRh3lg6NMzbxmNuo9cBr_318CHR23gO8Nnh2q0v9OD7LXPLu9lWErqi7NMzen0pHauRW5NsDoPXvMIEo-uLd4Tcn7iIug5tV_cXjTBYAp2JEAEdiSs9h2L9Tfk7oiJF1hxH1Oz21igcmWYgNanl5qk_kSOKJYhQnFPbsjECdEnJqLg02tRCcztejhp-NHX9KjfEMvcvCkOTyFIBVKGhSlble2cROGe7Ra27_sOEKuC5UesdGlTCZP33sXFd7F4y9YxcV_MyWVh4lVmcQ5XmZoirrz-W3vITgvnO-ylxzA3fuxoBF9CWZXPFpuHGIfjUPGl9Ue_b1YTvSTnQLsglMtt1docmXv7oPFP7dmPP9_0vEWZRaVxy54zF4isCjYkr7HSunrUAAR5Yq--JYAreoPGCPbCc1PEmeU_5_x18CiJNTMusF3H_umJTuWF1ydRY3PrujWGcLU8w6Z57SSo9tEUZGKytEanaBke4pSUO63PmXIc135AdyQmYPRXDrFgOrqeG01Z4Xf26K31Nal43kj7XBGWmUuRRECHumB9cvjBwRxnIJcVq0hLiolSpLPVkSCEdo4__4-igWsyVZP2Q8sRyUYHgzQ0kZYtkWbSwtpre0qcJa5XpkSzPf7TfSi2t6c31b0U8Bi73PsEENfnSx_KBO26-oGHwuRwLNiqcg2aKr3-bRMheEb8Flfvi4YT6lmmYtTeS0eCqfi9hvxlCvVMQDrernfF2TZIzwzb_I7J8QOTk6IdSXuf7Yiaja7Xxm1ASpipIzbQy0DGUizJSNCT3fcNGDNzdfmHh3lvnWkelxIbrw-grF752VHH7Irti53DZWmSc0BuNjxOJNse9gsOppgKtfUvbMYjVaZxU7gGSNZwvg_hJ6ZiMN-gBuD2ybMa-zvYM4af2b8Smfs0kw6Xyjk4QrVZI0804R_3i_UGqJABHkGsKosHdLbGdrzfh6_Yznzha8UHHdBcyW2LrZfPmLhgEJcObt8_OYGYxE8ntkMkS8CIBftRsVLwKrfkt-7KhwLPAMFHeHyCgBd4h6BOaJU3VfBbCivDc6T3JWNRpLusCP_q0Hal57wTHF3zHBlRfx2CyvX1dYld1ySItDxUiiKinqLkwWYHOyXQHuJbIIYkGc0ifZkLaNSVlfSemKw6IRX3z2VRC2YFuOGsNvfU030CIcLUnXmqi99nitnEDSt8FssXlCfRPojx76WK7LTJ3PLer4FUDFklCjdk45VAU2K7CNwqpY4tSrfcQdBbDp1BUTRpuR3Mk_TBu3JsHVSU9Dg-agTSOarPwPhpDCEJPFsBNWzy0nyHPyfc_jFIxJdmV277TeSpxAaNmOvmLvwZzt_U-6d_pJv1QucoV4FHWETALJOkKC4ie8owUtOu0vHD70UhAM0rXXI2ECGXd25JrvKIlHjD7CFCjpnJDyzF2iSZtlO_LyJ8nlYVGY0cRHiqX5sPyIRIp36GARC2qG7FG2MfOi-ipPS1E38_VdnvyrbV8aJxt-EuWIrcQpByY07D6mnI79eDptvw898Y5hG4Nx990cCN0jShIsrKkivwoI76I8yh0URppB59ns0je0S9dx9kc1Wi6-Y6elJwbgI3ADQiaE4CvbyHPtwevvQ7o9BC475MrEEmHm8eYec8NxjY_LlXW6Vj1ZfPEJKKyzZxv0Zru13RQyeGDt9M9SEQzUaILFCPwTp-SPBvhRnhbO87j1HmWSRPN0YOOlUdJkBUdSumiAoIXlaT_Gdcku96Pyrhg_e5DqiWEUxk6YSfoYkE0G7Gc80W3G9otS3NGXKhWbugMaG_8665yKVItYTPwEP2C1ZqEsKtH4bwuMmovDz9yqHbo5yNfD4hC1v4PRILBITd2e5XDq9nWVdoJBkP8A.ZdAelcOkNx3eDO6jonbFgNBvPlnI1YQbdMfVPlH0J-g";
 
   return headers;
 }

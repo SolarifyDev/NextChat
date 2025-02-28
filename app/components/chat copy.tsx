@@ -1,5 +1,15 @@
-import { useDebouncedCallback } from "use-debounce";
-import React, {
+import { useNavigate } from "react-router-dom";
+import {
+  ChatMessage,
+  ChatSession,
+  DEFAULT_TOPIC,
+  SubmitKey,
+  Theme,
+  useAppConfig,
+  useChatStore,
+  usePluginStore,
+} from "../store";
+import {
   Fragment,
   RefObject,
   useCallback,
@@ -9,15 +19,35 @@ import React, {
   useState,
 } from "react";
 
+import styles from "./chat.module.scss";
+import {
+  autoGrowTextArea,
+  copyToClipboard,
+  getMessageImages,
+  getMessageTextContent,
+  getModelSizes,
+  isDalle3,
+  isVisionModel,
+  selectOrCopy,
+  showPlugins,
+  supportsCustomSize,
+  useMobileScreen,
+} from "../utils";
+import { IconButton } from "./button";
+import {
+  CHAT_PAGE_SIZE,
+  Path,
+  ServiceProvider,
+  UNFINISHED_INPUT,
+} from "../constant";
+import Locale from "../locales";
+
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
 import EditIcon from "../icons/rename.svg";
 import ReturnIcon from "../icons/return.svg";
 import CopyIcon from "../icons/copy.svg";
-import SpeakIcon from "../icons/speak.svg";
-import SpeakStopIcon from "../icons/speak-stop.svg";
-import LoadingIcon from "../icons/three-dots.svg";
 import LoadingButtonIcon from "../icons/loading.svg";
 import PromptIcon from "../icons/prompt.svg";
 import MaskIcon from "../icons/mask.svg";
@@ -47,92 +77,34 @@ import PluginIcon from "../icons/plugin.svg";
 import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
-import {
-  BOT_HELLO,
-  ChatMessage,
-  createMessage,
-  DEFAULT_TOPIC,
-  ModelType,
-  SubmitKey,
-  Theme,
-  useAccessStore,
-  useAppConfig,
-  useChatStore,
-  usePluginStore,
-} from "../store";
 
-import {
-  autoGrowTextArea,
-  copyToClipboard,
-  getMessageImages,
-  getMessageTextContent,
-  isDalle3,
-  isVisionModel,
-  safeLocalStorage,
-  getModelSizes,
-  supportsCustomSize,
-  useMobileScreen,
-  selectOrCopy,
-  showPlugins,
-} from "../utils";
-
-import { uploadImage as uploadImageRemote } from "@/app/utils/chat";
-
-import dynamic from "next/dynamic";
-
-import { ChatControllerPool } from "../client/controller";
-import { DalleQuality, DalleStyle, ModelSize } from "../typing";
-import { Prompt, usePromptStore } from "../store/prompt";
-import Locale from "../locales";
-
-import { IconButton } from "./button";
-import styles from "./chat.module.scss";
-
+import clsx from "clsx";
 import {
   List,
   ListItem,
   Modal,
   Selector,
-  showConfirm,
   showPrompt,
   showToast,
 } from "./ui-lib";
-import { useNavigate } from "react-router-dom";
-import {
-  CHAT_PAGE_SIZE,
-  DEFAULT_TTS_ENGINE,
-  ModelProvider,
-  Path,
-  REQUEST_TIMEOUT_MS,
-  ServiceProvider,
-  UNFINISHED_INPUT,
-} from "../constant";
-import { Avatar } from "./emoji";
-import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
-import { useMaskStore } from "../store/mask";
-import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
-import { prettyObject } from "../utils/format";
-import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
-import { useAllModels } from "../utils/hooks";
-import { ClientApi, MultimodalContent } from "../client/api";
-import { createTTSPlayer } from "../utils/audio";
-import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
-
+import { useMaskStore } from "../store/mask";
+import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
+import { MultimodalContent } from "../client/api";
+import { Avatar } from "./emoji";
+import { ChatControllerPool } from "../client/controller";
+import { Prompt, usePromptStore } from "../store/prompt";
+import { useDebouncedCallback } from "use-debounce";
+import { ChatCommandPrefix, useChatCommand } from "../command";
 import { isEmpty } from "lodash-es";
+import { useAllModels } from "../utils/hooks";
+import { DalleQuality, DalleStyle, ModelSize } from "../typing";
 import { getModelProvider } from "../utils/model";
-import { RealtimeChat } from "@/app/components/realtime-chat";
-import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
-import { _NewChat } from "./chat copy";
 
-const localStorage = safeLocalStorage();
-
-const ttsPlayer = createTTSPlayer();
-
-const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
-  loading: () => <LoadingIcon />,
-});
+import { uploadImage as uploadImageRemote } from "@/app/utils/chat";
+import { Markdown } from "./markdown";
+import { RealtimeChat } from "@/app/components/realtime-chat";
 
 const MCPAction = () => {
   const navigate = useNavigate();
@@ -162,9 +134,12 @@ const MCPAction = () => {
   );
 };
 
-export function SessionConfigModel(props: { onClose: () => void }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+export function SessionConfigModel(props: {
+  onClose: () => void;
+  session: ChatSession;
+}) {
+  // const chatStore = useChatStore();
+  const session = props?.session;
   const maskStore = useMaskStore();
   const navigate = useNavigate();
 
@@ -180,12 +155,12 @@ export function SessionConfigModel(props: { onClose: () => void }) {
             bordered
             text={Locale.Chat.Config.Reset}
             onClick={async () => {
-              if (await showConfirm(Locale.Memory.ResetConfirm)) {
-                chatStore.updateTargetSession(
-                  session,
-                  (session) => (session.memoryPrompt = ""),
-                );
-              }
+              // if (await showConfirm(Locale.Memory.ResetConfirm)) {
+              //   chatStore.updateTargetSession(
+              //     session,
+              //     (session) => (session.memoryPrompt = ""),
+              //   );
+              // }
             }}
           />,
           <IconButton
@@ -207,10 +182,11 @@ export function SessionConfigModel(props: { onClose: () => void }) {
           updateMask={(updater) => {
             const mask = { ...session.mask };
             updater(mask);
-            chatStore.updateTargetSession(
-              session,
-              (session) => (session.mask = mask),
-            );
+
+            // chatStore.updateTargetSession(
+            //   session,
+            //   (session) => (session.mask = mask),
+            // );
           }}
           shouldSyncFromGlobal
           extraListItems={
@@ -234,10 +210,9 @@ function PromptToast(props: {
   showToast?: boolean;
   showModal?: boolean;
   setShowModal: (_: boolean) => void;
+  session: ChatSession;
 }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
-  const context = session.mask.context;
+  const context = props?.session?.mask?.context || [];
 
   return (
     <div className={styles["prompt-toast"]} key="prompt-toast">
@@ -254,7 +229,10 @@ function PromptToast(props: {
         </div>
       )}
       {props.showModal && (
-        <SessionConfigModel onClose={() => props.setShowModal(false)} />
+        <SessionConfigModel
+          onClose={() => props.setShowModal(false)}
+          session={props?.session}
+        />
       )}
     </div>
   );
@@ -307,90 +285,19 @@ function useSubmitHandler() {
   };
 }
 
-export type RenderPrompt = Pick<Prompt, "title" | "content">;
-
-export function PromptHints(props: {
-  prompts: RenderPrompt[];
-  onPromptSelect: (prompt: RenderPrompt) => void;
-}) {
-  const noPrompts = props.prompts.length === 0;
-  const [selectIndex, setSelectIndex] = useState(0);
-  const selectedRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setSelectIndex(0);
-  }, [props.prompts.length]);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (noPrompts || e.metaKey || e.altKey || e.ctrlKey) {
-        return;
-      }
-      // arrow up / down to select prompt
-      const changeIndex = (delta: number) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const nextIndex = Math.max(
-          0,
-          Math.min(props.prompts.length - 1, selectIndex + delta),
-        );
-        setSelectIndex(nextIndex);
-        selectedRef.current?.scrollIntoView({
-          block: "center",
-        });
-      };
-
-      if (e.key === "ArrowUp") {
-        changeIndex(1);
-      } else if (e.key === "ArrowDown") {
-        changeIndex(-1);
-      } else if (e.key === "Enter") {
-        const selectedPrompt = props.prompts.at(selectIndex);
-        if (selectedPrompt) {
-          props.onPromptSelect(selectedPrompt);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.prompts.length, selectIndex]);
-
-  if (noPrompts) return null;
-  return (
-    <div className={styles["prompt-hints"]}>
-      {props.prompts.map((prompt, i) => (
-        <div
-          ref={i === selectIndex ? selectedRef : null}
-          className={clsx(styles["prompt-hint"], {
-            [styles["prompt-hint-selected"]]: i === selectIndex,
-          })}
-          key={prompt.title + i.toString()}
-          onClick={() => props.onPromptSelect(prompt)}
-          onMouseEnter={() => setSelectIndex(i)}
-        >
-          <div className={styles["hint-title"]}>{prompt.title}</div>
-          <div className={styles["hint-content"]}>{prompt.content}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ClearContextDivider() {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+function ClearContextDivider(props: { session: ChatSession }) {
+  // const chatStore = useChatStore();
+  // const session = chatStore.currentSession();
 
   return (
     <div
       className={styles["clear-context"]}
-      onClick={() =>
-        chatStore.updateTargetSession(
-          session,
-          (session) => (session.clearContextIndex = undefined),
-        )
+      onClick={
+        () => {}
+        // chatStore.updateTargetSession(
+        //   session,
+        //   (session) => (session.clearContextIndex = undefined),
+        // )
       }
     >
       <div className={styles["clear-context-tips"]}>{Locale.Context.Clear}</div>
@@ -503,12 +410,13 @@ export function ChatActions(props: {
   setShowShortcutKeyModal: React.Dispatch<React.SetStateAction<boolean>>;
   setUserInput: (input: string) => void;
   setShowChatSidePanel: React.Dispatch<React.SetStateAction<boolean>>;
+  session: ChatSession;
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
-  const chatStore = useChatStore();
+  // const chatStore = useChatStore();
   const pluginStore = usePluginStore();
-  const session = chatStore.currentSession();
+  // const session = chatStore.currentSession(); // 需要调整
 
   // switch themes
   const theme = config.theme;
@@ -526,9 +434,9 @@ export function ChatActions(props: {
   const stopAll = () => ChatControllerPool.stopAll();
 
   // switch model
-  const currentModel = session.mask.modelConfig.model;
+  const currentModel = props.session.mask.modelConfig.model;
   const currentProviderName =
-    session.mask.modelConfig?.providerName || ServiceProvider.OpenAI;
+    props.session.mask.modelConfig?.providerName || ServiceProvider.OpenAI;
   const allModels = useAllModels();
   const models = useMemo(() => {
     const filteredModels = allModels.filter((m) => m.available);
@@ -563,9 +471,9 @@ export function ChatActions(props: {
   const dalle3Qualitys: DalleQuality[] = ["standard", "hd"];
   const dalle3Styles: DalleStyle[] = ["vivid", "natural"];
   const currentSize =
-    session.mask.modelConfig?.size ?? ("1024x1024" as ModelSize);
-  const currentQuality = session.mask.modelConfig?.quality ?? "standard";
-  const currentStyle = session.mask.modelConfig?.style ?? "vivid";
+    props.session.mask.modelConfig?.size ?? ("1024x1024" as ModelSize);
+  const currentQuality = props.session.mask.modelConfig?.quality ?? "standard";
+  const currentStyle = props.session.mask.modelConfig?.style ?? "vivid";
 
   const isMobileScreen = useMobileScreen();
 
@@ -583,18 +491,19 @@ export function ChatActions(props: {
     if (isUnavailableModel && models.length > 0) {
       // show next model to default model if exist
       let nextModel = models.find((model) => model.isDefault) || models[0];
-      chatStore.updateTargetSession(session, (session) => {
-        session.mask.modelConfig.model = nextModel.name;
-        session.mask.modelConfig.providerName = nextModel?.provider
-          ?.providerName as ServiceProvider;
-      });
+      // chatStore.updateTargetSession(session, (session) => {
+      //   session.mask.modelConfig.model = nextModel.name;
+      //   session.mask.modelConfig.providerName = nextModel?.provider
+      //     ?.providerName as ServiceProvider;
+      // });
       showToast(
         nextModel?.provider?.providerName == "ByteDance"
           ? nextModel.displayName
           : nextModel.name,
       );
     }
-  }, [chatStore, currentModel, models, session]);
+    // }, [chatStore, currentModel, models, props.session]);
+  }, [currentModel, models, props.session]);
 
   return (
     <div className={styles["chat-input-actions"]}>
@@ -662,14 +571,14 @@ export function ChatActions(props: {
           text={Locale.Chat.InputActions.Clear}
           icon={<BreakIcon />}
           onClick={() => {
-            chatStore.updateTargetSession(session, (session) => {
-              if (session.clearContextIndex === session.messages.length) {
-                session.clearContextIndex = undefined;
-              } else {
-                session.clearContextIndex = session.messages.length;
-                session.memoryPrompt = ""; // will clear memory
-              }
-            });
+            // chatStore.updateTargetSession(session, (session) => {
+            //   if (session.clearContextIndex === session.messages.length) {
+            //     session.clearContextIndex = undefined;
+            //   } else {
+            //     session.clearContextIndex = session.messages.length;
+            //     session.memoryPrompt = ""; // will clear memory
+            //   }
+            // });
           }}
         />
 
@@ -694,12 +603,12 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const [model, providerName] = getModelProvider(s[0]);
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.modelConfig.model = model as ModelType;
-                session.mask.modelConfig.providerName =
-                  providerName as ServiceProvider;
-                session.mask.syncGlobalConfig = false;
-              });
+              // chatStore.updateTargetSession(session, (session) => {
+              //   session.mask.modelConfig.model = model as ModelType;
+              //   session.mask.modelConfig.providerName =
+              //     providerName as ServiceProvider;
+              //   session.mask.syncGlobalConfig = false;
+              // });
               if (providerName == "ByteDance") {
                 const selectedModel = models.find(
                   (m) =>
@@ -733,9 +642,9 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const size = s[0];
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.modelConfig.size = size;
-              });
+              // chatStore.updateTargetSession(session, (session) => {
+              //   session.mask.modelConfig.size = size;
+              // });
               showToast(size);
             }}
           />
@@ -760,9 +669,9 @@ export function ChatActions(props: {
             onSelection={(q) => {
               if (q.length === 0) return;
               const quality = q[0];
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.modelConfig.quality = quality;
-              });
+              // chatStore.updateTargetSession(session, (session) => {
+              //   session.mask.modelConfig.quality = quality;
+              // });
               showToast(quality);
             }}
           />
@@ -787,9 +696,9 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const style = s[0];
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.modelConfig.style = style;
-              });
+              // chatStore.updateTargetSession(session, (session) => {
+              //   session.mask.modelConfig.style = style;
+              // });
               showToast(style);
             }}
           />
@@ -811,16 +720,16 @@ export function ChatActions(props: {
         {showPluginSelector && (
           <Selector
             multiple
-            defaultSelectedValue={chatStore.currentSession().mask?.plugin}
+            // defaultSelectedValue={chatStore.currentSession().mask?.plugin}
             items={pluginStore.getAll().map((item) => ({
               title: `${item?.title}@${item?.version}`,
               value: item?.id,
             }))}
             onClose={() => setShowPluginSelector(false)}
             onSelection={(s) => {
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.plugin = s as string[];
-              });
+              // chatStore.updateTargetSession(session, (session) => {
+              //   session.mask.plugin = s as string[];
+              // });
             }}
           />
         )}
@@ -843,6 +752,78 @@ export function ChatActions(props: {
           />
         )}
       </div>
+    </div>
+  );
+}
+
+export type RenderPrompt = Pick<Prompt, "title" | "content">;
+
+export function PromptHints(props: {
+  prompts: RenderPrompt[];
+  onPromptSelect: (prompt: RenderPrompt) => void;
+}) {
+  const noPrompts = props.prompts.length === 0;
+  const [selectIndex, setSelectIndex] = useState(0);
+  const selectedRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSelectIndex(0);
+  }, [props.prompts.length]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (noPrompts || e.metaKey || e.altKey || e.ctrlKey) {
+        return;
+      }
+      // arrow up / down to select prompt
+      const changeIndex = (delta: number) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const nextIndex = Math.max(
+          0,
+          Math.min(props.prompts.length - 1, selectIndex + delta),
+        );
+        setSelectIndex(nextIndex);
+        selectedRef.current?.scrollIntoView({
+          block: "center",
+        });
+      };
+
+      if (e.key === "ArrowUp") {
+        changeIndex(1);
+      } else if (e.key === "ArrowDown") {
+        changeIndex(-1);
+      } else if (e.key === "Enter") {
+        const selectedPrompt = props.prompts.at(selectIndex);
+        if (selectedPrompt) {
+          props.onPromptSelect(selectedPrompt);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.prompts.length, selectIndex]);
+
+  if (noPrompts) return null;
+  return (
+    <div className={styles["prompt-hints"]}>
+      {props.prompts.map((prompt, i) => (
+        <div
+          ref={i === selectIndex ? selectedRef : null}
+          className={clsx(styles["prompt-hint"], {
+            [styles["prompt-hint-selected"]]: i === selectIndex,
+          })}
+          key={prompt.title + i.toString()}
+          onClick={() => props.onPromptSelect(prompt)}
+          onMouseEnter={() => setSelectIndex(i)}
+        >
+          <div className={styles["hint-title"]}>{prompt.title}</div>
+          <div className={styles["hint-content"]}>{prompt.content}</div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -986,16 +967,162 @@ export function ShortcutKeyModal(props: { onClose: () => void }) {
   );
 }
 
-function _Chat() {
+export function _NewChat() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
+  const navigate = useNavigate();
+
+  // config setting
   const chatStore = useChatStore();
-  const session = chatStore.currentSession();
   const config = useAppConfig();
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
 
-  const [showExport, setShowExport] = useState(false);
+  const { newSecctions, newCurrentSessionIndex, getNewMessage, newMessage } =
+    useChatStore();
+
+  // 获取detail
+  useEffect(() => {
+    getNewMessage();
+  }, [newCurrentSessionIndex]);
+
+  // 获取左侧
+  const session = useMemo(() => {
+    return newSecctions[newCurrentSessionIndex] || [];
+  }, [newSecctions, newCurrentSessionIndex]);
+
+  // 预设文本
+  const context: RenderMessage[] = useMemo(() => {
+    return (
+      (session?.mask?.hideContext ? [] : session?.mask?.context.slice()) || []
+    );
+  }, [session]);
+
+  // 最终显示文本
+  const renderMessages = useMemo(() => {
+    return context.concat(newMessage as RenderMessage[]);
+  }, [context, newMessage]);
+
+  const isMobileScreen = useMobileScreen();
+
+  const [showPromptModal, setShowPromptModal] = useState(false);
+
+  const clientConfig = useMemo(() => getClientConfig(), []);
+
+  const autoFocus = !isMobileScreen; // wont auto focus on mobile screen
+  const showMaxIcon = !isMobileScreen && !clientConfig?.isApp;
+
+  const [attachImages, setAttachImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+
+  // edit / insert message modal
+  const [isEditingMessage, setIsEditingMessage] = useState(false);
+
+  // remember unfinished input
+  useEffect(() => {
+    // try to load from local storage
+    const key = UNFINISHED_INPUT(session.id);
+    const mayBeUnfinishedInput = localStorage.getItem(key);
+    if (mayBeUnfinishedInput && userInput.length === 0) {
+      setUserInput(mayBeUnfinishedInput);
+      localStorage.removeItem(key);
+    }
+
+    const dom = inputRef.current;
+    return () => {
+      localStorage.setItem(key, dom?.value ?? "");
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handlePaste = useCallback(
+    async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      // const currentModel = chatStore.currentSession().mask.modelConfig.model;
+      // if (!isVisionModel(currentModel)) {
+      //   return;
+      // }
+      // const items = (event.clipboardData || window.clipboardData).items;
+      // for (const item of items) {
+      //   if (item.kind === "file" && item.type.startsWith("image/")) {
+      //     event.preventDefault();
+      //     const file = item.getAsFile();
+      //     if (file) {
+      //       const images: string[] = [];
+      //       images.push(...attachImages);
+      //       images.push(
+      //         ...(await new Promise<string[]>((res, rej) => {
+      //           setUploading(true);
+      //           const imagesData: string[] = [];
+      //           uploadImageRemote(file)
+      //             .then((dataUrl) => {
+      //               imagesData.push(dataUrl);
+      //               setUploading(false);
+      //               res(imagesData);
+      //             })
+      //             .catch((e) => {
+      //               setUploading(false);
+      //               rej(e);
+      //             });
+      //         })),
+      //       );
+      //       const imagesLength = images.length;
+      //       if (imagesLength > 3) {
+      //         images.splice(3, imagesLength - 3);
+      //       }
+      //       setAttachImages(images);
+      //     }
+      //   }
+      // }
+    },
+    // [attachImages, chatStore],
+    [attachImages],
+  );
+
+  async function uploadImage() {
+    const images: string[] = [];
+    images.push(...attachImages);
+
+    images.push(
+      ...(await new Promise<string[]>((res, rej) => {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept =
+          "image/png, image/jpeg, image/webp, image/heic, image/heif";
+        fileInput.multiple = true;
+        fileInput.onchange = (event: any) => {
+          setUploading(true);
+          const files = event.target.files;
+          const imagesData: string[] = [];
+          for (let i = 0; i < files.length; i++) {
+            const file = event.target.files[i];
+            console.log("file", file);
+            uploadImageRemote(file)
+              .then((dataUrl) => {
+                imagesData.push(dataUrl);
+                if (
+                  imagesData.length === 3 ||
+                  imagesData.length === files.length
+                ) {
+                  setUploading(false);
+                  res(imagesData);
+                }
+              })
+              .catch((e) => {
+                setUploading(false);
+                rej(e);
+              });
+          }
+        };
+        fileInput.click();
+      })),
+    );
+
+    const imagesLength = images.length;
+    if (imagesLength > 3) {
+      images.splice(3, imagesLength - 3);
+    }
+    setAttachImages(images);
+  }
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userInput, setUserInput] = useState("");
@@ -1020,7 +1147,6 @@ function _Chat() {
   }, [scrollRef?.current?.scrollHeight]);
 
   const isTyping = userInput !== "";
-
   // if user is typing, should auto scroll to bottom
   // if user is not typing, should auto scroll to bottom only if already at bottom
   const { setAutoScroll, scrollDomToBottom } = useScrollToBottom(
@@ -1028,11 +1154,8 @@ function _Chat() {
     (isScrolledToBottom || isAttachWithTop) && !isTyping,
     session.messages,
   );
+
   const [hitBottom, setHitBottom] = useState(true);
-  const isMobileScreen = useMobileScreen();
-  const navigate = useNavigate();
-  const [attachImages, setAttachImages] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
 
   // prompt hints
   const promptStore = usePromptStore();
@@ -1112,11 +1235,12 @@ function _Chat() {
       return;
     }
     setIsLoading(true);
+
     chatStore
       .onUserInput(userInput, attachImages)
       .then(() => setIsLoading(false));
     setAttachImages([]);
-    chatStore.setLastInput(userInput);
+    // chatStore.setLastInput(userInput);
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
@@ -1146,31 +1270,29 @@ function _Chat() {
   };
 
   useEffect(() => {
-    chatStore.updateTargetSession(session, (session) => {
-      const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
-      session.messages.forEach((m) => {
-        // check if should stop all stale messages
-        if (m.isError || new Date(m.date).getTime() < stopTiming) {
-          if (m.streaming) {
-            m.streaming = false;
-          }
-
-          if (m.content.length === 0) {
-            m.isError = true;
-            m.content = prettyObject({
-              error: true,
-              message: "empty response",
-            });
-          }
-        }
-      });
-
-      // auto sync mask config from global config
-      if (session.mask.syncGlobalConfig) {
-        console.log("[Mask] syncing from global, name = ", session.mask.name);
-        session.mask.modelConfig = { ...config.modelConfig };
-      }
-    });
+    // chatStore.updateTargetSession(session, (session) => {
+    //   const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
+    //   session.messages.forEach((m) => {
+    //     // check if should stop all stale messages
+    //     if (m.isError || new Date(m.date).getTime() < stopTiming) {
+    //       if (m.streaming) {
+    //         m.streaming = false;
+    //       }
+    //       if (m.content.length === 0) {
+    //         m.isError = true;
+    //         m.content = prettyObject({
+    //           error: true,
+    //           message: "empty response",
+    //         });
+    //       }
+    //     }
+    //   });
+    //   // auto sync mask config from global config
+    //   if (session.mask.syncGlobalConfig) {
+    //     console.log("[Mask] syncing from global, name = ", session.mask.name);
+    //     session.mask.modelConfig = { ...config.modelConfig };
+    //   }
+    // });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
@@ -1182,7 +1304,7 @@ function _Chat() {
       userInput.length <= 0 &&
       !(e.metaKey || e.altKey || e.ctrlKey)
     ) {
-      setUserInput(chatStore.lastInput ?? "");
+      // setUserInput(chatStore.lastInput ?? "");
       e.preventDefault();
       return;
     }
@@ -1203,11 +1325,12 @@ function _Chat() {
   };
 
   const deleteMessage = (msgId?: string) => {
-    chatStore.updateTargetSession(
-      session,
-      (session) =>
-        (session.messages = session.messages.filter((m) => m.id !== msgId)),
-    );
+    // chatStore.updateTargetSession(
+    //   session,
+    //   (session) =>
+    //     (session.messages = session.messages.filter((m) => m.id !== msgId)),
+    // );
+    chatStore.deleteMessage(msgId);
   };
 
   const onDelete = (msgId: string) => {
@@ -1221,11 +1344,9 @@ function _Chat() {
     // 3. delete original user input and bot's message
     // 4. resend the user's input
 
-    const resendingIndex = session.messages.findIndex(
-      (m) => m.id === message.id,
-    );
+    const resendingIndex = newMessage.findIndex((m) => m.id === message.id);
 
-    if (resendingIndex < 0 || resendingIndex >= session.messages.length) {
+    if (resendingIndex < 0 || resendingIndex >= newMessage?.length) {
       console.error("[Chat] failed to find resending message", message);
       return;
     }
@@ -1237,17 +1358,17 @@ function _Chat() {
       // if it is resending a bot's message, find the user input for it
       botMessage = message;
       for (let i = resendingIndex; i >= 0; i -= 1) {
-        if (session.messages[i].role === "user") {
-          userMessage = session.messages[i];
+        if (newMessage[i].role === "user") {
+          userMessage = newMessage[i];
           break;
         }
       }
     } else if (message.role === "user") {
       // if it is resending a user's input, find the bot's response
       userMessage = message;
-      for (let i = resendingIndex; i < session.messages.length; i += 1) {
-        if (session.messages[i].role === "assistant") {
-          botMessage = session.messages[i];
+      for (let i = resendingIndex; i < newMessage?.length; i += 1) {
+        if (newMessage[i].role === "assistant") {
+          botMessage = newMessage[i];
           break;
         }
       }
@@ -1283,116 +1404,12 @@ function _Chat() {
     });
   };
 
-  const appstore = useAppConfig();
-  const accessStore = useAccessStore();
-  const [speechStatus, setSpeechStatus] = useState(false);
-  const [speechLoading, setSpeechLoading] = useState(false);
-
-  async function openaiSpeech(text: string) {
-    if (speechStatus) {
-      ttsPlayer.stop();
-      setSpeechStatus(false);
-    } else {
-      var api: ClientApi;
-      api = new ClientApi(ModelProvider.GPT);
-      const config = useAppConfig.getState();
-      setSpeechLoading(true);
-      ttsPlayer.init();
-      let audioBuffer: ArrayBuffer;
-      const { markdownToTxt } = require("markdown-to-txt");
-      const textContent = markdownToTxt(text);
-      if (config.ttsConfig.engine !== DEFAULT_TTS_ENGINE) {
-        const edgeVoiceName = accessStore.edgeVoiceName();
-        const tts = new MsEdgeTTS();
-        await tts.setMetadata(
-          edgeVoiceName,
-          OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3,
-        );
-        audioBuffer = await tts.toArrayBuffer(textContent);
-      } else {
-        audioBuffer = await api.llm.speech({
-          model: config.ttsConfig.model,
-          input: textContent,
-          voice: config.ttsConfig.voice,
-          speed: config.ttsConfig.speed,
-        });
-      }
-      setSpeechStatus(true);
-      ttsPlayer
-        .play(audioBuffer, () => {
-          setSpeechStatus(false);
-        })
-        .catch((e) => {
-          console.error("[OpenAI Speech]", e);
-          showToast(prettyObject(e));
-          setSpeechStatus(false);
-        })
-        .finally(() => setSpeechLoading(false));
-    }
-  }
-
-  const context: RenderMessage[] = useMemo(() => {
-    return session.mask.hideContext ? [] : session.mask.context.slice();
-  }, [session.mask.context, session.mask.hideContext]);
-
-  if (
-    context.length === 0 &&
-    session.messages.at(0)?.content !== BOT_HELLO.content
-  ) {
-    const copiedHello = Object.assign({}, BOT_HELLO);
-    if (!accessStore.isAuthorized()) {
-      if (!isEmpty(appstore.omeToken)) {
-      } else {
-        copiedHello.content = Locale.Error.Unauthorized;
-      }
-    }
-    context.push(copiedHello);
-  }
-
-  // preview messages
-  const renderMessages = useMemo(() => {
-    return context
-      .concat(session.messages as RenderMessage[])
-      .concat(
-        isLoading
-          ? [
-              {
-                ...createMessage({
-                  role: "assistant",
-                  content: "……",
-                }),
-                preview: true,
-              },
-            ]
-          : [],
-      )
-      .concat(
-        userInput.length > 0 && config.sendPreviewBubble
-          ? [
-              {
-                ...createMessage({
-                  role: "user",
-                  content: userInput,
-                }),
-                preview: true,
-              },
-            ]
-          : [],
-      );
-  }, [
-    config.sendPreviewBubble,
-    context,
-    isLoading,
-    session.messages,
-    userInput,
-  ]);
-
   const [msgRenderIndex, _setMsgRenderIndex] = useState(
-    Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
+    Math.max(0, renderMessages?.length - CHAT_PAGE_SIZE),
   );
 
   function setMsgRenderIndex(newIndex: number) {
-    newIndex = Math.min(renderMessages.length - CHAT_PAGE_SIZE, newIndex);
+    newIndex = Math.min(renderMessages?.length - CHAT_PAGE_SIZE, newIndex);
     newIndex = Math.max(0, newIndex);
     _setMsgRenderIndex(newIndex);
   }
@@ -1400,7 +1417,7 @@ function _Chat() {
   const messages = useMemo(() => {
     const endRenderIndex = Math.min(
       msgRenderIndex + 3 * CHAT_PAGE_SIZE,
-      renderMessages.length,
+      renderMessages?.length,
     );
     return renderMessages.slice(msgRenderIndex, endRenderIndex);
   }, [msgRenderIndex, renderMessages]);
@@ -1438,169 +1455,7 @@ function _Chat() {
       ? session.clearContextIndex! + context.length - msgRenderIndex
       : -1;
 
-  const [showPromptModal, setShowPromptModal] = useState(false);
-
-  const clientConfig = useMemo(() => getClientConfig(), []);
-
-  const autoFocus = !isMobileScreen; // wont auto focus on mobile screen
-  const showMaxIcon = !isMobileScreen && !clientConfig?.isApp;
-
-  useCommand({
-    fill: setUserInput,
-    submit: (text) => {
-      doSubmit(text);
-    },
-    code: (text) => {
-      if (accessStore.disableFastLink) return;
-      console.log("[Command] got code from url: ", text);
-      showConfirm(Locale.URLCommand.Code + `code = ${text}`).then((res) => {
-        if (res) {
-          accessStore.update((access) => (access.accessCode = text));
-        }
-      });
-    },
-    settings: (text) => {
-      if (accessStore.disableFastLink) return;
-
-      try {
-        const payload = JSON.parse(text) as {
-          key?: string;
-          url?: string;
-        };
-
-        console.log("[Command] got settings from url: ", payload);
-
-        if (payload.key || payload.url) {
-          showConfirm(
-            Locale.URLCommand.Settings +
-              `\n${JSON.stringify(payload, null, 4)}`,
-          ).then((res) => {
-            if (!res) return;
-            if (payload.key) {
-              accessStore.update(
-                (access) => (access.openaiApiKey = payload.key!),
-              );
-            }
-            if (payload.url) {
-              accessStore.update((access) => (access.openaiUrl = payload.url!));
-            }
-            accessStore.update((access) => (access.useCustomConfig = true));
-          });
-        }
-      } catch {
-        console.error("[Command] failed to get settings from url: ", text);
-      }
-    },
-  });
-
-  // edit / insert message modal
-  const [isEditingMessage, setIsEditingMessage] = useState(false);
-
-  // remember unfinished input
-  useEffect(() => {
-    // try to load from local storage
-    const key = UNFINISHED_INPUT(session.id);
-    const mayBeUnfinishedInput = localStorage.getItem(key);
-    if (mayBeUnfinishedInput && userInput.length === 0) {
-      setUserInput(mayBeUnfinishedInput);
-      localStorage.removeItem(key);
-    }
-
-    const dom = inputRef.current;
-    return () => {
-      localStorage.setItem(key, dom?.value ?? "");
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handlePaste = useCallback(
-    async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const currentModel = chatStore.currentSession().mask.modelConfig.model;
-      if (!isVisionModel(currentModel)) {
-        return;
-      }
-      const items = (event.clipboardData || window.clipboardData).items;
-      for (const item of items) {
-        if (item.kind === "file" && item.type.startsWith("image/")) {
-          event.preventDefault();
-          const file = item.getAsFile();
-          if (file) {
-            const images: string[] = [];
-            images.push(...attachImages);
-            images.push(
-              ...(await new Promise<string[]>((res, rej) => {
-                setUploading(true);
-                const imagesData: string[] = [];
-                uploadImageRemote(file)
-                  .then((dataUrl) => {
-                    imagesData.push(dataUrl);
-                    setUploading(false);
-                    res(imagesData);
-                  })
-                  .catch((e) => {
-                    setUploading(false);
-                    rej(e);
-                  });
-              })),
-            );
-            const imagesLength = images.length;
-
-            if (imagesLength > 3) {
-              images.splice(3, imagesLength - 3);
-            }
-            setAttachImages(images);
-          }
-        }
-      }
-    },
-    [attachImages, chatStore],
-  );
-
-  async function uploadImage() {
-    const images: string[] = [];
-    images.push(...attachImages);
-
-    images.push(
-      ...(await new Promise<string[]>((res, rej) => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept =
-          "image/png, image/jpeg, image/webp, image/heic, image/heif";
-        fileInput.multiple = true;
-        fileInput.onchange = (event: any) => {
-          setUploading(true);
-          const files = event.target.files;
-          const imagesData: string[] = [];
-          for (let i = 0; i < files.length; i++) {
-            const file = event.target.files[i];
-            console.log("file", file);
-            uploadImageRemote(file)
-              .then((dataUrl) => {
-                imagesData.push(dataUrl);
-                if (
-                  imagesData.length === 3 ||
-                  imagesData.length === files.length
-                ) {
-                  setUploading(false);
-                  res(imagesData);
-                }
-              })
-              .catch((e) => {
-                setUploading(false);
-                rej(e);
-              });
-          }
-        };
-        fileInput.click();
-      })),
-    );
-
-    const imagesLength = images.length;
-    if (imagesLength > 3) {
-      images.splice(3, imagesLength - 3);
-    }
-    setAttachImages(images);
-  }
+  const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
   // 快捷键 shortcut keys
   const [showShortcutKeyModal, setShowShortcutKeyModal] = useState(false);
@@ -1615,7 +1470,7 @@ function _Chat() {
       ) {
         event.preventDefault();
         setTimeout(() => {
-          chatStore.newSession();
+          // chatStore.newSession();
           navigate(Path.Chat);
         }, 10);
       }
@@ -1664,14 +1519,14 @@ function _Chat() {
         event.key.toLowerCase() === "backspace"
       ) {
         event.preventDefault();
-        chatStore.updateTargetSession(session, (session) => {
-          if (session.clearContextIndex === session.messages.length) {
-            session.clearContextIndex = undefined;
-          } else {
-            session.clearContextIndex = session.messages.length;
-            session.memoryPrompt = ""; // will clear memory
-          }
-        });
+        // chatStore.updateTargetSession(session, (session) => {
+        //   if (session.clearContextIndex === session.messages.length) {
+        //     session.clearContextIndex = undefined;
+        //   } else {
+        //     session.clearContextIndex = session.messages.length;
+        //     session.memoryPrompt = ""; // will clear memory
+        //   }
+        // });
       }
     };
 
@@ -1680,9 +1535,8 @@ function _Chat() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [messages, chatStore, navigate, session]);
-
-  const [showChatSidePanel, setShowChatSidePanel] = useState(false);
+    // }, [messages, chatStore, navigate, session]);
+  }, [messages, navigate, session]);
 
   return (
     <>
@@ -1725,7 +1579,8 @@ function _Chat() {
                 title={Locale.Chat.Actions.RefreshTitle}
                 onClick={() => {
                   showToast(Locale.Chat.Actions.RefreshToast);
-                  chatStore.summarizeSession(true, session);
+                  // 需要调整
+                  // chatStore.summarizeSession(true, session);
                 }}
               />
             </div>
@@ -1771,6 +1626,7 @@ function _Chat() {
             showToast={!hitBottom}
             showModal={showPromptModal}
             setShowModal={setShowPromptModal}
+            session={session}
           />
         </div>
         <div className={styles["chat-main"]}>
@@ -1839,11 +1695,12 @@ function _Chat() {
                                         });
                                       }
                                     }
+
                                     chatStore.updateTargetSession(
                                       session,
                                       (session) => {
                                         const m = session.mask.context
-                                          .concat(session.messages)
+                                          .concat(chatStore.newMessage)
                                           .find((m) => m.id === message.id);
                                         if (m) {
                                           m.content = newContent;
@@ -1918,7 +1775,7 @@ function _Chat() {
                                           )
                                         }
                                       />
-                                      {config.ttsConfig.enable && (
+                                      {/* {config.ttsConfig.enable && (
                                         <ChatAction
                                           text={
                                             speechStatus
@@ -1938,7 +1795,7 @@ function _Chat() {
                                             )
                                           }
                                         />
-                                      )}
+                                      )} */}
                                     </>
                                   )}
                                 </div>
@@ -2039,7 +1896,9 @@ function _Chat() {
                           </div>
                         </div>
                       </div>
-                      {shouldShowClearContextDivider && <ClearContextDivider />}
+                      {shouldShowClearContextDivider && (
+                        <ClearContextDivider session={session} />
+                      )}
                     </Fragment>
                   );
                 })}
@@ -2072,6 +1931,7 @@ function _Chat() {
                 setShowShortcutKeyModal={setShowShortcutKeyModal}
                 setUserInput={setUserInput}
                 setShowChatSidePanel={setShowChatSidePanel}
+                session={session}
               />
               <label
                 className={clsx(styles["chat-input-panel-inner"], {
@@ -2150,9 +2010,6 @@ function _Chat() {
           </div>
         </div>
       </div>
-      {showExport && (
-        <ExportMessageModal onClose={() => setShowExport(false)} />
-      )}
 
       {isEditingMessage && (
         <EditMessageModal
@@ -2167,804 +2024,4 @@ function _Chat() {
       )}
     </>
   );
-}
-
-// function _NewChat() {
-//   type RenderMessage = ChatMessage & { preview?: boolean };
-
-//   const navigate = useNavigate();
-
-//   const config = useAppConfig();
-//   const fontSize = config.fontSize;
-//   const fontFamily = config.fontFamily;
-
-//   const { newSecctions, newCurrentSessionIndex, getNewMessage, newMessage } =
-//     useChatStore();
-
-//   useEffect(() => {
-//     getNewMessage();
-//   }, [newCurrentSessionIndex]);
-
-//   const session = useMemo(() => {
-//     return newSecctions[newCurrentSessionIndex] || [];
-//   }, [newSecctions, newCurrentSessionIndex]);
-
-//   const context: RenderMessage[] = useMemo(() => {
-//     return session.mask.hideContext ? [] : session.mask.context.slice();
-//   }, [session]);
-
-//   const renderMessages = useMemo(() => {
-//     return context.concat(newMessage as RenderMessage[]);
-//   }, [context, newMessage]);
-
-//   const isMobileScreen = useMobileScreen();
-
-//   // edit / insert message modal
-//   const [isEditingMessage, setIsEditingMessage] = useState(false);
-
-//   const clientConfig = useMemo(() => getClientConfig(), []);
-
-//   const showMaxIcon = !isMobileScreen && !clientConfig?.isApp;
-
-//   const [hitBottom, setHitBottom] = useState(true);
-
-//   const [showPromptModal, setShowPromptModal] = useState(false);
-
-//   const [userInput, setUserInput] = useState("");
-
-//   const scrollRef = useRef<HTMLDivElement>(null);
-
-//   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-//   const isScrolledToBottom = scrollRef?.current
-//     ? Math.abs(
-//         scrollRef.current.scrollHeight -
-//           (scrollRef.current.scrollTop + scrollRef.current.clientHeight),
-//       ) <= 1
-//     : false;
-
-//   const isAttachWithTop = useMemo(() => {
-//     const lastMessage = scrollRef.current?.lastElementChild as HTMLElement;
-//     // if scrolllRef is not ready or no message, return false
-//     if (!scrollRef?.current || !lastMessage) return false;
-//     const topDistance =
-//       lastMessage!.getBoundingClientRect().top -
-//       scrollRef.current.getBoundingClientRect().top;
-//     // leave some space for user question
-//     return topDistance < 100;
-//   }, [scrollRef?.current?.scrollHeight]);
-
-//   const isTyping = userInput !== "";
-
-//   const [msgRenderIndex, _setMsgRenderIndex] = useState(
-//     Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
-//   );
-
-//   const { setAutoScroll, scrollDomToBottom } = useScrollToBottom(
-//     scrollRef,
-//     (isScrolledToBottom || isAttachWithTop) && !isTyping,
-//     session.messages,
-//   );
-
-//   function setMsgRenderIndex(newIndex: number) {
-//     newIndex = Math.min(renderMessages.length - CHAT_PAGE_SIZE, newIndex);
-//     newIndex = Math.max(0, newIndex);
-//     _setMsgRenderIndex(newIndex);
-//   }
-
-//   const messages = useMemo(() => {
-//     const endRenderIndex = Math.min(
-//       msgRenderIndex + 3 * CHAT_PAGE_SIZE,
-//       renderMessages.length,
-//     );
-//     return renderMessages.slice(msgRenderIndex, endRenderIndex);
-//   }, [msgRenderIndex, renderMessages]);
-
-//   const onChatBodyScroll = (e: HTMLElement) => {
-//     const bottomHeight = e.scrollTop + e.clientHeight;
-//     const edgeThreshold = e.clientHeight;
-
-//     const isTouchTopEdge = e.scrollTop <= edgeThreshold;
-//     const isTouchBottomEdge = bottomHeight >= e.scrollHeight - edgeThreshold;
-//     const isHitBottom =
-//       bottomHeight >= e.scrollHeight - (isMobileScreen ? 4 : 10);
-
-//     const prevPageMsgIndex = msgRenderIndex - CHAT_PAGE_SIZE;
-//     const nextPageMsgIndex = msgRenderIndex + CHAT_PAGE_SIZE;
-
-//     if (isTouchTopEdge && !isTouchBottomEdge) {
-//       setMsgRenderIndex(prevPageMsgIndex);
-//     } else if (isTouchBottomEdge) {
-//       setMsgRenderIndex(nextPageMsgIndex);
-//     }
-
-//     setHitBottom(isHitBottom);
-//     setAutoScroll(isHitBottom);
-//   };
-
-//   // clear context index = context length + index in messages
-//   const clearContextIndex =
-//     (session.clearContextIndex ?? -1) >= 0
-//       ? session.clearContextIndex! + context.length - msgRenderIndex
-//       : -1;
-
-//   const [speechStatus, setSpeechStatus] = useState(false);
-
-//   const [promptHints, setPromptHints] = useState<RenderPrompt[]>([]);
-
-//   const [attachImages, setAttachImages] = useState<string[]>([]);
-
-//   const [uploading, setUploading] = useState(false);
-
-//   const onPromptSelect = (prompt: RenderPrompt) => {
-//     setTimeout(() => {
-//       setPromptHints([]);
-
-//       // 需要更改内置方法 --
-//       // const matchedChatCommand = chatCommands.match(prompt.content);
-//       // if (matchedChatCommand.matched) {
-//       //   // if user is selecting a chat command, just trigger it
-//       //   matchedChatCommand.invoke();
-//       //   setUserInput("");
-//       // } else {
-//       //   // or fill the prompt
-//       //   setUserInput(prompt.content);
-//       // }
-//       inputRef.current?.focus();
-//     }, 30);
-//   };
-
-//   async function uploadImage() {
-//     const images: string[] = [];
-//     images.push(...attachImages);
-
-//     images.push(
-//       ...(await new Promise<string[]>((res, rej) => {
-//         const fileInput = document.createElement("input");
-//         fileInput.type = "file";
-//         fileInput.accept =
-//           "image/png, image/jpeg, image/webp, image/heic, image/heif";
-//         fileInput.multiple = true;
-//         fileInput.onchange = (event: any) => {
-//           setUploading(true);
-//           const files = event.target.files;
-//           const imagesData: string[] = [];
-//           for (let i = 0; i < files.length; i++) {
-//             const file = event.target.files[i];
-//             console.log("file", file);
-//             uploadImageRemote(file)
-//               .then((dataUrl) => {
-//                 imagesData.push(dataUrl);
-//                 if (
-//                   imagesData.length === 3 ||
-//                   imagesData.length === files.length
-//                 ) {
-//                   setUploading(false);
-//                   res(imagesData);
-//                 }
-//               })
-//               .catch((e) => {
-//                 setUploading(false);
-//                 rej(e);
-//               });
-//           }
-//         };
-//         fileInput.click();
-//       })),
-//     );
-
-//     const imagesLength = images.length;
-//     if (imagesLength > 3) {
-//       images.splice(3, imagesLength - 3);
-//     }
-//     setAttachImages(images);
-//   }
-
-//   function scrollToBottom() {
-//     setMsgRenderIndex(renderMessages.length - CHAT_PAGE_SIZE);
-//     scrollDomToBottom();
-//   }
-
-//   const promptStore = usePromptStore();
-
-//   const onSearch = useDebouncedCallback(
-//     (text: string) => {
-//       const matchedPrompts = promptStore.search(text);
-//       setPromptHints(matchedPrompts);
-//     },
-//     100,
-//     { leading: true, trailing: true },
-//   );
-
-//   const [showShortcutKeyModal, setShowShortcutKeyModal] = useState(false);
-
-//   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
-
-//   const { submitKey, shouldSubmit } = useSubmitHandler();
-
-//   const SEARCH_TEXT_LIMIT = 30;
-//   const onInput = (text: string) => {
-//     setUserInput(text);
-//     const n = text.trim().length;
-
-//     // clear search results
-//     if (n === 0) {
-//       setPromptHints([]);
-//     } else if (text.match(ChatCommandPrefix)) {
-//       // setPromptHints(chatCommands.search(text));
-//     } else if (!config.disablePromptHint && n < SEARCH_TEXT_LIMIT) {
-//       // check if need to trigger auto completion
-//       if (text.startsWith("/")) {
-//         let searchText = text.slice(1);
-//         onSearch(searchText);
-//       }
-//     }
-//   };
-
-//   const onInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-//     // if ArrowUp and no userInput, fill with last input
-//     if (
-//       e.key === "ArrowUp" &&
-//       userInput.length <= 0 &&
-//       !(e.metaKey || e.altKey || e.ctrlKey)
-//     ) {
-//       // setUserInput(chatStore.lastInput ?? "");
-//       e.preventDefault();
-//       return;
-//     }
-//     if (shouldSubmit(e) && promptHints.length === 0) {
-//       doSubmit(userInput);
-//       e.preventDefault();
-//     }
-//   };
-
-//   const doSubmit = (userInput: string) => {
-//     if (userInput.trim() === "" && isEmpty(attachImages)) return;
-//     // const matchCommand = chatCommands.match(userInput);
-//     // if (matchCommand.matched) {
-//     //   setUserInput("");
-//     //   setPromptHints([]);
-//     //   matchCommand.invoke();
-//     //   return;
-//     // }
-//     // setIsLoading(true);
-//     // chatStore
-//     //   .onUserInput(userInput, attachImages)
-//     //   .then(() => setIsLoading(false));
-//     // setAttachImages([]);
-//     // chatStore.setLastInput(userInput);
-//     // setUserInput("");
-//     // setPromptHints([]);
-//     // if (!isMobileScreen) inputRef.current?.focus();
-//     // setAutoScroll(true);
-//   };
-
-//   const handlePaste = useCallback(
-//     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-//       // const currentModel = chatStore.currentSession().mask.modelConfig.model;
-//       // if (!isVisionModel(currentModel)) {
-//       //   return;
-//       // }
-//       // const items = (event.clipboardData || window.clipboardData).items;
-//       // for (const item of items) {
-//       //   if (item.kind === "file" && item.type.startsWith("image/")) {
-//       //     event.preventDefault();
-//       //     const file = item.getAsFile();
-//       //     if (file) {
-//       //       const images: string[] = [];
-//       //       images.push(...attachImages);
-//       //       images.push(
-//       //         ...(await new Promise<string[]>((res, rej) => {
-//       //           setUploading(true);
-//       //           const imagesData: string[] = [];
-//       //           uploadImageRemote(file)
-//       //             .then((dataUrl) => {
-//       //               imagesData.push(dataUrl);
-//       //               setUploading(false);
-//       //               res(imagesData);
-//       //             })
-//       //             .catch((e) => {
-//       //               setUploading(false);
-//       //               rej(e);
-//       //             });
-//       //         })),
-//       //       );
-//       //       const imagesLength = images.length;
-//       //       if (imagesLength > 3) {
-//       //         images.splice(3, imagesLength - 3);
-//       //       }
-//       //       setAttachImages(images);
-//       //     }
-//       //   }
-//       // }
-//     },
-//     // [attachImages, chatStore],
-//     [attachImages],
-//   );
-
-//   const [inputRows, setInputRows] = useState(2);
-
-//   const autoFocus = !isMobileScreen; // wont auto focus on mobile screen
-
-//   return (
-//     <>
-//       <div className={styles.chat} key={session.id}>
-//         <div className="window-header" data-tauri-drag-region>
-//           {isMobileScreen && (
-//             <div className="window-actions">
-//               <div className={"window-action-button"}>
-//                 <IconButton
-//                   icon={<ReturnIcon />}
-//                   bordered
-//                   title={Locale.Chat.Actions.ChatList}
-//                   onClick={() => navigate(Path.Home)}
-//                 />
-//               </div>
-//             </div>
-//           )}
-
-//           <div
-//             className={clsx("window-header-title", styles["chat-body-title"])}
-//           >
-//             <div
-//               className={clsx(
-//                 "window-header-main-title",
-//                 styles["chat-body-main-title"],
-//               )}
-//               onClickCapture={() => setIsEditingMessage(true)}
-//             >
-//               {!session.topic ? DEFAULT_TOPIC : session.topic}
-//             </div>
-//             <div className="window-header-sub-title">
-//               {Locale.Chat.SubTitle(session.messages.length)}
-//             </div>
-//           </div>
-//           <div className="window-actions">
-//             <div className="window-action-button">
-//               <IconButton
-//                 icon={<ReloadIcon />}
-//                 bordered
-//                 title={Locale.Chat.Actions.RefreshTitle}
-//                 onClick={() => {
-//                   showToast(Locale.Chat.Actions.RefreshToast);
-//                   // chatStore.summarizeSession(true, session);
-//                 }}
-//               />
-//             </div>
-//             {!isMobileScreen && (
-//               <div className="window-action-button">
-//                 <IconButton
-//                   icon={<RenameIcon />}
-//                   bordered
-//                   title={Locale.Chat.EditMessage.Title}
-//                   aria={Locale.Chat.EditMessage.Title}
-//                   onClick={() => setIsEditingMessage(true)}
-//                 />
-//               </div>
-//             )}
-//             {/* <div className="window-action-button">
-//               <IconButton
-//                 icon={<ExportIcon />}
-//                 bordered
-//                 title={Locale.Chat.Actions.Export}
-//                 onClick={() => {
-//                   setShowExport(true);
-//                 }}
-//               />
-//             </div> */}
-//             {showMaxIcon && (
-//               <div className="window-action-button">
-//                 <IconButton
-//                   icon={config.tightBorder ? <MinIcon /> : <MaxIcon />}
-//                   bordered
-//                   title={Locale.Chat.Actions.FullScreen}
-//                   aria={Locale.Chat.Actions.FullScreen}
-//                   onClick={() => {
-//                     config.update(
-//                       (config) => (config.tightBorder = !config.tightBorder),
-//                     );
-//                   }}
-//                 />
-//               </div>
-//             )}
-//           </div>
-
-//           <PromptToast
-//             showToast={!hitBottom}
-//             showModal={showPromptModal}
-//             setShowModal={setShowPromptModal}
-//           />
-//         </div>
-//         <div className={styles["chat-main"]}>
-//           <div className={styles["chat-body-container"]}>
-//             <div
-//               className={styles["chat-body"]}
-//               ref={scrollRef}
-//               onScroll={(e) => onChatBodyScroll(e.currentTarget)}
-//               onMouseDown={() => inputRef.current?.blur()}
-//               onTouchStart={() => {
-//                 inputRef.current?.blur();
-//                 setAutoScroll(false);
-//               }}
-//             >
-//               {messages
-//                 // TODO
-//                 // .filter((m) => !m.isMcpResponse)
-//                 .map((message, i) => {
-//                   const isUser = message.role === "user";
-//                   const isContext = i < context.length;
-//                   const showActions =
-//                     i > 0 &&
-//                     !(message.preview || message.content.length === 0) &&
-//                     !isContext;
-//                   const showTyping = message.preview || message.streaming;
-
-//                   const shouldShowClearContextDivider =
-//                     i === clearContextIndex - 1;
-
-//                   return (
-//                     <Fragment key={message.id}>
-//                       <div
-//                         className={
-//                           isUser
-//                             ? styles["chat-message-user"]
-//                             : styles["chat-message"]
-//                         }
-//                       >
-//                         <div className={styles["chat-message-container"]}>
-//                           <div className={styles["chat-message-header"]}>
-//                             <div className={styles["chat-message-avatar"]}>
-//                               <div className={styles["chat-message-edit"]}>
-//                                 <IconButton
-//                                   icon={<EditIcon />}
-//                                   aria={Locale.Chat.Actions.Edit}
-//                                   onClick={async () => {
-//                                     const newMessage = await showPrompt(
-//                                       Locale.Chat.Actions.Edit,
-//                                       getMessageTextContent(message),
-//                                       10,
-//                                     );
-//                                     let newContent:
-//                                       | string
-//                                       | MultimodalContent[] = newMessage;
-//                                     const images = getMessageImages(message);
-//                                     if (images.length > 0) {
-//                                       newContent = [
-//                                         { type: "text", text: newMessage },
-//                                       ];
-//                                       for (let i = 0; i < images.length; i++) {
-//                                         newContent.push({
-//                                           type: "image_url",
-//                                           image_url: {
-//                                             url: images[i],
-//                                           },
-//                                         });
-//                                       }
-//                                     }
-//                                     // chatStore.updateTargetSession(
-//                                     //   session,
-//                                     //   (session) => {
-//                                     //     const m = session.mask.context
-//                                     //       .concat(session.messages)
-//                                     //       .find((m) => m.id === message.id);
-//                                     //     if (m) {
-//                                     //       m.content = newContent;
-//                                     //     }
-//                                     //   },
-//                                     // );
-//                                   }}
-//                                 ></IconButton>
-//                               </div>
-//                               {isUser ? (
-//                                 <Avatar avatar={config.avatar} />
-//                               ) : (
-//                                 <>
-//                                   {["system"].includes(message.role) ? (
-//                                     <Avatar avatar="2699-fe0f" />
-//                                   ) : (
-//                                     <MaskAvatar
-//                                       avatar={session.mask.avatar}
-//                                       model={
-//                                         message.model ||
-//                                         session.mask.modelConfig.model
-//                                       }
-//                                     />
-//                                   )}
-//                                 </>
-//                               )}
-//                             </div>
-//                             {!isUser && (
-//                               <div className={styles["chat-model-name"]}>
-//                                 {message.model}
-//                               </div>
-//                             )}
-
-//                             {showActions && (
-//                               <div className={styles["chat-message-actions"]}>
-//                                 <div className={styles["chat-input-actions"]}>
-//                                   {message.streaming ? (
-//                                     <ChatAction
-//                                       text={Locale.Chat.Actions.Stop}
-//                                       icon={<StopIcon />}
-//                                       onClick={
-//                                         () => {}
-//                                         // onUserStop(message.id ?? i)
-//                                       }
-//                                     />
-//                                   ) : (
-//                                     <>
-//                                       <ChatAction
-//                                         text={Locale.Chat.Actions.Retry}
-//                                         icon={<ResetIcon />}
-//                                         // onClick={() => onResend(message)}
-//                                         onClick={() => {}}
-//                                       />
-
-//                                       <ChatAction
-//                                         text={Locale.Chat.Actions.Delete}
-//                                         icon={<DeleteIcon />}
-//                                         // onClick={() =>
-//                                         //   onDelete(message.id ?? i)
-//                                         // }
-//                                         onClick={() => {}}
-//                                       />
-
-//                                       <ChatAction
-//                                         text={Locale.Chat.Actions.Pin}
-//                                         icon={<PinIcon />}
-//                                         // onClick={() => onPinMessage(message)}
-//                                         onClick={() => {}}
-//                                       />
-//                                       <ChatAction
-//                                         text={Locale.Chat.Actions.Copy}
-//                                         icon={<CopyIcon />}
-//                                         onClick={() =>
-//                                           copyToClipboard(
-//                                             getMessageTextContent(message),
-//                                           )
-//                                         }
-//                                       />
-//                                       {config.ttsConfig.enable && (
-//                                         <ChatAction
-//                                           text={
-//                                             speechStatus
-//                                               ? Locale.Chat.Actions.StopSpeech
-//                                               : Locale.Chat.Actions.Speech
-//                                           }
-//                                           icon={
-//                                             speechStatus ? (
-//                                               <SpeakStopIcon />
-//                                             ) : (
-//                                               <SpeakIcon />
-//                                             )
-//                                           }
-//                                           onClick={
-//                                             () => {}
-//                                             // openaiSpeech(
-//                                             //   getMessageTextContent(message),
-//                                             // )
-//                                           }
-//                                         />
-//                                       )}
-//                                     </>
-//                                   )}
-//                                 </div>
-//                               </div>
-//                             )}
-//                           </div>
-//                           {message?.tools?.length == 0 && showTyping && (
-//                             <div className={styles["chat-message-status"]}>
-//                               {Locale.Chat.Typing}
-//                             </div>
-//                           )}
-//                           {/*@ts-ignore*/}
-//                           {message?.tools?.length > 0 && (
-//                             <div className={styles["chat-message-tools"]}>
-//                               {message?.tools?.map((tool) => (
-//                                 <div
-//                                   key={tool.id}
-//                                   title={tool?.errorMsg}
-//                                   className={styles["chat-message-tool"]}
-//                                 >
-//                                   {tool.isError === false ? (
-//                                     <ConfirmIcon />
-//                                   ) : tool.isError === true ? (
-//                                     <CloseIcon />
-//                                   ) : (
-//                                     <LoadingButtonIcon />
-//                                   )}
-//                                   <span>{tool?.function?.name}</span>
-//                                 </div>
-//                               ))}
-//                             </div>
-//                           )}
-//                           <div className={styles["chat-message-item"]}>
-//                             <Markdown
-//                               key={message.streaming ? "loading" : "done"}
-//                               content={getMessageTextContent(message)}
-//                               loading={
-//                                 (message.preview || message.streaming) &&
-//                                 message.content.length === 0 &&
-//                                 !isUser
-//                               }
-//                               //   onContextMenu={(e) => onRightClick(e, message)} // hard to use
-//                               onDoubleClickCapture={() => {
-//                                 if (!isMobileScreen) return;
-//                                 setUserInput(getMessageTextContent(message));
-//                               }}
-//                               fontSize={fontSize}
-//                               fontFamily={fontFamily}
-//                               parentRef={scrollRef}
-//                               defaultShow={i >= messages.length - 6}
-//                             />
-//                             {getMessageImages(message).length == 1 && (
-//                               <img
-//                                 className={styles["chat-message-item-image"]}
-//                                 src={getMessageImages(message)[0]}
-//                                 alt=""
-//                               />
-//                             )}
-//                             {getMessageImages(message).length > 1 && (
-//                               <div
-//                                 className={styles["chat-message-item-images"]}
-//                                 style={
-//                                   {
-//                                     "--image-count":
-//                                       getMessageImages(message).length,
-//                                   } as React.CSSProperties
-//                                 }
-//                               >
-//                                 {getMessageImages(message).map(
-//                                   (image, index) => {
-//                                     return (
-//                                       <img
-//                                         className={
-//                                           styles[
-//                                             "chat-message-item-image-multi"
-//                                           ]
-//                                         }
-//                                         key={index}
-//                                         src={image}
-//                                         alt=""
-//                                       />
-//                                     );
-//                                   },
-//                                 )}
-//                               </div>
-//                             )}
-//                           </div>
-//                           {message?.audio_url && (
-//                             <div className={styles["chat-message-audio"]}>
-//                               <audio src={message.audio_url} controls />
-//                             </div>
-//                           )}
-
-//                           <div className={styles["chat-message-action-date"]}>
-//                             {isContext
-//                               ? Locale.Chat.IsContext
-//                               : message.date.toLocaleString()}
-//                           </div>
-//                         </div>
-//                       </div>
-//                       {shouldShowClearContextDivider && <ClearContextDivider />}
-//                     </Fragment>
-//                   );
-//                 })}
-//             </div>
-//             <div className={styles["chat-input-panel"]}>
-//               <PromptHints
-//                 prompts={promptHints}
-//                 onPromptSelect={onPromptSelect}
-//               />
-
-//               <ChatActions
-//                 uploadImage={uploadImage}
-//                 setAttachImages={setAttachImages}
-//                 setUploading={setUploading}
-//                 showPromptModal={() => setShowPromptModal(true)}
-//                 scrollToBottom={scrollToBottom}
-//                 hitBottom={hitBottom}
-//                 uploading={uploading}
-//                 showPromptHints={() => {
-//                   // Click again to close
-//                   if (promptHints.length > 0) {
-//                     setPromptHints([]);
-//                     return;
-//                   }
-
-//                   inputRef.current?.focus();
-//                   setUserInput("/");
-//                   onSearch("");
-//                 }}
-//                 setShowShortcutKeyModal={setShowShortcutKeyModal}
-//                 setUserInput={setUserInput}
-//                 setShowChatSidePanel={setShowChatSidePanel}
-//               />
-//               <label
-//                 className={clsx(styles["chat-input-panel-inner"], {
-//                   [styles["chat-input-panel-inner-attach"]]:
-//                     attachImages.length !== 0,
-//                 })}
-//                 htmlFor="chat-input"
-//               >
-//                 <textarea
-//                   id="chat-input"
-//                   ref={inputRef}
-//                   className={styles["chat-input"]}
-//                   placeholder={Locale.Chat.Input(submitKey)}
-//                   onInput={(e) => onInput(e.currentTarget.value)}
-//                   value={userInput}
-//                   onKeyDown={onInputKeyDown}
-//                   onFocus={scrollToBottom}
-//                   onClick={scrollToBottom}
-//                   onPaste={handlePaste}
-//                   rows={inputRows}
-//                   autoFocus={autoFocus}
-//                   style={{
-//                     fontSize: config.fontSize,
-//                     fontFamily: config.fontFamily,
-//                   }}
-//                 />
-//                 {attachImages.length != 0 && (
-//                   <div className={styles["attach-images"]}>
-//                     {attachImages.map((image, index) => {
-//                       return (
-//                         <div
-//                           key={index}
-//                           className={styles["attach-image"]}
-//                           style={{ backgroundImage: `url("${image}")` }}
-//                         >
-//                           <div className={styles["attach-image-mask"]}>
-//                             <DeleteImageButton
-//                               deleteImage={() => {
-//                                 setAttachImages(
-//                                   attachImages.filter((_, i) => i !== index),
-//                                 );
-//                               }}
-//                             />
-//                           </div>
-//                         </div>
-//                       );
-//                     })}
-//                   </div>
-//                 )}
-//                 <IconButton
-//                   icon={<SendWhiteIcon />}
-//                   text={Locale.Chat.Send}
-//                   className={styles["chat-input-send"]}
-//                   type="primary"
-//                   onClick={() => doSubmit(userInput)}
-//                 />
-//               </label>
-//             </div>
-//           </div>
-//           <div
-//             className={clsx(styles["chat-side-panel"], {
-//               [styles["mobile"]]: isMobileScreen,
-//               [styles["chat-side-panel-show"]]: showChatSidePanel,
-//             })}
-//           >
-//             {showChatSidePanel && (
-//               <RealtimeChat
-//                 onClose={() => {
-//                   setShowChatSidePanel(false);
-//                 }}
-//                 onStartVoice={async () => {
-//                   console.log("start voice");
-//                 }}
-//               />
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-
-export function Chat() {
-  // const chatStore = useChatStore();
-  // const session = chatStore.currentSession();
-  // return <_Chat key={session.id}></_Chat>;
-
-  return <_NewChat key={""}></_NewChat>;
 }
