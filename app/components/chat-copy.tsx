@@ -1,3 +1,25 @@
+// import { useEffect, useState } from "react";
+// import { newChatStore } from "../store/new-chat";
+
+// export function _Chat_NEW() {
+//   const { message, currentSessionIndex, getCurrentMessage, getCurrentSession } =
+//     newChatStore();
+
+//   const session = getCurrentSession(currentSessionIndex);
+
+//   const [loading, setLoading] = useState<boolean>(false);
+
+//   useEffect(() => {
+//     getCurrentMessage(currentSessionIndex);
+//   }, [currentSessionIndex]);
+
+//   if (!session) {
+//     return <></>;
+//   }
+
+//   return <></>;
+// }
+
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   Fragment,
@@ -103,9 +125,7 @@ import {
   DEFAULT_TTS_ENGINE,
   ModelProvider,
   Path,
-  REQUEST_TIMEOUT_MS,
   ServiceProvider,
-  UNFINISHED_INPUT,
 } from "../constant";
 import { Avatar } from "./emoji";
 import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
@@ -125,7 +145,6 @@ import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
 import { newChatStore } from "../store/new-chat";
-import { _Chat_NEW } from "./chat-copy";
 
 const localStorage = safeLocalStorage();
 
@@ -987,11 +1006,20 @@ export function ShortcutKeyModal(props: { onClose: () => void }) {
   );
 }
 
-function _Chat() {
+export function _Chat_NEW() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  const { message, currentSessionIndex, getCurrentMessage, getCurrentSession } =
+    newChatStore();
+
+  const session = getCurrentSession(currentSessionIndex);
+
+  useEffect(() => {
+    getCurrentMessage(currentSessionIndex);
+  }, [currentSessionIndex]);
+
+  // const chatStore = useChatStore();
+  // const session = chatStore.currentSession();
   const config = useAppConfig();
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
@@ -1027,7 +1055,7 @@ function _Chat() {
   const { setAutoScroll, scrollDomToBottom } = useScrollToBottom(
     scrollRef,
     (isScrolledToBottom || isAttachWithTop) && !isTyping,
-    session.messages,
+    message,
   );
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
@@ -1070,17 +1098,17 @@ function _Chat() {
 
   // chat commands shortcuts
   const chatCommands = useChatCommand({
-    new: () => chatStore.newSession(),
-    newm: () => navigate(Path.NewChat),
-    prev: () => chatStore.nextSession(-1),
-    next: () => chatStore.nextSession(1),
-    clear: () =>
-      chatStore.updateTargetSession(
-        session,
-        (session) => (session.clearContextIndex = session.messages.length),
-      ),
-    fork: () => chatStore.forkSession(),
-    del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
+    // new: () => chatStore.newSession(),
+    // newm: () => navigate(Path.NewChat),
+    // prev: () => chatStore.nextSession(-1),
+    // next: () => chatStore.nextSession(1),
+    // clear: () =>
+    //   chatStore.updateTargetSession(
+    //     session,
+    //     (session) => (session.clearContextIndex = session.messages.length),
+    //   ),
+    // fork: () => chatStore.forkSession(),
+    // del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
   });
 
   // only search prompts when user input is short
@@ -1113,11 +1141,11 @@ function _Chat() {
       return;
     }
     setIsLoading(true);
-    chatStore
-      .onUserInput(userInput, attachImages)
-      .then(() => setIsLoading(false));
+    // chatStore
+    //   .onUserInput(userInput, attachImages)
+    //   .then(() => setIsLoading(false));
     setAttachImages([]);
-    chatStore.setLastInput(userInput);
+    // chatStore.setLastInput(userInput);
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
@@ -1143,35 +1171,33 @@ function _Chat() {
 
   // stop response
   const onUserStop = (messageId: string) => {
-    ChatControllerPool.stop(session.id, messageId);
+    if (session) ChatControllerPool.stop(session.id, messageId);
   };
 
   useEffect(() => {
-    chatStore.updateTargetSession(session, (session) => {
-      const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
-      session.messages.forEach((m) => {
-        // check if should stop all stale messages
-        if (m.isError || new Date(m.date).getTime() < stopTiming) {
-          if (m.streaming) {
-            m.streaming = false;
-          }
-
-          if (m.content.length === 0) {
-            m.isError = true;
-            m.content = prettyObject({
-              error: true,
-              message: "empty response",
-            });
-          }
-        }
-      });
-
-      // auto sync mask config from global config
-      if (session.mask.syncGlobalConfig) {
-        console.log("[Mask] syncing from global, name = ", session.mask.name);
-        session.mask.modelConfig = { ...config.modelConfig };
-      }
-    });
+    // chatStore.updateTargetSession(session, (session) => {
+    //   const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
+    //   session.messages.forEach((m) => {
+    //     // check if should stop all stale messages
+    //     if (m.isError || new Date(m.date).getTime() < stopTiming) {
+    //       if (m.streaming) {
+    //         m.streaming = false;
+    //       }
+    //       if (m.content.length === 0) {
+    //         m.isError = true;
+    //         m.content = prettyObject({
+    //           error: true,
+    //           message: "empty response",
+    //         });
+    //       }
+    //     }
+    //   });
+    //   // auto sync mask config from global config
+    //   if (session.mask.syncGlobalConfig) {
+    //     console.log("[Mask] syncing from global, name = ", session.mask.name);
+    //     session.mask.modelConfig = { ...config.modelConfig };
+    //   }
+    // });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
@@ -1183,7 +1209,7 @@ function _Chat() {
       userInput.length <= 0 &&
       !(e.metaKey || e.altKey || e.ctrlKey)
     ) {
-      setUserInput(chatStore.lastInput ?? "");
+      // setUserInput(chatStore.lastInput ?? "");
       e.preventDefault();
       return;
     }
@@ -1204,11 +1230,11 @@ function _Chat() {
   };
 
   const deleteMessage = (msgId?: string) => {
-    chatStore.updateTargetSession(
-      session,
-      (session) =>
-        (session.messages = session.messages.filter((m) => m.id !== msgId)),
-    );
+    // chatStore.updateTargetSession(
+    //   session,
+    //   (session) =>
+    //     (session.messages = session.messages.filter((m) => m.id !== msgId)),
+    // );
   };
 
   const onDelete = (msgId: string) => {
@@ -1221,60 +1247,53 @@ function _Chat() {
     // 2. for a bot's message, find the last user's input
     // 3. delete original user input and bot's message
     // 4. resend the user's input
-
-    const resendingIndex = session.messages.findIndex(
-      (m) => m.id === message.id,
-    );
-
-    if (resendingIndex < 0 || resendingIndex >= session.messages.length) {
-      console.error("[Chat] failed to find resending message", message);
-      return;
-    }
-
-    let userMessage: ChatMessage | undefined;
-    let botMessage: ChatMessage | undefined;
-
-    if (message.role === "assistant") {
-      // if it is resending a bot's message, find the user input for it
-      botMessage = message;
-      for (let i = resendingIndex; i >= 0; i -= 1) {
-        if (session.messages[i].role === "user") {
-          userMessage = session.messages[i];
-          break;
-        }
-      }
-    } else if (message.role === "user") {
-      // if it is resending a user's input, find the bot's response
-      userMessage = message;
-      for (let i = resendingIndex; i < session.messages.length; i += 1) {
-        if (session.messages[i].role === "assistant") {
-          botMessage = session.messages[i];
-          break;
-        }
-      }
-    }
-
-    if (userMessage === undefined) {
-      console.error("[Chat] failed to resend", message);
-      return;
-    }
-
-    // delete the original messages
-    deleteMessage(userMessage.id);
-    deleteMessage(botMessage?.id);
-
-    // resend the message
-    setIsLoading(true);
-    const textContent = getMessageTextContent(userMessage);
-    const images = getMessageImages(userMessage);
-    chatStore.onUserInput(textContent, images).then(() => setIsLoading(false));
-    inputRef.current?.focus();
+    // const resendingIndex = session.messages.findIndex(
+    //   (m) => m.id === message.id,
+    // );
+    // if (resendingIndex < 0 || resendingIndex >= session.messages.length) {
+    //   console.error("[Chat] failed to find resending message", message);
+    //   return;
+    // }
+    // let userMessage: ChatMessage | undefined;
+    // let botMessage: ChatMessage | undefined;
+    // if (message.role === "assistant") {
+    //   // if it is resending a bot's message, find the user input for it
+    //   botMessage = message;
+    //   for (let i = resendingIndex; i >= 0; i -= 1) {
+    //     if (session.messages[i].role === "user") {
+    //       userMessage = session.messages[i];
+    //       break;
+    //     }
+    //   }
+    // } else if (message.role === "user") {
+    //   // if it is resending a user's input, find the bot's response
+    //   userMessage = message;
+    //   for (let i = resendingIndex; i < session.messages.length; i += 1) {
+    //     if (session.messages[i].role === "assistant") {
+    //       botMessage = session.messages[i];
+    //       break;
+    //     }
+    //   }
+    // }
+    // if (userMessage === undefined) {
+    //   console.error("[Chat] failed to resend", message);
+    //   return;
+    // }
+    // // delete the original messages
+    // deleteMessage(userMessage.id);
+    // deleteMessage(botMessage?.id);
+    // // resend the message
+    // setIsLoading(true);
+    // const textContent = getMessageTextContent(userMessage);
+    // const images = getMessageImages(userMessage);
+    // chatStore.onUserInput(textContent, images).then(() => setIsLoading(false));
+    // inputRef.current?.focus();
   };
 
   const onPinMessage = (message: ChatMessage) => {
-    chatStore.updateTargetSession(session, (session) =>
-      session.mask.context.push(message),
-    );
+    // chatStore.updateTargetSession(session, (session) =>
+    //   session.mask.context.push(message),
+    // );
 
     showToast(Locale.Chat.Actions.PinToastContent, {
       text: Locale.Chat.Actions.PinToastAction,
@@ -1333,13 +1352,12 @@ function _Chat() {
   }
 
   const context: RenderMessage[] = useMemo(() => {
-    return session.mask.hideContext ? [] : session.mask.context.slice();
-  }, [session.mask.context, session.mask.hideContext]);
+    return (
+      (session?.mask?.hideContext ? [] : session?.mask?.context?.slice()) || []
+    );
+  }, [session?.mask?.context, session?.mask?.hideContext]);
 
-  if (
-    context.length === 0 &&
-    session.messages.at(0)?.content !== BOT_HELLO.content
-  ) {
+  if (context.length === 0 && message.at(0)?.content !== BOT_HELLO.content) {
     const copiedHello = Object.assign({}, BOT_HELLO);
     if (!accessStore.isAuthorized()) {
       if (!isEmpty(appstore.omeToken)) {
@@ -1353,7 +1371,7 @@ function _Chat() {
   // preview messages
   const renderMessages = useMemo(() => {
     return context
-      .concat(session.messages as RenderMessage[])
+      .concat(message as RenderMessage[])
       .concat(
         isLoading
           ? [
@@ -1380,13 +1398,7 @@ function _Chat() {
             ]
           : [],
       );
-  }, [
-    config.sendPreviewBubble,
-    context,
-    isLoading,
-    session.messages,
-    userInput,
-  ]);
+  }, [config.sendPreviewBubble, context, isLoading, message, userInput]);
 
   const [msgRenderIndex, _setMsgRenderIndex] = useState(
     Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
@@ -1435,8 +1447,8 @@ function _Chat() {
 
   // clear context index = context length + index in messages
   const clearContextIndex =
-    (session.clearContextIndex ?? -1) >= 0
-      ? session.clearContextIndex! + context.length - msgRenderIndex
+    (session?.clearContextIndex ?? -1) >= 0
+      ? session?.clearContextIndex! + context.length - msgRenderIndex
       : -1;
 
   const [showPromptModal, setShowPromptModal] = useState(false);
@@ -1499,62 +1511,61 @@ function _Chat() {
 
   // remember unfinished input
   useEffect(() => {
-    // try to load from local storage
-    const key = UNFINISHED_INPUT(session.id);
-    const mayBeUnfinishedInput = localStorage.getItem(key);
-    if (mayBeUnfinishedInput && userInput.length === 0) {
-      setUserInput(mayBeUnfinishedInput);
-      localStorage.removeItem(key);
-    }
-
-    const dom = inputRef.current;
-    return () => {
-      localStorage.setItem(key, dom?.value ?? "");
-    };
+    // // try to load from local storage
+    // const key = UNFINISHED_INPUT(session.id);
+    // const mayBeUnfinishedInput = localStorage.getItem(key);
+    // if (mayBeUnfinishedInput && userInput.length === 0) {
+    //   setUserInput(mayBeUnfinishedInput);
+    //   localStorage.removeItem(key);
+    // }
+    // const dom = inputRef.current;
+    // return () => {
+    //   localStorage.setItem(key, dom?.value ?? "");
+    // };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const currentModel = chatStore.currentSession().mask.modelConfig.model;
-      if (!isVisionModel(currentModel)) {
-        return;
-      }
-      const items = (event.clipboardData || window.clipboardData).items;
-      for (const item of items) {
-        if (item.kind === "file" && item.type.startsWith("image/")) {
-          event.preventDefault();
-          const file = item.getAsFile();
-          if (file) {
-            const images: string[] = [];
-            images.push(...attachImages);
-            images.push(
-              ...(await new Promise<string[]>((res, rej) => {
-                setUploading(true);
-                const imagesData: string[] = [];
-                uploadImageRemote(file)
-                  .then((dataUrl) => {
-                    imagesData.push(dataUrl);
-                    setUploading(false);
-                    res(imagesData);
-                  })
-                  .catch((e) => {
-                    setUploading(false);
-                    rej(e);
-                  });
-              })),
-            );
-            const imagesLength = images.length;
-
-            if (imagesLength > 3) {
-              images.splice(3, imagesLength - 3);
-            }
-            setAttachImages(images);
-          }
-        }
-      }
+      // const currentModel = chatStore.currentSession().mask.modelConfig.model;
+      // if (!isVisionModel(currentModel)) {
+      //   return;
+      // }
+      // const items = (event.clipboardData || window.clipboardData).items;
+      // for (const item of items) {
+      //   if (item.kind === "file" && item.type.startsWith("image/")) {
+      //     event.preventDefault();
+      //     const file = item.getAsFile();
+      //     if (file) {
+      //       const images: string[] = [];
+      //       images.push(...attachImages);
+      //       images.push(
+      //         ...(await new Promise<string[]>((res, rej) => {
+      //           setUploading(true);
+      //           const imagesData: string[] = [];
+      //           uploadImageRemote(file)
+      //             .then((dataUrl) => {
+      //               imagesData.push(dataUrl);
+      //               setUploading(false);
+      //               res(imagesData);
+      //             })
+      //             .catch((e) => {
+      //               setUploading(false);
+      //               rej(e);
+      //             });
+      //         })),
+      //       );
+      //       const imagesLength = images.length;
+      //       if (imagesLength > 3) {
+      //         images.splice(3, imagesLength - 3);
+      //       }
+      //       setAttachImages(images);
+      //     }
+      //   }
+      // }
     },
-    [attachImages, chatStore],
+    // [attachImages, chatStore],
+    [attachImages],
   );
 
   async function uploadImage() {
@@ -1607,83 +1618,86 @@ function _Chat() {
   const [showShortcutKeyModal, setShowShortcutKeyModal] = useState(false);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // 打开新聊天 command + shift + o
-      if (
-        (event.metaKey || event.ctrlKey) &&
-        event.shiftKey &&
-        event.key.toLowerCase() === "o"
-      ) {
-        event.preventDefault();
-        setTimeout(() => {
-          chatStore.newSession();
-          navigate(Path.Chat);
-        }, 10);
-      }
-      // 聚焦聊天输入 shift + esc
-      else if (event.shiftKey && event.key.toLowerCase() === "escape") {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-      // 复制最后一个代码块 command + shift + ;
-      else if (
-        (event.metaKey || event.ctrlKey) &&
-        event.shiftKey &&
-        event.code === "Semicolon"
-      ) {
-        event.preventDefault();
-        const copyCodeButton =
-          document.querySelectorAll<HTMLElement>(".copy-code-button");
-        if (copyCodeButton.length > 0) {
-          copyCodeButton[copyCodeButton.length - 1].click();
-        }
-      }
-      // 复制最后一个回复 command + shift + c
-      else if (
-        (event.metaKey || event.ctrlKey) &&
-        event.shiftKey &&
-        event.key.toLowerCase() === "c"
-      ) {
-        event.preventDefault();
-        const lastNonUserMessage = messages
-          .filter((message) => message.role !== "user")
-          .pop();
-        if (lastNonUserMessage) {
-          const lastMessageContent = getMessageTextContent(lastNonUserMessage);
-          copyToClipboard(lastMessageContent);
-        }
-      }
-      // 展示快捷键 command + /
-      else if ((event.metaKey || event.ctrlKey) && event.key === "/") {
-        event.preventDefault();
-        setShowShortcutKeyModal(true);
-      }
-      // 清除上下文 command + shift + backspace
-      else if (
-        (event.metaKey || event.ctrlKey) &&
-        event.shiftKey &&
-        event.key.toLowerCase() === "backspace"
-      ) {
-        event.preventDefault();
-        chatStore.updateTargetSession(session, (session) => {
-          if (session.clearContextIndex === session.messages.length) {
-            session.clearContextIndex = undefined;
-          } else {
-            session.clearContextIndex = session.messages.length;
-            session.memoryPrompt = ""; // will clear memory
-          }
-        });
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [messages, chatStore, navigate, session]);
+    // const handleKeyDown = (event: KeyboardEvent) => {
+    //   // 打开新聊天 command + shift + o
+    //   if (
+    //     (event.metaKey || event.ctrlKey) &&
+    //     event.shiftKey &&
+    //     event.key.toLowerCase() === "o"
+    //   ) {
+    //     event.preventDefault();
+    //     setTimeout(() => {
+    //       chatStore.newSession();
+    //       navigate(Path.Chat);
+    //     }, 10);
+    //   }
+    //   // 聚焦聊天输入 shift + esc
+    //   else if (event.shiftKey && event.key.toLowerCase() === "escape") {
+    //     event.preventDefault();
+    //     inputRef.current?.focus();
+    //   }
+    //   // 复制最后一个代码块 command + shift + ;
+    //   else if (
+    //     (event.metaKey || event.ctrlKey) &&
+    //     event.shiftKey &&
+    //     event.code === "Semicolon"
+    //   ) {
+    //     event.preventDefault();
+    //     const copyCodeButton =
+    //       document.querySelectorAll<HTMLElement>(".copy-code-button");
+    //     if (copyCodeButton.length > 0) {
+    //       copyCodeButton[copyCodeButton.length - 1].click();
+    //     }
+    //   }
+    //   // 复制最后一个回复 command + shift + c
+    //   else if (
+    //     (event.metaKey || event.ctrlKey) &&
+    //     event.shiftKey &&
+    //     event.key.toLowerCase() === "c"
+    //   ) {
+    //     event.preventDefault();
+    //     const lastNonUserMessage = messages
+    //       .filter((message) => message.role !== "user")
+    //       .pop();
+    //     if (lastNonUserMessage) {
+    //       const lastMessageContent = getMessageTextContent(lastNonUserMessage);
+    //       copyToClipboard(lastMessageContent);
+    //     }
+    //   }
+    //   // 展示快捷键 command + /
+    //   else if ((event.metaKey || event.ctrlKey) && event.key === "/") {
+    //     event.preventDefault();
+    //     setShowShortcutKeyModal(true);
+    //   }
+    //   // 清除上下文 command + shift + backspace
+    //   else if (
+    //     (event.metaKey || event.ctrlKey) &&
+    //     event.shiftKey &&
+    //     event.key.toLowerCase() === "backspace"
+    //   ) {
+    //     event.preventDefault();
+    //     chatStore.updateTargetSession(session, (session) => {
+    //       if (session.clearContextIndex === session.messages.length) {
+    //         session.clearContextIndex = undefined;
+    //       } else {
+    //         session.clearContextIndex = session.messages.length;
+    //         session.memoryPrompt = ""; // will clear memory
+    //       }
+    //     });
+    //   }
+    // };
+    // document.addEventListener("keydown", handleKeyDown);
+    // return () => {
+    //   document.removeEventListener("keydown", handleKeyDown);
+    // };
+    // }, [messages, chatStore, navigate, session]);
+  }, [messages, navigate, session]);
 
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
+
+  if (!session) {
+    return <></>;
+  }
 
   return (
     <>
@@ -1726,7 +1740,7 @@ function _Chat() {
                 title={Locale.Chat.Actions.RefreshTitle}
                 onClick={() => {
                   showToast(Locale.Chat.Actions.RefreshToast);
-                  chatStore.summarizeSession(true, session);
+                  // chatStore.summarizeSession(true, session);
                 }}
               />
             </div>
@@ -1840,17 +1854,17 @@ function _Chat() {
                                         });
                                       }
                                     }
-                                    chatStore.updateTargetSession(
-                                      session,
-                                      (session) => {
-                                        const m = session.mask.context
-                                          .concat(session.messages)
-                                          .find((m) => m.id === message.id);
-                                        if (m) {
-                                          m.content = newContent;
-                                        }
-                                      },
-                                    );
+                                    // chatStore.updateTargetSession(
+                                    //   session,
+                                    //   (session) => {
+                                    //     const m = session.mask.context
+                                    //       .concat(session.messages)
+                                    //       .find((m) => m.id === message.id);
+                                    //     if (m) {
+                                    //       m.content = newContent;
+                                    //     }
+                                    //   },
+                                    // );
                                   }}
                                 ></IconButton>
                               </div>
@@ -2168,21 +2182,4 @@ function _Chat() {
       )}
     </>
   );
-}
-
-// export function Chat() {
-//   const chatStore = useChatStore();
-//   const session = chatStore.currentSession();
-
-//   return <_Chat key={session.id}></_Chat>;
-// }
-
-export function Chat() {
-  const { currentSessionIndex } = newChatStore();
-
-  if (currentSessionIndex < 0) {
-    return <></>;
-  }
-
-  return <_Chat_NEW key={currentSessionIndex}></_Chat_NEW>;
 }
