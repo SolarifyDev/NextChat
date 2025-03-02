@@ -2,8 +2,24 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { RequestMessage } from "../typing";
 import { ModelType } from "./config";
-import { ChatStat } from ".";
+import { ChatStat, ModelConfig } from ".";
 import { Mask } from "./mask";
+import { ChatControllerPool } from "../client/controller";
+import { ClientApi, getClientApi, MultimodalContent } from "../client/api";
+import {
+  DEFAULT_INPUT_TEMPLATE,
+  DEFAULT_MODELS,
+  DEFAULT_SYSTEM_TEMPLATE,
+  KnowledgeCutOffDate,
+  MCP_SYSTEM_TEMPLATE,
+  MCP_TOOLS_TEMPLATE,
+} from "../constant";
+import Locale, { getLang } from "../locales";
+import { nanoid } from "nanoid";
+import { prettyObject } from "../utils/format";
+import { getAllTools, isMcpEnabled } from "../mcp/actions";
+import { getMessageTextContent } from "../utils";
+import { estimateTokenLength } from "../utils/token";
 
 export type ChatMessageTool = {
   id: string;
@@ -52,7 +68,99 @@ export type ChatStoreType = {
   getCurrentMessage: (i: number) => Promise<void>;
   getCurrentSession: (i: number) => ChatSession | null;
   clearCurrent: () => void;
+  onUserInput(
+    content: string,
+    attachImages?: string[],
+    isMcpResponse?: boolean,
+  ): Promise<void>;
+  getMessagesWithMemory(): Promise<ChatMessage[]>;
+  onNewMessage(message: ChatMessage, targetSession: ChatSession): void;
+  updateTargetSession(
+    targetSession: ChatSession,
+    updater: (session: ChatSession) => void,
+  ): void;
+  getMemoryPrompt(): ChatMessage | undefined;
+  onUserInput(
+    content: string,
+    attachImages?: string[],
+    isMcpResponse?: boolean,
+  ): Promise<void>;
 };
+
+export function createMessage(override: Partial<ChatMessage>): ChatMessage {
+  return {
+    id: nanoid(),
+    date: new Date().toLocaleString(),
+    role: "user",
+    content: "",
+    ...override,
+  };
+}
+
+function fillTemplateWith(input: string, modelConfig: ModelConfig) {
+  const cutoff =
+    KnowledgeCutOffDate[modelConfig.model] ?? KnowledgeCutOffDate.default;
+  // Find the model in the DEFAULT_MODELS array that matches the modelConfig.model
+  const modelInfo = DEFAULT_MODELS.find((m) => m.name === modelConfig.model);
+
+  var serviceProvider = "OpenAI";
+  if (modelInfo) {
+    // TODO: auto detect the providerName from the modelConfig.model
+
+    // Directly use the providerName from the modelInfo
+    serviceProvider = modelInfo.provider.providerName;
+  }
+
+  const vars = {
+    ServiceProvider: serviceProvider,
+    cutoff,
+    model: modelConfig.model,
+    time: new Date().toString(),
+    lang: getLang(),
+    input: input,
+  };
+
+  let output = modelConfig.template ?? DEFAULT_INPUT_TEMPLATE;
+
+  // remove duplicate
+  if (input.startsWith(output)) {
+    output = "";
+  }
+
+  // must contains {{input}}
+  const inputVar = "{{input}}";
+  if (!output.includes(inputVar)) {
+    output += "\n" + inputVar;
+  }
+
+  Object.entries(vars).forEach(([name, value]) => {
+    const regex = new RegExp(`{{${name}}}`, "g");
+    output = output.replace(regex, value.toString()); // Ensure value is a string
+  });
+
+  return output;
+}
+
+async function getMcpSystemPrompt(): Promise<string> {
+  const tools = await getAllTools();
+
+  let toolsStr = "";
+
+  tools.forEach((i) => {
+    // error client has no tools
+    if (!i.tools) return;
+
+    toolsStr += MCP_TOOLS_TEMPLATE.replace(
+      "{{ clientId }}",
+      i.clientId,
+    ).replace(
+      "{{ tools }}",
+      i.tools.tools.map((p: object) => JSON.stringify(p, null, 2)).join("\n"),
+    );
+  });
+
+  return MCP_SYSTEM_TEMPLATE.replace("{{ MCP_TOOLS }}", toolsStr);
+}
 
 export const newChatStore = create<ChatStoreType>()(
   persist(
@@ -90,6 +198,281 @@ export const newChatStore = create<ChatStoreType>()(
       },
       clearCurrent: () => {
         set({ currentSessionIndex: -1 });
+      },
+      onNewMessage(message: ChatMessage, targetSession: ChatSession) {
+        set({
+          message: get().message.concat(),
+        });
+        get().updateTargetSession(targetSession, (session) => {
+          session.lastUpdate = Date.now();
+        });
+
+        // get().updateStat(message, targetSession);
+
+        // get().checkMcpJson(message);
+
+        // get().summarizeSession(false, targetSession);
+      },
+      async onUserInput(
+        content: string,
+        attachImages?: string[],
+        isMcpResponse?: boolean,
+      ) {
+        const session = get().getCurrentSession(get().currentSessionIndex);
+        if (!session) return;
+
+        const modelConfig = session.mask.modelConfig;
+
+        // MCP Response no need to fill template
+        let mContent: string | MultimodalContent[] = isMcpResponse
+          ? content
+          : fillTemplateWith(content, modelConfig);
+
+        if (!isMcpResponse && attachImages && attachImages.length > 0) {
+          mContent = [
+            ...(content ? [{ type: "text" as const, text: content }] : []),
+            ...attachImages.map((url) => ({
+              type: "image_url" as const,
+              image_url: { url },
+            })),
+          ];
+        }
+
+        let userMessage: ChatMessage = createMessage({
+          role: "user",
+          content: mContent,
+          isMcpResponse,
+        });
+
+        const botMessage: ChatMessage = createMessage({
+          role: "assistant",
+          streaming: true,
+          model: modelConfig.model,
+        });
+
+        // get recent messages
+        const recentMessages = await get().getMessagesWithMemory();
+        const sendMessages = recentMessages.concat(userMessage);
+        const messageIndex = session.messages.length + 1;
+
+        // save user's and bot's message
+        // get().updateTargetSession(session, (session) => {
+        //   const savedUserMessage = {
+        //     ...userMessage,
+        //     content: mContent,
+        //   };
+        //   session.messages = session.messages.concat([
+        //     savedUserMessage,
+        //     botMessage,
+        //   ]);
+        // });
+
+        const savedUserMessage = {
+          ...userMessage,
+          content: mContent,
+        };
+
+        set({
+          message: get().message.concat([savedUserMessage, botMessage]),
+        });
+
+        const api: ClientApi = getClientApi(modelConfig.providerName);
+        // make request
+        api.llm.chat({
+          messages: sendMessages,
+          config: { ...modelConfig, stream: true },
+          onUpdate(message) {
+            botMessage.streaming = true;
+            if (message) {
+              botMessage.content = message;
+            }
+            // get().updateTargetSession(session, (session) => {
+            //   session.messages = session.messages.concat();
+            // });
+
+            set({
+              message: get().message.concat(),
+            });
+          },
+          async onFinish(message) {
+            botMessage.streaming = false;
+            if (message) {
+              botMessage.content = message;
+              botMessage.date = new Date().toLocaleString();
+              get().onNewMessage(botMessage, session);
+            }
+            ChatControllerPool.remove(session.id, botMessage.id);
+          },
+          onBeforeTool(tool: ChatMessageTool) {
+            (botMessage.tools = botMessage?.tools || []).push(tool);
+            set({
+              message: get().message.concat(),
+            });
+          },
+          onAfterTool(tool: ChatMessageTool) {
+            botMessage?.tools?.forEach((t, i, tools) => {
+              if (tool.id == t.id) {
+                tools[i] = { ...tool };
+              }
+            });
+            // get().updateTargetSession(session, (session) => {
+            //   session.messages = session.messages.concat();
+            // });
+            set({
+              message: get().message.concat(),
+            });
+          },
+          onError(error) {
+            const isAborted = error.message?.includes?.("aborted");
+            botMessage.content +=
+              "\n\n" +
+              prettyObject({
+                error: true,
+                message: error.message,
+              });
+            botMessage.streaming = false;
+            userMessage.isError = !isAborted;
+            botMessage.isError = !isAborted;
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
+            ChatControllerPool.remove(
+              session.id,
+              botMessage.id ?? messageIndex,
+            );
+
+            console.error("[Chat] failed ", error);
+          },
+          onController(controller) {
+            // collect controller for stop/retry
+            ChatControllerPool.addController(
+              session.id,
+              botMessage.id ?? messageIndex,
+              controller,
+            );
+          },
+        });
+      },
+      async getMessagesWithMemory() {
+        const session = get().getCurrentSession(get().currentSessionIndex);
+
+        const modelConfig = session?.mask?.modelConfig;
+        const clearContextIndex = session?.clearContextIndex ?? 0;
+        const messages = session?.messages.slice();
+        const totalMessageCount = session?.messages?.length ?? 0;
+
+        // in-context prompts
+        const contextPrompts = session?.mask?.context.slice();
+
+        // system prompts, to get close to OpenAI Web ChatGPT
+        const shouldInjectSystemPrompts =
+          modelConfig?.enableInjectSystemPrompts &&
+          (session?.mask?.modelConfig?.model.startsWith("gpt-") ||
+            session?.mask?.modelConfig?.model.startsWith("chatgpt-"));
+
+        const mcpEnabled = await isMcpEnabled();
+        const mcpSystemPrompt = mcpEnabled ? await getMcpSystemPrompt() : "";
+
+        var systemPrompts: ChatMessage[] = [];
+
+        if (shouldInjectSystemPrompts) {
+          systemPrompts = [
+            createMessage({
+              role: "system",
+              content:
+                fillTemplateWith("", {
+                  ...modelConfig,
+                  template: DEFAULT_SYSTEM_TEMPLATE,
+                }) + mcpSystemPrompt,
+            }),
+          ];
+        } else if (mcpEnabled) {
+          systemPrompts = [
+            createMessage({
+              role: "system",
+              content: mcpSystemPrompt,
+            }),
+          ];
+        }
+
+        if (shouldInjectSystemPrompts || mcpEnabled) {
+          console.log(
+            "[Global System Prompt] ",
+            systemPrompts.at(0)?.content ?? "empty",
+          );
+        }
+        const memoryPrompt = get().getMemoryPrompt();
+        // long term memory
+        const shouldSendLongTermMemory =
+          modelConfig?.sendMemory &&
+          session?.memoryPrompt &&
+          session?.memoryPrompt.length > 0 &&
+          session?.lastSummarizeIndex > clearContextIndex;
+        const longTermMemoryPrompts =
+          shouldSendLongTermMemory && memoryPrompt ? [memoryPrompt] : [];
+        const longTermMemoryStartIndex = session?.lastSummarizeIndex;
+
+        // short term memory
+        const shortTermMemoryStartIndex = Math.max(
+          0,
+          totalMessageCount - (modelConfig?.historyMessageCount ?? 0),
+        );
+
+        // lets concat send messages, including 4 parts:
+        // 0. system prompt: to get close to OpenAI Web ChatGPT
+        // 1. long term memory: summarized memory messages
+        // 2. pre-defined in-context prompts
+        // 3. short term memory: latest n messages
+        // 4. newest input message
+        const memoryStartIndex = shouldSendLongTermMemory
+          ? Math.min(longTermMemoryStartIndex ?? 0, shortTermMemoryStartIndex)
+          : shortTermMemoryStartIndex;
+        // and if user has cleared history messages, we should exclude the memory too.
+        const contextStartIndex = Math.max(clearContextIndex, memoryStartIndex);
+        const maxTokenThreshold = modelConfig?.max_tokens ?? 0;
+
+        // get recent messages as much as possible
+        const reversedRecentMessages = [];
+        for (
+          let i = totalMessageCount - 1, tokenCount = 0;
+          i >= contextStartIndex && tokenCount < maxTokenThreshold;
+          i -= 1
+        ) {
+          const msg = messages ? messages[i] : undefined;
+          if (!msg || msg.isError) continue;
+          tokenCount += estimateTokenLength(getMessageTextContent(msg));
+          reversedRecentMessages.push(msg);
+        }
+        // concat all messages
+        const recentMessages = [
+          ...systemPrompts,
+          ...longTermMemoryPrompts,
+          ...contextPrompts,
+          ...reversedRecentMessages.reverse(),
+        ];
+
+        return recentMessages;
+      },
+      getMemoryPrompt() {
+        const session = get().getCurrentSession(get().currentSessionIndex);
+
+        if (session?.memoryPrompt?.length) {
+          return {
+            role: "system",
+            content: Locale.Store.Prompt.History(session.memoryPrompt),
+            date: "",
+          } as ChatMessage;
+        }
+      },
+      updateTargetSession(
+        targetSession: ChatSession,
+        updater: (session: ChatSession) => void,
+      ) {
+        const sessions = get().sessions;
+        const index = sessions.findIndex((s) => s.id === targetSession.id);
+        if (index < 0) return;
+        updater(sessions[index]);
+        set(() => ({ sessions }));
       },
     }),
     {

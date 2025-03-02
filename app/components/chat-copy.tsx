@@ -1009,8 +1009,14 @@ export function ShortcutKeyModal(props: { onClose: () => void }) {
 export function _Chat_NEW() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
-  const { message, currentSessionIndex, getCurrentMessage, getCurrentSession } =
-    newChatStore();
+  const {
+    message,
+    currentSessionIndex,
+    getCurrentMessage,
+    getCurrentSession,
+    onUserInput,
+    updateTargetSession,
+  } = newChatStore();
 
   const session = getCurrentSession(currentSessionIndex);
 
@@ -1141,9 +1147,8 @@ export function _Chat_NEW() {
       return;
     }
     setIsLoading(true);
-    // chatStore
-    //   .onUserInput(userInput, attachImages)
-    //   .then(() => setIsLoading(false));
+
+    onUserInput(userInput, attachImages).then(() => setIsLoading(false));
     setAttachImages([]);
     // chatStore.setLastInput(userInput);
     setUserInput("");
@@ -1291,9 +1296,9 @@ export function _Chat_NEW() {
   };
 
   const onPinMessage = (message: ChatMessage) => {
-    // chatStore.updateTargetSession(session, (session) =>
-    //   session.mask.context.push(message),
-    // );
+    updateTargetSession(session!, (session) =>
+      session.mask.context.push(message),
+    );
 
     showToast(Locale.Chat.Actions.PinToastContent, {
       text: Locale.Chat.Actions.PinToastAction,
