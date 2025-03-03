@@ -1,5 +1,5 @@
 import { ISession } from "../client/smarties";
-import { ChatSession } from "../store";
+import { ChatSession } from "../store/new-chat";
 
 export const JSONParse = (data: string): any | null => {
   if (!data) return null;
@@ -57,7 +57,7 @@ export const ConvertSession = (
     case "delete": {
       return {
         sessionId: session.sessionId!,
-        isDeleted: false,
+        isDeleted: true,
       };
     }
   }

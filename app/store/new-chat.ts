@@ -61,6 +61,9 @@ export type ChatMessage = RequestMessage & {
 };
 
 export interface ChatSession {
+  sessionId?: number;
+  isDeleted?: boolean;
+
   id: string;
   topic: string;
 
@@ -69,7 +72,7 @@ export interface ChatSession {
   stat: ChatStat;
   lastUpdate: number;
   lastSummarizeIndex: number;
-  clearContextIndex?: number;
+  clearContextIndex?: number | null;
 
   mask: Mask;
 }
@@ -576,7 +579,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           } as ChatMessage;
         }
       },
-      updateTargetSession(
+      async updateTargetSession(
         targetSession: ChatSession,
         updater: (session: ChatSession) => void,
         isUpdate: boolean = false,
@@ -589,8 +592,12 @@ export const useNewChatStore = create<ChatStoreType>()(
         if (isUpdate) {
           console.log(sessions[index], "sessions[index];");
           const config = useAppConfig.getState();
-          console.log(config.omeToken, "---");
-          //  await PostAddOrUpdateSession()
+          await PostAddOrUpdateSession(
+            config.omeToken,
+            ConvertSession("update", sessions[index]),
+          )
+            .then(() => console.log("更新成功"))
+            .catch(() => console.log("更新失败"));
         }
       },
       setLastInput(lastInput: string) {
@@ -775,6 +782,17 @@ export const useNewChatStore = create<ChatStoreType>()(
             },
           },
           5000,
+          async () => {
+            const data = ConvertSession("delete", deletedSession);
+
+            await PostAddOrUpdateSession(useAppConfig.getState().omeToken, data)
+              .then(() => {
+                console.log("delete成功");
+              })
+              .catch(() => {
+                console.log("delete失败");
+              });
+          },
         );
       },
       forkSession() {
@@ -828,11 +846,16 @@ export const useNewChatStore = create<ChatStoreType>()(
         const data = ConvertSession("add", session);
 
         await PostAddOrUpdateSession(token, data)
-          .then(() => {
-            set((state) => ({
-              currentSessionIndex: 0,
-              sessions: [session].concat(state.sessions),
-            }));
+          .then((res) => {
+            if (res) {
+              session.sessionId = res.sessionId;
+
+              set((state) => ({
+                currentSessionIndex: 0,
+                sessions: [session].concat(state.sessions),
+              }));
+            }
+
             callback && callback();
           })
           .catch(() => {

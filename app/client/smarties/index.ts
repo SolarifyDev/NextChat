@@ -26,7 +26,7 @@ export const GetHistory = async (token: string): Promise<ISession[]> => {
 export const PostAddOrUpdateSession = async (
   token: string,
   data: Partial<ISession>,
-) => {
+): Promise<ISession> => {
   return (
     await api.post("/api/v1/history/addOrUpdate", data, {
       headers: {

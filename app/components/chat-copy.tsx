@@ -57,7 +57,6 @@ import {
   Theme,
   useAccessStore,
   useAppConfig,
-  useChatStore,
   usePluginStore,
 } from "../store";
 
@@ -123,6 +122,7 @@ import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
 import { useNewChatStore } from "../store/new-chat";
+import { nanoid } from "nanoid";
 
 const localStorage = safeLocalStorage();
 
@@ -161,8 +161,8 @@ const MCPAction = () => {
 };
 
 export function SessionConfigModel(props: { onClose: () => void }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
   const maskStore = useMaskStore();
   const navigate = useNavigate();
 
@@ -182,6 +182,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
                 chatStore.updateTargetSession(
                   session,
                   (session) => (session.memoryPrompt = ""),
+                  true,
                 );
               }
             }}
@@ -233,8 +234,8 @@ function PromptToast(props: {
   showModal?: boolean;
   setShowModal: (_: boolean) => void;
 }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
   const context = session.mask.context;
 
   return (
@@ -252,7 +253,12 @@ function PromptToast(props: {
         </div>
       )}
       {props.showModal && (
-        <SessionConfigModel onClose={() => props.setShowModal(false)} />
+        <SessionConfigModel
+          onClose={() => {
+            props.setShowModal(false);
+            chatStore.updateTargetSession(session, (session) => {}, true);
+          }}
+        />
       )}
     </div>
   );
@@ -378,8 +384,8 @@ export function PromptHints(props: {
 }
 
 function ClearContextDivider() {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
 
   return (
     <div
@@ -388,6 +394,7 @@ function ClearContextDivider() {
         chatStore.updateTargetSession(
           session,
           (session) => (session.clearContextIndex = undefined),
+          true,
         )
       }
     >
@@ -504,9 +511,9 @@ export function ChatActions(props: {
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
-  const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
   const pluginStore = usePluginStore();
-  const session = chatStore.currentSession();
+  const session = chatStore.getCurrentSession();
 
   // switch themes
   const theme = config.theme;
@@ -581,11 +588,15 @@ export function ChatActions(props: {
     if (isUnavailableModel && models.length > 0) {
       // show next model to default model if exist
       let nextModel = models.find((model) => model.isDefault) || models[0];
-      chatStore.updateTargetSession(session, (session) => {
-        session.mask.modelConfig.model = nextModel.name;
-        session.mask.modelConfig.providerName = nextModel?.provider
-          ?.providerName as ServiceProvider;
-      });
+      chatStore.updateTargetSession(
+        session,
+        (session) => {
+          session.mask.modelConfig.model = nextModel.name;
+          session.mask.modelConfig.providerName = nextModel?.provider
+            ?.providerName as ServiceProvider;
+        },
+        true,
+      );
       showToast(
         nextModel?.provider?.providerName == "ByteDance"
           ? nextModel.displayName
@@ -660,14 +671,18 @@ export function ChatActions(props: {
           text={Locale.Chat.InputActions.Clear}
           icon={<BreakIcon />}
           onClick={() => {
-            chatStore.updateTargetSession(session, (session) => {
-              if (session.clearContextIndex === session.messages.length) {
-                session.clearContextIndex = undefined;
-              } else {
-                session.clearContextIndex = session.messages.length;
-                session.memoryPrompt = ""; // will clear memory
-              }
-            });
+            chatStore.updateTargetSession(
+              session,
+              (session) => {
+                if (session.clearContextIndex === session.messages.length) {
+                  session.clearContextIndex = null;
+                } else {
+                  session.clearContextIndex = session.messages.length;
+                  session.memoryPrompt = ""; // will clear memory
+                }
+              },
+              true,
+            );
           }}
         />
 
@@ -809,16 +824,20 @@ export function ChatActions(props: {
         {showPluginSelector && (
           <Selector
             multiple
-            defaultSelectedValue={chatStore.currentSession().mask?.plugin}
+            defaultSelectedValue={chatStore.getCurrentSession().mask?.plugin}
             items={pluginStore.getAll().map((item) => ({
               title: `${item?.title}@${item?.version}`,
               value: item?.id,
             }))}
             onClose={() => setShowPluginSelector(false)}
             onSelection={(s) => {
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.plugin = s as string[];
-              });
+              chatStore.updateTargetSession(
+                session,
+                (session) => {
+                  session.mask.plugin = s as string[];
+                },
+                true,
+              );
             }}
           />
         )}
@@ -846,8 +865,8 @@ export function ChatActions(props: {
 }
 
 export function EditMessageModal(props: { onClose: () => void }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
   const [messages, setMessages] = useState(session.messages.slice());
 
   return (
@@ -873,6 +892,7 @@ export function EditMessageModal(props: { onClose: () => void }) {
               chatStore.updateTargetSession(
                 session,
                 (session) => (session.messages = messages),
+                true,
               );
               props.onClose();
             }}
@@ -1199,16 +1219,17 @@ export function _Chat_NEW() {
     }
   };
 
-  const deleteMessage = (msgId?: string) => {
-    // chatStore.updateTargetSession(
-    //   session,
-    //   (session) =>
-    //     (session.messages = session.messages.filter((m) => m.id !== msgId)),
-    // );
+  const deleteMessage = (msgId?: string, isGetApi = false) => {
+    chatStore.updateTargetSession(
+      session,
+      (session) =>
+        (session.messages = session.messages.filter((m) => m.id !== msgId)),
+      isGetApi,
+    );
   };
 
   const onDelete = (msgId: string) => {
-    deleteMessage(msgId);
+    deleteMessage(msgId, true);
   };
 
   const onResend = (message: ChatMessage) => {
@@ -1217,52 +1238,58 @@ export function _Chat_NEW() {
     // 2. for a bot's message, find the last user's input
     // 3. delete original user input and bot's message
     // 4. resend the user's input
-    // const resendingIndex = session.messages.findIndex(
-    //   (m) => m.id === message.id,
-    // );
-    // if (resendingIndex < 0 || resendingIndex >= session.messages.length) {
-    //   console.error("[Chat] failed to find resending message", message);
-    //   return;
-    // }
-    // let userMessage: ChatMessage | undefined;
-    // let botMessage: ChatMessage | undefined;
-    // if (message.role === "assistant") {
-    //   // if it is resending a bot's message, find the user input for it
-    //   botMessage = message;
-    //   for (let i = resendingIndex; i >= 0; i -= 1) {
-    //     if (session.messages[i].role === "user") {
-    //       userMessage = session.messages[i];
-    //       break;
-    //     }
-    //   }
-    // } else if (message.role === "user") {
-    //   // if it is resending a user's input, find the bot's response
-    //   userMessage = message;
-    //   for (let i = resendingIndex; i < session.messages.length; i += 1) {
-    //     if (session.messages[i].role === "assistant") {
-    //       botMessage = session.messages[i];
-    //       break;
-    //     }
-    //   }
-    // }
-    // if (userMessage === undefined) {
-    //   console.error("[Chat] failed to resend", message);
-    //   return;
-    // }
-    // // delete the original messages
-    // deleteMessage(userMessage.id);
-    // deleteMessage(botMessage?.id);
-    // // resend the message
-    // setIsLoading(true);
-    // const textContent = getMessageTextContent(userMessage);
-    // const images = getMessageImages(userMessage);
-    // chatStore.onUserInput(textContent, images).then(() => setIsLoading(false));
-    // inputRef.current?.focus();
+    const resendingIndex = session.messages.findIndex(
+      (m) => m.id === message.id,
+    );
+    if (resendingIndex < 0 || resendingIndex >= session.messages.length) {
+      console.error("[Chat] failed to find resending message", message);
+      return;
+    }
+    let userMessage: ChatMessage | undefined;
+    let botMessage: ChatMessage | undefined;
+    if (message.role === "assistant") {
+      // if it is resending a bot's message, find the user input for it
+      botMessage = message;
+      for (let i = resendingIndex; i >= 0; i -= 1) {
+        if (session.messages[i].role === "user") {
+          userMessage = session.messages[i];
+          break;
+        }
+      }
+    } else if (message.role === "user") {
+      // if it is resending a user's input, find the bot's response
+      userMessage = message;
+      for (let i = resendingIndex; i < session.messages.length; i += 1) {
+        if (session.messages[i].role === "assistant") {
+          botMessage = session.messages[i];
+          break;
+        }
+      }
+    }
+    if (userMessage === undefined) {
+      console.error("[Chat] failed to resend", message);
+      return;
+    }
+    // delete the original messages
+    deleteMessage(userMessage.id);
+    deleteMessage(botMessage?.id);
+    // resend the message
+    setIsLoading(true);
+    const textContent = getMessageTextContent(userMessage);
+    const images = getMessageImages(userMessage);
+    chatStore.onUserInput(textContent, images).then(() => setIsLoading(false));
+    inputRef.current?.focus();
   };
 
   const onPinMessage = (message: ChatMessage) => {
-    chatStore.updateTargetSession(session!, (session) =>
-      session.mask.context.push(message),
+    chatStore.updateTargetSession(
+      session!,
+      (session) =>
+        session.mask.context.push({
+          ...message,
+          id: nanoid(),
+        }),
+      true,
     );
 
     showToast(Locale.Chat.Actions.PinToastContent, {
@@ -1833,17 +1860,18 @@ export function _Chat_NEW() {
                                         });
                                       }
                                     }
-                                    // chatStore.updateTargetSession(
-                                    //   session,
-                                    //   (session) => {
-                                    //     const m = session.mask.context
-                                    //       .concat(session.messages)
-                                    //       .find((m) => m.id === message.id);
-                                    //     if (m) {
-                                    //       m.content = newContent;
-                                    //     }
-                                    //   },
-                                    // );
+                                    chatStore.updateTargetSession(
+                                      session,
+                                      (session) => {
+                                        const m = session.mask.context
+                                          .concat(session.messages)
+                                          .find((m) => m.id === message.id);
+                                        if (m) {
+                                          m.content = newContent;
+                                        }
+                                      },
+                                      true,
+                                    );
                                   }}
                                 ></IconButton>
                               </div>
@@ -1893,9 +1921,7 @@ export function _Chat_NEW() {
                                       <ChatAction
                                         text={Locale.Chat.Actions.Delete}
                                         icon={<DeleteIcon />}
-                                        onClick={() =>
-                                          onDelete(message.id ?? i)
-                                        }
+                                        onClick={() => onDelete(message.id)}
                                       />
 
                                       <ChatAction
