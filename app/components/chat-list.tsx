@@ -17,7 +17,7 @@ import { useRef, useEffect } from "react";
 import { showConfirm } from "./ui-lib";
 import { useMobileScreen } from "../utils";
 import clsx from "clsx";
-import { newChatStore } from "../store/new-chat";
+import { useNewChatStore } from "../store/new-chat";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -102,7 +102,7 @@ export function ChatItem(props: {
 }
 
 export function ChatList(props: { narrow?: boolean }) {
-  const { currentSessionIndex, sessions, selectSession } = newChatStore();
+  const { currentSessionIndex, sessions, selectSession } = useNewChatStore();
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
 

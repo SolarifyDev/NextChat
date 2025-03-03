@@ -11,12 +11,13 @@ import EyeIcon from "../icons/eye.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Mask, useMaskStore } from "../store/mask";
 import Locale from "../locales";
-import { useAppConfig, useChatStore } from "../store";
+import { useAppConfig } from "../store";
 import { MaskAvatar } from "./mask";
 import { useCommand } from "../command";
 import { showConfirm } from "./ui-lib";
 import { BUILTIN_MASK_STORE } from "../masks";
 import clsx from "clsx";
+import { useNewChatStore } from "../store/new-chat";
 
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
@@ -75,7 +76,7 @@ function useMaskGroup(masks: Mask[]) {
 }
 
 export function NewChat() {
-  const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
   const maskStore = useMaskStore();
 
   const masks = maskStore.getAll();
@@ -90,7 +91,7 @@ export function NewChat() {
 
   const startChat = (mask?: Mask) => {
     setTimeout(() => {
-      chatStore.newSession(mask);
+      chatStore.newSession(config.omeToken, mask);
       navigate(Path.Chat);
     }, 10);
   };

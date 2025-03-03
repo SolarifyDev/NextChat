@@ -12,6 +12,7 @@ declare global {
 
       BASE_URL?: string;
       OPENAI_ORG_ID?: string; // openai only
+      SMARTIES_URL?: string;
 
       VERCEL?: string;
       BUILD_MODE?: "standalone" | "export";

@@ -14,7 +14,7 @@ import SettingsIcon from "../icons/settings.svg";
 
 import Locale from "../locales";
 
-import { useAppConfig, useChatStore } from "../store";
+import { useAppConfig } from "../store";
 
 import {
   DEFAULT_SIDEBAR_WIDTH,
@@ -30,7 +30,7 @@ import dynamic from "next/dynamic";
 import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
-import { newChatStore } from "../store/new-chat";
+import { useNewChatStore } from "../store/new-chat";
 
 const DISCOVERY = [
   { name: Locale.Plugin.Name, path: Path.Plugins },
@@ -43,7 +43,7 @@ const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
 });
 
 export function useHotKey() {
-  const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -229,10 +229,10 @@ export function SideBar(props: { className?: string }) {
   const [showDiscoverySelector, setshowDiscoverySelector] = useState(false);
   const navigate = useNavigate();
   const config = useAppConfig();
-  const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
-  const { getSession } = newChatStore();
+  const { getSession } = useNewChatStore();
 
   useEffect(() => {
     // 检查 MCP 是否启用
@@ -243,7 +243,7 @@ export function SideBar(props: { className?: string }) {
     };
     checkMcpStatus();
 
-    getSession();
+    getSession(config.omeToken);
   }, []);
 
   return (
@@ -348,7 +348,7 @@ export function SideBar(props: { className?: string }) {
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
             onClick={() => {
               if (config.dontShowMaskSplashScreen) {
-                chatStore.newSession();
+                chatStore.newSession(config.omeToken);
                 navigate(Path.Chat);
               } else {
                 navigate(Path.NewChat);

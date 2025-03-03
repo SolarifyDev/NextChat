@@ -124,7 +124,7 @@ import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
-import { newChatStore } from "../store/new-chat";
+import { useNewChatStore } from "../store/new-chat";
 import { _Chat_NEW } from "./chat-copy";
 
 const localStorage = safeLocalStorage();
@@ -2178,7 +2178,7 @@ function _Chat() {
 // }
 
 export function Chat() {
-  const { currentSessionIndex } = newChatStore();
+  const { currentSessionIndex } = useNewChatStore();
 
   if (currentSessionIndex < 0) {
     return <></>;

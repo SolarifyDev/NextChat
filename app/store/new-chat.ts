@@ -2,24 +2,39 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { RequestMessage } from "../typing";
 import { ModelType } from "./config";
-import { ChatStat, ModelConfig } from ".";
-import { Mask } from "./mask";
+import {
+  ChatStat,
+  DEFAULT_TOPIC,
+  ModelConfig,
+  useAccessStore,
+  useAppConfig,
+} from ".";
+import { Mask, createEmptyMask } from "./mask";
 import { ChatControllerPool } from "../client/controller";
 import { ClientApi, getClientApi, MultimodalContent } from "../client/api";
 import {
+  DEEPSEEK_SUMMARIZE_MODEL,
   DEFAULT_INPUT_TEMPLATE,
   DEFAULT_MODELS,
   DEFAULT_SYSTEM_TEMPLATE,
+  GEMINI_SUMMARIZE_MODEL,
   KnowledgeCutOffDate,
   MCP_SYSTEM_TEMPLATE,
   MCP_TOOLS_TEMPLATE,
+  SUMMARIZE_MODEL,
+  ServiceProvider,
 } from "../constant";
 import Locale, { getLang } from "../locales";
 import { nanoid } from "nanoid";
 import { prettyObject } from "../utils/format";
-import { getAllTools, isMcpEnabled } from "../mcp/actions";
-import { getMessageTextContent } from "../utils";
+import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
+import { getMessageTextContent, isDalle3, trimTopic } from "../utils";
 import { estimateTokenLength } from "../utils/token";
+import { collectModelsWithDefaultModel } from "../utils/model";
+import { showToast } from "../components/ui-lib";
+import { GetHistory, PostAddOrUpdateSession } from "../client/smarties";
+import { ConvertSession, JSONParse } from "../utils/convert";
+import { extractMcpJson, isMcpJson } from "../mcp/utils";
 
 export type ChatMessageTool = {
   id: string;
@@ -62,11 +77,10 @@ export interface ChatSession {
 export type ChatStoreType = {
   currentSessionIndex: number;
   sessions: ChatSession[];
-  message: ChatMessage[];
+  lastInput: string;
   selectSession: (i: number) => void;
-  getSession: () => Promise<void>;
-  getCurrentMessage: (i: number) => Promise<void>;
-  getCurrentSession: (i: number) => ChatSession | null;
+  getSession: (token: string) => Promise<void>;
+  getCurrentSession: () => ChatSession;
   clearCurrent: () => void;
   onUserInput(
     content: string,
@@ -78,6 +92,7 @@ export type ChatStoreType = {
   updateTargetSession(
     targetSession: ChatSession,
     updater: (session: ChatSession) => void,
+    isUpdate?: boolean,
   ): void;
   getMemoryPrompt(): ChatMessage | undefined;
   onUserInput(
@@ -85,6 +100,17 @@ export type ChatStoreType = {
     attachImages?: string[],
     isMcpResponse?: boolean,
   ): Promise<void>;
+  setLastInput(lastInput: string): void;
+  summarizeSession(
+    refreshTitle: boolean | undefined,
+    targetSession: ChatSession,
+  ): void;
+  deleteSession(index: number): void;
+  forkSession(): void;
+  nextSession(delta: number): void;
+  newSession(token: string, mask?: Mask, callback?: () => void): void;
+  updateStat(message: ChatMessage, session: ChatSession): void;
+  checkMcpJson(message: ChatMessage): void;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -162,63 +188,161 @@ async function getMcpSystemPrompt(): Promise<string> {
   return MCP_SYSTEM_TEMPLATE.replace("{{ MCP_TOOLS }}", toolsStr);
 }
 
-export const newChatStore = create<ChatStoreType>()(
+function countMessages(msgs: ChatMessage[]) {
+  return msgs.reduce(
+    (pre, cur) => pre + estimateTokenLength(getMessageTextContent(cur)),
+    0,
+  );
+}
+
+function createEmptySession(): ChatSession {
+  return {
+    id: nanoid(),
+    topic: DEFAULT_TOPIC,
+    memoryPrompt: "",
+    messages: [],
+    stat: {
+      tokenCount: 0,
+      wordCount: 0,
+      charCount: 0,
+    },
+    lastUpdate: Date.now(),
+    lastSummarizeIndex: 0,
+
+    mask: createEmptyMask(),
+  };
+}
+
+function getSummarizeModel(
+  currentModel: string,
+  providerName: string,
+): string[] {
+  // if it is using gpt-* models, force to use 4o-mini to summarize
+  if (currentModel.startsWith("gpt") || currentModel.startsWith("chatgpt")) {
+    const configStore = useAppConfig.getState();
+    const accessStore = useAccessStore.getState();
+    const allModel = collectModelsWithDefaultModel(
+      configStore.models,
+      [configStore.customModels, accessStore.customModels].join(","),
+      accessStore.defaultModel,
+    );
+    const summarizeModel = allModel.find(
+      (m) => m.name === SUMMARIZE_MODEL && m.available,
+    );
+    if (summarizeModel) {
+      return [
+        summarizeModel.name,
+        summarizeModel.provider?.providerName as string,
+      ];
+    }
+  }
+  if (currentModel.startsWith("gemini")) {
+    return [GEMINI_SUMMARIZE_MODEL, ServiceProvider.Google];
+  } else if (currentModel.startsWith("deepseek-")) {
+    return [DEEPSEEK_SUMMARIZE_MODEL, ServiceProvider.DeepSeek];
+  }
+
+  return [currentModel, providerName];
+}
+
+export const useNewChatStore = create<ChatStoreType>()(
   persist(
     (set, get) => ({
       currentSessionIndex: -1,
       sessions: [],
-      message: [],
+      lastInput: "",
       selectSession: (i: number) => {
         set({ currentSessionIndex: i });
       },
-      getSession: async () => {
-        set({
-          sessions: data,
-        });
-      },
-      getCurrentMessage: async (i: number) => {
-        if (i >= 0) {
-          console.log("getCurrentMessage", data[i].messages);
 
+      getSession: async (token: string) => {
+        try {
+          const data = await GetHistory(token);
+          const newData: ChatSession[] = data.map((item) => ({
+            ...item,
+            messages: JSONParse(item.messages),
+            stat: JSONParse(item.stat),
+            mask: JSONParse(item.mask),
+          }));
           set({
-            message: data[i].messages,
+            sessions: newData,
           });
-        } else {
+        } catch {
           set({
-            message: [],
+            sessions: [],
           });
         }
       },
-      getCurrentSession: (i: number) => {
-        if (i >= 0) {
-          return get().sessions[i];
-        }
 
-        return null;
+      getCurrentSession: () => {
+        return get().sessions[get().currentSessionIndex];
       },
+
       clearCurrent: () => {
-        set({ currentSessionIndex: -1 });
+        set({ currentSessionIndex: -1, sessions: [] });
       },
+
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
-        set({
-          message: get().message.concat(),
-        });
-        get().updateTargetSession(targetSession, (session) => {
-          session.lastUpdate = Date.now();
-        });
+        console.log(message, "message", targetSession); // 触发更新
+        get().updateTargetSession(
+          targetSession,
+          (session) => {
+            session.lastUpdate = Date.now();
+            session.messages = session.messages.concat();
+          },
+          true,
+        );
 
         // get().updateStat(message, targetSession);
 
-        // get().checkMcpJson(message);
+        // // get().checkMcpJson(message);
 
         // get().summarizeSession(false, targetSession);
+      },
+      /** check if the message contains MCP JSON and execute the MCP action */
+      checkMcpJson(message: ChatMessage) {
+        const mcpEnabled = isMcpEnabled();
+        console.log(mcpEnabled, "mcpEnabled");
+        if (!mcpEnabled) return;
+        const content = getMessageTextContent(message);
+        if (isMcpJson(content)) {
+          try {
+            const mcpRequest = extractMcpJson(content);
+            if (mcpRequest) {
+              console.debug("[MCP Request]", mcpRequest);
+
+              executeMcpAction(mcpRequest.clientId, mcpRequest.mcp)
+                .then((result) => {
+                  console.log("[MCP Response]", result);
+                  const mcpResponse =
+                    typeof result === "object"
+                      ? JSON.stringify(result)
+                      : String(result);
+                  get().onUserInput(
+                    `\`\`\`json:mcp-response:${mcpRequest.clientId}\n${mcpResponse}\n\`\`\``,
+                    [],
+                    true,
+                  );
+                })
+                .catch((error) => showToast("MCP execution failed", error));
+            }
+          } catch (error) {
+            console.error("[Check MCP JSON]", error);
+          }
+        }
+      },
+      updateStat(message: ChatMessage, session: ChatSession) {
+        get().updateTargetSession(session, (session) => {
+          session.stat.charCount += message.content.length;
+          // TODO: should update chat count and word count
+        });
       },
       async onUserInput(
         content: string,
         attachImages?: string[],
         isMcpResponse?: boolean,
       ) {
-        const session = get().getCurrentSession(get().currentSessionIndex);
+        const session = get().getCurrentSession();
         if (!session) return;
 
         const modelConfig = session.mask.modelConfig;
@@ -256,24 +380,15 @@ export const newChatStore = create<ChatStoreType>()(
         const messageIndex = session.messages.length + 1;
 
         // save user's and bot's message
-        // get().updateTargetSession(session, (session) => {
-        //   const savedUserMessage = {
-        //     ...userMessage,
-        //     content: mContent,
-        //   };
-        //   session.messages = session.messages.concat([
-        //     savedUserMessage,
-        //     botMessage,
-        //   ]);
-        // });
-
-        const savedUserMessage = {
-          ...userMessage,
-          content: mContent,
-        };
-
-        set({
-          message: get().message.concat([savedUserMessage, botMessage]),
+        get().updateTargetSession(session, (session) => {
+          const savedUserMessage = {
+            ...userMessage,
+            content: mContent,
+          };
+          session.messages = session.messages.concat([
+            savedUserMessage,
+            botMessage,
+          ]);
         });
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
@@ -286,13 +401,13 @@ export const newChatStore = create<ChatStoreType>()(
             if (message) {
               botMessage.content = message;
             }
-            // get().updateTargetSession(session, (session) => {
-            //   session.messages = session.messages.concat();
-            // });
-
-            set({
-              message: get().message.concat(),
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
             });
+
+            // set({
+            //   message: get().message.concat(),
+            // });
           },
           async onFinish(message) {
             botMessage.streaming = false;
@@ -305,8 +420,8 @@ export const newChatStore = create<ChatStoreType>()(
           },
           onBeforeTool(tool: ChatMessageTool) {
             (botMessage.tools = botMessage?.tools || []).push(tool);
-            set({
-              message: get().message.concat(),
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
             });
           },
           onAfterTool(tool: ChatMessageTool) {
@@ -315,11 +430,8 @@ export const newChatStore = create<ChatStoreType>()(
                 tools[i] = { ...tool };
               }
             });
-            // get().updateTargetSession(session, (session) => {
-            //   session.messages = session.messages.concat();
-            // });
-            set({
-              message: get().message.concat(),
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
             });
           },
           onError(error) {
@@ -354,7 +466,7 @@ export const newChatStore = create<ChatStoreType>()(
         });
       },
       async getMessagesWithMemory() {
-        const session = get().getCurrentSession(get().currentSessionIndex);
+        const session = get().getCurrentSession();
 
         const modelConfig = session?.mask?.modelConfig;
         const clearContextIndex = session?.clearContextIndex ?? 0;
@@ -454,7 +566,7 @@ export const newChatStore = create<ChatStoreType>()(
         return recentMessages;
       },
       getMemoryPrompt() {
-        const session = get().getCurrentSession(get().currentSessionIndex);
+        const session = get().getCurrentSession();
 
         if (session?.memoryPrompt?.length) {
           return {
@@ -467,12 +579,265 @@ export const newChatStore = create<ChatStoreType>()(
       updateTargetSession(
         targetSession: ChatSession,
         updater: (session: ChatSession) => void,
+        isUpdate: boolean = false,
       ) {
         const sessions = get().sessions;
         const index = sessions.findIndex((s) => s.id === targetSession.id);
         if (index < 0) return;
         updater(sessions[index]);
         set(() => ({ sessions }));
+        if (isUpdate) {
+          console.log(sessions[index], "sessions[index];");
+          const config = useAppConfig.getState();
+          console.log(config.omeToken, "---");
+          //  await PostAddOrUpdateSession()
+        }
+      },
+      setLastInput(lastInput: string) {
+        set({
+          lastInput,
+        });
+      },
+      summarizeSession(
+        refreshTitle: boolean = false,
+        targetSession: ChatSession,
+      ) {
+        const config = useAppConfig.getState();
+        const session = targetSession;
+        const modelConfig = session.mask.modelConfig;
+        // skip summarize when using dalle3?
+        if (isDalle3(modelConfig.model)) {
+          return;
+        }
+
+        // if not config compressModel, then using getSummarizeModel
+        const [model, providerName] = modelConfig.compressModel
+          ? [modelConfig.compressModel, modelConfig.compressProviderName]
+          : getSummarizeModel(
+              session.mask.modelConfig.model,
+              session.mask.modelConfig.providerName,
+            );
+        const api: ClientApi = getClientApi(providerName as ServiceProvider);
+
+        // remove error messages if any
+        const messages = session.messages;
+
+        // should summarize topic after chating more than 50 words
+        const SUMMARIZE_MIN_LEN = 50;
+        if (
+          (config.enableAutoGenerateTitle &&
+            session.topic === DEFAULT_TOPIC &&
+            countMessages(messages) >= SUMMARIZE_MIN_LEN) ||
+          refreshTitle
+        ) {
+          const startIndex = Math.max(
+            0,
+            messages.length - modelConfig.historyMessageCount,
+          );
+          const topicMessages = messages
+            .slice(
+              startIndex < messages.length ? startIndex : messages.length - 1,
+              messages.length,
+            )
+            .concat(
+              createMessage({
+                role: "user",
+                content: Locale.Store.Prompt.Topic,
+              }),
+            );
+          api.llm.chat({
+            messages: topicMessages,
+            config: {
+              model,
+              stream: false,
+              providerName,
+            },
+            onFinish(message, responseRes) {
+              if (responseRes?.status === 200) {
+                get().updateTargetSession(
+                  session,
+                  (session) =>
+                    (session.topic =
+                      message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
+                );
+              }
+            },
+          });
+        }
+        const summarizeIndex = Math.max(
+          session.lastSummarizeIndex,
+          session.clearContextIndex ?? 0,
+        );
+        let toBeSummarizedMsgs = messages
+          .filter((msg) => !msg.isError)
+          .slice(summarizeIndex);
+
+        const historyMsgLength = countMessages(toBeSummarizedMsgs);
+
+        if (historyMsgLength > (modelConfig?.max_tokens || 4000)) {
+          const n = toBeSummarizedMsgs.length;
+          toBeSummarizedMsgs = toBeSummarizedMsgs.slice(
+            Math.max(0, n - modelConfig.historyMessageCount),
+          );
+        }
+        const memoryPrompt = get().getMemoryPrompt();
+        if (memoryPrompt) {
+          // add memory prompt
+          toBeSummarizedMsgs.unshift(memoryPrompt);
+        }
+
+        const lastSummarizeIndex = session.messages.length;
+
+        console.log(
+          "[Chat History] ",
+          toBeSummarizedMsgs,
+          historyMsgLength,
+          modelConfig.compressMessageLengthThreshold,
+        );
+
+        if (
+          historyMsgLength > modelConfig.compressMessageLengthThreshold &&
+          modelConfig.sendMemory
+        ) {
+          /** Destruct max_tokens while summarizing
+           * this param is just shit
+           **/
+          const { max_tokens, ...modelcfg } = modelConfig;
+          api.llm.chat({
+            messages: toBeSummarizedMsgs.concat(
+              createMessage({
+                role: "system",
+                content: Locale.Store.Prompt.Summarize,
+                date: "",
+              }),
+            ),
+            config: {
+              ...modelcfg,
+              stream: true,
+              model,
+              providerName,
+            },
+            onUpdate(message) {
+              session.memoryPrompt = message;
+            },
+            onFinish(message, responseRes) {
+              if (responseRes?.status === 200) {
+                console.log("[Memory] ", message);
+                get().updateTargetSession(session, (session) => {
+                  session.lastSummarizeIndex = lastSummarizeIndex;
+                  session.memoryPrompt = message; // Update the memory prompt for stored it in local storage
+                });
+              }
+            },
+            onError(err) {
+              console.error("[Summarize] ", err);
+            },
+          });
+        }
+      },
+      deleteSession(index: number) {
+        const deletingLastSession = get().sessions.length === 1;
+        const deletedSession = get().sessions.at(index);
+
+        if (!deletedSession) return;
+
+        const sessions = get().sessions.slice();
+        sessions.splice(index, 1);
+
+        const currentIndex = get().currentSessionIndex;
+        let nextIndex = Math.min(
+          currentIndex - Number(index < currentIndex),
+          sessions.length - 1,
+        );
+
+        if (deletingLastSession) {
+          nextIndex = -1;
+          // sessions.push(createEmptySession());
+        }
+
+        // for undo delete action
+        const restoreState = {
+          currentSessionIndex: get().currentSessionIndex,
+          sessions: get().sessions.slice(),
+        };
+
+        set(() => ({
+          currentSessionIndex: nextIndex,
+          sessions,
+        }));
+
+        showToast(
+          Locale.Home.DeleteToast,
+          {
+            text: Locale.Home.Revert,
+            onClick() {
+              set(() => restoreState);
+            },
+          },
+          5000,
+        );
+      },
+      forkSession() {
+        // 获取当前会话
+        const currentSession = get().getCurrentSession();
+        if (!currentSession) return;
+
+        const newSession = createEmptySession();
+
+        newSession.topic = currentSession.topic;
+        // 深拷贝消息
+        newSession.messages = currentSession.messages.map((msg) => ({
+          ...msg,
+          id: nanoid(), // 生成新的消息 ID
+        }));
+        newSession.mask = {
+          ...currentSession.mask,
+          modelConfig: {
+            ...currentSession.mask.modelConfig,
+          },
+        };
+
+        set((state) => ({
+          currentSessionIndex: 0,
+          sessions: [newSession, ...state.sessions],
+        }));
+      },
+      nextSession(delta: number) {
+        const n = get().sessions.length;
+        const limit = (x: number) => (x + n) % n;
+        const i = get().currentSessionIndex;
+        get().selectSession(limit(i + delta));
+      },
+      async newSession(token: string, mask?: Mask, callback?: () => void) {
+        const session = createEmptySession();
+
+        if (mask) {
+          const config = useAppConfig.getState();
+          const globalModelConfig = config.modelConfig;
+
+          session.mask = {
+            ...mask,
+            modelConfig: {
+              ...globalModelConfig,
+              ...mask.modelConfig,
+            },
+          };
+          session.topic = mask.name;
+        }
+
+        const data = ConvertSession("add", session);
+
+        await PostAddOrUpdateSession(token, data)
+          .then(() => {
+            set((state) => ({
+              currentSessionIndex: 0,
+              sessions: [session].concat(state.sessions),
+            }));
+            callback && callback();
+          })
+          .catch(() => {
+            console.log("失败");
+          });
       },
     }),
     {

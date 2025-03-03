@@ -1,25 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { newChatStore } from "../store/new-chat";
-
-// export function _Chat_NEW() {
-//   const { message, currentSessionIndex, getCurrentMessage, getCurrentSession } =
-//     newChatStore();
-
-//   const session = getCurrentSession(currentSessionIndex);
-
-//   const [loading, setLoading] = useState<boolean>(false);
-
-//   useEffect(() => {
-//     getCurrentMessage(currentSessionIndex);
-//   }, [currentSessionIndex]);
-
-//   if (!session) {
-//     return <></>;
-//   }
-
-//   return <></>;
-// }
-
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   Fragment,
@@ -144,7 +122,7 @@ import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
-import { newChatStore } from "../store/new-chat";
+import { useNewChatStore } from "../store/new-chat";
 
 const localStorage = safeLocalStorage();
 
@@ -1009,23 +987,8 @@ export function ShortcutKeyModal(props: { onClose: () => void }) {
 export function _Chat_NEW() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
-  const {
-    message,
-    currentSessionIndex,
-    getCurrentMessage,
-    getCurrentSession,
-    onUserInput,
-    updateTargetSession,
-  } = newChatStore();
-
-  const session = getCurrentSession(currentSessionIndex);
-
-  useEffect(() => {
-    getCurrentMessage(currentSessionIndex);
-  }, [currentSessionIndex]);
-
-  // const chatStore = useChatStore();
-  // const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
   const config = useAppConfig();
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
@@ -1061,7 +1024,7 @@ export function _Chat_NEW() {
   const { setAutoScroll, scrollDomToBottom } = useScrollToBottom(
     scrollRef,
     (isScrolledToBottom || isAttachWithTop) && !isTyping,
-    message,
+    session.messages,
   );
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
@@ -1148,9 +1111,11 @@ export function _Chat_NEW() {
     }
     setIsLoading(true);
 
-    onUserInput(userInput, attachImages).then(() => setIsLoading(false));
+    chatStore
+      .onUserInput(userInput, attachImages)
+      .then(() => setIsLoading(false));
     setAttachImages([]);
-    // chatStore.setLastInput(userInput);
+    chatStore.setLastInput(userInput);
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
@@ -1296,7 +1261,7 @@ export function _Chat_NEW() {
   };
 
   const onPinMessage = (message: ChatMessage) => {
-    updateTargetSession(session!, (session) =>
+    chatStore.updateTargetSession(session!, (session) =>
       session.mask.context.push(message),
     );
 
@@ -1362,7 +1327,10 @@ export function _Chat_NEW() {
     );
   }, [session?.mask?.context, session?.mask?.hideContext]);
 
-  if (context.length === 0 && message.at(0)?.content !== BOT_HELLO.content) {
+  if (
+    context.length === 0 &&
+    session.messages.at(0)?.content !== BOT_HELLO.content
+  ) {
     const copiedHello = Object.assign({}, BOT_HELLO);
     if (!accessStore.isAuthorized()) {
       if (!isEmpty(appstore.omeToken)) {
@@ -1376,7 +1344,7 @@ export function _Chat_NEW() {
   // preview messages
   const renderMessages = useMemo(() => {
     return context
-      .concat(message as RenderMessage[])
+      .concat(session.messages as RenderMessage[])
       .concat(
         isLoading
           ? [
@@ -1403,7 +1371,13 @@ export function _Chat_NEW() {
             ]
           : [],
       );
-  }, [config.sendPreviewBubble, context, isLoading, message, userInput]);
+  }, [
+    config.sendPreviewBubble,
+    context,
+    isLoading,
+    session.messages,
+    userInput,
+  ]);
 
   const [msgRenderIndex, _setMsgRenderIndex] = useState(
     Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
