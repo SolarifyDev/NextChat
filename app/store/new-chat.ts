@@ -82,7 +82,7 @@ export type ChatStoreType = {
   sessions: ChatSession[];
   lastInput: string;
   selectSession: (i: number) => void;
-  getSession: (token: string) => Promise<void>;
+  getSession: () => Promise<void>;
   getCurrentSession: () => ChatSession;
   clearCurrent: () => void;
   onUserInput(
@@ -98,11 +98,6 @@ export type ChatStoreType = {
     isUpdate?: boolean,
   ): void;
   getMemoryPrompt(): ChatMessage | undefined;
-  onUserInput(
-    content: string,
-    attachImages?: string[],
-    isMcpResponse?: boolean,
-  ): Promise<void>;
   setLastInput(lastInput: string): void;
   summarizeSession(
     refreshTitle: boolean | undefined,
@@ -111,9 +106,10 @@ export type ChatStoreType = {
   deleteSession(index: number): void;
   forkSession(): void;
   nextSession(delta: number): void;
-  newSession(token: string, mask?: Mask, callback?: () => void): void;
+  newSession(mask?: Mask, callback?: () => void): void;
   updateStat(message: ChatMessage, session: ChatSession): void;
   checkMcpJson(message: ChatMessage): void;
+  clearAllData(): void;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -258,9 +254,9 @@ export const useNewChatStore = create<ChatStoreType>()(
         set({ currentSessionIndex: i });
       },
 
-      getSession: async (token: string) => {
+      getSession: async () => {
         try {
-          const data = await GetHistory(token);
+          const data = await GetHistory(useAppConfig.getState().omeToken);
           const newData: ChatSession[] = data.map((item) => ({
             ...item,
             messages: JSONParse(item.messages),
@@ -286,7 +282,6 @@ export const useNewChatStore = create<ChatStoreType>()(
       },
 
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
-        console.log(message, "message", targetSession); // 触发更新
         get().updateTargetSession(
           targetSession,
           (session) => {
@@ -298,9 +293,9 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         // get().updateStat(message, targetSession);
 
-        // // get().checkMcpJson(message);
+        get().checkMcpJson(message);
 
-        // get().summarizeSession(false, targetSession);
+        get().summarizeSession(false, targetSession);
       },
       /** check if the message contains MCP JSON and execute the MCP action */
       checkMcpJson(message: ChatMessage) {
@@ -407,10 +402,6 @@ export const useNewChatStore = create<ChatStoreType>()(
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
             });
-
-            // set({
-            //   message: get().message.concat(),
-            // });
           },
           async onFinish(message) {
             botMessage.streaming = false;
@@ -448,9 +439,13 @@ export const useNewChatStore = create<ChatStoreType>()(
             botMessage.streaming = false;
             userMessage.isError = !isAborted;
             botMessage.isError = !isAborted;
-            get().updateTargetSession(session, (session) => {
-              session.messages = session.messages.concat();
-            });
+            get().updateTargetSession(
+              session,
+              (session) => {
+                session.messages = session.messages.concat();
+              },
+              true,
+            );
             ChatControllerPool.remove(
               session.id,
               botMessage.id ?? messageIndex,
@@ -590,7 +585,6 @@ export const useNewChatStore = create<ChatStoreType>()(
         updater(sessions[index]);
         set(() => ({ sessions }));
         if (isUpdate) {
-          console.log(sessions[index], "sessions[index];");
           const config = useAppConfig.getState();
           await PostAddOrUpdateSession(
             config.omeToken,
@@ -666,6 +660,7 @@ export const useNewChatStore = create<ChatStoreType>()(
                   (session) =>
                     (session.topic =
                       message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
+                  true,
                 );
               }
             },
@@ -730,10 +725,14 @@ export const useNewChatStore = create<ChatStoreType>()(
             onFinish(message, responseRes) {
               if (responseRes?.status === 200) {
                 console.log("[Memory] ", message);
-                get().updateTargetSession(session, (session) => {
-                  session.lastSummarizeIndex = lastSummarizeIndex;
-                  session.memoryPrompt = message; // Update the memory prompt for stored it in local storage
-                });
+                get().updateTargetSession(
+                  session,
+                  (session) => {
+                    session.lastSummarizeIndex = lastSummarizeIndex;
+                    session.memoryPrompt = message; // Update the memory prompt for stored it in local storage
+                  },
+                  true,
+                );
               }
             },
             onError(err) {
@@ -795,7 +794,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           },
         );
       },
-      forkSession() {
+      async forkSession() {
         // 获取当前会话
         const currentSession = get().getCurrentSession();
         if (!currentSession) return;
@@ -815,10 +814,24 @@ export const useNewChatStore = create<ChatStoreType>()(
           },
         };
 
-        set((state) => ({
-          currentSessionIndex: 0,
-          sessions: [newSession, ...state.sessions],
-        }));
+        const config = useAppConfig.getState();
+
+        const data = ConvertSession("add", newSession);
+
+        await PostAddOrUpdateSession(config.omeToken, data)
+          .then((res) => {
+            if (res) {
+              newSession.sessionId = res.sessionId;
+
+              set((state) => ({
+                currentSessionIndex: 0,
+                sessions: [newSession, ...state.sessions],
+              }));
+            }
+          })
+          .catch(() => {
+            console.log("失败");
+          });
       },
       nextSession(delta: number) {
         const n = get().sessions.length;
@@ -826,7 +839,7 @@ export const useNewChatStore = create<ChatStoreType>()(
         const i = get().currentSessionIndex;
         get().selectSession(limit(i + delta));
       },
-      async newSession(token: string, mask?: Mask, callback?: () => void) {
+      async newSession(mask?: Mask, callback?: () => void) {
         const session = createEmptySession();
 
         if (mask) {
@@ -845,7 +858,7 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         const data = ConvertSession("add", session);
 
-        await PostAddOrUpdateSession(token, data)
+        await PostAddOrUpdateSession(useAppConfig.getState().omeToken, data)
           .then((res) => {
             if (res) {
               session.sessionId = res.sessionId;
@@ -862,6 +875,10 @@ export const useNewChatStore = create<ChatStoreType>()(
             console.log("失败");
           });
       },
+      clearAllData() {
+        localStorage.clear();
+        location.reload();
+      },
     }),
     {
       name: "CHAT_STORE",
@@ -872,133 +889,3 @@ export const useNewChatStore = create<ChatStoreType>()(
     },
   ),
 );
-
-const data: ChatSession[] = [
-  {
-    id: "OQUqwpaDpcLuTl63N0AWD",
-    topic: "新的聊天",
-    memoryPrompt: "",
-    messages: [],
-    stat: {
-      tokenCount: 0,
-      wordCount: 0,
-      charCount: 1360,
-    },
-    lastUpdate: 1740465702082,
-    lastSummarizeIndex: 0,
-    mask: {
-      id: "xynUrxn49IouorL-Imfm-",
-      avatar: "gpt-bot",
-      name: "新的聊天",
-      context: [],
-      syncGlobalConfig: true,
-      modelConfig: {
-        model: "gpt-4o-mini",
-        providerName: "OpenAI",
-        temperature: 0.5,
-        top_p: 1,
-        max_tokens: 4000,
-        presence_penalty: 0,
-        frequency_penalty: 0,
-        sendMemory: true,
-        historyMessageCount: 4,
-        compressMessageLengthThreshold: 1000,
-        compressModel: "",
-        compressProviderName: "",
-        enableInjectSystemPrompts: true,
-        template: "{{input}}",
-        size: "1024x1024",
-        quality: "standard",
-        style: "vivid",
-      },
-      lang: "cn",
-      builtin: false,
-      createdAt: 1740448232818,
-      plugin: ["ikAbgA1Miq34iB7tZ9OY5"],
-    },
-  },
-  {
-    id: "lt_ab6Q_8i4NhHLf6YxI8",
-    topic: "AI文生图",
-    memoryPrompt: "",
-    messages: [
-      {
-        id: "xz03XUbkKFzPeOB_K1B62",
-        date: "2025/2/26 10:16:37",
-        role: "user",
-        content: "123",
-      },
-      {
-        id: "QhlqN8GRqTmCrEIloxFla",
-        date: "2025/2/26 10:16:37",
-        role: "assistant",
-        content:
-          '\n\n😆 对话遇到了一些问题，不用慌:\n        1️⃣ 想要零配置开箱即用，[点击这里立刻开启对话 🚀](https://nextchat.club?utm=github)\n        2️⃣ 如果你正在使用私有部署版本，点击[这里](/#/auth)输入访问秘钥 🔑\n        3️⃣ 如果你想消耗自己的 OpenAI 资源，点击[这里](/#/settings)修改设置 ⚙️\n       \n\n```json\n{\n  "error": true,\n  "msg": "empty access code"\n}\n```',
-        streaming: false,
-        model: "gpt-4o-mini",
-      },
-    ],
-    stat: {
-      tokenCount: 0,
-      wordCount: 0,
-      charCount: 272,
-    },
-    lastUpdate: 1740536197336,
-    lastSummarizeIndex: 0,
-    mask: {
-      avatar: "1f5bc-fe0f",
-      name: "AI文生图",
-      context: [
-        {
-          id: "text-to-pic-0",
-          role: "system",
-          content:
-            "You are a useful Assistant that won't refuse to draw picture, instead, you will output specific markdown code for picture description, but don't use code block.",
-          date: "",
-        },
-        {
-          id: "text-to-pic-1",
-          role: "user",
-          content: "Can you draw some pictures for me?",
-          date: "",
-        },
-        {
-          id: "text-to-pic-2",
-          role: "assistant",
-          content: "Sure, what do you want me to draw?",
-          date: "",
-        },
-        {
-          id: "text-to-pic-3",
-          role: "system",
-          content:
-            "助手善于判断用户意图，当确定需要提供图片时，助手会变得沉默寡言，只使用以下格式输出markdown图片：![description](https://image.pollinations.ai/prompt/description?nologo=true)，因为这个语法可以自动按照提示生成并渲染图片。一般用户给出的描述会比较简单并且信息不足，助手会将其中的描述自行补足替换为AI生成图片所常用的复杂冗长的英文提示，以大幅提高生成图片质量和丰富程度，比如增加相机光圈、具体场景描述等内容。助手会避免用代码块或原始块包围markdown标记，因为那样只会渲染出代码块或原始块而不是图片。url中的空格等符号需要转义。",
-          date: "",
-        },
-      ],
-      modelConfig: {
-        model: "gpt-4o-mini",
-        providerName: "OpenAi",
-        temperature: 1,
-        top_p: 1,
-        max_tokens: 2000,
-        presence_penalty: 0,
-        frequency_penalty: 0,
-        sendMemory: true,
-        historyMessageCount: 32,
-        compressMessageLengthThreshold: 1000,
-        compressModel: "",
-        compressProviderName: "",
-        enableInjectSystemPrompts: true,
-        template: "{{input}}",
-        size: "1024x1024",
-        quality: "standard",
-        style: "vivid",
-      },
-      lang: "cn",
-      builtin: true,
-      createdAt: 1688899480510,
-      id: 100000,
-    },
-  },
-];

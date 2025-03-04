@@ -243,7 +243,7 @@ export function SideBar(props: { className?: string }) {
     };
     checkMcpStatus();
 
-    getSession(config.omeToken);
+    getSession();
   }, []);
 
   return (
@@ -348,8 +348,7 @@ export function SideBar(props: { className?: string }) {
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
             onClick={() => {
               if (config.dontShowMaskSplashScreen) {
-                chatStore.newSession(config.omeToken);
-                navigate(Path.Chat);
+                chatStore.newSession(undefined, () => navigate(Path.Chat));
               } else {
                 navigate(Path.NewChat);
               }

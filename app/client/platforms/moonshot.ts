@@ -9,7 +9,6 @@ import {
 import {
   useAccessStore,
   useAppConfig,
-  useChatStore,
   ChatMessageTool,
   usePluginStore,
 } from "@/app/store";
@@ -25,6 +24,7 @@ import { getClientConfig } from "@/app/config/client";
 import { getMessageTextContent } from "@/app/utils";
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
+import { useNewChatStore } from "@/app/store/new-chat";
 
 export class MoonshotApi implements LLMApi {
   private disableListModels = true;
@@ -73,7 +73,8 @@ export class MoonshotApi implements LLMApi {
 
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
+      // ...useChatStore.getState().currentSession().mask.modelConfig,
+      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,
@@ -114,11 +115,10 @@ export class MoonshotApi implements LLMApi {
       );
 
       if (shouldStream) {
-        const [tools, funcs] = usePluginStore
-          .getState()
-          .getAsTools(
-            useChatStore.getState().currentSession().mask?.plugin || [],
-          );
+        const [tools, funcs] = usePluginStore.getState().getAsTools(
+          // useChatStore.getState().currentSession().mask?.plugin || [],
+          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+        );
         return stream(
           chatPath,
           requestPayload,

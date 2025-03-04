@@ -444,7 +444,6 @@ export function MaskPage() {
 
   const maskStore = useMaskStore();
   const chatStore = useNewChatStore();
-  const config = useAppConfig();
 
   const filterLang = maskStore.language;
 
@@ -602,8 +601,7 @@ export function MaskPage() {
                     icon={<AddIcon />}
                     text={Locale.Mask.Item.Chat}
                     onClick={() => {
-                      chatStore.newSession(config.omeToken, m);
-                      navigate(Path.Chat);
+                      chatStore.newSession(m, () => navigate(Path.Chat));
                     }}
                   />
                   {m.builtin ? (

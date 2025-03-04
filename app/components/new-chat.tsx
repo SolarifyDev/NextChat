@@ -91,8 +91,7 @@ export function NewChat() {
 
   const startChat = (mask?: Mask) => {
     setTimeout(() => {
-      chatStore.newSession(config.omeToken, mask);
-      navigate(Path.Chat);
+      chatStore.newSession(mask, () => navigate(Path.Chat));
     }, 10);
   };
 

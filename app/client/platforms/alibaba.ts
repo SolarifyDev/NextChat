@@ -3,7 +3,6 @@ import { ApiPath, Alibaba, ALIBABA_BASE_URL } from "@/app/constant";
 import {
   useAccessStore,
   useAppConfig,
-  useChatStore,
   ChatMessageTool,
   usePluginStore,
 } from "@/app/store";
@@ -23,6 +22,7 @@ import {
   getTimeoutMSByModel,
 } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
+import { useNewChatStore } from "@/app/store/new-chat";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -99,7 +99,8 @@ export class QwenApi implements LLMApi {
 
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
+      // ...useChatStore.getState().currentSession().mask.modelConfig,
+      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
       ...{
         model: options.config.model,
       },
@@ -144,11 +145,10 @@ export class QwenApi implements LLMApi {
       );
 
       if (shouldStream) {
-        const [tools, funcs] = usePluginStore
-          .getState()
-          .getAsTools(
-            useChatStore.getState().currentSession().mask?.plugin || [],
-          );
+        const [tools, funcs] = usePluginStore.getState().getAsTools(
+          // useChatStore.getState().currentSession().mask?.plugin || [],
+          useNewChatStore.getState().getCurrentSession()?.mask?.plugin || [],
+        );
         return streamWithThink(
           chatPath,
           requestPayload,

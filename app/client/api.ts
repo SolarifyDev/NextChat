@@ -9,7 +9,6 @@ import {
   ChatMessage,
   ModelType,
   useAccessStore,
-  useChatStore,
   useAppConfig,
 } from "../store";
 import { ChatGPTApi, DalleRequestPayload } from "./platforms/openai";
@@ -25,6 +24,7 @@ import { DeepSeekApi } from "./platforms/deepseek";
 import { XAIApi } from "./platforms/xai";
 import { ChatGLMApi } from "./platforms/glm";
 import { SiliconflowApi } from "./platforms/siliconflow";
+import { useNewChatStore } from "../store/new-chat";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -236,7 +236,8 @@ export function validString(x: string): boolean {
 export function getHeaders(ignoreHeaders: boolean = false) {
   const appConfig = useAppConfig.getState();
   const accessStore = useAccessStore.getState();
-  const chatStore = useChatStore.getState();
+  // const chatStore = useChatStore.getState();
+  const chatStore = useNewChatStore.getState();
   let headers: Record<string, string> = {};
   if (!ignoreHeaders) {
     headers = {
@@ -248,20 +249,20 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   const clientConfig = getClientConfig();
 
   function getConfig() {
-    const modelConfig = chatStore.currentSession().mask.modelConfig;
-    const isGoogle = modelConfig.providerName === ServiceProvider.Google;
-    const isAzure = modelConfig.providerName === ServiceProvider.Azure;
-    const isAnthropic = modelConfig.providerName === ServiceProvider.Anthropic;
-    const isBaidu = modelConfig.providerName == ServiceProvider.Baidu;
-    const isByteDance = modelConfig.providerName === ServiceProvider.ByteDance;
-    const isAlibaba = modelConfig.providerName === ServiceProvider.Alibaba;
-    const isMoonshot = modelConfig.providerName === ServiceProvider.Moonshot;
-    const isIflytek = modelConfig.providerName === ServiceProvider.Iflytek;
-    const isDeepSeek = modelConfig.providerName === ServiceProvider.DeepSeek;
-    const isXAI = modelConfig.providerName === ServiceProvider.XAI;
-    const isChatGLM = modelConfig.providerName === ServiceProvider.ChatGLM;
+    const modelConfig = chatStore.getCurrentSession()?.mask?.modelConfig;
+    const isGoogle = modelConfig?.providerName === ServiceProvider.Google;
+    const isAzure = modelConfig?.providerName === ServiceProvider.Azure;
+    const isAnthropic = modelConfig?.providerName === ServiceProvider.Anthropic;
+    const isBaidu = modelConfig?.providerName == ServiceProvider.Baidu;
+    const isByteDance = modelConfig?.providerName === ServiceProvider.ByteDance;
+    const isAlibaba = modelConfig?.providerName === ServiceProvider.Alibaba;
+    const isMoonshot = modelConfig?.providerName === ServiceProvider.Moonshot;
+    const isIflytek = modelConfig?.providerName === ServiceProvider.Iflytek;
+    const isDeepSeek = modelConfig?.providerName === ServiceProvider.DeepSeek;
+    const isXAI = modelConfig?.providerName === ServiceProvider.XAI;
+    const isChatGLM = modelConfig?.providerName === ServiceProvider.ChatGLM;
     const isSiliconFlow =
-      modelConfig.providerName === ServiceProvider.SiliconFlow;
+      modelConfig?.providerName === ServiceProvider.SiliconFlow;
     const isEnabledAccessControl = accessStore.enabledAccessControl();
     const apiKey = isGoogle
       ? accessStore.googleApiKey
@@ -349,7 +350,7 @@ export function getHeaders(ignoreHeaders: boolean = false) {
       ACCESS_CODE_PREFIX + accessStore.accessCode,
     );
   }
-  console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
+  // console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
 
   headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
 

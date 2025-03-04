@@ -102,7 +102,9 @@ import {
   DEFAULT_TTS_ENGINE,
   ModelProvider,
   Path,
+  REQUEST_TIMEOUT_MS,
   ServiceProvider,
+  UNFINISHED_INPUT,
 } from "../constant";
 import { Avatar } from "./emoji";
 import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
@@ -393,7 +395,7 @@ function ClearContextDivider() {
       onClick={() =>
         chatStore.updateTargetSession(
           session,
-          (session) => (session.clearContextIndex = undefined),
+          (session) => (session.clearContextIndex = null),
           true,
         )
       }
@@ -1087,17 +1089,18 @@ export function _Chat_NEW() {
 
   // chat commands shortcuts
   const chatCommands = useChatCommand({
-    // new: () => chatStore.newSession(),
-    // newm: () => navigate(Path.NewChat),
-    // prev: () => chatStore.nextSession(-1),
-    // next: () => chatStore.nextSession(1),
-    // clear: () =>
-    //   chatStore.updateTargetSession(
-    //     session,
-    //     (session) => (session.clearContextIndex = session.messages.length),
-    //   ),
-    // fork: () => chatStore.forkSession(),
-    // del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
+    new: () => chatStore.newSession(),
+    newm: () => navigate(Path.NewChat),
+    prev: () => chatStore.nextSession(-1),
+    next: () => chatStore.nextSession(1),
+    clear: () =>
+      chatStore.updateTargetSession(
+        session,
+        (session) => (session.clearContextIndex = session.messages.length),
+        true,
+      ),
+    fork: () => chatStore.forkSession(),
+    del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
   });
 
   // only search prompts when user input is short
@@ -1165,29 +1168,33 @@ export function _Chat_NEW() {
   };
 
   useEffect(() => {
-    // chatStore.updateTargetSession(session, (session) => {
-    //   const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
-    //   session.messages.forEach((m) => {
-    //     // check if should stop all stale messages
-    //     if (m.isError || new Date(m.date).getTime() < stopTiming) {
-    //       if (m.streaming) {
-    //         m.streaming = false;
-    //       }
-    //       if (m.content.length === 0) {
-    //         m.isError = true;
-    //         m.content = prettyObject({
-    //           error: true,
-    //           message: "empty response",
-    //         });
-    //       }
-    //     }
-    //   });
-    //   // auto sync mask config from global config
-    //   if (session.mask.syncGlobalConfig) {
-    //     console.log("[Mask] syncing from global, name = ", session.mask.name);
-    //     session.mask.modelConfig = { ...config.modelConfig };
-    //   }
-    // });
+    chatStore.updateTargetSession(
+      session,
+      (session) => {
+        const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
+        session.messages.forEach((m) => {
+          // check if should stop all stale messages
+          if (m.isError || new Date(m.date).getTime() < stopTiming) {
+            if (m.streaming) {
+              m.streaming = false;
+            }
+            if (m.content.length === 0) {
+              m.isError = true;
+              m.content = prettyObject({
+                error: true,
+                message: "empty response",
+              });
+            }
+          }
+        });
+        // auto sync mask config from global config
+        if (session.mask.syncGlobalConfig) {
+          console.log("[Mask] syncing from global, name = ", session.mask.name);
+          session.mask.modelConfig = { ...config.modelConfig };
+        }
+      },
+      true,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
@@ -1517,61 +1524,60 @@ export function _Chat_NEW() {
 
   // remember unfinished input
   useEffect(() => {
-    // // try to load from local storage
-    // const key = UNFINISHED_INPUT(session.id);
-    // const mayBeUnfinishedInput = localStorage.getItem(key);
-    // if (mayBeUnfinishedInput && userInput.length === 0) {
-    //   setUserInput(mayBeUnfinishedInput);
-    //   localStorage.removeItem(key);
-    // }
-    // const dom = inputRef.current;
-    // return () => {
-    //   localStorage.setItem(key, dom?.value ?? "");
-    // };
+    // try to load from local storage
+    const key = UNFINISHED_INPUT(session.id);
+    const mayBeUnfinishedInput = localStorage.getItem(key);
+    if (mayBeUnfinishedInput && userInput.length === 0) {
+      setUserInput(mayBeUnfinishedInput);
+      localStorage.removeItem(key);
+    }
+    const dom = inputRef.current;
+    return () => {
+      localStorage.setItem(key, dom?.value ?? "");
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      // const currentModel = chatStore.currentSession().mask.modelConfig.model;
-      // if (!isVisionModel(currentModel)) {
-      //   return;
-      // }
-      // const items = (event.clipboardData || window.clipboardData).items;
-      // for (const item of items) {
-      //   if (item.kind === "file" && item.type.startsWith("image/")) {
-      //     event.preventDefault();
-      //     const file = item.getAsFile();
-      //     if (file) {
-      //       const images: string[] = [];
-      //       images.push(...attachImages);
-      //       images.push(
-      //         ...(await new Promise<string[]>((res, rej) => {
-      //           setUploading(true);
-      //           const imagesData: string[] = [];
-      //           uploadImageRemote(file)
-      //             .then((dataUrl) => {
-      //               imagesData.push(dataUrl);
-      //               setUploading(false);
-      //               res(imagesData);
-      //             })
-      //             .catch((e) => {
-      //               setUploading(false);
-      //               rej(e);
-      //             });
-      //         })),
-      //       );
-      //       const imagesLength = images.length;
-      //       if (imagesLength > 3) {
-      //         images.splice(3, imagesLength - 3);
-      //       }
-      //       setAttachImages(images);
-      //     }
-      //   }
-      // }
+      const currentModel = chatStore.getCurrentSession().mask.modelConfig.model;
+      if (!isVisionModel(currentModel)) {
+        return;
+      }
+      const items = (event.clipboardData || window.clipboardData).items;
+      for (const item of items) {
+        if (item.kind === "file" && item.type.startsWith("image/")) {
+          event.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            const images: string[] = [];
+            images.push(...attachImages);
+            images.push(
+              ...(await new Promise<string[]>((res, rej) => {
+                setUploading(true);
+                const imagesData: string[] = [];
+                uploadImageRemote(file)
+                  .then((dataUrl) => {
+                    imagesData.push(dataUrl);
+                    setUploading(false);
+                    res(imagesData);
+                  })
+                  .catch((e) => {
+                    setUploading(false);
+                    rej(e);
+                  });
+              })),
+            );
+            const imagesLength = images.length;
+            if (imagesLength > 3) {
+              images.splice(3, imagesLength - 3);
+            }
+            setAttachImages(images);
+          }
+        }
+      }
     },
-    // [attachImages, chatStore],
-    [attachImages],
+    [attachImages, chatStore],
   );
 
   async function uploadImage() {
@@ -1624,80 +1630,82 @@ export function _Chat_NEW() {
   const [showShortcutKeyModal, setShowShortcutKeyModal] = useState(false);
 
   useEffect(() => {
-    // const handleKeyDown = (event: KeyboardEvent) => {
-    //   // 打开新聊天 command + shift + o
-    //   if (
-    //     (event.metaKey || event.ctrlKey) &&
-    //     event.shiftKey &&
-    //     event.key.toLowerCase() === "o"
-    //   ) {
-    //     event.preventDefault();
-    //     setTimeout(() => {
-    //       chatStore.newSession();
-    //       navigate(Path.Chat);
-    //     }, 10);
-    //   }
-    //   // 聚焦聊天输入 shift + esc
-    //   else if (event.shiftKey && event.key.toLowerCase() === "escape") {
-    //     event.preventDefault();
-    //     inputRef.current?.focus();
-    //   }
-    //   // 复制最后一个代码块 command + shift + ;
-    //   else if (
-    //     (event.metaKey || event.ctrlKey) &&
-    //     event.shiftKey &&
-    //     event.code === "Semicolon"
-    //   ) {
-    //     event.preventDefault();
-    //     const copyCodeButton =
-    //       document.querySelectorAll<HTMLElement>(".copy-code-button");
-    //     if (copyCodeButton.length > 0) {
-    //       copyCodeButton[copyCodeButton.length - 1].click();
-    //     }
-    //   }
-    //   // 复制最后一个回复 command + shift + c
-    //   else if (
-    //     (event.metaKey || event.ctrlKey) &&
-    //     event.shiftKey &&
-    //     event.key.toLowerCase() === "c"
-    //   ) {
-    //     event.preventDefault();
-    //     const lastNonUserMessage = messages
-    //       .filter((message) => message.role !== "user")
-    //       .pop();
-    //     if (lastNonUserMessage) {
-    //       const lastMessageContent = getMessageTextContent(lastNonUserMessage);
-    //       copyToClipboard(lastMessageContent);
-    //     }
-    //   }
-    //   // 展示快捷键 command + /
-    //   else if ((event.metaKey || event.ctrlKey) && event.key === "/") {
-    //     event.preventDefault();
-    //     setShowShortcutKeyModal(true);
-    //   }
-    //   // 清除上下文 command + shift + backspace
-    //   else if (
-    //     (event.metaKey || event.ctrlKey) &&
-    //     event.shiftKey &&
-    //     event.key.toLowerCase() === "backspace"
-    //   ) {
-    //     event.preventDefault();
-    //     chatStore.updateTargetSession(session, (session) => {
-    //       if (session.clearContextIndex === session.messages.length) {
-    //         session.clearContextIndex = undefined;
-    //       } else {
-    //         session.clearContextIndex = session.messages.length;
-    //         session.memoryPrompt = ""; // will clear memory
-    //       }
-    //     });
-    //   }
-    // };
-    // document.addEventListener("keydown", handleKeyDown);
-    // return () => {
-    //   document.removeEventListener("keydown", handleKeyDown);
-    // };
-    // }, [messages, chatStore, navigate, session]);
-  }, [messages, navigate, session]);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // 打开新聊天 command + shift + o
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey &&
+        event.key.toLowerCase() === "o"
+      ) {
+        event.preventDefault();
+        setTimeout(() => {
+          chatStore.newSession(undefined, () => navigate(Path.Chat));
+        }, 10);
+      }
+      // 聚焦聊天输入 shift + esc
+      else if (event.shiftKey && event.key.toLowerCase() === "escape") {
+        event.preventDefault();
+        inputRef.current?.focus();
+      }
+      // 复制最后一个代码块 command + shift + ;
+      else if (
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey &&
+        event.code === "Semicolon"
+      ) {
+        event.preventDefault();
+        const copyCodeButton =
+          document.querySelectorAll<HTMLElement>(".copy-code-button");
+        if (copyCodeButton.length > 0) {
+          copyCodeButton[copyCodeButton.length - 1].click();
+        }
+      }
+      // 复制最后一个回复 command + shift + c
+      else if (
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey &&
+        event.key.toLowerCase() === "c"
+      ) {
+        event.preventDefault();
+        const lastNonUserMessage = messages
+          .filter((message) => message.role !== "user")
+          .pop();
+        if (lastNonUserMessage) {
+          const lastMessageContent = getMessageTextContent(lastNonUserMessage);
+          copyToClipboard(lastMessageContent);
+        }
+      }
+      // 展示快捷键 command + /
+      else if ((event.metaKey || event.ctrlKey) && event.key === "/") {
+        event.preventDefault();
+        setShowShortcutKeyModal(true);
+      }
+      // 清除上下文 command + shift + backspace
+      else if (
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey &&
+        event.key.toLowerCase() === "backspace"
+      ) {
+        event.preventDefault();
+        chatStore.updateTargetSession(
+          session,
+          (session) => {
+            if (session.clearContextIndex === session.messages.length) {
+              session.clearContextIndex = null;
+            } else {
+              session.clearContextIndex = session.messages.length;
+              session.memoryPrompt = ""; // will clear memory
+            }
+          },
+          true,
+        );
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [messages, chatStore, navigate, session]);
 
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
@@ -1746,7 +1754,7 @@ export function _Chat_NEW() {
                 title={Locale.Chat.Actions.RefreshTitle}
                 onClick={() => {
                   showToast(Locale.Chat.Actions.RefreshToast);
-                  // chatStore.summarizeSession(true, session);
+                  chatStore.summarizeSession(true, session);
                 }}
               />
             </div>

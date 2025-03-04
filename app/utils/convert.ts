@@ -36,7 +36,7 @@ export const ConvertSession = (
         stat: JSONStringify(session.stat) ?? "",
         lastUpdate: session.lastUpdate,
         lastSummarizeIndex: session.lastSummarizeIndex,
-        // clearContextIndex
+        clearContextIndex: null,
         mask: JSONStringify(session.mask) ?? "",
         isDeleted: false,
       };
@@ -50,7 +50,7 @@ export const ConvertSession = (
         stat: JSONStringify(session.stat) ?? "",
         lastUpdate: session.lastUpdate,
         lastSummarizeIndex: session.lastSummarizeIndex,
-        // clearContextIndex
+        clearContextIndex: session.clearContextIndex,
         mask: JSONStringify(session.mask) ?? "",
         isDeleted: session.isDeleted!,
       };

@@ -11,6 +11,7 @@ export interface ISession {
   lastSummarizeIndex: number;
   mask: string;
   isDeleted: boolean;
+  clearContextIndex: number | null;
 }
 
 export const GetHistory = async (token: string): Promise<ISession[]> => {
