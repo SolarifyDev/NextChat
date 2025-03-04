@@ -287,11 +287,10 @@ export const useNewChatStore = create<ChatStoreType>()(
           (session) => {
             session.lastUpdate = Date.now();
             session.messages = session.messages.concat();
+            session.stat.charCount += message.content.length;
           },
           true,
         );
-
-        // get().updateStat(message, targetSession);
 
         get().checkMcpJson(message);
 
