@@ -242,9 +242,13 @@ export function SideBar(props: { className?: string }) {
       console.log("[SideBar] MCP enabled:", enabled);
     };
     checkMcpStatus();
-
-    getSession();
   }, []);
+
+  useEffect(() => {
+    if (config._hasHydrated) {
+      getSession();
+    }
+  }, [config._hasHydrated]);
 
   return (
     <SideBarContainer
