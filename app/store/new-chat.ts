@@ -256,7 +256,10 @@ export const useNewChatStore = create<ChatStoreType>()(
 
       getSession: async () => {
         try {
-          const data = await GetHistory(useAppConfig.getState().omeToken);
+          const data = await GetHistory(
+            useAppConfig.getState().omeToken,
+            useAppConfig.getState().omeUserId,
+          );
           const newData: ChatSession[] = data.map((item) => ({
             ...item,
             messages: JSONParse(item.messages),
@@ -587,6 +590,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           const config = useAppConfig.getState();
           await PostAddOrUpdateSession(
             config.omeToken,
+            config.omeUserId,
             ConvertSession("update", sessions[index]),
           )
             .then(() => console.log("更新成功"))
@@ -783,7 +787,11 @@ export const useNewChatStore = create<ChatStoreType>()(
           async () => {
             const data = ConvertSession("delete", deletedSession);
 
-            await PostAddOrUpdateSession(useAppConfig.getState().omeToken, data)
+            await PostAddOrUpdateSession(
+              useAppConfig.getState().omeToken,
+              useAppConfig.getState().omeUserId,
+              data,
+            )
               .then(() => {
                 console.log("delete成功");
               })
@@ -817,7 +825,7 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         const data = ConvertSession("add", newSession);
 
-        await PostAddOrUpdateSession(config.omeToken, data)
+        await PostAddOrUpdateSession(config.omeToken, config.omeUserId, data)
           .then((res) => {
             if (res) {
               newSession.sessionId = res.sessionId;
@@ -857,7 +865,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         const data = ConvertSession("add", session);
 
-        await PostAddOrUpdateSession(useAppConfig.getState().omeToken, data)
+        await PostAddOrUpdateSession(
+          useAppConfig.getState().omeToken,
+          useAppConfig.getState().omeUserId,
+          data,
+        )
           .then((res) => {
             if (res) {
               session.sessionId = res.sessionId;
