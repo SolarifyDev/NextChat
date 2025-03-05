@@ -354,6 +354,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
 
   headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
 
+  headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
+
   return headers;
 }
 

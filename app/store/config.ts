@@ -106,6 +106,7 @@ export const DEFAULT_CONFIG = {
     voice: "alloy" as Voice,
   },
   omeToken: "",
+  omeUserId: "",
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;
@@ -167,13 +168,17 @@ export const useAppConfig = createPersistStore(
   { ...DEFAULT_CONFIG },
   (set, get) => ({
     reset() {
-      const { omeToken } = get();
+      const { omeToken, omeUserId } = get();
 
-      set(() => ({ ...DEFAULT_CONFIG, omeToken }));
+      set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId }));
     },
 
     setOmeToken(omeToken: string) {
       set(() => ({ omeToken }));
+    },
+
+    setOmeUserId(omeUserId: string) {
+      set(() => ({ omeUserId }));
     },
 
     mergeModels(newModels: LLMModel[]) {

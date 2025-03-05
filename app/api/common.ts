@@ -100,6 +100,7 @@ export async function requestOpenai(req: NextRequest) {
       }),
       "OME-METIS-Authorization":
         req.headers.get("OME-METIS-Authorization") || "",
+      "OME-METIS-UserId": req.headers.get("OME-METIS-UserId") || "",
     },
     method: req.method,
     body: req.body,

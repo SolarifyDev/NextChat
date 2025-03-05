@@ -271,8 +271,13 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
-          if (!isEmpty(params?.ometoken) && params?.from === "OmeOfficeApp") {
-            appConfig.setOmeToken(params?.ometoken ?? "");
+          if (params?.from === "OmeOfficeApp") {
+            if (!isEmpty(params?.ometoken)) {
+              appConfig.setOmeToken(params?.ometoken ?? "");
+            }
+            if (!isEmpty(params?.omeUserId)) {
+              appConfig.setOmeUserId(params?.omeUserId ?? "");
+            }
           }
         } catch {}
       } else {
@@ -289,6 +294,10 @@ export function Home() {
             event.data.ometoken,
           );
           appConfig.setOmeToken(event.data.ometoken);
+        }
+
+        if (!isEmpty(event?.data?.omeUserId)) {
+          appConfig.setOmeUserId(event?.data?.omeUserId);
         }
       }
     };

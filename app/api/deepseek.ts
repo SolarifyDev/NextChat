@@ -71,6 +71,7 @@ async function request(req: NextRequest) {
       Authorization: req.headers.get("Authorization") ?? "",
       "OME-METIS-Authorization":
         req.headers.get("OME-METIS-Authorization") || "",
+      "OME-METIS-UserId": req.headers.get("OME-METIS-UserId") || "",
     },
     method: req.method,
     body: req.body,
