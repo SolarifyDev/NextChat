@@ -57,6 +57,15 @@ export const ConvertSession = (
     case "delete": {
       return {
         sessionId: session.sessionId!,
+        id: session.id,
+        topic: session.topic,
+        memoryPrompt: session.memoryPrompt,
+        messages: JSONStringify(session.messages) ?? "",
+        stat: JSONStringify(session.stat) ?? "",
+        lastUpdate: session.lastUpdate,
+        lastSummarizeIndex: session.lastSummarizeIndex,
+        clearContextIndex: session.clearContextIndex,
+        mask: JSONStringify(session.mask) ?? "",
         isDeleted: true,
       };
     }
