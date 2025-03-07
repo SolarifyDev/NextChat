@@ -280,6 +280,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           set({
             sessions: [],
           });
+          showToast("获取聊天失败");
         }
       },
 
@@ -816,6 +817,8 @@ export const useNewChatStore = create<ChatStoreType>()(
               })
               .catch(() => {
                 console.log("delete失败");
+                showToast("删除聊天失败");
+                set(() => restoreState);
               });
           },
         );
@@ -857,6 +860,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           })
           .catch(() => {
             console.log("失败");
+            showToast("复制聊天失败");
           });
       },
       nextSession(delta: number) {
@@ -905,6 +909,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           })
           .catch(() => {
             console.log("失败");
+            showToast("创建新聊天失败");
           });
       },
       clearAllData() {
