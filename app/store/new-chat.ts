@@ -35,6 +35,7 @@ import { showToast } from "../components/ui-lib";
 import { GetHistory, PostAddOrUpdateSession } from "../client/smarties";
 import { ConvertSession, JSONParse } from "../utils/convert";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
+import { isEmpty } from "lodash-es";
 
 export type ChatMessageTool = {
   id: string;
@@ -585,16 +586,25 @@ export const useNewChatStore = create<ChatStoreType>()(
         const index = sessions.findIndex((s) => s.id === targetSession.id);
         if (index < 0) return;
         updater(sessions[index]);
-        set(() => ({ sessions }));
-        if (isUpdate) {
-          const config = useAppConfig.getState();
-          await PostAddOrUpdateSession(
-            config.omeToken,
-            config.omeUserId,
-            ConvertSession("update", sessions[index]),
-          )
-            .then(() => console.log("更新成功"))
-            .catch(() => console.log("更新失败"));
+
+        const data = ConvertSession("update", sessions[index]);
+
+        if (
+          !isEmpty(data.messages) &&
+          !isEmpty(data.mask) &&
+          !isEmpty(data.stat)
+        ) {
+          set(() => ({ sessions }));
+          if (isUpdate) {
+            const config = useAppConfig.getState();
+            await PostAddOrUpdateSession(
+              config.omeToken,
+              config.omeUserId,
+              ConvertSession("update", sessions[index]),
+            )
+              .then(() => console.log("更新成功"))
+              .catch(() => console.log("更新失败"));
+          }
         }
       },
       setLastInput(lastInput: string) {
