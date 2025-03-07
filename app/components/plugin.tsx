@@ -59,6 +59,7 @@ export function PluginPage() {
 
   const onChangePlugin = useDebouncedCallback((editingPlugin, e) => {
     const content = e.target.innerText;
+    console.log(content, "OpenAPI Schema");
     try {
       const api = new OpenAPIClientAxios({
         definition: yaml.load(content) as any,
@@ -76,11 +77,11 @@ export function PluginPage() {
           }
         })
         .catch((e) => {
-          console.error(e);
+          console.error(e, "then");
           showToast(Locale.Plugin.EditModal.Error);
         });
     } catch (e) {
-      console.error(e);
+      console.error(e, "try");
       showToast(Locale.Plugin.EditModal.Error);
     }
   }, 100).bind(null, editingPlugin);
