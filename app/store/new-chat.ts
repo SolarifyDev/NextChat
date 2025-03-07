@@ -874,6 +874,8 @@ export const useNewChatStore = create<ChatStoreType>()(
             if (res) {
               session.sessionId = res.sessionId;
 
+              session.clearContextIndex = res.clearContextIndex;
+
               set((state) => ({
                 currentSessionIndex: 0,
                 sessions: [session].concat(state.sessions),
