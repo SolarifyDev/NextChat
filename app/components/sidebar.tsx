@@ -245,10 +245,10 @@ export function SideBar(props: { className?: string }) {
   }, []);
 
   useEffect(() => {
-    if (config._hasHydrated) {
+    if (config._hasHydrated && chatStore.isDown) {
       getSession();
     }
-  }, [config._hasHydrated]);
+  }, [config._hasHydrated, chatStore.isDown]);
 
   return (
     <SideBarContainer

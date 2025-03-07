@@ -82,6 +82,7 @@ export type ChatStoreType = {
   currentSessionIndex: number;
   sessions: ChatSession[];
   lastInput: string;
+  isDown: boolean;
   selectSession: (i: number) => void;
   getSession: () => Promise<void>;
   getCurrentSession: () => ChatSession;
@@ -111,6 +112,7 @@ export type ChatStoreType = {
   updateStat(message: ChatMessage, session: ChatSession): void;
   checkMcpJson(message: ChatMessage): void;
   clearAllData(): void;
+  setIsDown: (isDown: boolean) => void;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -251,6 +253,10 @@ export const useNewChatStore = create<ChatStoreType>()(
       currentSessionIndex: -1,
       sessions: [],
       lastInput: "",
+      isDown: false,
+      setIsDown: (isDown: boolean) => {
+        set({ isDown });
+      },
       selectSession: (i: number) => {
         set({ currentSessionIndex: i });
       },
@@ -282,7 +288,7 @@ export const useNewChatStore = create<ChatStoreType>()(
       },
 
       clearCurrent: () => {
-        set({ currentSessionIndex: -1, sessions: [] });
+        set({ currentSessionIndex: -1, sessions: [], isDown: false });
       },
 
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
