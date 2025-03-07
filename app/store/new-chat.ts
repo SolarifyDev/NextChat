@@ -587,15 +587,16 @@ export const useNewChatStore = create<ChatStoreType>()(
         if (index < 0) return;
         updater(sessions[index]);
 
-        const data = ConvertSession("update", sessions[index]);
+        if (isUpdate) {
+          const data = ConvertSession("update", sessions[index]);
 
-        if (
-          !isEmpty(data.messages) &&
-          !isEmpty(data.mask) &&
-          !isEmpty(data.stat)
-        ) {
-          set(() => ({ sessions }));
-          if (isUpdate) {
+          if (
+            !isEmpty(data.messages) &&
+            !isEmpty(data.mask) &&
+            !isEmpty(data.stat)
+          ) {
+            set(() => ({ sessions }));
+
             const config = useAppConfig.getState();
             await PostAddOrUpdateSession(
               config.omeToken,
@@ -605,6 +606,8 @@ export const useNewChatStore = create<ChatStoreType>()(
               .then(() => console.log("更新成功"))
               .catch(() => console.log("更新失败"));
           }
+        } else {
+          set(() => ({ sessions }));
         }
       },
       setLastInput(lastInput: string) {
