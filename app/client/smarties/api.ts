@@ -4,6 +4,10 @@ export const api = axios.create({ baseURL: "" });
 
 api.interceptors.request.use(
   async (config) => {
+    console.log(
+      process.env.NEXT_PUBLIC_SMARTIES_URL,
+      "process.env.NEXT_PUBLIC_SMARTIES_URL",
+    );
     config.baseURL = process.env.NEXT_PUBLIC_SMARTIES_URL;
 
     return config;
