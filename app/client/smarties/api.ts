@@ -4,8 +4,7 @@ export const api = axios.create({ baseURL: "" });
 
 api.interceptors.request.use(
   async (config) => {
-    config.baseURL =
-      process.env.SMARTIES_URL || "https://testsmarties.yamimeal.ca";
+    config.baseURL = process.env.NEXT_PUBLIC_SMARTIES_URL;
 
     return config;
   },
