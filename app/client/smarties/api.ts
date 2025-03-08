@@ -8,7 +8,11 @@ api.interceptors.request.use(
       process.env.NEXT_PUBLIC_SMARTIES_URL,
       "process.env.NEXT_PUBLIC_SMARTIES_URL",
     );
-    config.baseURL = process.env.NEXT_PUBLIC_SMARTIES_URL;
+    // config.baseURL = process.env.NEXT_PUBLIC_SMARTIES_URL;
+
+    config.baseURL = location.origin.includes("ai-chat-test")
+      ? "https://testsmarties.yamimeal.ca"
+      : "https://smarties.yamimeal.ca";
 
     return config;
   },
