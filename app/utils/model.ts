@@ -254,5 +254,5 @@ export function isModelNotavailableInServer(
     const fullName = `${modelName}@${providerName.toLowerCase()}`;
     if (modelTable?.[fullName]?.available === true) return false;
   }
-  return true;
+  return false;
 }
