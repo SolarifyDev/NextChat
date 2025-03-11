@@ -1,13 +1,26 @@
 import { ISession } from "../client/smarties";
+import { createEmptyMask } from "../store/mask";
 import { ChatSession } from "../store/new-chat";
 
-export const JSONParse = (data: string): any | null => {
-  if (!data) return null;
+export const JSONParse = (
+  data: string,
+  expectedValueType: "arr" | "obj" | "mask",
+): any => {
+  if (!data)
+    return expectedValueType === "arr"
+      ? []
+      : expectedValueType === "obj"
+      ? { tokenCount: 0, wordCount: 0, charCount: 0 }
+      : createEmptyMask();
 
   try {
     return JSON.parse(data);
   } catch (error) {
-    return null;
+    return expectedValueType === "arr"
+      ? []
+      : expectedValueType === "obj"
+      ? { tokenCount: 0, wordCount: 0, charCount: 0 }
+      : createEmptyMask();
   }
 };
 

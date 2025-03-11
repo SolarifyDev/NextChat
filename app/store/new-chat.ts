@@ -269,9 +269,9 @@ export const useNewChatStore = create<ChatStoreType>()(
           );
           const newData: ChatSession[] = data.map((item) => ({
             ...item,
-            messages: JSONParse(item.messages),
-            stat: JSONParse(item.stat),
-            mask: JSONParse(item.mask),
+            messages: JSONParse(item.messages, "arr"),
+            stat: JSONParse(item.stat, "obj"),
+            mask: JSONParse(item.mask, "mask"),
           }));
           set({
             sessions: newData,
