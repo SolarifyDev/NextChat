@@ -354,6 +354,9 @@ export function showPlugins(provider: ServiceProvider, model: string) {
   ) {
     return true;
   }
+  if (model.toLocaleLowerCase().includes("metis")) {
+    return true;
+  }
   return false;
 }
 
