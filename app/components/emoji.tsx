@@ -91,7 +91,7 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
       modelName.startsWith("cogvideox-")
     ) {
       LlmIcon = BotIconChatglm;
-    } else if (modelName.toLocaleLowerCase().includes("metis")) {
+    } else if (modelName.toLowerCase().includes("metis")) {
       LlmIcon = BotIconMetis;
     }
 
