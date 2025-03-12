@@ -337,7 +337,8 @@ export function showPlugins(provider: ServiceProvider, model: string) {
     provider.toLowerCase() == ServiceProvider.OpenAI.toLowerCase() ||
     provider.toLowerCase() == ServiceProvider.Azure.toLowerCase() ||
     provider.toLowerCase() == ServiceProvider.Moonshot.toLowerCase() ||
-    provider.toLowerCase() == ServiceProvider.ChatGLM.toLowerCase()
+    provider.toLowerCase() == ServiceProvider.ChatGLM.toLowerCase() ||
+    provider.toLowerCase() == ServiceProvider.DeepSeek.toLowerCase()
   ) {
     return true;
   }
