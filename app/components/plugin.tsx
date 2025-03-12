@@ -58,8 +58,7 @@ export function PluginPage() {
   const closePluginModal = () => setEditingPluginId(undefined);
 
   const onChangePlugin = useDebouncedCallback((editingPlugin, e) => {
-    const content = e.target.innerText;
-    console.log(content, "OpenAPI Schema");
+    const content = e.target.innerText.replace(/，/g, ",");
     try {
       const api = new OpenAPIClientAxios({
         definition: yaml.load(content) as any,
