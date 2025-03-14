@@ -140,13 +140,20 @@ export function SideBarContainer(props: {
   onDragStart: (e: MouseEvent) => void;
   shouldNarrow: boolean;
   className?: string;
+  isFromApp: boolean;
 }) {
   const isMobileScreen = useMobileScreen();
   const isIOSMobile = useMemo(
     () => isIOS() && isMobileScreen,
     [isMobileScreen],
   );
-  const { children, className, onDragStart, shouldNarrow } = props;
+  const {
+    children,
+    className,
+    isFromApp = false,
+    onDragStart,
+    shouldNarrow,
+  } = props;
   return (
     <div
       className={clsx(styles.sidebar, className, {
@@ -155,15 +162,19 @@ export function SideBarContainer(props: {
       style={{
         // #3016 disable transition on ios mobile screen
         transition: isMobileScreen && isIOSMobile ? "none" : undefined,
+        backgroundColor: isFromApp ? "red" : "",
+        paddingTop: isFromApp ? "0px" : undefined,
       }}
     >
       {children}
-      <div
-        className={styles["sidebar-drag"]}
-        onPointerDown={(e) => onDragStart(e as any)}
-      >
-        <DragIcon />
-      </div>
+      {!isFromApp && (
+        <div
+          className={styles["sidebar-drag"]}
+          onPointerDown={(e) => onDragStart(e as any)}
+        >
+          <DragIcon />
+        </div>
+      )}
     </div>
   );
 }
@@ -252,66 +263,77 @@ export function SideBar(props: { className?: string }) {
 
   return (
     <SideBarContainer
-      onDragStart={onDragStart}
+      onDragStart={config.isFromApp ? onDragStart : () => {}}
       shouldNarrow={shouldNarrow}
+      isFromApp={config.isFromApp}
       {...props}
     >
-      <SideBarHeader
-        title="NextChat"
-        subTitle="Build your own AI assistant."
-        logo={<ChatGptIcon />}
-        shouldNarrow={shouldNarrow}
-      >
-        <div className={styles["sidebar-header-bar"]}>
-          <IconButton
-            icon={<MaskIcon />}
-            text={shouldNarrow ? undefined : Locale.Mask.Name}
-            className={styles["sidebar-bar-button"]}
-            onClick={() => {
-              if (config.dontShowMaskSplashScreen !== true) {
-                navigate(Path.NewChat, { state: { fromHome: true } });
-              } else {
-                navigate(Path.Masks, { state: { fromHome: true } });
-              }
-            }}
-            shadow
-          />
-          {mcpEnabled && (
+      {!config.isFromApp ? (
+        <SideBarHeader
+          title="NextChat"
+          subTitle="Build your own AI assistant."
+          logo={<ChatGptIcon />}
+          shouldNarrow={shouldNarrow}
+        >
+          <div className={styles["sidebar-header-bar"]}>
             <IconButton
-              icon={<McpIcon />}
-              text={shouldNarrow ? undefined : Locale.Mcp.Name}
+              icon={<MaskIcon />}
+              text={shouldNarrow ? undefined : Locale.Mask.Name}
               className={styles["sidebar-bar-button"]}
               onClick={() => {
-                navigate(Path.McpMarket, { state: { fromHome: true } });
+                if (config.dontShowMaskSplashScreen !== true) {
+                  navigate(Path.NewChat, { state: { fromHome: true } });
+                } else {
+                  navigate(Path.Masks, { state: { fromHome: true } });
+                }
               }}
               shadow
             />
+            {mcpEnabled && (
+              <IconButton
+                icon={<McpIcon />}
+                text={shouldNarrow ? undefined : Locale.Mcp.Name}
+                className={styles["sidebar-bar-button"]}
+                onClick={() => {
+                  navigate(Path.McpMarket, { state: { fromHome: true } });
+                }}
+                shadow
+              />
+            )}
+            <IconButton
+              icon={<DiscoveryIcon />}
+              text={shouldNarrow ? undefined : Locale.Discovery.Name}
+              className={styles["sidebar-bar-button"]}
+              onClick={() => setshowDiscoverySelector(true)}
+              shadow
+            />
+          </div>
+          {showDiscoverySelector && (
+            <Selector
+              items={[
+                ...DISCOVERY.map((item) => {
+                  return {
+                    title: item.name,
+                    value: item.path,
+                  };
+                }),
+              ]}
+              onClose={() => setshowDiscoverySelector(false)}
+              onSelection={(s) => {
+                navigate(s[0], { state: { fromHome: true } });
+              }}
+            />
           )}
-          <IconButton
-            icon={<DiscoveryIcon />}
-            text={shouldNarrow ? undefined : Locale.Discovery.Name}
-            className={styles["sidebar-bar-button"]}
-            onClick={() => setshowDiscoverySelector(true)}
-            shadow
-          />
-        </div>
-        {showDiscoverySelector && (
-          <Selector
-            items={[
-              ...DISCOVERY.map((item) => {
-                return {
-                  title: item.name,
-                  value: item.path,
-                };
-              }),
-            ]}
-            onClose={() => setshowDiscoverySelector(false)}
-            onSelection={(s) => {
-              navigate(s[0], { state: { fromHome: true } });
-            }}
-          />
-        )}
-      </SideBarHeader>
+        </SideBarHeader>
+      ) : (
+        <SideBarHeader
+          title="历史数据"
+          // subTitle="Build your own AI assistant."
+          // logo={<ChatGptIcon />}
+          // shouldNarrow={shouldNarrow}
+        ></SideBarHeader>
+      )}
+
       <SideBarBody
         onClick={(e) => {
           if (e.target === e.currentTarget) {
@@ -321,46 +343,70 @@ export function SideBar(props: { className?: string }) {
       >
         <ChatList narrow={shouldNarrow} />
       </SideBarBody>
-      <SideBarTail
-        primaryAction={
-          <>
-            {/* 手机场景 */}
-            <div className={clsx(styles["sidebar-action"], styles.mobile)}>
-              <IconButton
-                icon={<DeleteIcon />}
-                onClick={async () => {
-                  if (await showConfirm(Locale.Home.DeleteChat)) {
-                    chatStore.deleteSession(chatStore.currentSessionIndex);
-                  }
-                }}
-              />
-            </div>
-            <div className={styles["sidebar-action"]}>
-              <Link to={Path.Settings}>
-                <IconButton
-                  aria={Locale.Settings.Title}
-                  icon={<SettingsIcon />}
-                  shadow
-                />
-              </Link>
-            </div>
-          </>
-        }
-        secondaryAction={
+      {config.isFromApp ? (
+        <div
+          style={{
+            width: "100%",
+            // backgroundColor: "red",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           <IconButton
+            style={{
+              backgroundColor: "gray",
+              padding: 5,
+            }}
             icon={<AddIcon />}
             text={shouldNarrow ? undefined : Locale.Home.NewChat}
             onClick={() => {
-              if (config.dontShowMaskSplashScreen) {
-                chatStore.newSession(undefined, () => navigate(Path.Chat));
-              } else {
-                navigate(Path.NewChat);
-              }
+              chatStore.newSession(undefined, () => navigate(Path.Chat));
             }}
             shadow
           />
-        }
-      />
+        </div>
+      ) : (
+        <SideBarTail
+          primaryAction={
+            <>
+              {/* 手机场景 */}
+              <div className={clsx(styles["sidebar-action"], styles.mobile)}>
+                <IconButton
+                  icon={<DeleteIcon />}
+                  onClick={async () => {
+                    if (await showConfirm(Locale.Home.DeleteChat)) {
+                      chatStore.deleteSession(chatStore.currentSessionIndex);
+                    }
+                  }}
+                />
+              </div>
+              <div className={styles["sidebar-action"]}>
+                <Link to={Path.Settings}>
+                  <IconButton
+                    aria={Locale.Settings.Title}
+                    icon={<SettingsIcon />}
+                    shadow
+                  />
+                </Link>
+              </div>
+            </>
+          }
+          secondaryAction={
+            <IconButton
+              icon={<AddIcon />}
+              text={shouldNarrow ? undefined : Locale.Home.NewChat}
+              onClick={() => {
+                if (config.dontShowMaskSplashScreen) {
+                  chatStore.newSession(undefined, () => navigate(Path.Chat));
+                } else {
+                  navigate(Path.NewChat);
+                }
+              }}
+              shadow
+            />
+          }
+        />
+      )}
     </SideBarContainer>
   );
 }

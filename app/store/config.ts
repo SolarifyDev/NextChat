@@ -107,6 +107,7 @@ export const DEFAULT_CONFIG = {
   },
   omeToken: "",
   omeUserId: "",
+  isFromApp: false,
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;
@@ -168,9 +169,9 @@ export const useAppConfig = createPersistStore(
   { ...DEFAULT_CONFIG },
   (set, get) => ({
     reset() {
-      const { omeToken, omeUserId } = get();
+      const { omeToken, omeUserId, isFromApp } = get();
 
-      set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId }));
+      set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId, isFromApp }));
     },
 
     setOmeToken(omeToken: string) {
@@ -179,6 +180,10 @@ export const useAppConfig = createPersistStore(
 
     setOmeUserId(omeUserId: string) {
       set(() => ({ omeUserId }));
+    },
+
+    setIsFromApp(isFromApp: boolean) {
+      set(() => ({ isFromApp }));
     },
 
     mergeModels(newModels: LLMModel[]) {

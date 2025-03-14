@@ -280,6 +280,9 @@ export function Home() {
             if (!isEmpty(params?.omeUserId)) {
               appConfig.setOmeUserId(params?.omeUserId ?? "");
             }
+            if (!isEmpty(params?.isFromApp)) {
+              appConfig.setIsFromApp(params?.isFromApp ?? false);
+            }
           }
         } catch {}
       } else {
