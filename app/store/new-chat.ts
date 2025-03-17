@@ -490,7 +490,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           (session?.mask?.modelConfig?.model.startsWith("gpt-") ||
             session?.mask?.modelConfig?.model.startsWith("chatgpt-"));
 
-        const mcpEnabled = await isMcpEnabled();
+        const mcpEnabled = (await isMcpEnabled()) ?? false;
         const mcpSystemPrompt = mcpEnabled ? await getMcpSystemPrompt() : "";
 
         var systemPrompts: ChatMessage[] = [];
