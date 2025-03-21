@@ -541,14 +541,22 @@ export function ChatActions(props: {
     const filteredModels = allModels.filter((m) => m.available);
     const defaultModel = filteredModels.find((m) => m.isDefault);
 
+    const deepseekModels = filteredModels.filter((m) =>
+      m.displayName.toLowerCase().includes("deepseek"),
+    );
+    const otherModels = filteredModels.filter(
+      (m) => !m.displayName.toLowerCase().includes("deepseek"),
+    );
+
     if (defaultModel) {
       const arr = [
         defaultModel,
-        ...filteredModels.filter((m) => m !== defaultModel),
+        ...deepseekModels.filter((m) => m !== defaultModel),
+        ...otherModels.filter((m) => m !== defaultModel),
       ];
       return arr;
     } else {
-      return filteredModels;
+      return [...deepseekModels, ...otherModels];
     }
   }, [allModels]);
   const currentModelName = useMemo(() => {
