@@ -176,7 +176,7 @@ export const useAppConfig = createPersistStore(
     setDefaultModel() {
       const { modelConfig } = get();
 
-      if (!modelConfig.model.includes("deepseek"))
+      if (!modelConfig.model.toLowerCase().includes("deepseek"))
         set(() => ({
           ...DEFAULT_CONFIG,
           modelConfig: {
