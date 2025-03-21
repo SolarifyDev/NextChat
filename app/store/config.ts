@@ -173,6 +173,20 @@ export const useAppConfig = createPersistStore(
       set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId }));
     },
 
+    setDefaultModel() {
+      const { modelConfig } = get();
+
+      if (!modelConfig.model.includes("deepseek"))
+        set(() => ({
+          ...DEFAULT_CONFIG,
+          modelConfig: {
+            ...modelConfig,
+            model: "deepseek-chat" as ModelType,
+            providerName: "DeepSeek" as ServiceProvider,
+          },
+        }));
+    },
+
     setOmeToken(omeToken: string) {
       set(() => ({ omeToken }));
     },

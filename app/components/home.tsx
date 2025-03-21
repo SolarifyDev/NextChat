@@ -325,6 +325,8 @@ export function Home() {
       } else {
         window.parent.postMessage("omemetis is ready", "*");
       }
+
+      appConfig.setDefaultModel();
     }
   }, [appConfig._hasHydrated]);
 
