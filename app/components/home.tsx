@@ -304,7 +304,7 @@ export function Home() {
         }
 
         if (!isEmpty(event?.data?.omeUserName)) {
-          appConfig.setOmeUserId(event?.data?.omeUserName);
+          appConfig.setOmeUserName(event?.data?.omeUserName);
         }
       }
     };
