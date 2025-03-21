@@ -11,8 +11,8 @@ import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
 import DiscoveryIcon from "../icons/discovery.svg";
 import SettingsIcon from "../icons/settings.svg";
-
-import Locale from "../locales";
+import PhoneIcon from "../icons/phone.svg";
+import ArrowLeftIcon from "../icons/arrow-left.svg";
 
 import { useAppConfig } from "../store";
 
@@ -31,12 +31,7 @@ import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 import { useNewChatStore } from "../store/new-chat";
-
-const DISCOVERY = [
-  { name: Locale.Plugin.Name, path: Path.Plugins },
-  // { name: "Stable Diffusion", path: Path.Sd },
-  { name: Locale.SearchChat.Page.Title, path: Path.SearchChat },
-];
+import { useTranslation } from "react-i18next";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -140,7 +135,7 @@ export function SideBarContainer(props: {
   onDragStart: (e: MouseEvent) => void;
   shouldNarrow: boolean;
   className?: string;
-  isFromApp: boolean;
+  isFromApp?: boolean;
 }) {
   const isMobileScreen = useMobileScreen();
   const isIOSMobile = useMemo(
@@ -162,8 +157,9 @@ export function SideBarContainer(props: {
       style={{
         // #3016 disable transition on ios mobile screen
         transition: isMobileScreen && isIOSMobile ? "none" : undefined,
-        backgroundColor: isFromApp ? "red" : "",
+        backgroundColor: isFromApp ? "#FAFAFF" : "",
         paddingTop: isFromApp ? "0px" : undefined,
+        paddingBottom: isFromApp ? "0px" : undefined,
       }}
     >
       {children}
@@ -235,6 +231,16 @@ export function SideBarTail(props: {
 }
 
 export function SideBar(props: { className?: string }) {
+  const { i18n, t } = useTranslation();
+
+  const DISCOVERY = [
+    // { name: Locale.Plugin.Name, path: Path.Plugins },
+    { name: t("Plugin.Name"), path: Path.Plugins },
+    // { name: "Stable Diffusion", path: Path.Sd },
+    // { name: Locale.SearchChat.Page.Title, path: Path.SearchChat },
+    { name: t("SearchChat.Page.Title"), path: Path.SearchChat },
+  ];
+
   useHotKey();
   const { onDragStart, shouldNarrow } = useDragSideBar();
   const [showDiscoverySelector, setshowDiscoverySelector] = useState(false);
@@ -263,7 +269,7 @@ export function SideBar(props: { className?: string }) {
 
   return (
     <SideBarContainer
-      onDragStart={config.isFromApp ? onDragStart : () => {}}
+      onDragStart={!config.isFromApp ? onDragStart : () => {}}
       shouldNarrow={shouldNarrow}
       isFromApp={config.isFromApp}
       {...props}
@@ -278,7 +284,8 @@ export function SideBar(props: { className?: string }) {
           <div className={styles["sidebar-header-bar"]}>
             <IconButton
               icon={<MaskIcon />}
-              text={shouldNarrow ? undefined : Locale.Mask.Name}
+              // text={shouldNarrow ? undefined : Locale.Mask.Name}
+              text={shouldNarrow ? undefined : t("Mask.Name")}
               className={styles["sidebar-bar-button"]}
               onClick={() => {
                 if (config.dontShowMaskSplashScreen !== true) {
@@ -292,7 +299,8 @@ export function SideBar(props: { className?: string }) {
             {mcpEnabled && (
               <IconButton
                 icon={<McpIcon />}
-                text={shouldNarrow ? undefined : Locale.Mcp.Name}
+                // text={shouldNarrow ? undefined : Locale.Mcp.Name}
+                text={shouldNarrow ? undefined : t("Mcp.Name")}
                 className={styles["sidebar-bar-button"]}
                 onClick={() => {
                   navigate(Path.McpMarket, { state: { fromHome: true } });
@@ -302,7 +310,8 @@ export function SideBar(props: { className?: string }) {
             )}
             <IconButton
               icon={<DiscoveryIcon />}
-              text={shouldNarrow ? undefined : Locale.Discovery.Name}
+              // text={shouldNarrow ? undefined : Locale.Discovery.Name}
+              text={shouldNarrow ? undefined : t("Discovery.Name")}
               className={styles["sidebar-bar-button"]}
               onClick={() => setshowDiscoverySelector(true)}
               shadow
@@ -326,12 +335,32 @@ export function SideBar(props: { className?: string }) {
           )}
         </SideBarHeader>
       ) : (
-        <SideBarHeader
-          title="历史数据"
-          // subTitle="Build your own AI assistant."
-          // logo={<ChatGptIcon />}
-          // shouldNarrow={shouldNarrow}
-        ></SideBarHeader>
+        <div
+          style={{
+            textAlign: "center",
+            fontWeight: 600,
+            fontSize: "16px",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              top: "50%",
+              transform: "translateY(-50%)",
+            }}
+            onClick={() => {
+              console.log("click");
+            }}
+          >
+            <ArrowLeftIcon />
+          </div>
+          <p>歷史對話</p>
+          {t("Mask.Name")}
+        </div>
       )}
 
       <SideBarBody
@@ -341,29 +370,37 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
-        <ChatList narrow={shouldNarrow} />
+        <ChatList narrow={shouldNarrow} isFromApp={config.isFromApp} />
       </SideBarBody>
       {config.isFromApp ? (
         <div
           style={{
             width: "100%",
-            // backgroundColor: "red",
             display: "flex",
             justifyContent: "center",
           }}
         >
-          <IconButton
+          <div
             style={{
-              backgroundColor: "gray",
-              padding: 5,
+              backgroundColor: "#FFFFFF",
+              border: "1px solid #28B446",
+              color: "#28B446",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "4px 16px",
+              borderRadius: 33,
+              fontSize: 16,
+              marginTop: 8,
             }}
-            icon={<AddIcon />}
-            text={shouldNarrow ? undefined : Locale.Home.NewChat}
             onClick={() => {
               chatStore.newSession(undefined, () => navigate(Path.Chat));
             }}
-            shadow
-          />
+          >
+            <PhoneIcon />{" "}
+            {/* <div>{shouldNarrow ? undefined : Locale.Home.NewChat}</div> */}
+            <div>{shouldNarrow ? undefined : t("Home.NewChat")}</div>
+          </div>
         </div>
       ) : (
         <SideBarTail
@@ -374,7 +411,8 @@ export function SideBar(props: { className?: string }) {
                 <IconButton
                   icon={<DeleteIcon />}
                   onClick={async () => {
-                    if (await showConfirm(Locale.Home.DeleteChat)) {
+                    // if (await showConfirm(Locale.Home.DeleteChat)) {
+                    if (await showConfirm(t("Home.DeleteChat"))) {
                       chatStore.deleteSession(chatStore.currentSessionIndex);
                     }
                   }}
@@ -383,7 +421,8 @@ export function SideBar(props: { className?: string }) {
               <div className={styles["sidebar-action"]}>
                 <Link to={Path.Settings}>
                   <IconButton
-                    aria={Locale.Settings.Title}
+                    // aria={Locale.Settings.Title}
+                    aria={t("Settings.Title")}
                     icon={<SettingsIcon />}
                     shadow
                   />
@@ -394,7 +433,8 @@ export function SideBar(props: { className?: string }) {
           secondaryAction={
             <IconButton
               icon={<AddIcon />}
-              text={shouldNarrow ? undefined : Locale.Home.NewChat}
+              // text={shouldNarrow ? undefined : Locale.Home.NewChat}
+              text={shouldNarrow ? undefined : t("Home.NewChat")}
               onClick={() => {
                 if (config.dontShowMaskSplashScreen) {
                   chatStore.newSession(undefined, () => navigate(Path.Chat));

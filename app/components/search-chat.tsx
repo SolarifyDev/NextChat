@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ErrorBoundary } from "./error";
+import ErrorBoundary from "./error";
 import styles from "./mask.module.scss";
 import { useNavigate } from "react-router-dom";
 import { IconButton } from "./button";
 import CloseIcon from "../icons/close.svg";
 import EyeIcon from "../icons/eye.svg";
-import Locale from "../locales";
 import { Path } from "../constant";
 
 import { useNewChatStore } from "../store/new-chat";
+import { useTranslation } from "react-i18next";
 
 type Item = {
   id: number;
@@ -16,6 +16,7 @@ type Item = {
   content: string;
 };
 export function SearchChatPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // const chatStore = useChatStore();
@@ -93,10 +94,12 @@ export function SearchChatPage() {
         <div className="window-header">
           <div className="window-header-title">
             <div className="window-header-main-title">
-              {Locale.SearchChat.Page.Title}
+              {/* {Locale.SearchChat.Page.Title} */}
+              {t("SearchChat.Page.Title")}
             </div>
             <div className="window-header-submai-title">
-              {Locale.SearchChat.Page.SubTitle(searchResults.length)}
+              {/* {Locale.SearchChat.Page.SubTitle(searchResults.length)} */}
+              {t("SearchChat.Page.SubTitle", { count: searchResults.length })}
             </div>
           </div>
 
@@ -117,7 +120,8 @@ export function SearchChatPage() {
             <input
               type="text"
               className={styles["search-bar"]}
-              placeholder={Locale.SearchChat.Page.Search}
+              // placeholder={Locale.SearchChat.Page.Search}
+              placeholder={t("SearchChat.Page.Search")}
               autoFocus
               ref={searchInputRef}
               onKeyDown={(e) => {
@@ -155,7 +159,8 @@ export function SearchChatPage() {
                 <div className={styles["mask-actions"]}>
                   <IconButton
                     icon={<EyeIcon />}
-                    text={Locale.SearchChat.Item.View}
+                    // text={Locale.SearchChat.Item.View}
+                    text={t("SearchChat.Item.View")}
                   />
                 </div>
               </div>

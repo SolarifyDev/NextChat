@@ -1,6 +1,5 @@
 import { TTSConfig, TTSConfigValidator } from "../store";
 
-import Locale from "../locales";
 import { ListItem, Select } from "./ui-lib";
 import {
   DEFAULT_TTS_ENGINE,
@@ -9,16 +8,20 @@ import {
   DEFAULT_TTS_VOICES,
 } from "../constant";
 import { InputRange } from "./input-range";
+import { useTranslation } from "react-i18next";
 
 export function TTSConfigList(props: {
   ttsConfig: TTSConfig;
   updateConfig: (updater: (config: TTSConfig) => void) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <>
       <ListItem
-        title={Locale.Settings.TTS.Enable.Title}
-        subTitle={Locale.Settings.TTS.Enable.SubTitle}
+        // title={Locale.Settings.TTS.Enable.Title}
+        // subTitle={Locale.Settings.TTS.Enable.SubTitle}
+        title={t("Settings.TTS.Enable.Title")}
+        subTitle={t("Settings.TTS.Enable.SubTitle")}
       >
         <input
           type="checkbox"
@@ -31,8 +34,11 @@ export function TTSConfigList(props: {
         ></input>
       </ListItem>
       {/* <ListItem
-        title={Locale.Settings.TTS.Autoplay.Title}
-        subTitle={Locale.Settings.TTS.Autoplay.SubTitle}
+        // title={Locale.Settings.TTS.Autoplay.Title}
+        // subTitle={Locale.Settings.TTS.Autoplay.SubTitle}
+        title={t("Settings.TTS.Autoplay.Title")}
+subTitle={t("Settings.TTS.Autoplay.SubTitle")}
+
       >
         <input
           type="checkbox"
@@ -44,7 +50,8 @@ export function TTSConfigList(props: {
           }
         ></input>
       </ListItem> */}
-      <ListItem title={Locale.Settings.TTS.Engine}>
+      {/* <ListItem title={Locale.Settings.TTS.Engine}> */}
+      <ListItem title={t("Settings.TTS.Engine")}>
         <Select
           value={props.ttsConfig.engine}
           onChange={(e) => {
@@ -65,7 +72,8 @@ export function TTSConfigList(props: {
       </ListItem>
       {props.ttsConfig.engine === DEFAULT_TTS_ENGINE && (
         <>
-          <ListItem title={Locale.Settings.TTS.Model}>
+          {/* <ListItem title={Locale.Settings.TTS.Model}> */}
+          <ListItem title={t("Settings.TTS.Model")}>
             <Select
               value={props.ttsConfig.model}
               onChange={(e) => {
@@ -85,8 +93,10 @@ export function TTSConfigList(props: {
             </Select>
           </ListItem>
           <ListItem
-            title={Locale.Settings.TTS.Voice.Title}
-            subTitle={Locale.Settings.TTS.Voice.SubTitle}
+            // title={Locale.Settings.TTS.Voice.Title}
+            // subTitle={Locale.Settings.TTS.Voice.SubTitle}
+            title={t("Settings.TTS.Voice.Title")}
+            subTitle={t("Settings.TTS.Voice.SubTitle")}
           >
             <Select
               value={props.ttsConfig.voice}
@@ -107,11 +117,14 @@ export function TTSConfigList(props: {
             </Select>
           </ListItem>
           <ListItem
-            title={Locale.Settings.TTS.Speed.Title}
-            subTitle={Locale.Settings.TTS.Speed.SubTitle}
+            // title={Locale.Settings.TTS.Speed.Title}
+            // subTitle={Locale.Settings.TTS.Speed.SubTitle}
+            title={t("Settings.TTS.Speed.Title")}
+            subTitle={t("Settings.TTS.Speed.SubTitle")}
           >
             <InputRange
-              aria={Locale.Settings.TTS.Speed.Title}
+              // aria={Locale.Settings.TTS.Speed.Title}
+              aria={t("Settings.TTS.Speed.Title")}
               value={props.ttsConfig.speed?.toFixed(1)}
               min="0.3"
               max="4.0"

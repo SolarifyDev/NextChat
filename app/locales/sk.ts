@@ -1,5 +1,4 @@
 import { getClientConfig } from "../config/client";
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
 // if you are adding a new translation, please use PartialLocaleType instead of LocaleType
@@ -31,10 +30,10 @@ const sk: PartialLocaleType = {
       "🥳 Uvítacia ponuka NextChat AI, okamžite odomknite OpenAI o1, GPT-4o, Claude-3.5 a najnovšie veľké modely",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} správ`,
+    ChatItemCount: `{{count}} správ`,
   },
   Chat: {
-    SubTitle: (count: number) => `${count} správ`,
+    SubTitle: `{{count}} správ`,
     EditMessage: {
       Title: "Upraviť všetky správy",
       Topic: {
@@ -80,19 +79,19 @@ const sk: PartialLocaleType = {
     },
     Rename: "Premenovať Chat",
     Typing: "Písanie…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} na odoslanie`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += ", Shift + Enter na zalomenie";
-      }
-      return inputHints + ", / na vyhľadávanie výziev, : na použitie príkazov";
-    },
+    Input:
+      "{{submitKey}} na odoslanie, / na vyhľadávanie výziev, : na použitie príkazov",
     Send: "Odoslať",
     Config: {
       Reset: "Resetovať na predvolené",
       SaveAs: "Uložiť ako masku",
     },
     IsContext: "Kontextová výzva",
+    Metis: {
+      Title: "Ahoj~ Ja som METIS",
+      Content:
+        "Môžem vám pomôcť s vyhľadávaním a odpovedaním na otázky. Spýtajte sa ma na čokoľvek!",
+    },
   },
   Export: {
     Title: "Export správ",
@@ -182,11 +181,11 @@ const sk: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Verzia: ${x}`,
+      Version: `Verzia: {{x}}`,
       IsLatest: "Najnovšia verzia",
       CheckUpdate: "Skontrolovať aktualizácie",
       IsChecking: "Kontrola aktualizácií...",
-      FoundUpdate: (x: string) => `Nájdená nová verzia: ${x}`,
+      FoundUpdate: "Nájdená nová verzia: {{x}}",
       GoToUpdate: "Aktualizovať",
     },
     SendKey: "Odoslať kľúč",
@@ -238,9 +237,8 @@ const sk: PartialLocaleType = {
       },
 
       LocalState: "Lokálne údaje",
-      Overview: (overview: any) => {
-        return `${overview.chat} chaty, ${overview.message} správy, ${overview.prompt} výzvy, ${overview.mask} masky`;
-      },
+      Overview:
+        "{{chat}} chaty, {{message}} správy, {{prompt}} výzvy, {{mask}} masky",
       ImportFailed: "Import z súboru zlyhal",
     },
     Mask: {
@@ -259,8 +257,7 @@ const sk: PartialLocaleType = {
         SubTitle: "Zadajte / na spustenie automatického dopĺňania",
       },
       List: "Zoznam výziev",
-      ListCount: (builtin: number, custom: number) =>
-        `${builtin} vstavaných, ${custom} užívateľsky definovaných`,
+      ListCount: "{{builtin}} vstavaných, {{custom}} užívateľsky definovaných",
       Edit: "Upraviť",
       Modal: {
         Title: "Zoznam výziev",
@@ -283,9 +280,7 @@ const sk: PartialLocaleType = {
 
     Usage: {
       Title: "Stav účtu",
-      SubTitle(used: any, total: any) {
-        return `Tento mesiac použité ${used}, predplatné ${total}`;
-      },
+      SubTitle: "Tento mesiac použité {{used}}, predplatné {{total}}",
       IsChecking: "Kontroluje sa...",
       Check: "Skontrolovať",
       NoAccess: "Zadajte API kľúč na skontrolovanie zostatku",
@@ -416,8 +411,7 @@ const sk: PartialLocaleType = {
     BotHello: "Ahoj! Ako vám dnes môžem pomôcť?",
     Error: "Niečo sa pokazilo, skúste to prosím neskôr znova.",
     Prompt: {
-      History: (content: string) =>
-        "Toto je zhrnutie histórie chatu ako rekapitulácia: " + content,
+      History: "Toto je zhrnutie histórie chatu ako rekapitulácia: {{content}}",
       Topic:
         "Prosím, vygenerujte štvor- až päťslovný titul, ktorý zhrnie našu konverzáciu bez akéhokoľvek úvodu, interpunkcie, úvodzoviek, bodiek, symbolov, tučného textu alebo ďalšieho textu. Odstráňte uzatváracie úvodzovky.",
       Summarize:
@@ -434,7 +428,7 @@ const sk: PartialLocaleType = {
     Failed: "Stiahnutie zlyhalo.",
   },
   Context: {
-    Toast: (x: any) => `S ${x} kontextovými výzvami`,
+    Toast: "S {{x}} kontextovými výzvami",
     Edit: "Aktuálne nastavenia chatu",
     Add: "Pridať výzvu",
     Clear: "Kontext vyčistený",
@@ -455,7 +449,7 @@ const sk: PartialLocaleType = {
       NoData: "Žiadne údaje",
       Loading: "Načítava sa",
 
-      SubTitle: (count: number) => `Nájdených ${count} výsledkov`,
+      SubTitle: "Nájdených {{count}} výsledkov",
     },
     Item: {
       View: "Zobraziť",
@@ -465,12 +459,12 @@ const sk: PartialLocaleType = {
     Name: "Maska",
     Page: {
       Title: "Šablóna výziev",
-      SubTitle: (count: number) => `${count} šablón výziev`,
+      SubTitle: "{{count}} šablón výziev",
       Search: "Hľadať šablóny",
       Create: "Vytvoriť",
     },
     Item: {
-      Info: (count: number) => `${count} výziev`,
+      Info: `{{count}} výziev`,
       Chat: "Chat",
       View: "Zobraziť",
       Edit: "Upraviť",
@@ -478,8 +472,8 @@ const sk: PartialLocaleType = {
       DeleteConfirm: "Potvrdiť vymazanie?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Upraviť šablónu výziev ${readonly ? "(iba na čítanie)" : ""}`,
+      Title: "Upraviť šablónu výziev",
+      ReadOnlyTitle: "Upraviť šablónu výziev (iba na čítanie)",
       Download: "Stiahnuť",
       Clone: "Klonovať",
     },

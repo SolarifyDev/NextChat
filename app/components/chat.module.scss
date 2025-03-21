@@ -7,6 +7,10 @@
   display: flex;
 }
 
+.attach-images-app {
+  display: flex;
+}
+
 .attach-image {
   cursor: default;
   width: 64px;
@@ -288,6 +292,14 @@
   height: 100%;
 }
 
+.chat-is-app {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  background-color: #fafaff;
+}
+
 .chat-body {
   flex: 1;
   overflow: auto;
@@ -449,6 +461,19 @@
   transition: all ease 0.3s;
 }
 
+.chat-message-item-is-app {
+  box-sizing: border-box;
+  max-width: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 14px;
+  user-select: text;
+  word-break: break-word;
+  position: relative;
+  transition: all ease 0.3s;
+}
+
 .chat-message-audio {
   display: flex;
   align-items: center;
@@ -552,6 +577,14 @@
   }
 }
 
+.chat-message-user > .chat-message-container > .chat-message-item-is-app {
+  background-color: rgba(13, 31, 59, 0.06);
+
+  &:hover {
+    min-width: 0;
+  }
+}
+
 .chat-input-panel {
   position: relative;
   width: 100%;
@@ -631,6 +664,61 @@
   border: var(--border-in-light);
 }
 
+.chat-input-panel-inner-is-app {
+  cursor: text;
+  display: flex;
+  flex: 1;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(45deg, #fff2eb, #caffd6, #dcdaff) border-box;
+  box-shadow: 0px 0px 22px 0px rgba(204, 192, 249, 0.25);
+}
+
+.gradient-input {
+  width: 400px;
+  height: 40px;
+  padding: 5px 12px;
+  font-size: 16px;
+  font-family: "Arial", sans-serif;
+  color: #333;
+  outline: none;
+
+  /* 渐变边框 */
+  border: 1px solid transparent;
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(45deg, #ff7eb3, #65d9ff, #c7f464, #ff7eb3) border-box !important;
+  border-radius: 20px;
+
+  /* 平滑过渡 */
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+/* 
+
+/* Hover 状态 */
+.gradient-input:hover {
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(135deg, #ff0076, #1eaeff, #28ffbf, #ff0076) border-box;
+}
+
+/* Focus 状态 */
+.gradient-input:focus {
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(45deg, #ff0076, #1eaeff, #28ffbf, #ff0076) border-box !important;
+  color: #000; /* 聚焦时文本颜色 */
+}
+
+/* Placeholder 样式 */
+.gradient-input::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
 .chat-input-panel-inner-attach {
   padding-bottom: 80px;
 }
@@ -653,6 +741,51 @@
   outline: none;
   box-sizing: border-box;
   min-height: 68px;
+}
+
+.chat-input-is-app {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  border: none;
+  // box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+  background-color: var(--white);
+  color: var(--black);
+  font-family: inherit;
+  padding: 4px 4px !important;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  border: none !important;
+  box-shadow: none !important;
+  // border: 1px solid transparent !important;
+  // background:
+  //   linear-gradient(white, white) padding-box,
+  //   linear-gradient(45deg, #ff7eb3, #65d9ff, #c7f464, #ff7eb3) border-box !important;
+}
+
+.chat-input-is-app:hover {
+  // background:
+  //   linear-gradient(white, white) padding-box,
+  //   linear-gradient(45deg, #ff7eb3, #65d9ff, #c7f464, #ff7eb3) border-box !important;
+  // border: 1px solid transparent;
+  border: none;
+}
+
+// /* Focus 状态 */
+.chat-input-is-app:focus {
+  // background:
+  //   linear-gradient(white, white) padding-box,
+  //   linear-gradient(45deg, #ff7eb3, #65d9ff, #c7f464, #ff7eb3) border-box !important;
+  border: none;
+  color: #000;
+}
+
+.chat-input-is-app::placeholder {
+  color: #8b98ad;
+  font-weight: 400;
+  font-size: 15px;
+  font-style: normal;
 }
 
 .chat-input:focus {

@@ -4,13 +4,13 @@ import {
   REQUEST_TIMEOUT_MS,
 } from "@/app/constant";
 import { RequestMessage } from "@/app/client/api";
-import Locale from "@/app/locales";
 import {
   EventStreamContentType,
   fetchEventSource,
 } from "@fortaine/fetch-event-source";
 import { prettyObject } from "./format";
 import { fetch as tauriFetch } from "./stream";
+import { t } from "i18next";
 
 export function compressImage(file: Blob, maxSize: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -327,7 +327,8 @@ export function stream(
           } catch {}
 
           if (res.status === 401) {
-            responseTexts.push(Locale.Error.Unauthorized);
+            // responseTexts.push(Locale.Error.Unauthorized);
+            responseTexts.push(t("Error.Unauthorized"));
           }
 
           if (extraInfo) {
@@ -553,7 +554,8 @@ export function streamWithThink(
           } catch {}
 
           if (res.status === 401) {
-            responseTexts.push(Locale.Error.Unauthorized);
+            // responseTexts.push(Locale.Error.Unauthorized);
+            responseTexts.push(t("Error.Unauthorized"));
           }
 
           if (extraInfo) {

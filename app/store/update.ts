@@ -8,8 +8,8 @@ import { getClientConfig } from "../config/client";
 import { createPersistStore } from "../utils/store";
 import { clientUpdate } from "../utils";
 import ChatGptIcon from "../icons/chatgpt.png";
-import Locale from "../locales";
 import { ClientApi } from "../client/api";
+import { t } from "i18next";
 
 const ONE_MINUTE = 60 * 1000;
 const isApp = !!getClientConfig()?.isApp;
@@ -106,13 +106,16 @@ export const useUpdateStore = createPersistStore(
                         // Show a notification using Tauri
                         window.__TAURI__?.notification.sendNotification({
                           title: "NextChat",
-                          body: `${Locale.Settings.Update.IsLatest}`,
+                          // body: `${Locale.Settings.Update.IsLatest}`,
+                          body: `${t("Settings.Update.IsLatest")}`,
                           icon: `${ChatGptIcon.src}`,
                           sound: "Default",
                         });
                       } else {
                         const updateMessage =
-                          Locale.Settings.Update.FoundUpdate(`${remoteId}`);
+                          // Locale.Settings.Update.FoundUpdate(`${remoteId}`);
+                          t("Settings.Update.FoundUpdate", { x: remoteId });
+
                         // Show a notification for the new version using Tauri
                         window.__TAURI__?.notification.sendNotification({
                           title: "NextChat",

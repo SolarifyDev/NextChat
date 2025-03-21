@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -30,10 +29,10 @@ const ko: PartialLocaleType = {
       "🥳 NextChat AI 출시 기념 할인, 지금 OpenAI o1, GPT-4o, Claude-3.5 및 최신 대형 모델을 해제하세요",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} 개의 대화`,
+    ChatItemCount: `{{count}} 개의 대화`,
   },
   Chat: {
-    SubTitle: (count: number) => `총 ${count} 개의 대화`,
+    SubTitle: `총 {{count}} 개의 대화`,
     EditMessage: {
       Title: "메시지 기록 편집",
       Topic: {
@@ -80,19 +79,17 @@ const ko: PartialLocaleType = {
     },
     Rename: "채팅 이름 변경",
     Typing: "입력 중…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} 전송`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter 줄 바꿈";
-      }
-      return inputHints + "，/ 자동 완성，: 명령어 입력";
-    },
+    Input: "{{submitKey}} 전송，/ 자동 완성，: 명령어 입력",
     Send: "전송",
     Config: {
       Reset: "기억 지우기",
       SaveAs: "마스크로 저장",
     },
     IsContext: "프롬프트 설정",
+    Metis: {
+      Title: "안녕하세요~ 저는 METIS입니다",
+      Content: "검색과 질문에 답해드릴 수 있어요. 무엇이든 물어보세요!",
+    },
   },
   Export: {
     Title: "채팅 기록 공유",
@@ -181,11 +178,11 @@ const ko: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `현재 버전: ${x}`,
+      Version: `현재 버전: {{x}}`,
       IsLatest: "최신 버전입니다.",
       CheckUpdate: "업데이트 확인",
       IsChecking: "업데이트 확인 중...",
-      FoundUpdate: (x: string) => `새 버전 발견: ${x}`,
+      FoundUpdate: "새 버전 발견: {{x}}",
       GoToUpdate: "업데이트로 이동",
     },
     SendKey: "전송 키",
@@ -238,9 +235,8 @@ const ko: PartialLocaleType = {
       },
 
       LocalState: "로컬 데이터",
-      Overview: (overview: any) => {
-        return `${overview.chat} 회의 대화, ${overview.message} 개의 메시지, ${overview.prompt} 개의 프롬프트, ${overview.mask} 개의 마스크`;
-      },
+      Overview:
+        "{{chat}} 회의 대화, {{message}} 개의 메시지, {{prompt}} 개의 프롬프트, {{mask}} 개의 마스크",
       ImportFailed: "가져오기 실패",
     },
     Mask: {
@@ -259,8 +255,7 @@ const ko: PartialLocaleType = {
         SubTitle: "입력 상자 시작 부분에 / 를 입력하여 자동 완성 활성화",
       },
       List: "사용자 정의 프롬프트 목록",
-      ListCount: (builtin: number, custom: number) =>
-        `내장 ${builtin} 개, 사용자 정의 ${custom} 개`,
+      ListCount: "내장 {{builtin}} 개, 사용자 정의 {{custom}} 개",
       Edit: "편집",
       Modal: {
         Title: "프롬프트 목록",
@@ -282,9 +277,7 @@ const ko: PartialLocaleType = {
 
     Usage: {
       Title: "잔액 조회",
-      SubTitle(used: any, total: any) {
-        return `이번 달 사용된 금액: $${used}，총 구독 금액: $${total}`;
-      },
+      SubTitle: "이번 달 사용된 금액: ${{used}}，총 구독 금액: ${{total}}",
       IsChecking: "확인 중...",
       Check: "다시 확인",
       NoAccess: "잔액을 보려면 API 키 또는 접근 비밀번호를 입력하십시오.",
@@ -454,7 +447,7 @@ const ko: PartialLocaleType = {
     BotHello: "무엇을 도와드릴까요?",
     Error: "오류가 발생했습니다. 나중에 다시 시도해 주세요.",
     Prompt: {
-      History: (content: string) => "이것은 이전 채팅 요약입니다: " + content,
+      History: "이것은 이전 채팅 요약입니다: {{content}}",
       Topic:
         "네 글자에서 다섯 글자로 이 문장의 간략한 주제를 반환하세요. 설명이나 문장 부호, 어미, 불필요한 텍스트, 굵은 글씨는 필요 없습니다. 주제가 없다면 '잡담'이라고만 반환하세요.",
       Summarize:
@@ -470,7 +463,7 @@ const ko: PartialLocaleType = {
     Failed: "다운로드 실패.",
   },
   Context: {
-    Toast: (x: any) => ` ${x} 개의 프리셋 프롬프트 포함됨`,
+    Toast: "{{x}} 개의 프리셋 프롬프트 포함됨",
     Edit: "현재 대화 설정",
     Add: "대화 추가",
     Clear: "컨텍스트가 지워졌습니다.",
@@ -491,7 +484,7 @@ const ko: PartialLocaleType = {
       NoData: "데이터가 없습니다",
       Loading: "로딩 중",
 
-      SubTitle: (count: number) => `${count}개의 결과를 찾았습니다`,
+      SubTitle: "{{count}}개의 결과를 찾았습니다",
     },
     Item: {
       View: "보기",
@@ -501,12 +494,12 @@ const ko: PartialLocaleType = {
     Name: "마스크",
     Page: {
       Title: "프리셋 캐릭터 마스크",
-      SubTitle: (count: number) => `${count} 개의 프리셋 캐릭터 정의`,
+      SubTitle: "{{count}} 개의 프리셋 캐릭터 정의",
       Search: "캐릭터 마스크 검색",
       Create: "새로 만들기",
     },
     Item: {
-      Info: (count: number) => ` ${count} 개의 프리셋 대화 포함`,
+      Info: `{{count}} 개의 프리셋 대화 포함`,
       Chat: "대화",
       View: "보기",
       Edit: "편집",
@@ -514,8 +507,8 @@ const ko: PartialLocaleType = {
       DeleteConfirm: "삭제를 확인하시겠습니까?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `프리셋 마스크 편집 ${readonly ? "（읽기 전용）" : ""}`,
+      Title: "프리셋 마스크 편집",
+      ReadOnlyTitle: "프리셋 마스크 편집 （읽기 전용）",
       Download: "프리셋 다운로드",
       Clone: "프리셋 복제",
     },

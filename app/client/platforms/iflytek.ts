@@ -14,7 +14,6 @@ import {
   LLMModel,
   SpeechOptions,
 } from "../api";
-import Locale from "../../locales";
 import {
   EventStreamContentType,
   fetchEventSource,
@@ -26,6 +25,7 @@ import { fetch } from "@/app/utils/stream";
 
 import { RequestPayload } from "./openai";
 import { useNewChatStore } from "@/app/store/new-chat";
+import { t } from "i18next";
 
 export class SparkApi implements LLMApi {
   private disableListModels = true;
@@ -180,7 +180,8 @@ export class SparkApi implements LLMApi {
               } catch {}
 
               if (res.status === 401) {
-                extraInfo = Locale.Error.Unauthorized;
+                // extraInfo = Locale.Error.Unauthorized;
+                extraInfo = t("Error.Unauthorized");
               }
 
               options.onError?.(

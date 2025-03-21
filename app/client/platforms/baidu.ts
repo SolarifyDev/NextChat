@@ -11,7 +11,6 @@ import {
   MultimodalContent,
   SpeechOptions,
 } from "../api";
-import Locale from "../../locales";
 import {
   EventStreamContentType,
   fetchEventSource,
@@ -21,6 +20,7 @@ import { getClientConfig } from "@/app/config/client";
 import { getMessageTextContent, getTimeoutMSByModel } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
 import { useNewChatStore } from "@/app/store/new-chat";
+import { t } from "i18next";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -223,7 +223,8 @@ export class ErnieApi implements LLMApi {
               } catch {}
 
               if (res.status === 401) {
-                responseTexts.push(Locale.Error.Unauthorized);
+                // responseTexts.push(Locale.Error.Unauthorized);
+                responseTexts.push(t("Error.Unauthorized"));
               }
 
               if (extraInfo) {

@@ -1,5 +1,4 @@
 import { getClientConfig } from "../config/client";
-import { SubmitKey } from "../store/config";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
 
 const isApp = !!getClientConfig()?.isApp;
@@ -30,10 +29,10 @@ const cn = {
       "🥳 NextChat AI 首发优惠，立刻解锁 OpenAI o1, GPT-4o, Claude-3.5 等最新大模型",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} 条对话`,
+    ChatItemCount: `{{count}} 条对话`,
   },
   Chat: {
-    SubTitle: (count: number) => `共 ${count} 条对话`,
+    SubTitle: `共 {{count}} 条对话`,
     EditMessage: {
       Title: "编辑消息记录",
       Topic: {
@@ -84,13 +83,7 @@ const cn = {
     },
     Rename: "重命名对话",
     Typing: "正在输入…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} 发送`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter 换行";
-      }
-      return inputHints + "，/ 触发补全，: 触发命令";
-    },
+    Input: "{{submitKey}} 发送，/ 触发补全，: 触发命令",
     Send: "发送",
     StartSpeak: "说话",
     StopSpeak: "停止",
@@ -107,6 +100,10 @@ const cn = {
       copyLastCode: "复制最后一个代码块",
       showShortcutKey: "显示快捷方式",
       clearContext: "清除上下文",
+    },
+    Metis: {
+      Title: "Hi~我是METIS",
+      Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
   },
   Export: {
@@ -200,11 +197,11 @@ const cn = {
     },
 
     Update: {
-      Version: (x: string) => `当前版本：${x}`,
+      Version: `当前版本：{{x}}`,
       IsLatest: "已是最新版本",
       CheckUpdate: "检查更新",
       IsChecking: "正在检查更新...",
-      FoundUpdate: (x: string) => `发现新版本：${x}`,
+      FoundUpdate: `发现新版本：{{x}}`,
       GoToUpdate: "前往更新",
       Success: "更新成功！",
       Failed: "更新失败",
@@ -258,9 +255,8 @@ const cn = {
       },
 
       LocalState: "本地数据",
-      Overview: (overview: any) => {
-        return `${overview.chat} 次对话，${overview.message} 条消息，${overview.prompt} 条提示词，${overview.mask} 个面具`;
-      },
+      Overview:
+        "{{chat}} 次对话，{{message}} 条消息，{{prompt}} 条提示词，{{mask}} 个面具",
       ImportFailed: "导入失败",
     },
     Mask: {
@@ -279,8 +275,7 @@ const cn = {
         SubTitle: "在输入框开头输入 / 即可触发自动补全",
       },
       List: "自定义提示词列表",
-      ListCount: (builtin: number, custom: number) =>
-        `内置 ${builtin} 条，用户定义 ${custom} 条`,
+      ListCount: "内置 {{builtin}} 条，用户定义 {{custom}} 条",
       Edit: "编辑",
       Modal: {
         Title: "提示词列表",
@@ -302,9 +297,7 @@ const cn = {
 
     Usage: {
       Title: "余额查询",
-      SubTitle(used: any, total: any) {
-        return `本月已使用 $${used}，订阅总额 $${total}`;
-      },
+      SubTitle: "本月已使用 ${{used}}，订阅总额 ${{total}}",
       IsChecking: "正在检查…",
       Check: "重新检查",
       NoAccess: "输入 API Key 或访问密码查看余额",
@@ -624,7 +617,7 @@ const cn = {
     BotHello: "有什么可以帮你的吗",
     Error: "出错了，稍后重试吧",
     Prompt: {
-      History: (content: string) => "这是历史聊天总结作为前情提要：" + content,
+      History: "这是历史聊天总结作为前情提要：{{content}}",
       Topic:
         "使用四到五个字直接返回这句话的简要主题，不要解释、不要标点、不要语气词、不要多余文本，不要加粗，如果没有主题，请直接返回“闲聊”",
       Summarize:
@@ -640,7 +633,7 @@ const cn = {
     Failed: "下载失败。",
   },
   Context: {
-    Toast: (x: any) => `包含 ${x} 条预设提示词`,
+    Toast: "包含 {{x}} 条预设提示词",
     Edit: "当前对话设置",
     Add: "新增一条对话",
     Clear: "上下文已清除",
@@ -664,7 +657,7 @@ const cn = {
       NoData: "没有数据",
       Loading: "加载中",
 
-      SubTitle: (count: number) => `搜索到 ${count} 条结果`,
+      SubTitle: "搜索到 {{count}} 条结果",
     },
     Item: {
       View: "查看",
@@ -674,13 +667,13 @@ const cn = {
     Name: "插件",
     Page: {
       Title: "插件",
-      SubTitle: (count: number) => `${count} 个插件`,
+      SubTitle: "{{count}} 个插件",
       Search: "搜索插件",
       Create: "新建",
       Find: "您可以在Github上找到优秀的插件：",
     },
     Item: {
-      Info: (count: number) => `${count} 方法`,
+      Info: "{{count}} 方法",
       View: "查看",
       Edit: "编辑",
       Delete: "删除",
@@ -701,7 +694,8 @@ const cn = {
       LocationBody: "Body",
     },
     EditModal: {
-      Title: (readonly: boolean) => `编辑插件 ${readonly ? "（只读）" : ""}`,
+      Title: "编辑插件",
+      ReadOnlyTitle: "编辑插件（只读）",
       Download: "下载",
       Auth: "授权方式",
       Content: "OpenAPI Schema",
@@ -714,12 +708,12 @@ const cn = {
     Name: "面具",
     Page: {
       Title: "预设角色面具",
-      SubTitle: (count: number) => `${count} 个预设角色定义`,
+      SubTitle: "{{count}} 个预设角色定义",
       Search: "搜索角色面具",
       Create: "新建",
     },
     Item: {
-      Info: (count: number) => `包含 ${count} 条预设对话`,
+      Info: "包含 {{count}} 条预设对话",
       Chat: "对话",
       View: "查看",
       Edit: "编辑",
@@ -727,8 +721,8 @@ const cn = {
       DeleteConfirm: "确认删除？",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `编辑预设面具 ${readonly ? "（只读）" : ""}`,
+      Title: `编辑预设面具`,
+      ReadOnlyTitle: "编辑预设面具（只读）",
       Download: "下载预设",
       Clone: "克隆预设",
     },
@@ -797,7 +791,7 @@ const cn = {
   SdPanel: {
     Prompt: "画面提示",
     NegativePrompt: "否定提示",
-    PleaseInput: (name: string) => `请输入${name}`,
+    PleaseInput: `请输入{{name}}`,
     AspectRatio: "横纵比",
     ImageStyle: "图像风格",
     OutFormat: "输出格式",

@@ -4,12 +4,12 @@ import { Updater } from "../typing";
 import { IconButton } from "./button";
 import { Avatar } from "./emoji";
 import { MaskAvatar } from "./mask";
-import Locale from "../locales";
 
 import styles from "./message-selector.module.scss";
 import { getMessageTextContent } from "../utils";
 import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
+import { useTranslation } from "react-i18next";
 
 function useShiftRange() {
   const [startIndex, setStartIndex] = useState<number>();
@@ -73,6 +73,7 @@ export function MessageSelector(props: {
   defaultSelectAll?: boolean;
   onSelected?: (messages: ChatMessage[]) => void;
 }) {
+  const { t } = useTranslation();
   const LATEST_COUNT = 4;
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
@@ -151,7 +152,8 @@ export function MessageSelector(props: {
       <div className={styles["message-filter"]}>
         <input
           type="text"
-          placeholder={Locale.Select.Search}
+          // placeholder={Locale.Select.Search}
+          placeholder={t("Select.Search")}
           className={clsx(styles["filter-item"], styles["search-bar"])}
           value={searchInput}
           onInput={(e) => {
@@ -162,13 +164,15 @@ export function MessageSelector(props: {
 
         <div className={styles["actions"]}>
           <IconButton
-            text={Locale.Select.All}
+            // text={Locale.Select.All}
+            text={t("Select.All")}
             bordered
             className={styles["filter-item"]}
             onClick={selectAll}
           />
           <IconButton
-            text={Locale.Select.Latest}
+            // text={Locale.Select.Latest}
+            text={t("Select.Latest")}
             bordered
             className={styles["filter-item"]}
             onClick={() =>
@@ -181,7 +185,8 @@ export function MessageSelector(props: {
             }
           />
           <IconButton
-            text={Locale.Select.Clear}
+            // text={Locale.Select.Clear}
+            text={t("Select.Clear")}
             bordered
             className={styles["filter-item"]}
             onClick={() =>

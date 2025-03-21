@@ -5,10 +5,10 @@ import { IconButton } from "./button";
 import GithubIcon from "../icons/github.svg";
 import ResetIcon from "../icons/reload.svg";
 import { ISSUE_URL } from "../constant";
-import Locale from "../locales";
 import { showConfirm } from "./ui-lib";
 import { useSyncStore } from "../store/sync";
 import { useNewChatStore } from "../store/new-chat";
+import { withTranslation, WithTranslation } from "react-i18next";
 
 interface IErrorBoundaryState {
   hasError: boolean;
@@ -16,8 +16,15 @@ interface IErrorBoundaryState {
   info: React.ErrorInfo | null;
 }
 
-export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
-  constructor(props: any) {
+interface ErrorBoundaryProps extends WithTranslation {
+  children: React.ReactNode; // 显式声明 children 属性
+}
+
+class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  IErrorBoundaryState
+> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null, info: null };
   }
@@ -36,6 +43,7 @@ export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
   }
 
   render() {
+    const { t, children } = this.props;
     if (this.state.hasError) {
       // Render error message
       return (
@@ -58,7 +66,8 @@ export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
               icon={<ResetIcon />}
               text="Clear All Data"
               onClick={async () => {
-                if (await showConfirm(Locale.Settings.Danger.Reset.Confirm)) {
+                // if (await showConfirm(Locale.Settings.Danger.Reset.Confirm)) {
+                if (await showConfirm(t("Settings.Danger.Reset.Confirm"))) {
                   this.clearAndSaveData();
                 }
               }}
@@ -69,6 +78,8 @@ export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
       );
     }
     // if no error occurred, render children
-    return this.props.children;
+    return children;
   }
 }
+
+export default withTranslation()(ErrorBoundary);

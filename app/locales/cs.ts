@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -30,10 +29,10 @@ const cs: PartialLocaleType = {
       "🥳 Uvítací nabídka NextChat AI, okamžitě odemkněte OpenAI o1, GPT-4o, Claude-3.5 a nejnovější velké modely",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} konverzací`,
+    ChatItemCount: `{{count}} konverzací`,
   },
   Chat: {
-    SubTitle: (count: number) => `Celkem ${count} konverzací`,
+    SubTitle: `Celkem {{count}} konverzací`,
     EditMessage: {
       Title: "Upravit zprávy",
       Topic: {
@@ -80,19 +79,18 @@ const cs: PartialLocaleType = {
     },
     Rename: "Přejmenovat konverzaci",
     Typing: "Píše se…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} odeslat`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter pro nový řádek";
-      }
-      return inputHints + "，/ pro doplnění, : pro příkaz";
-    },
+    Input: "{submitKey} odeslat，/ pro doplnění, : pro příkaz",
     Send: "Odeslat",
     Config: {
       Reset: "Vymazat paměť",
       SaveAs: "Uložit jako masku",
     },
     IsContext: "Přednastavené prompty",
+    Metis: {
+      Title: "Ahoj~ Jsem METIS",
+      Content:
+        "Mohu vám pomoci s hledáním a odpověďmi na otázky. Ptejte se na cokoliv!",
+    },
   },
   Export: {
     Title: "Sdílet konverzace",
@@ -182,11 +180,11 @@ const cs: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Aktuální verze: ${x}`,
+      Version: `Aktuální verze: {{x}}`,
       IsLatest: "Jste na nejnovější verzi",
       CheckUpdate: "Zkontrolovat aktualizace",
       IsChecking: "Kontrola aktualizací...",
-      FoundUpdate: (x: string) => `Nalezena nová verze: ${x}`,
+      FoundUpdate: `Nalezena nová verze: {{x}}`,
       GoToUpdate: "Přejít na aktualizaci",
     },
     SendKey: "Klávesa pro odeslání",
@@ -239,9 +237,8 @@ const cs: PartialLocaleType = {
       },
 
       LocalState: "Lokální data",
-      Overview: (overview: any) => {
-        return `${overview.chat} konverzací, ${overview.message} zpráv, ${overview.prompt} promptů, ${overview.mask} masek`;
-      },
+      Overview:
+        "{{chat}} konverzací, {{message}} zpráv, {{prompt}} promptů, {{mask}} masek",
       ImportFailed: "Import selhal",
     },
     Mask: {
@@ -261,8 +258,8 @@ const cs: PartialLocaleType = {
           "Automatické doplňování se aktivuje zadáním / na začátku textového pole",
       },
       List: "Seznam vlastních promptů",
-      ListCount: (builtin: number, custom: number) =>
-        `Vestavěné ${builtin} položek, uživatelsky definované ${custom} položek`,
+      ListCount:
+        "Vestavěné {{builtin}} položek, uživatelsky definované {{custom}} položek",
       Edit: "Upravit",
       Modal: {
         Title: "Seznam promptů",
@@ -285,9 +282,8 @@ const cs: PartialLocaleType = {
 
     Usage: {
       Title: "Kontrola zůstatku",
-      SubTitle(used: any, total: any) {
-        return `Tento měsíc použito $${used}, celkový předplatný objem $${total}`;
-      },
+      SubTitle:
+        "Tento měsíc použito ${{used}}, celkový předplatný objem ${{total}}",
       IsChecking: "Probíhá kontrola…",
       Check: "Znovu zkontrolovat",
       NoAccess: "Zadejte API Key nebo přístupové heslo pro zobrazení zůstatku",
@@ -462,8 +458,7 @@ const cs: PartialLocaleType = {
     BotHello: "Jak vám mohu pomoci?",
     Error: "Došlo k chybě, zkuste to prosím znovu později.",
     Prompt: {
-      History: (content: string) =>
-        "Toto je shrnutí historie chatu jako kontext: " + content,
+      History: "Toto je shrnutí historie chatu jako kontext: {{content}}",
       Topic:
         "Použijte čtyři až pět slov pro stručné téma této věty, bez vysvětlení, interpunkce, citoslovcí, nadbytečného textu, bez tučného písma. Pokud téma neexistuje, vraťte pouze 'neformální chat'.",
       Summarize:
@@ -479,7 +474,7 @@ const cs: PartialLocaleType = {
     Failed: "Stahování selhalo.",
   },
   Context: {
-    Toast: (x: any) => `Obsahuje ${x} přednastavených promptů`,
+    Toast: "Obsahuje {{x}} přednastavených promptů",
     Edit: "Nastavení aktuální konverzace",
     Add: "Přidat novou konverzaci",
     Clear: "Kontext byl vymazán",
@@ -500,7 +495,7 @@ const cs: PartialLocaleType = {
       NoData: "Žádná data",
       Loading: "Načítání",
 
-      SubTitle: (count: number) => `Nalezeno ${count} výsledků`,
+      SubTitle: "Nalezeno {{count}} výsledků",
     },
     Item: {
       View: "Zobrazit",
@@ -510,12 +505,12 @@ const cs: PartialLocaleType = {
     Name: "Maska",
     Page: {
       Title: "Přednastavené role masky",
-      SubTitle: (count: number) => `${count} definovaných rolí`,
+      SubTitle: "{{count}} definovaných rolí",
       Search: "Hledat role masky",
       Create: "Nový",
     },
     Item: {
-      Info: (count: number) => `Obsahuje ${count} přednastavených konverzací`,
+      Info: `Obsahuje {{count}} přednastavených konverzací`,
       Chat: "Chat",
       View: "Zobrazit",
       Edit: "Upravit",
@@ -523,8 +518,8 @@ const cs: PartialLocaleType = {
       DeleteConfirm: "Opravdu chcete smazat?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Upravit přednastavenou masku ${readonly ? " (jen pro čtení)" : ""}`,
+      Title: "Upravit přednastavenou masku",
+      ReadOnlyTitle: "Upravit přednastavenou masku (jen pro čtení)",
       Download: "Stáhnout přednastavení",
       Clone: "Klonovat přednastavení",
     },

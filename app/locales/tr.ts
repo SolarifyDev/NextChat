@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -30,10 +29,10 @@ const tr: PartialLocaleType = {
       "🥳 NextChat AI lansman teklifi, OpenAI o1, GPT-4o, Claude-3.5 ve en son büyük modelleri şimdi açın",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} konuşma`,
+    ChatItemCount: `{{count}} konuşma`,
   },
   Chat: {
-    SubTitle: (count: number) => `Toplam ${count} konuşma`,
+    SubTitle: `Toplam {{count}} konuşma`,
     EditMessage: {
       Title: "Mesaj Kayıtlarını Düzenle",
       Topic: {
@@ -80,19 +79,18 @@ const tr: PartialLocaleType = {
     },
     Rename: "Sohbeti yeniden adlandır",
     Typing: "Yazıyor…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} gönder`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += " Shift + Enter satır sonu için";
-      }
-      return inputHints + " / tamamlama için, : komutlar için";
-    },
+    Input: "{{submitKey}} gönder, / tamamlama için, : komutlar için",
     Send: "Gönder",
     Config: {
       Reset: "Hafızayı temizle",
       SaveAs: "Maske olarak kaydet",
     },
     IsContext: "Varsayılan ifade",
+    Metis: {
+      Title: "Merhaba~ Ben METIS",
+      Content:
+        "Arama yapabilir ve sorularınızı yanıtlayabilirim. Bana istediğinizi sorabilirsiniz!",
+    },
   },
   Export: {
     Title: "Sohbet kayıtlarını paylaş",
@@ -182,11 +180,11 @@ const tr: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Mevcut sürüm: ${x}`,
+      Version: `Mevcut sürüm: {{x}}`,
       IsLatest: "En son sürüm",
       CheckUpdate: "Güncellemeleri kontrol et",
       IsChecking: "Güncellemeler kontrol ediliyor...",
-      FoundUpdate: (x: string) => `Yeni sürüm bulundu: ${x}`,
+      FoundUpdate: "Yeni sürüm bulundu: {{x}}",
       GoToUpdate: "Güncellemeye git",
     },
     SendKey: "Gönderme Tuşu",
@@ -239,9 +237,8 @@ const tr: PartialLocaleType = {
       },
 
       LocalState: "Yerel Veri",
-      Overview: (overview: any) => {
-        return `${overview.chat} konuşma, ${overview.message} mesaj, ${overview.prompt} ipucu, ${overview.mask} maske`;
-      },
+      Overview:
+        "{{chat}} konuşma, {{message}} mesaj, {{prompt}} ipucu, {{mask}} maske",
       ImportFailed: "İçeri aktarma başarısız",
     },
     Mask: {
@@ -262,8 +259,7 @@ const tr: PartialLocaleType = {
           "Giriş kutusunun başına / yazarak otomatik tamamlamayı tetikle",
       },
       List: "Özelleştirilmiş İpucu Listesi",
-      ListCount: (builtin: number, custom: number) =>
-        `Yerleşik ${builtin} tane, kullanıcı tanımlı ${custom} tane`,
+      ListCount: "Yerleşik {{builtin}} tane, kullanıcı tanımlı {{custom}} tane",
       Edit: "Düzenle",
       Modal: {
         Title: "İpucu Listesi",
@@ -286,9 +282,7 @@ const tr: PartialLocaleType = {
 
     Usage: {
       Title: "Bakiye Sorgulama",
-      SubTitle(used: any, total: any) {
-        return `Bu ay kullanılan $${used}, toplam abonelik ücreti $${total}`;
-      },
+      SubTitle: "Bu ay kullanılan ${{used}}, toplam abonelik ücreti ${{total}}",
       IsChecking: "Kontrol ediliyor…",
       Check: "Yeniden kontrol et",
       NoAccess:
@@ -466,7 +460,7 @@ const tr: PartialLocaleType = {
     BotHello: "Size nasıl yardımcı olabilirim?",
     Error: "Bir hata oluştu, lütfen daha sonra tekrar deneyin",
     Prompt: {
-      History: (content: string) => "Bu, geçmiş sohbetin özeti: " + content,
+      History: "Bu, geçmiş sohbetin özeti: {{content}}",
       Topic:
         "Bu cümlenin dört ila beş kelimelik kısa başlığını doğrudan verin, açıklama yapmayın, noktalama işareti, duygu kelimesi veya fazla metin eklemeyin, kalın yapmayın. Başlık yoksa, doğrudan 'Sohbet' yanıtını verin.",
       Summarize:
@@ -482,7 +476,7 @@ const tr: PartialLocaleType = {
     Failed: "İndirme başarısız.",
   },
   Context: {
-    Toast: (x: any) => `${x} tane önceden tanımlı ipucu içeriyor`,
+    Toast: "{{x}} tane önceden tanımlı ipucu içeriyor",
     Edit: "Mevcut sohbet ayarları",
     Add: "Yeni bir sohbet ekle",
     Clear: "Bağlam temizlendi",
@@ -503,7 +497,7 @@ const tr: PartialLocaleType = {
       NoData: "Veri yok",
       Loading: "Yükleniyor",
 
-      SubTitle: (count: number) => `${count} sonuç bulundu`,
+      SubTitle: "{{count}} sonuç bulundu",
     },
     Item: {
       View: "Görüntüle",
@@ -513,13 +507,12 @@ const tr: PartialLocaleType = {
     Name: "Maske",
     Page: {
       Title: "Önceden Tanımlı Karakter Maskeleri",
-      SubTitle: (count: number) =>
-        `${count} tane önceden tanımlı karakter tanımı`,
+      SubTitle: "{{count}} tane önceden tanımlı karakter tanımı",
       Search: "Karakter maskesi ara",
       Create: "Yeni oluştur",
     },
     Item: {
-      Info: (count: number) => `${count} tane önceden tanımlı sohbet içeriyor`,
+      Info: `{{count}} tane önceden tanımlı sohbet içeriyor`,
       Chat: "Sohbet",
       View: "Görüntüle",
       Edit: "Düzenle",
@@ -527,8 +520,8 @@ const tr: PartialLocaleType = {
       DeleteConfirm: "Silmek istediğinizden emin misiniz?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Önceden Tanımlı Maskeyi Düzenle ${readonly ? " (Salt Okunur)" : ""}`,
+      Title: "Önceden Tanımlı Maskeyi Düzenle",
+      ReadOnlyTitle: "Önceden Tanımlı Maskeyi Düzenle (Salt Okunur)",
       Download: "Önceden Tanımlı Maskeyi İndir",
       Clone: "Önceden Tanımlı Maskeyi Kopyala",
     },

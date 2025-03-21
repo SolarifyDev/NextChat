@@ -1,5 +1,4 @@
 import { getClientConfig } from "../config/client";
-import { SubmitKey } from "../store/config";
 import { LocaleType } from "./index";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
 // if you are adding a new translation, please use PartialLocaleType instead of LocaleType
@@ -31,10 +30,10 @@ const en: LocaleType = {
       "🥳 NextChat AI launch promotion: Instantly unlock the latest models like OpenAI o1, GPT-4o, Claude-3.5!",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} messages`,
+    ChatItemCount: `{{count}} messages`,
   },
   Chat: {
-    SubTitle: (count: number) => `${count} messages`,
+    SubTitle: `{{count}} messages`,
     EditMessage: {
       Title: "Edit All Messages",
       Topic: {
@@ -85,13 +84,7 @@ const en: LocaleType = {
     },
     Rename: "Rename Chat",
     Typing: "Typing…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} to send`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += ", Shift + Enter to wrap";
-      }
-      return inputHints + ", / to search prompts, : to use commands";
-    },
+    Input: "{{submitKey}} to send, / to search prompts, : to use commands",
     Send: "Send",
     StartSpeak: "Start Speak",
     StopSpeak: "Stop Speak",
@@ -108,6 +101,11 @@ const en: LocaleType = {
       copyLastCode: "Copy Last Code Block",
       showShortcutKey: "Show Shortcuts",
       clearContext: "Clear Context",
+    },
+    Metis: {
+      Title: "Hi~ I am METIS",
+      Content:
+        "I can help you search and answer questions. Just ask me anything!",
     },
   },
   Export: {
@@ -202,11 +200,11 @@ const en: LocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Version: ${x}`,
+      Version: `Version: {{x}}`,
       IsLatest: "Latest version",
       CheckUpdate: "Check Update",
       IsChecking: "Checking update...",
-      FoundUpdate: (x: string) => `Found new version: ${x}`,
+      FoundUpdate: `Found new version: {{x}}`,
       GoToUpdate: "Update",
       Success: "Update Successful.",
       Failed: "Update Failed.",
@@ -261,9 +259,8 @@ const en: LocaleType = {
       },
 
       LocalState: "Local Data",
-      Overview: (overview: any) => {
-        return `${overview.chat} chats，${overview.message} messages，${overview.prompt} prompts，${overview.mask} masks`;
-      },
+      Overview:
+        "{{chat}} chats，{{message}} messages，{{prompt}} prompts，{{mask}} masks",
       ImportFailed: "Failed to import from file",
     },
     Mask: {
@@ -282,8 +279,7 @@ const en: LocaleType = {
         SubTitle: "Input / to trigger auto-completion",
       },
       List: "Prompt List",
-      ListCount: (builtin: number, custom: number) =>
-        `${builtin} built-in, ${custom} user-defined`,
+      ListCount: "{{builtin}} built-in, {{custom}} user-defined",
       Edit: "Edit",
       Modal: {
         Title: "Prompt List",
@@ -306,9 +302,7 @@ const en: LocaleType = {
 
     Usage: {
       Title: "Account Balance",
-      SubTitle(used: any, total: any) {
-        return `Used this month $${used}, subscription $${total}`;
-      },
+      SubTitle: "Used this month ${{used}}, subscription ${{total}}",
       IsChecking: "Checking...",
       Check: "Check",
       NoAccess: "Enter API Key to check balance",
@@ -632,8 +626,7 @@ const en: LocaleType = {
     BotHello: "Hello! How can I assist you today?",
     Error: "Something went wrong, please try again later.",
     Prompt: {
-      History: (content: string) =>
-        "This is a summary of the chat history as a recap: " + content,
+      History: "This is a summary of the chat history as a recap: {{content}}",
       Topic:
         "Please generate a four to five word title summarizing our conversation without any lead-in, punctuation, quotation marks, periods, symbols, bold text, or additional text. Remove enclosing quotation marks.",
       Summarize:
@@ -649,7 +642,7 @@ const en: LocaleType = {
     Failed: "Download failed.",
   },
   Context: {
-    Toast: (x: any) => `With ${x} contextual prompts`,
+    Toast: "With {{x}} contextual prompts",
     Edit: "Current Chat Settings",
     Add: "Add a Prompt",
     Clear: "Context Cleared",
@@ -673,7 +666,7 @@ const en: LocaleType = {
       NoData: "No data",
       Loading: "Loading...",
 
-      SubTitle: (count: number) => `Found ${count} results`,
+      SubTitle: "Found {{count}} results",
     },
     Item: {
       View: "View",
@@ -683,13 +676,13 @@ const en: LocaleType = {
     Name: "Plugin",
     Page: {
       Title: "Plugins",
-      SubTitle: (count: number) => `${count} plugins`,
+      SubTitle: "{{count}} plugins",
       Search: "Search Plugin",
       Create: "Create",
       Find: "You can find awesome plugins on github: ",
     },
     Item: {
-      Info: (count: number) => `${count} method`,
+      Info: "{{count}} method",
       View: "View",
       Edit: "Edit",
       Delete: "Delete",
@@ -710,8 +703,8 @@ const en: LocaleType = {
       LocationBody: "Body",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Edit Plugin ${readonly ? "(readonly)" : ""}`,
+      Title: "Edit Plugin",
+      ReadOnlyTitle: "Edit Plugin (readonly)",
       Download: "Download",
       Auth: "Authentication Type",
       Content: "OpenAPI Schema",
@@ -724,12 +717,12 @@ const en: LocaleType = {
     Name: "Mask",
     Page: {
       Title: "Prompt Template",
-      SubTitle: (count: number) => `${count} prompt templates`,
+      SubTitle: "{{count}} prompt templates",
       Search: "Search Templates",
       Create: "Create",
     },
     Item: {
-      Info: (count: number) => `${count} prompts`,
+      Info: `{{count}} prompts`,
       Chat: "Chat",
       View: "View",
       Edit: "Edit",
@@ -737,8 +730,8 @@ const en: LocaleType = {
       DeleteConfirm: "Confirm to delete?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Edit Prompt Template ${readonly ? "(readonly)" : ""}`,
+      Title: "Edit Prompt Template",
+      ReadOnlyTitle: "Edit Prompt Template (readonly)",
       Download: "Download",
       Clone: "Clone",
     },
@@ -807,7 +800,7 @@ const en: LocaleType = {
   SdPanel: {
     Prompt: "Prompt",
     NegativePrompt: "Negative Prompt",
-    PleaseInput: (name: string) => `Please input ${name}`,
+    PleaseInput: `Please input {{name}}`,
     AspectRatio: "Aspect Ratio",
     ImageStyle: "Image Style",
     OutFormat: "Output Format",

@@ -3,7 +3,7 @@ import OpenAPIClientAxios from "openapi-client-axios";
 import yaml from "js-yaml";
 import { PLUGINS_REPO_URL } from "../constant";
 import { IconButton } from "./button";
-import { ErrorBoundary } from "./error";
+import ErrorBoundary from "./error";
 
 import styles from "./mask.module.scss";
 import pluginStyles from "./plugin.module.scss";
@@ -29,8 +29,10 @@ import Locale from "../locales";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import clsx from "clsx";
+import { useTranslation } from "react-i18next";
 
 export function PluginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const pluginStore = usePluginStore();
 
@@ -77,11 +79,13 @@ export function PluginPage() {
         })
         .catch((e) => {
           console.error(e, "then");
-          showToast(Locale.Plugin.EditModal.Error);
+          // showToast(Locale.Plugin.EditModal.Error);
+          showToast(t("Plugin.EditModal.Error"));
         });
     } catch (e) {
       console.error(e, "try");
-      showToast(Locale.Plugin.EditModal.Error);
+      // showToast(Locale.Plugin.EditModal.Error);
+      showToast(t("Plugin.EditModal.Error"));
     }
   }, 100).bind(null, editingPlugin);
 
@@ -113,7 +117,8 @@ export function PluginPage() {
         });
       })
       .catch((e) => {
-        showToast(Locale.Plugin.EditModal.Error);
+        // showToast(Locale.Plugin.EditModal.Error);
+        showToast(t("Plugin.EditModal.Error"));
       });
 
   return (
@@ -122,10 +127,12 @@ export function PluginPage() {
         <div className="window-header">
           <div className="window-header-title">
             <div className="window-header-main-title">
-              {Locale.Plugin.Page.Title}
+              {/* {Locale.Plugin.Page.Title} */}
+              {t("Plugin.Page.Title")}
             </div>
             <div className="window-header-submai-title">
-              {Locale.Plugin.Page.SubTitle(plugins.length)}
+              {/* {Locale.Plugin.Page.SubTitle(plugins.length)} */}
+              {t("Plugin.Page.SubTitle", { count: plugins.length })}
             </div>
           </div>
 
@@ -154,7 +161,8 @@ export function PluginPage() {
             <input
               type="text"
               className={styles["search-bar"]}
-              placeholder={Locale.Plugin.Page.Search}
+              // placeholder={Locale.Plugin.Page.Search}
+              placeholder={t("Plugin.Page.Search")}
               autoFocus
               onInput={(e) => onSearch(e.currentTarget.value)}
             />
@@ -162,7 +170,8 @@ export function PluginPage() {
             <IconButton
               className={styles["mask-create"]}
               icon={<AddIcon />}
-              text={Locale.Plugin.Page.Create}
+              // text={Locale.Plugin.Page.Create}
+              text={t("Plugin.Page.Create")}
               bordered
               onClick={() => {
                 const createdPlugin = pluginStore.create();
@@ -181,7 +190,8 @@ export function PluginPage() {
                   justifyContent: "center",
                 }}
               >
-                {Locale.Plugin.Page.Find}
+                {/* {Locale.Plugin.Page.Find} */}
+                {t("Plugin.Page.Find")}
                 <a
                   href={PLUGINS_REPO_URL}
                   target="_blank"
@@ -201,25 +211,31 @@ export function PluginPage() {
                       {m.title}@<small>{m.version}</small>
                     </div>
                     <div className={clsx(styles["mask-info"], "one-line")}>
-                      {Locale.Plugin.Item.Info(
+                      {/* {Locale.Plugin.Item.Info(
                         FunctionToolService.add(m).length,
-                      )}
+                      )} */}
+                      {t("Plugin.Item.Info", {
+                        count: FunctionToolService.add(m).length,
+                      })}
                     </div>
                   </div>
                 </div>
                 <div className={styles["mask-actions"]}>
                   <IconButton
                     icon={<EditIcon />}
-                    text={Locale.Plugin.Item.Edit}
+                    // text={Locale.Plugin.Item.Edit}
+                    text={t("Plugin.Item.Edit")}
                     onClick={() => setEditingPluginId(m.id)}
                   />
                   {!m.builtin && (
                     <IconButton
                       icon={<DeleteIcon />}
-                      text={Locale.Plugin.Item.Delete}
+                      // text={Locale.Plugin.Item.Delete}
+                      text={t("Plugin.Item.Delete")}
                       onClick={async () => {
                         if (
-                          await showConfirm(Locale.Plugin.Item.DeleteConfirm)
+                          // await showConfirm(Locale.Plugin.Item.DeleteConfirm)
+                          await showConfirm(t("Plugin.Item.DeleteConfirm"))
                         ) {
                           pluginStore.delete(m.id);
                         }
@@ -236,12 +252,18 @@ export function PluginPage() {
       {editingPlugin && (
         <div className="modal-mask">
           <Modal
-            title={Locale.Plugin.EditModal.Title(editingPlugin?.builtin)}
+            // title={Locale.Plugin.EditModal.Title(editingPlugin?.builtin)}
+            title={
+              editingPlugin?.builtin
+                ? t("Plugin.EditModal.ReadOnlyTitle")
+                : t("Plugin.EditModal.Title")
+            }
             onClose={closePluginModal}
             actions={[
               <IconButton
                 icon={<ConfirmIcon />}
-                text={Locale.UI.Confirm}
+                // text={Locale.UI.Confirm}
+                text={t("UI.Confirm")}
                 key="export"
                 bordered
                 onClick={() => setEditingPluginId("")}
@@ -258,16 +280,21 @@ export function PluginPage() {
                     });
                   }}
                 >
-                  <option value="">{Locale.Plugin.Auth.None}</option>
+                  {/* <option value="">{Locale.Plugin.Auth.None}</option>
                   <option value="bearer">{Locale.Plugin.Auth.Bearer}</option>
                   <option value="basic">{Locale.Plugin.Auth.Basic}</option>
-                  <option value="custom">{Locale.Plugin.Auth.Custom}</option>
+                  <option value="custom">{Locale.Plugin.Auth.Custom}</option> */}
+                  <option value="">{t("Plugin.Auth.None")}</option>
+                  <option value="bearer">{t("Plugin.Auth.Bearer")}</option>
+                  <option value="basic">{t("Plugin.Auth.Basic")}</option>
+                  <option value="custom">{t("Plugin.Auth.Custom")}</option>
                 </select>
               </ListItem>
               {["bearer", "basic", "custom"].includes(
                 editingPlugin.authType as string,
               ) && (
-                <ListItem title={Locale.Plugin.Auth.Location}>
+                // <ListItem title={Locale.Plugin.Auth.Location}>
+                <ListItem title={t("Plugin.Auth.Location")}>
                   <select
                     value={editingPlugin?.authLocation}
                     onChange={(e) => {
@@ -276,7 +303,7 @@ export function PluginPage() {
                       });
                     }}
                   >
-                    <option value="header">
+                    {/* <option value="header">
                       {Locale.Plugin.Auth.LocationHeader}
                     </option>
                     <option value="query">
@@ -284,12 +311,22 @@ export function PluginPage() {
                     </option>
                     <option value="body">
                       {Locale.Plugin.Auth.LocationBody}
+                    </option> */}
+                    <option value="header">
+                      {t("Plugin.Auth.LocationHeader")}
+                    </option>
+                    <option value="query">
+                      {t("Plugin.Auth.LocationQuery")}
+                    </option>
+                    <option value="body">
+                      {t("Plugin.Auth.LocationBody")}
                     </option>
                   </select>
                 </ListItem>
               )}
               {editingPlugin.authType == "custom" && (
-                <ListItem title={Locale.Plugin.Auth.CustomHeader}>
+                // <ListItem title={Locale.Plugin.Auth.CustomHeader}>
+                <ListItem title={t("Plugin.Auth.CustomHeader")}>
                   <input
                     type="text"
                     value={editingPlugin?.authHeader}
@@ -304,7 +341,8 @@ export function PluginPage() {
               {["bearer", "basic", "custom"].includes(
                 editingPlugin.authType as string,
               ) && (
-                <ListItem title={Locale.Plugin.Auth.Token}>
+                // <ListItem title={Locale.Plugin.Auth.Token}>
+                <ListItem title={t("Plugin.Auth.Token")}>
                   <PasswordInput
                     type="text"
                     value={editingPlugin?.authToken}
@@ -318,7 +356,8 @@ export function PluginPage() {
               )}
             </List>
             <List>
-              <ListItem title={Locale.Plugin.EditModal.Content}>
+              {/* <ListItem title={Locale.Plugin.EditModal.Content}> */}
+              <ListItem title={t("Plugin.EditModal.Content")}>
                 <div className={pluginStyles["plugin-schema"]}>
                   <input
                     type="text"
@@ -327,7 +366,8 @@ export function PluginPage() {
                   ></input>
                   <IconButton
                     icon={<ReloadIcon />}
-                    text={Locale.Plugin.EditModal.Load}
+                    // text={Locale.Plugin.EditModal.Load}
+                    text={t("Plugin.EditModal.Load")}
                     bordered
                     onClick={() => loadFromUrl(loadUrl)}
                   />

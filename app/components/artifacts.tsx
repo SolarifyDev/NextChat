@@ -15,12 +15,12 @@ import DownloadIcon from "../icons/download.svg";
 import GithubIcon from "../icons/github.svg";
 import LoadingButtonIcon from "../icons/loading.svg";
 import ReloadButtonIcon from "../icons/reload.svg";
-import Locale from "../locales";
 import { Modal, showToast } from "./ui-lib";
 import { copyToClipboard, downloadAs } from "../utils";
 import { Path, ApiPath, REPO_URL } from "@/app/constant";
 import { Loading } from "./home";
 import styles from "./artifacts.module.scss";
+import { useTranslation } from "react-i18next";
 
 type HTMLPreviewProps = {
   code: string;
@@ -117,6 +117,7 @@ export function ArtifactsShareButton({
   style?: any;
   fileName?: string;
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(id);
   const [show, setShow] = useState(false);
@@ -139,7 +140,8 @@ export function ArtifactsShareButton({
             throw Error();
           })
           .catch((e) => {
-            showToast(Locale.Export.Artifacts.Error);
+            // showToast(Locale.Export.Artifacts.Error);
+            showToast(t("Export.Artifacts.Error"));
           });
   return (
     <>
@@ -147,7 +149,8 @@ export function ArtifactsShareButton({
         <IconButton
           icon={loading ? <LoadingButtonIcon /> : <ExportIcon />}
           bordered
-          title={Locale.Export.Artifacts.Title}
+          // title={Locale.Export.Artifacts.Title}
+          title={t("Export.Artifacts.Title")}
           onClick={() => {
             if (loading) return;
             setLoading(true);
@@ -165,14 +168,16 @@ export function ArtifactsShareButton({
       {show && (
         <div className="modal-mask">
           <Modal
-            title={Locale.Export.Artifacts.Title}
+            // title={Locale.Export.Artifacts.Title}
+            title={t("Export.Artifacts.Title")}
             onClose={() => setShow(false)}
             actions={[
               <IconButton
                 key="download"
                 icon={<DownloadIcon />}
                 bordered
-                text={Locale.Export.Download}
+                // text={Locale.Export.Download}
+                text={t("Export.Download")}
                 onClick={() => {
                   downloadAs(getCode(), `${fileName || name}.html`).then(() =>
                     setShow(false),
@@ -183,7 +188,8 @@ export function ArtifactsShareButton({
                 key="copy"
                 icon={<CopyIcon />}
                 bordered
-                text={Locale.Chat.Actions.Copy}
+                // text={Locale.Chat.Actions.Copy}
+                text={t("Chat.Actions.Copy")}
                 onClick={() => {
                   copyToClipboard(shareUrl).then(() => setShow(false));
                 }}
@@ -203,6 +209,8 @@ export function ArtifactsShareButton({
 }
 
 export function Artifacts() {
+  const { t } = useTranslation();
+
   const { id } = useParams();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(true);
@@ -221,7 +229,8 @@ export function Artifacts() {
         .then((res) => res.text())
         .then(setCode)
         .catch((e) => {
-          showToast(Locale.Export.Artifacts.Error);
+          // showToast(Locale.Export.Artifacts.Error);
+          showToast(t("Export.Artifacts.Error"));
         });
     }
   }, [id]);

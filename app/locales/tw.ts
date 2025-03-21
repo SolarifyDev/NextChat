@@ -1,5 +1,4 @@
 import { getClientConfig } from "../config/client";
-import { SubmitKey } from "../store/config";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
 const isApp = !!getClientConfig()?.isApp;
 
@@ -30,10 +29,10 @@ const tw = {
       "🥳 NextChat AI 首發優惠，立刻解鎖 OpenAI o1, GPT-4o, Claude-3.5 等最新的大型語言模型",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} 則對話`,
+    ChatItemCount: `{{count}} 則對話`,
   },
   Chat: {
-    SubTitle: (count: number) => `您已經與 ChatGPT 進行了 ${count} 則對話`,
+    SubTitle: `您已經與 ChatGPT 進行了 {{count}} 則對話`,
     EditMessage: {
       Title: "編輯訊息記錄",
       Topic: {
@@ -80,13 +79,7 @@ const tw = {
     },
     Rename: "重新命名對話",
     Typing: "正在輸入…",
-    Input: (submitKey: string) => {
-      var inputHints = `輸入訊息後，按下 ${submitKey} 鍵即可傳送`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter 鍵換行";
-      }
-      return inputHints;
-    },
+    Input: "輸入訊息後，按下 {{submitKey}} 鍵即可傳送",
     Send: "傳送",
     Config: {
       Reset: "重設",
@@ -101,6 +94,10 @@ const tw = {
       copyLastCode: "複製最後一個程式碼區塊",
       showShortcutKey: "顯示快捷方式",
       clearContext: "清除上下文",
+    },
+    Metis: {
+      Title: "Hi~我是METIS",
+      Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
   },
   Export: {
@@ -189,11 +186,11 @@ const tw = {
     },
 
     Update: {
-      Version: (x: string) => `目前版本：${x}`,
+      Version: `目前版本：{{x}}`,
       IsLatest: "已是最新版本",
       CheckUpdate: "檢查更新",
       IsChecking: "正在檢查更新...",
-      FoundUpdate: (x: string) => `發現新版本：${x}`,
+      FoundUpdate: "發現新版本：{{x}}",
       GoToUpdate: "前往更新",
     },
     SendKey: "傳送鍵",
@@ -245,9 +242,8 @@ const tw = {
       },
 
       LocalState: "本機資料",
-      Overview: (overview: any) => {
-        return `${overview.chat} 次對話，${overview.message} 則訊息，${overview.prompt} 條提示詞，${overview.mask} 個角色範本`;
-      },
+      Overview:
+        "{{chat}} 次對話，{{message}} 則訊息，{{prompt}} 條提示詞，{{mask}} 個角色範本",
       ImportFailed: "匯入失敗",
     },
     Mask: {
@@ -266,8 +262,7 @@ const tw = {
         SubTitle: "在輸入框開頭輸入 / 即可觸發自動補齊",
       },
       List: "自訂提示詞列表",
-      ListCount: (builtin: number, custom: number) =>
-        `內建 ${builtin} 條，使用者自訂 ${custom} 條`,
+      ListCount: "內建 {{builtin}} 條，使用者自訂 {{custom}} 條",
       Edit: "編輯",
       Modal: {
         Title: "提示詞列表",
@@ -289,9 +284,7 @@ const tw = {
 
     Usage: {
       Title: "帳戶餘額",
-      SubTitle(used: any, total: any) {
-        return `本月已使用 $${used}，訂閱總額 $${total}`;
-      },
+      SubTitle: "本月已使用 ${{used}}，訂閱總額 ${{total}}",
       IsChecking: "正在檢查…",
       Check: "重新檢查",
       NoAccess: "輸入 API Key 檢視餘額",
@@ -419,8 +412,7 @@ const tw = {
     BotHello: "請問需要我的協助嗎？",
     Error: "出錯了，請稍後再嘗試",
     Prompt: {
-      History: (content: string) =>
-        "這是 AI 與使用者的歷史聊天總結，作為前情提要：" + content,
+      History: "這是 AI 與使用者的歷史聊天總結，作為前情提要：{{content}}",
       Topic:
         "Use the language used by the user (e.g. en for english conversation, zh-hant for chinese conversation, etc.) to generate a title (at most 6 words) summarizing our conversation without any lead-in, quotation marks, preamble like 'Title:', direct text copies, single-word replies, quotation marks, translations, or brackets. Remove enclosing quotation marks. The title should make third-party grasp the essence of the conversation in first sight.",
       Summarize:
@@ -436,7 +428,7 @@ const tw = {
     Failed: "下載失敗。",
   },
   Context: {
-    Toast: (x: any) => `已設定 ${x} 條前置上下文`,
+    Toast: "已設定 {{x}} 條前置上下文",
     Edit: "前置上下文和歷史記憶",
     Add: "新增一則",
     Clear: "上下文已清除",
@@ -448,12 +440,12 @@ const tw = {
     Name: "角色範本",
     Page: {
       Title: "預設角色角色範本",
-      SubTitle: (count: number) => `${count} 個預設角色定義`,
+      SubTitle: "{{count}} 個預設角色定義",
       Search: "搜尋角色角色範本",
       Create: "新增",
     },
     Item: {
-      Info: (count: number) => `包含 ${count} 條預設對話`,
+      Info: "包含 {{count}} 條預設對話",
       Chat: "對話",
       View: "檢視",
       Edit: "編輯",
@@ -461,8 +453,8 @@ const tw = {
       DeleteConfirm: "確認刪除？",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `編輯預設角色範本 ${readonly ? "（唯讀）" : ""}`,
+      Title: "編輯預設角色範本",
+      ReadOnlyTitle: "編輯預設角色範本 （唯讀）",
       Download: "下載預設值",
       Clone: "以此預設值建立副本",
     },

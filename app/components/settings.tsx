@@ -74,7 +74,7 @@ import {
   SiliconFlow,
 } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
-import { ErrorBoundary } from "./error";
+import ErrorBoundary from "./error";
 import { InputRange } from "./input-range";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarPicker } from "./emoji";
@@ -84,21 +84,25 @@ import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";
 import { ProviderType } from "../utils/cloud";
 import { useNewChatStore } from "../store/new-chat";
+import { useTranslation } from "react-i18next";
 
 function EditPromptModal(props: { id: string; onClose: () => void }) {
+  const { t } = useTranslation();
   const promptStore = usePromptStore();
   const prompt = promptStore.get(props.id);
 
   return prompt ? (
     <div className="modal-mask">
       <Modal
-        title={Locale.Settings.Prompt.EditModal.Title}
+        // title={Locale.Settings.Prompt.EditModal.Title}
+        title={t("Settings.Prompt.EditModal.Title")}
         onClose={props.onClose}
         actions={[
           <IconButton
             key=""
             onClick={props.onClose}
-            text={Locale.UI.Confirm}
+            // text={Locale.UI.Confirm}
+            text={t("UI.Confirm")}
             bordered
           />,
         ]}
@@ -135,6 +139,7 @@ function EditPromptModal(props: { id: string; onClose: () => void }) {
 }
 
 function UserPromptModal(props: { onClose?: () => void }) {
+  const { t } = useTranslation();
   const promptStore = usePromptStore();
   const userPrompts = promptStore.getUserPrompts();
   const builtinPrompts = SearchService.builtinPrompts;
@@ -157,7 +162,8 @@ function UserPromptModal(props: { onClose?: () => void }) {
   return (
     <div className="modal-mask">
       <Modal
-        title={Locale.Settings.Prompt.Modal.Title}
+        // title={Locale.Settings.Prompt.Modal.Title}
+        title={t("Settings.Prompt.Modal.Title")}
         onClose={() => props.onClose?.()}
         actions={[
           <IconButton
@@ -173,7 +179,8 @@ function UserPromptModal(props: { onClose?: () => void }) {
             }}
             icon={<AddIcon />}
             bordered
-            text={Locale.Settings.Prompt.Modal.Add}
+            // text={Locale.Settings.Prompt.Modal.Add}
+            text={t("Settings.Prompt.Modal.Add")}
           />,
         ]}
       >
@@ -181,7 +188,8 @@ function UserPromptModal(props: { onClose?: () => void }) {
           <input
             type="text"
             className={styles["user-prompt-search"]}
-            placeholder={Locale.Settings.Prompt.Modal.Search}
+            // placeholder={Locale.Settings.Prompt.Modal.Search}
+            placeholder={t("Settings.Prompt.Modal.Search")}
             value={searchInput}
             onInput={(e) => setSearchInput(e.currentTarget.value)}
           ></input>
@@ -240,20 +248,26 @@ function UserPromptModal(props: { onClose?: () => void }) {
 }
 
 function DangerItems() {
+  const { t } = useTranslation();
   const chatStore = useNewChatStore();
   const appConfig = useAppConfig();
 
   return (
     <List>
       <ListItem
-        title={Locale.Settings.Danger.Reset.Title}
-        subTitle={Locale.Settings.Danger.Reset.SubTitle}
+        // title={Locale.Settings.Danger.Reset.Title}
+        // subTitle={Locale.Settings.Danger.Reset.SubTitle}
+        title={t("Settings.Danger.Reset.Title")}
+        subTitle={t("Settings.Danger.Reset.SubTitle")}
       >
         <IconButton
-          aria={Locale.Settings.Danger.Reset.Title}
-          text={Locale.Settings.Danger.Reset.Action}
+          // aria={Locale.Settings.Danger.Reset.Title}
+          // text={Locale.Settings.Danger.Reset.Action}
+          aria={t("Settings.Danger.Reset.Title")}
+          text={t("Settings.Danger.Reset.Action")}
           onClick={async () => {
-            if (await showConfirm(Locale.Settings.Danger.Reset.Confirm)) {
+            // if (await showConfirm(Locale.Settings.Danger.Reset.Confirm)) {
+            if (await showConfirm(t("Settings.Danger.Reset.Confirm"))) {
               appConfig.reset();
             }
           }}
@@ -261,14 +275,19 @@ function DangerItems() {
         />
       </ListItem>
       <ListItem
-        title={Locale.Settings.Danger.Clear.Title}
-        subTitle={Locale.Settings.Danger.Clear.SubTitle}
+        // title={Locale.Settings.Danger.Clear.Title}
+        // subTitle={Locale.Settings.Danger.Clear.SubTitle}
+        title={t("Settings.Danger.Clear.Title")}
+        subTitle={t("Settings.Danger.Clear.SubTitle")}
       >
         <IconButton
-          aria={Locale.Settings.Danger.Clear.Title}
-          text={Locale.Settings.Danger.Clear.Action}
+          // aria={Locale.Settings.Danger.Clear.Title}
+          // text={Locale.Settings.Danger.Clear.Action}
+          aria={t("Settings.Danger.Clear.Title")}
+          text={t("Settings.Danger.Clear.Action")}
           onClick={async () => {
-            if (await showConfirm(Locale.Settings.Danger.Clear.Confirm)) {
+            // if (await showConfirm(Locale.Settings.Danger.Clear.Confirm)) {
+            if (await showConfirm(t("Settings.Danger.Clear.Confirm"))) {
               chatStore.clearAllData();
             }
           }}
@@ -280,6 +299,7 @@ function DangerItems() {
 }
 
 function CheckButton() {
+  const { t } = useTranslation();
   const syncStore = useSyncStore();
 
   const couldCheck = useMemo(() => {
@@ -300,7 +320,8 @@ function CheckButton() {
 
   return (
     <IconButton
-      text={Locale.Settings.Sync.Config.Modal.Check}
+      // text={Locale.Settings.Sync.Config.Modal.Check}
+      text={t("Settings.Sync.Config.Modal.Check")}
       bordered
       onClick={check}
       icon={
@@ -321,12 +342,14 @@ function CheckButton() {
 }
 
 function SyncConfigModal(props: { onClose?: () => void }) {
+  const { t } = useTranslation();
   const syncStore = useSyncStore();
 
   return (
     <div className="modal-mask">
       <Modal
-        title={Locale.Settings.Sync.Config.Modal.Title}
+        // title={Locale.Settings.Sync.Config.Modal.Title}
+        title={t("Settings.Sync.Config.Modal.Title")}
         onClose={() => props.onClose?.()}
         actions={[
           <CheckButton key="check" />,
@@ -335,14 +358,17 @@ function SyncConfigModal(props: { onClose?: () => void }) {
             onClick={props.onClose}
             icon={<ConfirmIcon />}
             bordered
-            text={Locale.UI.Confirm}
+            // text={Locale.UI.Confirm}
+            text={t("UI.Confirm")}
           />,
         ]}
       >
         <List>
           <ListItem
-            title={Locale.Settings.Sync.Config.SyncType.Title}
-            subTitle={Locale.Settings.Sync.Config.SyncType.SubTitle}
+            // title={Locale.Settings.Sync.Config.SyncType.Title}
+            // subTitle={Locale.Settings.Sync.Config.SyncType.SubTitle}
+            title={t("Settings.Sync.Config.SyncType.Title")}
+            subTitle={t("Settings.Sync.Config.SyncType.SubTitle")}
           >
             <select
               value={syncStore.provider}
@@ -362,8 +388,10 @@ function SyncConfigModal(props: { onClose?: () => void }) {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.Sync.Config.Proxy.Title}
-            subTitle={Locale.Settings.Sync.Config.Proxy.SubTitle}
+            // title={Locale.Settings.Sync.Config.Proxy.Title}
+            // subTitle={Locale.Settings.Sync.Config.Proxy.SubTitle}
+            title={t("Settings.Sync.Config.Proxy.Title")}
+            subTitle={t("Settings.Sync.Config.Proxy.SubTitle")}
           >
             <input
               type="checkbox"
@@ -377,8 +405,10 @@ function SyncConfigModal(props: { onClose?: () => void }) {
           </ListItem>
           {syncStore.useProxy ? (
             <ListItem
-              title={Locale.Settings.Sync.Config.ProxyUrl.Title}
-              subTitle={Locale.Settings.Sync.Config.ProxyUrl.SubTitle}
+              // title={Locale.Settings.Sync.Config.ProxyUrl.Title}
+              // subTitle={Locale.Settings.Sync.Config.ProxyUrl.SubTitle}
+              title={t("Settings.Sync.Config.ProxyUrl.Title")}
+              subTitle={t("Settings.Sync.Config.ProxyUrl.SubTitle")}
             >
               <input
                 type="text"
@@ -396,7 +426,8 @@ function SyncConfigModal(props: { onClose?: () => void }) {
         {syncStore.provider === ProviderType.WebDAV && (
           <>
             <List>
-              <ListItem title={Locale.Settings.Sync.Config.WebDav.Endpoint}>
+              {/* <ListItem title={Locale.Settings.Sync.Config.WebDav.Endpoint}> */}
+              <ListItem title={t("Settings.Sync.Config.WebDav.Endpoint")}>
                 <input
                   type="text"
                   value={syncStore.webdav.endpoint}
@@ -409,7 +440,8 @@ function SyncConfigModal(props: { onClose?: () => void }) {
                 ></input>
               </ListItem>
 
-              <ListItem title={Locale.Settings.Sync.Config.WebDav.UserName}>
+              {/* <ListItem title={Locale.Settings.Sync.Config.WebDav.UserName}> */}
+              <ListItem title={t("Settings.Sync.Config.WebDav.UserName")}>
                 <input
                   type="text"
                   value={syncStore.webdav.username}
@@ -421,7 +453,8 @@ function SyncConfigModal(props: { onClose?: () => void }) {
                   }}
                 ></input>
               </ListItem>
-              <ListItem title={Locale.Settings.Sync.Config.WebDav.Password}>
+              {/* <ListItem title={Locale.Settings.Sync.Config.WebDav.Password}> */}
+              <ListItem title={t("Settings.Sync.Config.WebDav.Password")}>
                 <PasswordInput
                   value={syncStore.webdav.password}
                   onChange={(e) => {
@@ -438,7 +471,8 @@ function SyncConfigModal(props: { onClose?: () => void }) {
 
         {syncStore.provider === ProviderType.UpStash && (
           <List>
-            <ListItem title={Locale.Settings.Sync.Config.UpStash.Endpoint}>
+            {/* <ListItem title={Locale.Settings.Sync.Config.UpStash.Endpoint}> */}
+            <ListItem title={t("Settings.Sync.Config.UpStash.Endpoint")}>
               <input
                 type="text"
                 value={syncStore.upstash.endpoint}
@@ -451,7 +485,8 @@ function SyncConfigModal(props: { onClose?: () => void }) {
               ></input>
             </ListItem>
 
-            <ListItem title={Locale.Settings.Sync.Config.UpStash.UserName}>
+            {/* <ListItem title={Locale.Settings.Sync.Config.UpStash.UserName}> */}
+            <ListItem title={t("Settings.Sync.Config.UpStash.UserName")}>
               <input
                 type="text"
                 value={syncStore.upstash.username}
@@ -464,7 +499,8 @@ function SyncConfigModal(props: { onClose?: () => void }) {
                 }}
               ></input>
             </ListItem>
-            <ListItem title={Locale.Settings.Sync.Config.UpStash.Password}>
+            {/* <ListItem title={Locale.Settings.Sync.Config.UpStash.Password}> */}
+            <ListItem title={t("Settings.Sync.Config.UpStash.Password")}>
               <PasswordInput
                 value={syncStore.upstash.apiKey}
                 onChange={(e) => {
@@ -482,6 +518,7 @@ function SyncConfigModal(props: { onClose?: () => void }) {
 }
 
 function SyncItems() {
+  const { t } = useTranslation();
   const syncStore = useSyncStore();
   // const chatStore = useChatStore();
   const chatStore = useNewChatStore();
@@ -509,20 +546,24 @@ function SyncItems() {
     <>
       <List>
         <ListItem
-          title={Locale.Settings.Sync.CloudState}
+          // title={Locale.Settings.Sync.CloudState}
+          title={t("Settings.Sync.CloudState")}
           subTitle={
             syncStore.lastProvider
               ? `${new Date(syncStore.lastSyncTime).toLocaleString()} [${
                   syncStore.lastProvider
                 }]`
-              : Locale.Settings.Sync.NotSyncYet
+              : // : Locale.Settings.Sync.NotSyncYet
+                t("Settings.Sync.NotSyncYet")
           }
         >
           <div style={{ display: "flex" }}>
             <IconButton
-              aria={Locale.Settings.Sync.CloudState + Locale.UI.Config}
+              // aria={Locale.Settings.Sync.CloudState + Locale.UI.Config}
+              aria={t("Settings.Sync.CloudState") + t("UI.Config")}
               icon={<ConfigIcon />}
-              text={Locale.UI.Config}
+              // text={Locale.UI.Config}
+              text={t("UI.Config")}
               onClick={() => {
                 setShowSyncConfigModal(true);
               }}
@@ -530,13 +571,17 @@ function SyncItems() {
             {couldSync && (
               <IconButton
                 icon={<ResetIcon />}
-                text={Locale.UI.Sync}
+                // text={Locale.UI.Sync}
+                text={t("UI.Sync")}
                 onClick={async () => {
                   try {
                     await syncStore.sync();
-                    showToast(Locale.Settings.Sync.Success);
+                    // showToast(Locale.Settings.Sync.Success);
+                    showToast(t("Settings.Sync.Success"));
                   } catch (e) {
-                    showToast(Locale.Settings.Sync.Fail);
+                    // showToast(Locale.Settings.Sync.Fail);
+                    showToast(t("Settings.Sync.Fail"));
+
                     console.error("[Sync]", e);
                   }
                 }}
@@ -546,22 +591,33 @@ function SyncItems() {
         </ListItem>
 
         <ListItem
-          title={Locale.Settings.Sync.LocalState}
-          subTitle={Locale.Settings.Sync.Overview(stateOverview)}
+          // title={Locale.Settings.Sync.LocalState}
+          // subTitle={Locale.Settings.Sync.Overview(stateOverview)}
+          title={t("Settings.Sync.LocalState")}
+          subTitle={t("Settings.Sync.Overview", {
+            chat: stateOverview.chat,
+            message: stateOverview.message,
+            prompt: stateOverview.prompt,
+            mask: stateOverview.mask,
+          })}
         >
           <div style={{ display: "flex" }}>
             <IconButton
-              aria={Locale.Settings.Sync.LocalState + Locale.UI.Export}
+              // aria={Locale.Settings.Sync.LocalState + Locale.UI.Export}
+              aria={t("Settings.Sync.LocalState") + t("UI.Export")}
               icon={<UploadIcon />}
-              text={Locale.UI.Export}
+              // text={Locale.UI.Export}
+              text={t("UI.Export")}
               onClick={() => {
                 syncStore.export();
               }}
             />
             <IconButton
-              aria={Locale.Settings.Sync.LocalState + Locale.UI.Import}
+              // aria={Locale.Settings.Sync.LocalState + Locale.UI.Import}
+              aria={t("Settings.Sync.LocalState") + t("UI.Import")}
               icon={<DownloadIcon />}
-              text={Locale.UI.Import}
+              // text={Locale.UI.Import}
+              text={t("UI.Import")}
               onClick={() => {
                 syncStore.import();
               }}
@@ -578,6 +634,7 @@ function SyncItems() {
 }
 
 export function Settings() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const config = useAppConfig();
@@ -674,13 +731,16 @@ export function Settings() {
 
   const accessCodeComponent = showAccessCode && (
     <ListItem
-      title={Locale.Settings.Access.AccessCode.Title}
-      subTitle={Locale.Settings.Access.AccessCode.SubTitle}
+      // title={Locale.Settings.Access.AccessCode.Title}
+      // subTitle={Locale.Settings.Access.AccessCode.SubTitle}
+      title={t("Settings.Access.AccessCode.Title")}
+      subTitle={t("Settings.Access.AccessCode.SubTitle")}
     >
       <PasswordInput
         value={accessStore.accessCode}
         type="text"
-        placeholder={Locale.Settings.Access.AccessCode.Placeholder}
+        // placeholder={Locale.Settings.Access.AccessCode.Placeholder}
+        placeholder={t("Settings.Access.AccessCode.Placeholder")}
         onChange={(e) => {
           accessStore.update(
             (access) => (access.accessCode = e.currentTarget.value),
@@ -693,16 +753,25 @@ export function Settings() {
   const saasStartComponent = (
     <ListItem
       className={styles["subtitle-button"]}
+      // title={
+      //   Locale.Settings.Access.SaasStart.Title +
+      //   `${Locale.Settings.Access.SaasStart.Label}`
+      // }
       title={
-        Locale.Settings.Access.SaasStart.Title +
-        `${Locale.Settings.Access.SaasStart.Label}`
+        t("Settings.Access.SaasStart.Title") +
+        `${t("Settings.Access.SaasStart.Label")}`
       }
-      subTitle={Locale.Settings.Access.SaasStart.SubTitle}
+      // subTitle={Locale.Settings.Access.SaasStart.SubTitle}
+      subTitle={t("Settings.Access.SaasStart.SubTitle")}
     >
       <IconButton
+        // aria={
+        //   Locale.Settings.Access.SaasStart.Title +
+        //   Locale.Settings.Access.SaasStart.ChatNow
+        // }
         aria={
-          Locale.Settings.Access.SaasStart.Title +
-          Locale.Settings.Access.SaasStart.ChatNow
+          t("Settings.Access.SaasStart.Title") +
+          t("Settings.Access.SaasStart.ChatNow")
         }
         icon={<FireIcon />}
         type={"primary"}
@@ -718,11 +787,14 @@ export function Settings() {
   const useCustomConfigComponent = // Conditionally render the following ListItem based on clientConfig.isApp
     !clientConfig?.isApp && ( // only show if isApp is false
       <ListItem
-        title={Locale.Settings.Access.CustomEndpoint.Title}
-        subTitle={Locale.Settings.Access.CustomEndpoint.SubTitle}
+        // title={Locale.Settings.Access.CustomEndpoint.Title}
+        // subTitle={Locale.Settings.Access.CustomEndpoint.SubTitle}
+        title={t("Settings.Access.CustomEndpoint.Title")}
+        subTitle={t("Settings.Access.CustomEndpoint.SubTitle")}
       >
         <input
-          aria-label={Locale.Settings.Access.CustomEndpoint.Title}
+          // aria-label={Locale.Settings.Access.CustomEndpoint.Title}
+          aria-label={t("Settings.Access.CustomEndpoint.Title")}
           type="checkbox"
           checked={accessStore.useCustomConfig}
           onChange={(e) =>
@@ -738,11 +810,14 @@ export function Settings() {
     ServiceProvider.OpenAI && (
     <>
       <ListItem
-        title={Locale.Settings.Access.OpenAI.Endpoint.Title}
-        subTitle={Locale.Settings.Access.OpenAI.Endpoint.SubTitle}
+        // title={Locale.Settings.Access.OpenAI.Endpoint.Title}
+        // subTitle={Locale.Settings.Access.OpenAI.Endpoint.SubTitle}
+        title={t("Settings.Access.OpenAI.Endpoint.Title")}
+        subTitle={t("Settings.Access.OpenAI.Endpoint.SubTitle")}
       >
         <input
-          aria-label={Locale.Settings.Access.OpenAI.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.OpenAI.Endpoint.Title}
+          aria-label={t("Settings.Access.OpenAI.Endpoint.Title")}
           type="text"
           value={accessStore.openaiUrl}
           placeholder={OPENAI_BASE_URL}
@@ -754,15 +829,20 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.OpenAI.ApiKey.Title}
-        subTitle={Locale.Settings.Access.OpenAI.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.OpenAI.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.OpenAI.ApiKey.SubTitle}
+        title={t("Settings.Access.OpenAI.ApiKey.Title")}
+        subTitle={t("Settings.Access.OpenAI.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria={Locale.Settings.ShowPassword}
-          aria-label={Locale.Settings.Access.OpenAI.ApiKey.Title}
+          // aria={Locale.Settings.ShowPassword}
+          // aria-label={Locale.Settings.Access.OpenAI.ApiKey.Title}
+          aria={t("Settings.ShowPassword")}
+          aria-label={t("Settings.Access.OpenAI.ApiKey.Title")}
           value={accessStore.openaiApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.OpenAI.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.openaiApiKey = e.currentTarget.value),
@@ -777,13 +857,18 @@ export function Settings() {
     ServiceProvider.Azure && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Azure.Endpoint.Title}
+        // title={Locale.Settings.Access.Azure.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.Azure.Endpoint.SubTitle + Azure.ExampleEndpoint
+        // }
+        title={t("Settings.Access.Azure.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.Azure.Endpoint.SubTitle + Azure.ExampleEndpoint
+          t("Settings.Access.Azure.Endpoint.SubTitle") + Azure.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.Azure.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Azure.Endpoint.Title}
+          aria-label={t("Settings.Access.Azure.Endpoint.Title")}
           type="text"
           value={accessStore.azureUrl}
           placeholder={Azure.ExampleEndpoint}
@@ -795,14 +880,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Azure.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Azure.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Azure.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Azure.ApiKey.SubTitle}
+        title={t("Settings.Access.Azure.ApiKey.Title")}
+        subTitle={t("Settings.Access.Azure.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Azure.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Azure.ApiKey.Title}
+          aria-label={t("Settings.Access.Azure.ApiKey.Title")}
           value={accessStore.azureApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Azure.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Azure.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Azure.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.azureApiKey = e.currentTarget.value),
@@ -811,11 +900,14 @@ export function Settings() {
         />
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Azure.ApiVerion.Title}
-        subTitle={Locale.Settings.Access.Azure.ApiVerion.SubTitle}
+        // title={Locale.Settings.Access.Azure.ApiVerion.Title}
+        // subTitle={Locale.Settings.Access.Azure.ApiVerion.SubTitle}
+        title={t("Settings.Access.Azure.ApiVerion.Title")}
+        subTitle={t("Settings.Access.Azure.ApiVerion.SubTitle")}
       >
         <input
-          aria-label={Locale.Settings.Access.Azure.ApiVerion.Title}
+          // aria-label={Locale.Settings.Access.Azure.ApiVerion.Title}
+          aria-label={t("Settings.Access.Azure.ApiVerion.Title")}
           type="text"
           value={accessStore.azureApiVersion}
           placeholder="2023-08-01-preview"
@@ -833,14 +925,19 @@ export function Settings() {
     ServiceProvider.Google && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Google.Endpoint.Title}
+        // title={Locale.Settings.Access.Google.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.Google.Endpoint.SubTitle +
+        //   Google.ExampleEndpoint
+        // }
+        title={t("Settings.Access.Google.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.Google.Endpoint.SubTitle +
-          Google.ExampleEndpoint
+          t("Settings.Access.Google.Endpoint.SubTitle") + Google.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.Google.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Google.Endpoint.Title}
+          aria-label={t("Settings.Access.Google.Endpoint.Title")}
           type="text"
           value={accessStore.googleUrl}
           placeholder={Google.ExampleEndpoint}
@@ -852,14 +949,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Google.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Google.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Google.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Google.ApiKey.SubTitle}
+        title={t("Settings.Access.Google.ApiKey.Title")}
+        subTitle={t("Settings.Access.Google.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Google.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Google.ApiKey.Title}
+          aria-label={t("Settings.Access.Google.ApiKey.Title")}
           value={accessStore.googleApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Google.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Google.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Google.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.googleApiKey = e.currentTarget.value),
@@ -868,11 +969,14 @@ export function Settings() {
         />
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Google.ApiVersion.Title}
-        subTitle={Locale.Settings.Access.Google.ApiVersion.SubTitle}
+        // title={Locale.Settings.Access.Google.ApiVersion.Title}
+        // subTitle={Locale.Settings.Access.Google.ApiVersion.SubTitle}
+        title={t("Settings.Access.Google.ApiVersion.Title")}
+        subTitle={t("Settings.Access.Google.ApiVersion.SubTitle")}
       >
         <input
-          aria-label={Locale.Settings.Access.Google.ApiVersion.Title}
+          // aria-label={Locale.Settings.Access.Google.ApiVersion.Title}
+          aria-label={t("Settings.Access.Google.ApiVersion.Title")}
           type="text"
           value={accessStore.googleApiVersion}
           placeholder="2023-08-01-preview"
@@ -884,11 +988,14 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Google.GoogleSafetySettings.Title}
-        subTitle={Locale.Settings.Access.Google.GoogleSafetySettings.SubTitle}
+        // title={Locale.Settings.Access.Google.GoogleSafetySettings.Title}
+        // subTitle={Locale.Settings.Access.Google.GoogleSafetySettings.SubTitle}
+        title={t("Settings.Access.Google.GoogleSafetySettings.Title")}
+        subTitle={t("Settings.Access.Google.GoogleSafetySettings.SubTitle")}
       >
         <Select
-          aria-label={Locale.Settings.Access.Google.GoogleSafetySettings.Title}
+          // aria-label={Locale.Settings.Access.Google.GoogleSafetySettings.Title}
+          aria-label={t("Settings.Access.Google.GoogleSafetySettings.Title")}
           value={accessStore.googleSafetySettings}
           onChange={(e) => {
             accessStore.update(
@@ -912,14 +1019,20 @@ export function Settings() {
     ServiceProvider.Anthropic && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Anthropic.Endpoint.Title}
+        // title={Locale.Settings.Access.Anthropic.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.Anthropic.Endpoint.SubTitle +
+        //   Anthropic.ExampleEndpoint
+        // }
+        title={t("Settings.Access.Anthropic.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.Anthropic.Endpoint.SubTitle +
+          t("Settings.Access.Anthropic.Endpoint.SubTitle") +
           Anthropic.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.Anthropic.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Anthropic.Endpoint.Title}
+          aria-label={t("Settings.Access.Anthropic.Endpoint.Title")}
           type="text"
           value={accessStore.anthropicUrl}
           placeholder={Anthropic.ExampleEndpoint}
@@ -931,14 +1044,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Anthropic.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Anthropic.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Anthropic.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Anthropic.ApiKey.SubTitle}
+        title={t("Settings.Access.Anthropic.ApiKey.Title")}
+        subTitle={t("Settings.Access.Anthropic.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Anthropic.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Anthropic.ApiKey.Title}
+          aria-label={t("Settings.Access.Anthropic.ApiKey.Title")}
           value={accessStore.anthropicApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Anthropic.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Anthropic.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Anthropic.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.anthropicApiKey = e.currentTarget.value),
@@ -947,11 +1064,14 @@ export function Settings() {
         />
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Anthropic.ApiVerion.Title}
-        subTitle={Locale.Settings.Access.Anthropic.ApiVerion.SubTitle}
+        // title={Locale.Settings.Access.Anthropic.ApiVerion.Title}
+        // subTitle={Locale.Settings.Access.Anthropic.ApiVerion.SubTitle}
+        title={t("Settings.Access.Anthropic.ApiVerion.Title")}
+        subTitle={t("Settings.Access.Anthropic.ApiVerion.SubTitle")}
       >
         <input
-          aria-label={Locale.Settings.Access.Anthropic.ApiVerion.Title}
+          // aria-label={Locale.Settings.Access.Anthropic.ApiVerion.Title}
+          aria-label={t("Settings.Access.Anthropic.ApiVerion.Title")}
           type="text"
           value={accessStore.anthropicApiVersion}
           placeholder={Anthropic.Vision}
@@ -969,11 +1089,14 @@ export function Settings() {
     ServiceProvider.Baidu && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Baidu.Endpoint.Title}
-        subTitle={Locale.Settings.Access.Baidu.Endpoint.SubTitle}
+        // title={Locale.Settings.Access.Baidu.Endpoint.Title}
+        // subTitle={Locale.Settings.Access.Baidu.Endpoint.SubTitle}
+        title={t("Settings.Access.Baidu.Endpoint.Title")}
+        subTitle={t("Settings.Access.Baidu.Endpoint.SubTitle")}
       >
         <input
-          aria-label={Locale.Settings.Access.Baidu.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Baidu.Endpoint.Title}
+          aria-label={t("Settings.Access.Baidu.Endpoint.Title")}
           type="text"
           value={accessStore.baiduUrl}
           placeholder={Baidu.ExampleEndpoint}
@@ -985,14 +1108,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Baidu.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Baidu.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Baidu.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Baidu.ApiKey.SubTitle}
+        title={t("Settings.Access.Baidu.ApiKey.Title")}
+        subTitle={t("Settings.Access.Baidu.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Baidu.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Baidu.ApiKey.Title}
+          aria-label={t("Settings.Access.Baidu.ApiKey.Title")}
           value={accessStore.baiduApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Baidu.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Baidu.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Baidu.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.baiduApiKey = e.currentTarget.value),
@@ -1001,14 +1128,18 @@ export function Settings() {
         />
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Baidu.SecretKey.Title}
-        subTitle={Locale.Settings.Access.Baidu.SecretKey.SubTitle}
+        // title={Locale.Settings.Access.Baidu.SecretKey.Title}
+        // subTitle={Locale.Settings.Access.Baidu.SecretKey.SubTitle}
+        title={t("Settings.Access.Baidu.SecretKey.Title")}
+        subTitle={t("Settings.Access.Baidu.SecretKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Baidu.SecretKey.Title}
+          // aria-label={Locale.Settings.Access.Baidu.SecretKey.Title}
+          aria-label={t("Settings.Access.Baidu.SecretKey.Title")}
           value={accessStore.baiduSecretKey}
           type="text"
-          placeholder={Locale.Settings.Access.Baidu.SecretKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Baidu.SecretKey.Placeholder}
+          placeholder={t("Settings.Access.Baidu.SecretKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.baiduSecretKey = e.currentTarget.value),
@@ -1023,11 +1154,14 @@ export function Settings() {
     ServiceProvider.Tencent && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Tencent.Endpoint.Title}
-        subTitle={Locale.Settings.Access.Tencent.Endpoint.SubTitle}
+        // title={Locale.Settings.Access.Tencent.Endpoint.Title}
+        // subTitle={Locale.Settings.Access.Tencent.Endpoint.SubTitle}
+        title={t("Settings.Access.Tencent.Endpoint.Title")}
+        subTitle={t("Settings.Access.Tencent.Endpoint.SubTitle")}
       >
         <input
-          aria-label={Locale.Settings.Access.Tencent.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Tencent.Endpoint.Title}
+          aria-label={t("Settings.Access.Tencent.Endpoint.Title")}
           type="text"
           value={accessStore.tencentUrl}
           placeholder={Tencent.ExampleEndpoint}
@@ -1039,14 +1173,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Tencent.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Tencent.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Tencent.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Tencent.ApiKey.SubTitle}
+        title={t("Settings.Access.Tencent.ApiKey.Title")}
+        subTitle={t("Settings.Access.Tencent.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Tencent.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Tencent.ApiKey.Title}
+          aria-label={t("Settings.Access.Tencent.ApiKey.Title")}
           value={accessStore.tencentSecretId}
           type="text"
-          placeholder={Locale.Settings.Access.Tencent.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Tencent.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Tencent.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.tencentSecretId = e.currentTarget.value),
@@ -1055,14 +1193,18 @@ export function Settings() {
         />
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Tencent.SecretKey.Title}
-        subTitle={Locale.Settings.Access.Tencent.SecretKey.SubTitle}
+        // title={Locale.Settings.Access.Tencent.SecretKey.Title}
+        // subTitle={Locale.Settings.Access.Tencent.SecretKey.SubTitle}
+        title={t("Settings.Access.Tencent.SecretKey.Title")}
+        subTitle={t("Settings.Access.Tencent.SecretKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Tencent.SecretKey.Title}
+          // aria-label={Locale.Settings.Access.Tencent.SecretKey.Title}
+          aria-label={t("Settings.Access.Tencent.SecretKey.Title")}
           value={accessStore.tencentSecretKey}
           type="text"
-          placeholder={Locale.Settings.Access.Tencent.SecretKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Tencent.SecretKey.Placeholder}
+          placeholder={t("Settings.Access.Tencent.SecretKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.tencentSecretKey = e.currentTarget.value),
@@ -1077,14 +1219,20 @@ export function Settings() {
     ServiceProvider.ByteDance && (
     <>
       <ListItem
-        title={Locale.Settings.Access.ByteDance.Endpoint.Title}
+        // title={Locale.Settings.Access.ByteDance.Endpoint.Title}
+        title={t("Settings.Access.ByteDance.Endpoint.Title")}
+        // subTitle={
+        //   Locale.Settings.Access.ByteDance.Endpoint.SubTitle +
+        //   ByteDance.ExampleEndpoint
+        // }
         subTitle={
-          Locale.Settings.Access.ByteDance.Endpoint.SubTitle +
+          t("Settings.Access.ByteDance.Endpoint.SubTitle") +
           ByteDance.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.ByteDance.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.ByteDance.Endpoint.Title}
+          aria-label={t("Settings.Access.ByteDance.Endpoint.Title")}
           type="text"
           value={accessStore.bytedanceUrl}
           placeholder={ByteDance.ExampleEndpoint}
@@ -1096,14 +1244,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.ByteDance.ApiKey.Title}
-        subTitle={Locale.Settings.Access.ByteDance.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.ByteDance.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.ByteDance.ApiKey.SubTitle}
+        title={t("Settings.Access.ByteDance.ApiKey.Title")}
+        subTitle={t("Settings.Access.ByteDance.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.ByteDance.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.ByteDance.ApiKey.Title}
+          aria-label={t("Settings.Access.ByteDance.ApiKey.Title")}
           value={accessStore.bytedanceApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.ByteDance.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.ByteDance.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.ByteDance.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.bytedanceApiKey = e.currentTarget.value),
@@ -1118,14 +1270,20 @@ export function Settings() {
     ServiceProvider.Alibaba && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Alibaba.Endpoint.Title}
+        // title={Locale.Settings.Access.Alibaba.Endpoint.Title}
+        title={t("Settings.Access.Alibaba.Endpoint.Title")}
+        // subTitle={
+        //   Locale.Settings.Access.Alibaba.Endpoint.SubTitle +
+        //   Alibaba.ExampleEndpoint
+        // }
         subTitle={
-          Locale.Settings.Access.Alibaba.Endpoint.SubTitle +
+          t("Settings.Access.Alibaba.Endpoint.SubTitle") +
           Alibaba.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.Alibaba.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Alibaba.Endpoint.Title}
+          aria-label={t("Settings.Access.Alibaba.Endpoint.Title")}
           type="text"
           value={accessStore.alibabaUrl}
           placeholder={Alibaba.ExampleEndpoint}
@@ -1137,14 +1295,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Alibaba.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Alibaba.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Alibaba.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Alibaba.ApiKey.SubTitle}
+        title={t("Settings.Access.Alibaba.ApiKey.Title")}
+        subTitle={t("Settings.Access.Alibaba.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Alibaba.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Alibaba.ApiKey.Title}
+          aria-label={t("Settings.Access.Alibaba.ApiKey.Title")}
           value={accessStore.alibabaApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Alibaba.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Alibaba.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Alibaba.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.alibabaApiKey = e.currentTarget.value),
@@ -1159,14 +1321,20 @@ export function Settings() {
     ServiceProvider.Moonshot && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Moonshot.Endpoint.Title}
+        // title={Locale.Settings.Access.Moonshot.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.Moonshot.Endpoint.SubTitle +
+        //   Moonshot.ExampleEndpoint
+        // }
+        title={t("Settings.Access.Moonshot.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.Moonshot.Endpoint.SubTitle +
+          t("Settings.Access.Moonshot.Endpoint.SubTitle") +
           Moonshot.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.Moonshot.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Moonshot.Endpoint.Title}
+          aria-label={t("Settings.Access.Moonshot.Endpoint.Title")}
           type="text"
           value={accessStore.moonshotUrl}
           placeholder={Moonshot.ExampleEndpoint}
@@ -1178,14 +1346,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Moonshot.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Moonshot.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Moonshot.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Moonshot.ApiKey.SubTitle}
+        title={t("Settings.Access.Moonshot.ApiKey.Title")}
+        subTitle={t("Settings.Access.Moonshot.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Moonshot.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Moonshot.ApiKey.Title}
+          aria-label={t("Settings.Access.Moonshot.ApiKey.Title")}
           value={accessStore.moonshotApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Moonshot.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Moonshot.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Moonshot.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.moonshotApiKey = e.currentTarget.value),
@@ -1200,14 +1372,20 @@ export function Settings() {
     ServiceProvider.DeepSeek && (
     <>
       <ListItem
-        title={Locale.Settings.Access.DeepSeek.Endpoint.Title}
+        // title={Locale.Settings.Access.DeepSeek.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.DeepSeek.Endpoint.SubTitle +
+        //   DeepSeek.ExampleEndpoint
+        // }
+        title={t("Settings.Access.DeepSeek.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.DeepSeek.Endpoint.SubTitle +
+          t("Settings.Access.DeepSeek.Endpoint.SubTitle") +
           DeepSeek.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.DeepSeek.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.DeepSeek.Endpoint.Title}
+          aria-label={t("Settings.Access.DeepSeek.Endpoint.Title")}
           type="text"
           value={accessStore.deepseekUrl}
           placeholder={DeepSeek.ExampleEndpoint}
@@ -1219,14 +1397,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.DeepSeek.ApiKey.Title}
-        subTitle={Locale.Settings.Access.DeepSeek.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.DeepSeek.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.DeepSeek.ApiKey.SubTitle}
+        title={t("Settings.Access.DeepSeek.ApiKey.Title")}
+        subTitle={t("Settings.Access.DeepSeek.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.DeepSeek.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.DeepSeek.ApiKey.Title}
+          aria-label={t("Settings.Access.DeepSeek.ApiKey.Title")}
           value={accessStore.deepseekApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.DeepSeek.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.DeepSeek.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.DeepSeek.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.deepseekApiKey = e.currentTarget.value),
@@ -1240,13 +1422,18 @@ export function Settings() {
   const XAIConfigComponent = accessStore.provider === ServiceProvider.XAI && (
     <>
       <ListItem
-        title={Locale.Settings.Access.XAI.Endpoint.Title}
+        // title={Locale.Settings.Access.XAI.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.XAI.Endpoint.SubTitle + XAI.ExampleEndpoint
+        // }
+        title={t("Settings.Access.XAI.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.XAI.Endpoint.SubTitle + XAI.ExampleEndpoint
+          t("Settings.Access.XAI.Endpoint.SubTitle") + XAI.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.XAI.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.XAI.Endpoint.Title}
+          aria-label={t("Settings.Access.XAI.Endpoint.Title")}
           type="text"
           value={accessStore.xaiUrl}
           placeholder={XAI.ExampleEndpoint}
@@ -1258,14 +1445,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.XAI.ApiKey.Title}
-        subTitle={Locale.Settings.Access.XAI.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.XAI.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.XAI.ApiKey.SubTitle}
+        title={t("Settings.Access.XAI.ApiKey.Title")}
+        subTitle={t("Settings.Access.XAI.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.XAI.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.XAI.ApiKey.Title}
+          aria-label={t("Settings.Access.XAI.ApiKey.Title")}
           value={accessStore.xaiApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.XAI.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.XAI.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.XAI.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.xaiApiKey = e.currentTarget.value),
@@ -1280,14 +1471,20 @@ export function Settings() {
     ServiceProvider.ChatGLM && (
     <>
       <ListItem
-        title={Locale.Settings.Access.ChatGLM.Endpoint.Title}
+        // title={Locale.Settings.Access.ChatGLM.Endpoint.Title}
+        title={t("Settings.Access.ChatGLM.Endpoint.Title")}
+        // subTitle={
+        //   Locale.Settings.Access.ChatGLM.Endpoint.SubTitle +
+        //   ChatGLM.ExampleEndpoint
+        // }
         subTitle={
-          Locale.Settings.Access.ChatGLM.Endpoint.SubTitle +
+          t("Settings.Access.ChatGLM.Endpoint.SubTitle") +
           ChatGLM.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.ChatGLM.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.ChatGLM.Endpoint.Title}
+          aria-label={t("Settings.Access.ChatGLM.Endpoint.Title")}
           type="text"
           value={accessStore.chatglmUrl}
           placeholder={ChatGLM.ExampleEndpoint}
@@ -1299,14 +1496,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.ChatGLM.ApiKey.Title}
-        subTitle={Locale.Settings.Access.ChatGLM.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.ChatGLM.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.ChatGLM.ApiKey.SubTitle}
+        title={t("Settings.Access.ChatGLM.ApiKey.Title")}
+        subTitle={t("Settings.Access.ChatGLM.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.ChatGLM.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.ChatGLM.ApiKey.Title}
+          aria-label={t("Settings.Access.ChatGLM.ApiKey.Title")}
           value={accessStore.chatglmApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.ChatGLM.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.ChatGLM.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.ChatGLM.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.chatglmApiKey = e.currentTarget.value),
@@ -1320,14 +1521,20 @@ export function Settings() {
     ServiceProvider.SiliconFlow && (
     <>
       <ListItem
-        title={Locale.Settings.Access.SiliconFlow.Endpoint.Title}
+        // title={Locale.Settings.Access.SiliconFlow.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.SiliconFlow.Endpoint.SubTitle +
+        //   SiliconFlow.ExampleEndpoint
+        // }
+        title={t("Settings.Access.SiliconFlow.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.SiliconFlow.Endpoint.SubTitle +
+          t("Settings.Access.SiliconFlow.Endpoint.SubTitle") +
           SiliconFlow.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.SiliconFlow.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.SiliconFlow.Endpoint.Title}
+          aria-label={t("Settings.Access.SiliconFlow.Endpoint.Title")}
           type="text"
           value={accessStore.siliconflowUrl}
           placeholder={SiliconFlow.ExampleEndpoint}
@@ -1339,14 +1546,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.SiliconFlow.ApiKey.Title}
-        subTitle={Locale.Settings.Access.SiliconFlow.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.SiliconFlow.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.SiliconFlow.ApiKey.SubTitle}
+        title={t("Settings.Access.SiliconFlow.ApiKey.Title")}
+        subTitle={t("Settings.Access.SiliconFlow.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.SiliconFlow.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.SiliconFlow.ApiKey.Title}
+          aria-label={t("Settings.Access.SiliconFlow.ApiKey.Title")}
           value={accessStore.siliconflowApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.SiliconFlow.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.SiliconFlow.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.SiliconFlow.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.siliconflowApiKey = e.currentTarget.value),
@@ -1361,14 +1572,20 @@ export function Settings() {
     ServiceProvider.Stability && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Stability.Endpoint.Title}
+        // title={Locale.Settings.Access.Stability.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.Stability.Endpoint.SubTitle +
+        //   Stability.ExampleEndpoint
+        // }
+        title={t("Settings.Access.Stability.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.Stability.Endpoint.SubTitle +
+          t("Settings.Access.Stability.Endpoint.SubTitle") +
           Stability.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.Stability.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Stability.Endpoint.Title}
+          aria-label={t("Settings.Access.Stability.Endpoint.Title")}
           type="text"
           value={accessStore.stabilityUrl}
           placeholder={Stability.ExampleEndpoint}
@@ -1380,14 +1597,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Stability.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Stability.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Stability.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Stability.ApiKey.SubTitle}
+        title={t("Settings.Access.Stability.ApiKey.Title")}
+        subTitle={t("Settings.Access.Stability.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Stability.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Stability.ApiKey.Title}
+          aria-label={t("Settings.Access.Stability.ApiKey.Title")}
           value={accessStore.stabilityApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Stability.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Stability.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Stability.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.stabilityApiKey = e.currentTarget.value),
@@ -1401,14 +1622,20 @@ export function Settings() {
     ServiceProvider.Iflytek && (
     <>
       <ListItem
-        title={Locale.Settings.Access.Iflytek.Endpoint.Title}
+        // title={Locale.Settings.Access.Iflytek.Endpoint.Title}
+        // subTitle={
+        //   Locale.Settings.Access.Iflytek.Endpoint.SubTitle +
+        //   Iflytek.ExampleEndpoint
+        // }
+        title={t("Settings.Access.Iflytek.Endpoint.Title")}
         subTitle={
-          Locale.Settings.Access.Iflytek.Endpoint.SubTitle +
+          t("Settings.Access.Iflytek.Endpoint.SubTitle") +
           Iflytek.ExampleEndpoint
         }
       >
         <input
-          aria-label={Locale.Settings.Access.Iflytek.Endpoint.Title}
+          // aria-label={Locale.Settings.Access.Iflytek.Endpoint.Title}
+          aria-label={t("Settings.Access.Iflytek.Endpoint.Title")}
           type="text"
           value={accessStore.iflytekUrl}
           placeholder={Iflytek.ExampleEndpoint}
@@ -1420,14 +1647,18 @@ export function Settings() {
         ></input>
       </ListItem>
       <ListItem
-        title={Locale.Settings.Access.Iflytek.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Iflytek.ApiKey.SubTitle}
+        // title={Locale.Settings.Access.Iflytek.ApiKey.Title}
+        // subTitle={Locale.Settings.Access.Iflytek.ApiKey.SubTitle}
+        title={t("Settings.Access.Iflytek.ApiKey.Title")}
+        subTitle={t("Settings.Access.Iflytek.ApiKey.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Iflytek.ApiKey.Title}
+          // aria-label={Locale.Settings.Access.Iflytek.ApiKey.Title}
+          aria-label={t("Settings.Access.Iflytek.ApiKey.Title")}
           value={accessStore.iflytekApiKey}
           type="text"
-          placeholder={Locale.Settings.Access.Iflytek.ApiKey.Placeholder}
+          // placeholder={Locale.Settings.Access.Iflytek.ApiKey.Placeholder}
+          placeholder={t("Settings.Access.Iflytek.ApiKey.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.iflytekApiKey = e.currentTarget.value),
@@ -1437,14 +1668,18 @@ export function Settings() {
       </ListItem>
 
       <ListItem
-        title={Locale.Settings.Access.Iflytek.ApiSecret.Title}
-        subTitle={Locale.Settings.Access.Iflytek.ApiSecret.SubTitle}
+        // title={Locale.Settings.Access.Iflytek.ApiSecret.Title}
+        // subTitle={Locale.Settings.Access.Iflytek.ApiSecret.SubTitle}
+        title={t("Settings.Access.Iflytek.ApiSecret.Title")}
+        subTitle={t("Settings.Access.Iflytek.ApiSecret.SubTitle")}
       >
         <PasswordInput
-          aria-label={Locale.Settings.Access.Iflytek.ApiSecret.Title}
+          // aria-label={Locale.Settings.Access.Iflytek.ApiSecret.Title}
+          aria-label={t("Settings.Access.Iflytek.ApiSecret.Title")}
           value={accessStore.iflytekApiSecret}
           type="text"
-          placeholder={Locale.Settings.Access.Iflytek.ApiSecret.Placeholder}
+          // placeholder={Locale.Settings.Access.Iflytek.ApiSecret.Placeholder}
+          placeholder={t("Settings.Access.Iflytek.ApiSecret.Placeholder")}
           onChange={(e) => {
             accessStore.update(
               (access) => (access.iflytekApiSecret = e.currentTarget.value),
@@ -1460,10 +1695,12 @@ export function Settings() {
       <div className="window-header" data-tauri-drag-region>
         <div className="window-header-title">
           <div className="window-header-main-title">
-            {Locale.Settings.Title}
+            {/* {Locale.Settings.Title} */}
+            {t("Settings.Title")}
           </div>
           <div className="window-header-sub-title">
-            {Locale.Settings.SubTitle}
+            {/* {Locale.Settings.SubTitle} */}
+            {t("Settings.SubTitle")}
           </div>
         </div>
         <div className="window-actions">
@@ -1471,7 +1708,8 @@ export function Settings() {
           <div className="window-action-button"></div>
           <div className="window-action-button">
             <IconButton
-              aria={Locale.UI.Close}
+              // aria={Locale.UI.Close}
+              aria={t("UI.Close")}
               icon={<CloseIcon />}
               onClick={() => navigate(Path.Home)}
               bordered
@@ -1481,7 +1719,8 @@ export function Settings() {
       </div>
       <div className={styles["settings"]}>
         <List>
-          <ListItem title={Locale.Settings.Avatar}>
+          {/* <ListItem title={Locale.Settings.Avatar}> */}
+          <ListItem title={t("Settings.Avatar")}>
             <Popover
               onClose={() => setShowEmojiPicker(false)}
               content={
@@ -1495,7 +1734,8 @@ export function Settings() {
               open={showEmojiPicker}
             >
               <div
-                aria-label={Locale.Settings.Avatar}
+                // aria-label={Locale.Settings.Avatar}
+                aria-label={t("Settings.Avatar")}
                 tabIndex={0}
                 className={styles.avatar}
                 onClick={() => {
@@ -1508,13 +1748,19 @@ export function Settings() {
           </ListItem>
 
           {/* <ListItem
-            title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}
+            // title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}
+            title={t("Settings.Update.Version", { x: currentVersion ?? "unknown" })}
             subTitle={
               checkingUpdate
-                ? Locale.Settings.Update.IsChecking
-                : hasNewVersion
-                ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
-                : Locale.Settings.Update.IsLatest
+                // ? Locale.Settings.Update.IsChecking
+                // : hasNewVersion
+                // ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
+                // : Locale.Settings.Update.IsLatest
+                ? t("Settings.Update.IsChecking")
+: hasNewVersion
+? t("Settings.Update.FoundUpdate", { x: remoteId ?? "ERROR" })
+: t("Settings.Update.IsLatest")
+
             }
           >
             {checkingUpdate ? (
@@ -1523,26 +1769,31 @@ export function Settings() {
               clientConfig?.isApp ? (
                 <IconButton
                   icon={<ResetIcon></ResetIcon>}
-                  text={Locale.Settings.Update.GoToUpdate}
+                  // text={Locale.Settings.Update.GoToUpdate}
+                  text={t("Settings.Update.GoToUpdate")}
                   onClick={() => clientUpdate()}
                 />
               ) : (
                 <Link href={updateUrl} target="_blank" className="link">
-                  {Locale.Settings.Update.GoToUpdate}
+                  // {Locale.Settings.Update.GoToUpdate}
+                  {t("Settings.Update.GoToUpdate")}
                 </Link>
               )
             ) : (
               <IconButton
                 icon={<ResetIcon></ResetIcon>}
-                text={Locale.Settings.Update.CheckUpdate}
+                // text={Locale.Settings.Update.CheckUpdate}
+                text={t("Settings.Update.CheckUpdate")}
                 onClick={() => checkUpdate(true)}
               />
             )}
           </ListItem> */}
 
-          <ListItem title={Locale.Settings.SendKey}>
+          {/* <ListItem title={Locale.Settings.SendKey}> */}
+          <ListItem title={t("Settings.SendKey")}>
             <Select
-              aria-label={Locale.Settings.SendKey}
+              // aria-label={Locale.Settings.SendKey}
+              aria-label={t("Settings.SendKey")}
               value={config.submitKey}
               onChange={(e) => {
                 updateConfig(
@@ -1559,9 +1810,11 @@ export function Settings() {
             </Select>
           </ListItem>
 
-          <ListItem title={Locale.Settings.Theme}>
+          {/* <ListItem title={Locale.Settings.Theme}> */}
+          <ListItem title={t("Settings.Theme")}>
             <Select
-              aria-label={Locale.Settings.Theme}
+              // aria-label={Locale.Settings.Theme}
+              aria-label={t("Settings.Theme")}
               value={config.theme}
               onChange={(e) => {
                 updateConfig(
@@ -1577,11 +1830,14 @@ export function Settings() {
             </Select>
           </ListItem>
 
-          <ListItem title={Locale.Settings.Lang.Name}>
+          {/* <ListItem title={Locale.Settings.Lang.Name}> */}
+          <ListItem title={t("Settings.Lang.Name")}>
             <Select
-              aria-label={Locale.Settings.Lang.Name}
+              // aria-label={Locale.Settings.Lang.Name}
+              aria-label={t("Settings.Lang.Name")}
               value={getLang()}
               onChange={(e) => {
+                console.log("changeLang", e.target.value);
                 changeLang(e.target.value as any);
               }}
             >
@@ -1594,11 +1850,14 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.FontSize.Title}
-            subTitle={Locale.Settings.FontSize.SubTitle}
+            // title={Locale.Settings.FontSize.Title}
+            // subTitle={Locale.Settings.FontSize.SubTitle}
+            title={t("Settings.FontSize.Title")}
+            subTitle={t("Settings.FontSize.SubTitle")}
           >
             <InputRange
-              aria={Locale.Settings.FontSize.Title}
+              // aria={Locale.Settings.FontSize.Title}
+              aria={t("Settings.FontSize.Title")}
               title={`${config.fontSize ?? 14}px`}
               value={config.fontSize}
               min="12"
@@ -1614,14 +1873,18 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.FontFamily.Title}
-            subTitle={Locale.Settings.FontFamily.SubTitle}
+            // title={Locale.Settings.FontFamily.Title}
+            // subTitle={Locale.Settings.FontFamily.SubTitle}
+            title={t("Settings.FontFamily.Title")}
+            subTitle={t("Settings.FontFamily.SubTitle")}
           >
             <input
-              aria-label={Locale.Settings.FontFamily.Title}
+              // aria-label={Locale.Settings.FontFamily.Title}
+              aria-label={t("Settings.FontFamily.Title")}
               type="text"
               value={config.fontFamily}
-              placeholder={Locale.Settings.FontFamily.Placeholder}
+              // placeholder={Locale.Settings.FontFamily.Placeholder}
+              placeholder={t("Settings.FontFamily.Placeholder")}
               onChange={(e) =>
                 updateConfig(
                   (config) => (config.fontFamily = e.currentTarget.value),
@@ -1631,11 +1894,14 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.AutoGenerateTitle.Title}
-            subTitle={Locale.Settings.AutoGenerateTitle.SubTitle}
+            // title={Locale.Settings.AutoGenerateTitle.Title}
+            // subTitle={Locale.Settings.AutoGenerateTitle.SubTitle}
+            title={t("Settings.AutoGenerateTitle.Title")}
+            subTitle={t("Settings.AutoGenerateTitle.SubTitle")}
           >
             <input
-              aria-label={Locale.Settings.AutoGenerateTitle.Title}
+              // aria-label={Locale.Settings.AutoGenerateTitle.Title}
+              aria-label={t("Settings.AutoGenerateTitle.Title")}
               type="checkbox"
               checked={config.enableAutoGenerateTitle}
               onChange={(e) =>
@@ -1648,11 +1914,14 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.SendPreviewBubble.Title}
-            subTitle={Locale.Settings.SendPreviewBubble.SubTitle}
+            // title={Locale.Settings.SendPreviewBubble.Title}
+            // subTitle={Locale.Settings.SendPreviewBubble.SubTitle}
+            title={t("Settings.SendPreviewBubble.Title")}
+            subTitle={t("Settings.SendPreviewBubble.SubTitle")}
           >
             <input
-              aria-label={Locale.Settings.SendPreviewBubble.Title}
+              // aria-label={Locale.Settings.SendPreviewBubble.Title}
+              aria-label={t("Settings.SendPreviewBubble.Title")}
               type="checkbox"
               checked={config.sendPreviewBubble}
               onChange={(e) =>
@@ -1665,11 +1934,14 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Mask.Config.Artifacts.Title}
-            subTitle={Locale.Mask.Config.Artifacts.SubTitle}
+            // title={Locale.Mask.Config.Artifacts.Title}
+            // subTitle={Locale.Mask.Config.Artifacts.SubTitle}
+            title={t("Mask.Config.Artifacts.Title")}
+            subTitle={t("Mask.Config.Artifacts.SubTitle")}
           >
             <input
-              aria-label={Locale.Mask.Config.Artifacts.Title}
+              // aria-label={Locale.Mask.Config.Artifacts.Title}
+              aria-label={t("Mask.Config.Artifacts.Title")}
               type="checkbox"
               checked={config.enableArtifacts}
               onChange={(e) =>
@@ -1681,11 +1953,14 @@ export function Settings() {
             ></input>
           </ListItem>
           <ListItem
-            title={Locale.Mask.Config.CodeFold.Title}
-            subTitle={Locale.Mask.Config.CodeFold.SubTitle}
+            // title={Locale.Mask.Config.CodeFold.Title}
+            // subTitle={Locale.Mask.Config.CodeFold.SubTitle}
+            title={t("Mask.Config.CodeFold.Title")}
+            subTitle={t("Mask.Config.CodeFold.SubTitle")}
           >
             <input
-              aria-label={Locale.Mask.Config.CodeFold.Title}
+              // aria-label={Locale.Mask.Config.CodeFold.Title}
+              aria-label={t("Mask.Config.CodeFold.Title")}
               type="checkbox"
               checked={config.enableCodeFold}
               data-testid="enable-code-fold-checkbox"
@@ -1702,11 +1977,14 @@ export function Settings() {
 
         <List>
           <ListItem
-            title={Locale.Settings.Mask.Splash.Title}
-            subTitle={Locale.Settings.Mask.Splash.SubTitle}
+            // title={Locale.Settings.Mask.Splash.Title}
+            // subTitle={Locale.Settings.Mask.Splash.SubTitle}
+            title={t("Settings.Mask.Splash.Title")}
+            subTitle={t("Settings.Mask.Splash.SubTitle")}
           >
             <input
-              aria-label={Locale.Settings.Mask.Splash.Title}
+              // aria-label={Locale.Settings.Mask.Splash.Title}
+              aria-label={t("Settings.Mask.Splash.Title")}
               type="checkbox"
               checked={!config.dontShowMaskSplashScreen}
               onChange={(e) =>
@@ -1720,11 +1998,14 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.Mask.Builtin.Title}
-            subTitle={Locale.Settings.Mask.Builtin.SubTitle}
+            // title={Locale.Settings.Mask.Builtin.Title}
+            // subTitle={Locale.Settings.Mask.Builtin.SubTitle}
+            title={t("Settings.Mask.Builtin.Title")}
+            subTitle={t("Settings.Mask.Builtin.SubTitle")}
           >
             <input
-              aria-label={Locale.Settings.Mask.Builtin.Title}
+              // aria-label={Locale.Settings.Mask.Builtin.Title}
+              aria-label={t("Settings.Mask.Builtin.Title")}
               type="checkbox"
               checked={config.hideBuiltinMasks}
               onChange={(e) =>
@@ -1739,11 +2020,14 @@ export function Settings() {
 
         <List>
           <ListItem
-            title={Locale.Settings.Prompt.Disable.Title}
-            subTitle={Locale.Settings.Prompt.Disable.SubTitle}
+            // title={Locale.Settings.Prompt.Disable.Title}
+            // subTitle={Locale.Settings.Prompt.Disable.SubTitle}
+            title={t("Settings.Prompt.Disable.Title")}
+            subTitle={t("Settings.Prompt.Disable.SubTitle")}
           >
             <input
-              aria-label={Locale.Settings.Prompt.Disable.Title}
+              // aria-label={Locale.Settings.Prompt.Disable.Title}
+              aria-label={t("Settings.Prompt.Disable.Title")}
               type="checkbox"
               checked={config.disablePromptHint}
               onChange={(e) =>
@@ -1756,16 +2040,23 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.Prompt.List}
-            subTitle={Locale.Settings.Prompt.ListCount(
-              builtinCount,
-              customCount,
-            )}
+            // title={Locale.Settings.Prompt.List}
+            // subTitle={Locale.Settings.Prompt.ListCount(
+            //   builtinCount,
+            //   customCount,
+            // )}
+            title={t("Settings.Prompt.List")}
+            subTitle={t("Settings.Prompt.ListCount", {
+              builtin: builtinCount,
+              custom: customCount,
+            })}
           >
             <IconButton
-              aria={Locale.Settings.Prompt.List + Locale.Settings.Prompt.Edit}
+              // aria={Locale.Settings.Prompt.List + Locale.Settings.Prompt.Edit}
+              aria={t("Settings.Prompt.List") + t("Settings.Prompt.Edit")}
               icon={<EditIcon />}
-              text={Locale.Settings.Prompt.Edit}
+              // text={Locale.Settings.Prompt.Edit}
+              text={t("Settings.Prompt.Edit")}
               onClick={() => setShowPromptModal(true)}
             />
           </ListItem>
@@ -1782,11 +2073,14 @@ export function Settings() {
               {accessStore.useCustomConfig && (
                 <>
                   <ListItem
-                    title={Locale.Settings.Access.Provider.Title}
-                    subTitle={Locale.Settings.Access.Provider.SubTitle}
+                    // title={Locale.Settings.Access.Provider.Title}
+                    // subTitle={Locale.Settings.Access.Provider.SubTitle}
+                    title={t("Settings.Access.Provider.Title")}
+subTitle={t("Settings.Access.Provider.SubTitle")}
                   >
                     <Select
-                      aria-label={Locale.Settings.Access.Provider.Title}
+                      // aria-label={Locale.Settings.Access.Provider.Title}
+                      aria-label={t("Settings.Access.Provider.Title")}
                       value={accessStore.provider}
                       onChange={(e) => {
                         accessStore.update(
@@ -1826,7 +2120,8 @@ export function Settings() {
 
           {!shouldHideBalanceQuery && !clientConfig?.isApp ? (
             <ListItem
-              title={Locale.Settings.Usage.Title}
+              // title={Locale.Settings.Usage.Title}
+              title={t("Settings.Usage.Title")}
               subTitle={
                 showUsage
                   ? loadingUsage

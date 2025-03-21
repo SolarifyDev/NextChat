@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -30,10 +29,10 @@ const vi: PartialLocaleType = {
       "🥳 Ưu đãi ra mắt NextChat AI, mở khóa OpenAI o1, GPT-4o, Claude-3.5 và các mô hình lớn mới nhất ngay bây giờ",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} cuộc trò chuyện`,
+    ChatItemCount: `{{count}} cuộc trò chuyện`,
   },
   Chat: {
-    SubTitle: (count: number) => `Tổng cộng ${count} cuộc trò chuyện`,
+    SubTitle: `Tổng cộng {{count}} cuộc trò chuyện`,
     EditMessage: {
       Title: "Chỉnh sửa ghi chép tin nhắn",
       Topic: {
@@ -80,19 +79,18 @@ const vi: PartialLocaleType = {
     },
     Rename: "Đổi tên cuộc trò chuyện",
     Typing: "Đang nhập…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} gửi`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter xuống dòng";
-      }
-      return inputHints + "，/ kích hoạt hoàn chỉnh, : kích hoạt lệnh";
-    },
+    Input: "{{submitKey}} gửi，/ kích hoạt hoàn chỉnh, : kích hoạt lệnh",
     Send: "Gửi",
     Config: {
       Reset: "Xóa trí nhớ",
       SaveAs: "Lưu dưới dạng mặt nạ",
     },
     IsContext: "Lời nhắc đã đặt sẵn",
+    Metis: {
+      Title: "Xin chào~ Tôi là METIS",
+      Content:
+        "Tôi có thể giúp bạn tìm kiếm và trả lời câu hỏi. Hãy hỏi tôi bất cứ điều gì!",
+    },
   },
   Export: {
     Title: "Chia sẻ ghi chép trò chuyện",
@@ -182,11 +180,11 @@ const vi: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Phiên bản hiện tại: ${x}`,
+      Version: `Phiên bản hiện tại: {{x}}`,
       IsLatest: "Đã là phiên bản mới nhất",
       CheckUpdate: "Kiểm tra cập nhật",
       IsChecking: "Đang kiểm tra cập nhật...",
-      FoundUpdate: (x: string) => `Tìm thấy phiên bản mới: ${x}`,
+      FoundUpdate: "Tìm thấy phiên bản mới: {{x}}",
       GoToUpdate: "Đi đến cập nhật",
     },
     SendKey: "Phím gửi",
@@ -239,9 +237,8 @@ const vi: PartialLocaleType = {
       },
 
       LocalState: "Dữ liệu cục bộ",
-      Overview: (overview: any) => {
-        return `${overview.chat} cuộc trò chuyện, ${overview.message} tin nhắn, ${overview.prompt} lệnh, ${overview.mask} mặt nạ`;
-      },
+      Overview:
+        "{{chat}} cuộc trò chuyện, {{message}} tin nhắn, {{prompt}} lệnh, {{mask}} mặt nạ",
       ImportFailed: "Nhập không thành công",
     },
     Mask: {
@@ -260,8 +257,8 @@ const vi: PartialLocaleType = {
         SubTitle: "Nhập / ở đầu ô nhập để kích hoạt tự động hoàn thành",
       },
       List: "Danh sách lệnh tùy chỉnh",
-      ListCount: (builtin: number, custom: number) =>
-        `Tích hợp ${builtin} mục, người dùng định nghĩa ${custom} mục`,
+      ListCount:
+        "Tích hợp {{builtin}} mục, người dùng định nghĩa {{custom}} mục",
       Edit: "Chỉnh sửa",
       Modal: {
         Title: "Danh sách lệnh",
@@ -284,9 +281,8 @@ const vi: PartialLocaleType = {
 
     Usage: {
       Title: "Tra cứu số dư",
-      SubTitle(used: any, total: any) {
-        return `Đã sử dụng trong tháng: $${used}, Tổng số đăng ký: $${total}`;
-      },
+      SubTitle:
+        "Đã sử dụng trong tháng: ${{used}}, Tổng số đăng ký: ${{total}}",
       IsChecking: "Đang kiểm tra…",
       Check: "Kiểm tra lại",
       NoAccess: "Nhập khóa API hoặc mật khẩu truy cập để xem số dư",
@@ -461,8 +457,8 @@ const vi: PartialLocaleType = {
     BotHello: "Có thể giúp gì cho bạn?",
     Error: "Đã xảy ra lỗi, vui lòng thử lại sau",
     Prompt: {
-      History: (content: string) =>
-        "Đây là tóm tắt cuộc trò chuyện lịch sử như tiền đề: " + content,
+      History:
+        "Đây là tóm tắt cuộc trò chuyện lịch sử như tiền đề: {{content}}",
       Topic:
         'Sử dụng bốn đến năm từ để trả lại chủ đề tóm tắt của câu này, không giải thích, không dấu câu, không từ cảm thán, không văn bản thừa, không in đậm, nếu không có chủ đề, hãy trả lại "Tán gẫu"',
       Summarize:
@@ -478,7 +474,7 @@ const vi: PartialLocaleType = {
     Failed: "Tải xuống thất bại.",
   },
   Context: {
-    Toast: (x: any) => `Bao gồm ${x} lệnh gợi ý đã định sẵn`,
+    Toast: "Bao gồm {{x}} lệnh gợi ý đã định sẵn",
     Edit: "Cài đặt cuộc trò chuyện hiện tại",
     Add: "Thêm một cuộc trò chuyện",
     Clear: "Ngữ cảnh đã được xóa",
@@ -499,7 +495,7 @@ const vi: PartialLocaleType = {
       NoData: "Không có dữ liệu",
       Loading: "Đang tải",
 
-      SubTitle: (count: number) => `Tìm thấy ${count} kết quả`,
+      SubTitle: "Tìm thấy {{count}} kết quả",
     },
     Item: {
       View: "Xem",
@@ -509,12 +505,12 @@ const vi: PartialLocaleType = {
     Name: "Mặt nạ",
     Page: {
       Title: "Mặt nạ vai trò đã định sẵn",
-      SubTitle: (count: number) => `${count} định nghĩa vai trò đã định sẵn`,
+      SubTitle: "{{count}} định nghĩa vai trò đã định sẵn",
       Search: "Tìm kiếm mặt nạ vai trò",
       Create: "Tạo mới",
     },
     Item: {
-      Info: (count: number) => `Bao gồm ${count} cuộc trò chuyện đã định sẵn`,
+      Info: `Bao gồm {{count}} cuộc trò chuyện đã định sẵn`,
       Chat: "Trò chuyện",
       View: "Xem",
       Edit: "Chỉnh sửa",
@@ -522,8 +518,8 @@ const vi: PartialLocaleType = {
       DeleteConfirm: "Xác nhận xóa?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Chỉnh sửa mặt nạ định sẵn ${readonly ? "(chỉ đọc)" : ""}`,
+      Title: "Chỉnh sửa mặt nạ định sẵn",
+      ReadOnlyTitle: "Chỉnh sửa mặt nạ định sẵn (chỉ đọc)",
       Download: "Tải xuống mặt nạ",
       Clone: "Nhân bản mặt nạ",
     },

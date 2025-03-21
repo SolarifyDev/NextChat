@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Path, SAAS_CHAT_URL } from "../constant";
 import { useAccessStore } from "../store";
-import Locale from "../locales";
 import Delete from "../icons/close.svg";
 import Arrow from "../icons/arrow.svg";
 import Logo from "../icons/logo.svg";
@@ -19,10 +18,13 @@ import {
   trackAuthorizationPageButtonToCPaymentClick,
 } from "../utils/auth-settings-events";
 import clsx from "clsx";
+import { useTranslation } from "react-i18next";
 
 const storage = safeLocalStorage();
 
 export function AuthPage() {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const accessStore = useAccessStore();
   const goHome = () => navigate(Path.Home);
@@ -52,7 +54,8 @@ export function AuthPage() {
       <div className={styles["auth-header"]}>
         <IconButton
           icon={<LeftIcon />}
-          text={Locale.Auth.Return}
+          // text={Locale.Auth.Return}
+          text={t("Auth.Return")}
           onClick={() => navigate(Path.Home)}
         ></IconButton>
       </div>
@@ -60,16 +63,21 @@ export function AuthPage() {
         <BotIcon />
       </div>
 
-      <div className={styles["auth-title"]}>{Locale.Auth.Title}</div>
-      <div className={styles["auth-tips"]}>{Locale.Auth.Tips}</div>
+      {/* <div className={styles["auth-title"]}>{Locale.Auth.Title}</div> */}
+      <div className={styles["auth-title"]}>{t("Auth.Title")}</div>
+      {/* <div className={styles["auth-tips"]}>{Locale.Auth.Tips}</div> */}
+      <div className={styles["auth-tips"]}>{t("Auth.Tips")}</div>
 
       <PasswordInput
         style={{ marginTop: "3vh", marginBottom: "3vh" }}
-        aria={Locale.Settings.ShowPassword}
-        aria-label={Locale.Auth.Input}
+        // aria={Locale.Settings.ShowPassword}
+        aria={t("Settings.ShowPassword")}
+        // aria-label={Locale.Auth.Input}
+        aria-label={t("Auth.Input")}
         value={accessStore.accessCode}
         type="text"
-        placeholder={Locale.Auth.Input}
+        // placeholder={Locale.Auth.Input}
+        placeholder={t("Auth.Input")}
         onChange={(e) => {
           accessStore.update(
             (access) => (access.accessCode = e.currentTarget.value),
@@ -79,14 +87,18 @@ export function AuthPage() {
 
       {!accessStore.hideUserApiKey ? (
         <>
-          <div className={styles["auth-tips"]}>{Locale.Auth.SubTips}</div>
+          {/* <div className={styles["auth-tips"]}>{Locale.Auth.SubTips}</div> */}
+          <div className={styles["auth-tips"]}>{t("Auth.SubTips")}</div>
           <PasswordInput
             style={{ marginTop: "3vh", marginBottom: "3vh" }}
-            aria={Locale.Settings.ShowPassword}
-            aria-label={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
+            // aria={Locale.Settings.ShowPassword}
+            aria={t("Settings.ShowPassword")}
+            // aria-label={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
+            aria-label={t("Settings.Access.OpenAI.ApiKey.Placeholder")}
             value={accessStore.openaiApiKey}
             type="text"
-            placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
+            // placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
+            placeholder={t("Settings.Access.OpenAI.ApiKey.Placeholder")}
             onChange={(e) => {
               accessStore.update(
                 (access) => (access.openaiApiKey = e.currentTarget.value),
@@ -95,11 +107,14 @@ export function AuthPage() {
           />
           <PasswordInput
             style={{ marginTop: "3vh", marginBottom: "3vh" }}
-            aria={Locale.Settings.ShowPassword}
-            aria-label={Locale.Settings.Access.Google.ApiKey.Placeholder}
+            // aria={Locale.Settings.ShowPassword}
+            aria={t("Settings.ShowPassword")}
+            // aria-label={Locale.Settings.Access.Google.ApiKey.Placeholder}
+            aria-label={t("Settings.Access.Google.ApiKey.Placeholder")}
             value={accessStore.googleApiKey}
             type="text"
-            placeholder={Locale.Settings.Access.Google.ApiKey.Placeholder}
+            // placeholder={Locale.Settings.Access.Google.ApiKey.Placeholder}
+            placeholder={t("Settings.Access.Google.ApiKey.Placeholder")}
             onChange={(e) => {
               accessStore.update(
                 (access) => (access.googleApiKey = e.currentTarget.value),
@@ -111,12 +126,14 @@ export function AuthPage() {
 
       <div className={styles["auth-actions"]}>
         <IconButton
-          text={Locale.Auth.Confirm}
+          // text={Locale.Auth.Confirm}
+          text={t("Auth.Confirm")}
           type="primary"
           onClick={goChat}
         />
         <IconButton
-          text={Locale.Auth.SaasTips}
+          // text={Locale.Auth.SaasTips}
+          text={t("Auth.SaasTips")}
           onClick={() => {
             goSaas();
           }}
@@ -127,6 +144,8 @@ export function AuthPage() {
 }
 
 function TopBanner() {
+  const { t } = useTranslation();
+
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const isMobile = useMobileScreen();
@@ -168,7 +187,8 @@ function TopBanner() {
       <div className={clsx(styles["top-banner-inner"], "no-dark")}>
         <Logo className={styles["top-banner-logo"]}></Logo>
         <span>
-          {Locale.Auth.TopTips}
+          {/* {Locale.Auth.TopTips} */}
+          {t("Auth.TopTips")}
           <a
             href={SAAS_CHAT_URL}
             rel="stylesheet"
@@ -176,7 +196,8 @@ function TopBanner() {
               trackSettingsPageGuideToCPaymentClick();
             }}
           >
-            {Locale.Settings.Access.SaasStart.ChatNow}
+            {/* {Locale.Settings.Access.SaasStart.ChatNow} */}
+            {t("Settings.Access.SaasStart.ChatNow")}
             <Arrow style={{ marginLeft: "4px" }} />
           </a>
         </span>

@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import { ChatMessage, useAppConfig } from "../store";
-import Locale from "../locales";
 import styles from "./exporter.module.scss";
 import {
   List,
@@ -41,16 +40,19 @@ import { getMessageTextContent } from "../utils";
 import { MaskAvatar } from "./mask";
 import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
+import { useTranslation } from "react-i18next";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
 });
 
 export function ExportMessageModal(props: { onClose: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="modal-mask">
       <Modal
-        title={Locale.Export.Title}
+        // title={Locale.Export.Title}
+        title={t("Export.Title")}
         onClose={props.onClose}
         footer={
           <div
@@ -61,7 +63,8 @@ export function ExportMessageModal(props: { onClose: () => void }) {
               opacity: 0.5,
             }}
           >
-            {Locale.Exporter.Description.Title}
+            {/* {Locale.Exporter.Description.Title} */}
+            {t("Exporter.Description.Title")}
           </div>
         }
       >
@@ -139,13 +142,16 @@ function Steps<
 }
 
 export function MessageExporter() {
+  const { t } = useTranslation();
   const steps = [
     {
-      name: Locale.Export.Steps.Select,
+      // name: Locale.Export.Steps.Select,
+      name: t("Export.Steps.Select"),
       value: "select",
     },
     {
-      name: Locale.Export.Steps.Preview,
+      // name: Locale.Export.Steps.Preview,
+      name: t("Export.Steps.Preview"),
       value: "preview",
     },
   ];
@@ -211,8 +217,10 @@ export function MessageExporter() {
       >
         <List>
           <ListItem
-            title={Locale.Export.Format.Title}
-            subTitle={Locale.Export.Format.SubTitle}
+            // title={Locale.Export.Format.Title}
+            // subTitle={Locale.Export.Format.SubTitle}
+            title={t("Export.Format.Title")}
+            subTitle={t("Export.Format.SubTitle")}
           >
             <Select
               value={exportConfig.format}
@@ -231,8 +239,10 @@ export function MessageExporter() {
             </Select>
           </ListItem>
           <ListItem
-            title={Locale.Export.IncludeContext.Title}
-            subTitle={Locale.Export.IncludeContext.SubTitle}
+            // title={Locale.Export.IncludeContext.Title}
+            // subTitle={Locale.Export.IncludeContext.SubTitle}
+            title={t("Export.IncludeContext.Title")}
+            subTitle={t("Export.IncludeContext.SubTitle")}
           >
             <input
               type="checkbox"
@@ -310,6 +320,7 @@ export function PreviewActions(props: {
   showCopy?: boolean;
   messages?: ChatMessage[];
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [shouldExport, setShouldExport] = useState(false);
   const config = useAppConfig();
@@ -323,7 +334,8 @@ export function PreviewActions(props: {
       .then((res) => {
         if (!res) return;
         showModal({
-          title: Locale.Export.Share,
+          // title: Locale.Export.Share,
+          title: t("Export.Share"),
           children: [
             <input
               type="text"
@@ -340,7 +352,8 @@ export function PreviewActions(props: {
           actions: [
             <IconButton
               icon={<CopyIcon />}
-              text={Locale.Chat.Actions.Copy}
+              // text={Locale.Chat.Actions.Copy}
+              text={t("Chat.Actions.Copy")}
               key="copy"
               onClick={() => copyToClipboard(res)}
             />,
@@ -369,7 +382,8 @@ export function PreviewActions(props: {
       <div className={styles["preview-actions"]}>
         {props.showCopy && (
           <IconButton
-            text={Locale.Export.Copy}
+            // text={Locale.Export.Copy}
+            text={t("Export.Copy")}
             bordered
             shadow
             icon={<CopyIcon />}
@@ -377,14 +391,16 @@ export function PreviewActions(props: {
           ></IconButton>
         )}
         <IconButton
-          text={Locale.Export.Download}
+          // text={Locale.Export.Download}
+          text={t("Export.Download")}
           bordered
           shadow
           icon={<DownloadIcon />}
           onClick={props.download}
         ></IconButton>
         <IconButton
-          text={Locale.Export.Share}
+          // text={Locale.Export.Share}
+          text={t("Export.Share")}
           bordered
           shadow
           icon={loading ? <LoadingIcon /> : <ShareIcon />}
@@ -413,6 +429,7 @@ export function ImagePreviewer(props: {
   messages: ChatMessage[];
   topic: string;
 }) {
+  const { t } = useTranslation();
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
   const chatStore = useNewChatStore();
@@ -423,7 +440,8 @@ export function ImagePreviewer(props: {
   const previewRef = useRef<HTMLDivElement>(null);
 
   const copy = () => {
-    showToast(Locale.Export.Image.Toast);
+    // showToast(Locale.Export.Image.Toast);
+    showToast(t("Export.Image.Toast"));
     const dom = previewRef.current;
     if (!dom) return;
     toBlob(dom).then((blob) => {
@@ -436,12 +454,14 @@ export function ImagePreviewer(props: {
             }),
           ])
           .then(() => {
-            showToast(Locale.Copy.Success);
+            // showToast(Locale.Copy.Success);
+            showToast(t("Copy.Success"));
             refreshPreview();
           });
       } catch (e) {
         console.error("[Copy Image] ", e);
-        showToast(Locale.Copy.Failed);
+        // showToast(Locale.Copy.Failed);
+        showToast(t("Copy.Failed"));
       }
     });
   };
@@ -449,7 +469,8 @@ export function ImagePreviewer(props: {
   const isMobile = useMobileScreen();
 
   const download = async () => {
-    showToast(Locale.Export.Image.Toast);
+    // showToast(Locale.Export.Image.Toast);
+    showToast(t("Export.Image.Toast"));
     const dom = previewRef.current;
     if (!dom) return;
 
@@ -480,9 +501,11 @@ export function ImagePreviewer(props: {
             const buffer = await response.arrayBuffer();
             const uint8Array = new Uint8Array(buffer);
             await window.__TAURI__.fs.writeBinaryFile(result, uint8Array);
-            showToast(Locale.Download.Success);
+            // showToast(Locale.Download.Success);
+            showToast(t("Download.Success"));
           } else {
-            showToast(Locale.Download.Failed);
+            // showToast(Locale.Download.Failed);
+            showToast(t("Download.Failed"));
           }
         } else {
           showImageModal(blob);
@@ -495,7 +518,8 @@ export function ImagePreviewer(props: {
         refreshPreview();
       }
     } catch (error) {
-      showToast(Locale.Download.Failed);
+      // showToast(Locale.Download.Failed);
+      showToast(t("Download.Failed"));
     }
   };
 
@@ -544,16 +568,20 @@ export function ImagePreviewer(props: {
           </div>
           <div>
             <div className={styles["chat-info-item"]}>
-              {Locale.Exporter.Model}: {mask.modelConfig.model}
+              {/* {Locale.Exporter.Model}: {mask.modelConfig.model} */}
+              {t("Exporter.Model")}: {mask.modelConfig.model}
             </div>
             <div className={styles["chat-info-item"]}>
-              {Locale.Exporter.Messages}: {props.messages.length}
+              {/* {Locale.Exporter.Messages}: {props.messages.length} */}
+              {t("Exporter.Messages")}: {props.messages.length}
             </div>
             <div className={styles["chat-info-item"]}>
-              {Locale.Exporter.Topic}: {session.topic}
+              {/* {Locale.Exporter.Topic}: {session.topic} */}
+              {t("Exporter.Topic")}: {session.topic}
             </div>
             <div className={styles["chat-info-item"]}>
-              {Locale.Exporter.Time}:{" "}
+              {/* {Locale.Exporter.Time}:{" "} */}
+              {t("Exporter.Time")}:{" "}
               {new Date(
                 props.messages.at(-1)?.date ?? Date.now(),
               ).toLocaleString()}
@@ -624,13 +652,16 @@ export function MarkdownPreviewer(props: {
   messages: ChatMessage[];
   topic: string;
 }) {
+  const { t } = useTranslation();
   const mdText =
     `# ${props.topic}\n\n` +
     props.messages
       .map((m) => {
         return m.role === "user"
-          ? `## ${Locale.Export.MessageFromYou}:\n${getMessageTextContent(m)}`
-          : `## ${Locale.Export.MessageFromChatGPT}:\n${getMessageTextContent(
+          ? // ? `## ${Locale.Export.MessageFromYou}:\n${getMessageTextContent(m)}`
+            `## ${t("Export.MessageFromYou")}:\n${getMessageTextContent(m)}`
+          : // : `## ${Locale.Export.MessageFromChatGPT}:\n${getMessageTextContent(
+            `## ${t("Export.MessageFromChatGPT")}:\n${getMessageTextContent(
               m,
             ).trim()}`;
       })
@@ -661,11 +692,13 @@ export function JsonPreviewer(props: {
   messages: ChatMessage[];
   topic: string;
 }) {
+  const { t } = useTranslation();
   const msgs = {
     messages: [
       {
         role: "system",
-        content: `${Locale.FineTuned.Sysmessage} ${props.topic}`,
+        // content: `${Locale.FineTuned.Sysmessage} ${props.topic}`,
+        content: `${t("FineTuned.Sysmessage")} ${props.topic}`,
       },
       ...props.messages.map((m) => ({
         role: m.role,

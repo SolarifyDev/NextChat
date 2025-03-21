@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -31,10 +30,10 @@ const no: PartialLocaleType = {
       "🥳 NextChat AI lanseringstilbud, lås opp OpenAI o1, GPT-4o, Claude-3.5 og de nyeste store modellene nå",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} samtaler`,
+    ChatItemCount: `{{count}} samtaler`,
   },
   Chat: {
-    SubTitle: (count: number) => `Totalt ${count} samtaler`,
+    SubTitle: `Totalt {{count}} samtaler`,
     EditMessage: {
       Title: "Rediger meldingshistorikk",
       Topic: {
@@ -82,21 +81,19 @@ const no: PartialLocaleType = {
     },
     Rename: "Gi nytt navn til samtale",
     Typing: "Skriver…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} send`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter for linjeskift";
-      }
-      return (
-        inputHints + "，/ for å utløse autoutfylling, : for å utløse kommando"
-      );
-    },
+    Input:
+      "{{submitKey}} send，/ for å utløse autoutfylling, : for å utløse kommando",
     Send: "Send",
     Config: {
       Reset: "Fjern minne",
       SaveAs: "Lagre som maske",
     },
     IsContext: "Forhåndsdefinerte oppfordringer",
+    Metis: {
+      Title: "Hei~ Jeg er METIS",
+      Content:
+        "Jeg kan hjelpe deg med å søke og svare på spørsmål. Spør meg om hva som helst!",
+    },
   },
   Export: {
     Title: "Del samtalehistorikk",
@@ -188,11 +185,11 @@ const no: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Nåværende versjon: ${x}`,
+      Version: `Nåværende versjon: {{x}}`,
       IsLatest: "Er den nyeste versjonen",
       CheckUpdate: "Sjekk oppdateringer",
       IsChecking: "Sjekker oppdateringer...",
-      FoundUpdate: (x: string) => `Ny versjon oppdaget: ${x}`,
+      FoundUpdate: "Ny versjon oppdaget: {{x}}",
       GoToUpdate: "Gå til oppdatering",
     },
     SendKey: "Send-knapp",
@@ -245,9 +242,8 @@ const no: PartialLocaleType = {
       },
 
       LocalState: "Lokal data",
-      Overview: (overview: any) => {
-        return `${overview.chat} samtaler, ${overview.message} meldinger, ${overview.prompt} oppfordringer, ${overview.mask} masker`;
-      },
+      Overview:
+        "{{chat}} samtaler, {{message}} meldinger, {{prompt}} oppfordringer, {{mask}} masker",
       ImportFailed: "Import mislyktes",
     },
     Mask: {
@@ -266,8 +262,7 @@ const no: PartialLocaleType = {
         SubTitle: "Skriv / i tekstboksen for å utløse automatisk fullføring",
       },
       List: "Egendefinerte oppfordringer",
-      ListCount: (builtin: number, custom: number) =>
-        `Innebygde ${builtin}, brukerdedefinerte ${custom}`,
+      ListCount: "Innebygde {{builtin}}, brukerdedefinerte {{custom}}",
       Edit: "Rediger",
       Modal: {
         Title: "Oppfordringsliste",
@@ -290,9 +285,8 @@ const no: PartialLocaleType = {
 
     Usage: {
       Title: "Saldoforespørsel",
-      SubTitle(used: any, total: any) {
-        return `Brukt denne måneden $${used}, total abonnementsbeløp $${total}`;
-      },
+      SubTitle:
+        "Brukt denne måneden ${{used}}, total abonnementsbeløp ${{total}}",
       IsChecking: "Sjekker...",
       Check: "Sjekk på nytt",
       NoAccess: "Skriv inn API-nøkkel eller tilgangspassord for å se saldo",
@@ -469,9 +463,8 @@ const no: PartialLocaleType = {
     BotHello: "Hva kan jeg hjelpe deg med?",
     Error: "Noe gikk galt, prøv igjen senere",
     Prompt: {
-      History: (content: string) =>
-        "Dette er oppsummeringen av historiske samtaler som bakgrunn:" +
-        content,
+      History:
+        "Dette er oppsummeringen av historiske samtaler som bakgrunn: {{content}}",
       Topic:
         'Bruk fire til fem ord for å returnere en kort oppsummering av temaet, uten forklaring, uten tegnsetting, uten fyllord, uten ekstra tekst, uten fet skrift. Hvis det ikke er noe tema, returner bare "sladder".',
       Summarize:
@@ -487,7 +480,7 @@ const no: PartialLocaleType = {
     Failed: "Nedlasting mislyktes.",
   },
   Context: {
-    Toast: (x: any) => `Inneholder ${x} forhåndsinnstilte oppfordringer`,
+    Toast: "Inneholder {{x}} forhåndsinnstilte oppfordringer",
     Edit: "Nåværende samtaleinnstillinger",
     Add: "Legg til en ny samtale",
     Clear: "Konteksten er tømt",
@@ -508,7 +501,7 @@ const no: PartialLocaleType = {
       NoData: "Ingen data",
       Loading: "Laster inn",
 
-      SubTitle: (count: number) => `Fant ${count} resultater`,
+      SubTitle: "Fant {{count}} resultater",
     },
     Item: {
       View: "Vis",
@@ -518,13 +511,12 @@ const no: PartialLocaleType = {
     Name: "Maske",
     Page: {
       Title: "Forhåndsdefinerte rollemasker",
-      SubTitle: (count: number) =>
-        `${count} forhåndsdefinerte rolledefinisjoner`,
+      SubTitle: "{{count}} forhåndsdefinerte rolledefinisjoner",
       Search: "Søk etter rollemasker",
       Create: "Opprett ny",
     },
     Item: {
-      Info: (count: number) => `Inneholder ${count} forhåndsdefinerte samtaler`,
+      Info: `Inneholder {{count}} forhåndsdefinerte samtaler`,
       Chat: "Samtale",
       View: "Vis",
       Edit: "Rediger",
@@ -532,8 +524,8 @@ const no: PartialLocaleType = {
       DeleteConfirm: "Bekreft sletting?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Rediger forhåndsdefinert maske ${readonly ? "（kun lesing）" : ""}`,
+      Title: "Rediger forhåndsdefinert maske",
+      ReadOnlyTitle: "Rediger forhåndsdefinert maske (kun lesing)",
       Download: "Last ned forhåndsdefinert",
       Clone: "Kopier forhåndsdefinert",
     },

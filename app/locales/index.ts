@@ -22,6 +22,7 @@ import { merge } from "../utils/merge";
 import { safeLocalStorage } from "@/app/utils";
 
 import type { LocaleType } from "./cn";
+import i18next from "i18next";
 export type { LocaleType, PartialLocaleType } from "./cn";
 
 const localStorage = safeLocalStorage();
@@ -80,7 +81,7 @@ const LANG_KEY = "lang";
 const DEFAULT_LANG = "en";
 
 const fallbackLang = en;
-const targetLang = ALL_LANGS[getLang()] as LocaleType;
+let targetLang = ALL_LANGS[getLang()] as LocaleType;
 
 // if target lang missing some fields, it will use fallback lang string
 merge(fallbackLang, targetLang);
@@ -116,16 +117,18 @@ function getLanguage() {
 export function getLang(): Lang {
   const savedLang = getItem(LANG_KEY);
 
-  if (AllLangs.includes((savedLang ?? "") as Lang)) {
-    return savedLang as Lang;
-  }
+  return (savedLang ?? "en") as Lang;
+  // if (AllLangs.includes((savedLang ?? "") as Lang)) {
+  //   return savedLang as Lang;
+  // }
 
-  return getLanguage();
+  // return getLanguage();
 }
 
 export function changeLang(lang: Lang) {
   setItem(LANG_KEY, lang);
-  location.reload();
+  // location.reload();
+  i18next.changeLanguage(lang);
 }
 
 export function getISOLang() {

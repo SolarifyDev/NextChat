@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -30,10 +29,10 @@ const id: PartialLocaleType = {
       "🥳 Penawaran Peluncuran NextChat AI, buka OpenAI o1, GPT-4o, Claude-3.5 dan model besar terbaru sekarang",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} percakapan`,
+    ChatItemCount: `{{count}} percakapan`,
   },
   Chat: {
-    SubTitle: (count: number) => `Total ${count} percakapan`,
+    SubTitle: `Total {{count}} percakapan`,
     EditMessage: {
       Title: "Edit Riwayat Pesan",
       Topic: {
@@ -80,19 +79,18 @@ const id: PartialLocaleType = {
     },
     Rename: "Ganti Nama Obrolan",
     Typing: "Sedang Mengetik…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} kirim`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter untuk baris baru";
-      }
-      return inputHints + "，/ untuk melengkapi, : untuk memicu perintah";
-    },
+    Input: "{{submitKey}} kirim，/ untuk melengkapi, : untuk memicu perintah",
     Send: "Kirim",
     Config: {
       Reset: "Hapus Memori",
       SaveAs: "Simpan sebagai Masker",
     },
     IsContext: "Prompt Default",
+    Metis: {
+      Title: "Hai~ Saya METIS",
+      Content:
+        "Saya bisa membantu Anda mencari dan menjawab pertanyaan. Silakan tanyakan apa saja!",
+    },
   },
   Export: {
     Title: "Bagikan Riwayat Obrolan",
@@ -183,11 +181,11 @@ const id: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Versi Saat Ini: ${x}`,
+      Version: `Versi Saat Ini: {{x}}`,
       IsLatest: "Sudah versi terbaru",
       CheckUpdate: "Periksa Pembaruan",
       IsChecking: "Sedang memeriksa pembaruan...",
-      FoundUpdate: (x: string) => `Versi Baru Ditemukan: ${x}`,
+      FoundUpdate: `Versi Baru Ditemukan: {{x}}`,
       GoToUpdate: "Pergi ke Pembaruan",
     },
     SendKey: "Kunci Kirim",
@@ -240,9 +238,8 @@ const id: PartialLocaleType = {
       },
 
       LocalState: "Data Lokal",
-      Overview: (overview: any) => {
-        return `${overview.chat} percakapan, ${overview.message} pesan, ${overview.prompt} prompt, ${overview.mask} masker`;
-      },
+      Overview:
+        "{{chat}} percakapan, {{message}} pesan, {{prompt}} prompt, {{mask}} masker",
       ImportFailed: "Impor Gagal",
     },
     Mask: {
@@ -262,8 +259,7 @@ const id: PartialLocaleType = {
           "Ketik / di awal kotak input untuk memicu pelengkapan otomatis",
       },
       List: "Daftar Prompt Kustom",
-      ListCount: (builtin: number, custom: number) =>
-        `Bawaan ${builtin} item, pengguna ${custom} item`,
+      ListCount: "Bawaan {{builtin}} item, pengguna {{custom}} item",
       Edit: "Edit",
       Modal: {
         Title: "Daftar Prompt",
@@ -286,9 +282,7 @@ const id: PartialLocaleType = {
 
     Usage: {
       Title: "Cek Saldo",
-      SubTitle(used: any, total: any) {
-        return `Digunakan bulan ini $${used}, total langganan $${total}`;
-      },
+      SubTitle: "Digunakan bulan ini ${{used}}, total langganan ${{total}}",
       IsChecking: "Sedang memeriksa…",
       Check: "Periksa Lagi",
       NoAccess: "Masukkan API Key atau kata sandi akses untuk melihat saldo",
@@ -464,9 +458,8 @@ const id: PartialLocaleType = {
     BotHello: "Ada yang bisa saya bantu?",
     Error: "Terjadi kesalahan, coba lagi nanti",
     Prompt: {
-      History: (content: string) =>
-        "Ini adalah ringkasan obrolan sebelumnya sebagai latar belakang: " +
-        content,
+      History:
+        "Ini adalah ringkasan obrolan sebelumnya sebagai latar belakang: {{content}}",
       Topic:
         "Gunakan empat hingga lima kata untuk langsung memberikan ringkasan topik kalimat ini, tanpa penjelasan, tanpa tanda baca, tanpa kata pengisi, tanpa teks tambahan, tanpa menebalkan. Jika tidak ada topik, langsung jawab 'Obrolan Santai'",
       Summarize:
@@ -482,7 +475,7 @@ const id: PartialLocaleType = {
     Failed: "Unduhan gagal.",
   },
   Context: {
-    Toast: (x: any) => `Berisi ${x} prompt preset`,
+    Toast: "Berisi {{x}} prompt preset",
     Edit: "Pengaturan Obrolan Saat Ini",
     Add: "Tambah Obrolan",
     Clear: "Konteks telah dihapus",
@@ -503,7 +496,7 @@ const id: PartialLocaleType = {
       NoData: "Tidak ada data",
       Loading: "Memuat",
 
-      SubTitle: (count: number) => `Ditemukan ${count} hasil`,
+      SubTitle: "Ditemukan {{count}} hasil",
     },
     Item: {
       View: "Lihat",
@@ -513,12 +506,12 @@ const id: PartialLocaleType = {
     Name: "Masker",
     Page: {
       Title: "Preset Karakter Masker",
-      SubTitle: (count: number) => `${count} definisi karakter preset`,
+      SubTitle: "{{count}} definisi karakter preset",
       Search: "Cari Masker Karakter",
       Create: "Buat Baru",
     },
     Item: {
-      Info: (count: number) => `Berisi ${count} obrolan preset`,
+      Info: `Berisi {{count}} obrolan preset`,
       Chat: "Obrolan",
       View: "Lihat",
       Edit: "Edit",
@@ -526,8 +519,8 @@ const id: PartialLocaleType = {
       DeleteConfirm: "Konfirmasi penghapusan?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Edit Masker Preset ${readonly ? "(Hanya Baca)" : ""}`,
+      Title: "Edit Masker Preset",
+      ReadOnlyTitle: "Edit Masker Preset (Hanya Baca)",
       Download: "Unduh Preset",
       Clone: "Klon Preset",
     },

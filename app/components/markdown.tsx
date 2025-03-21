@@ -8,7 +8,6 @@ import RehypeHighlight from "rehype-highlight";
 import { useRef, useState, RefObject, useEffect, useMemo } from "react";
 import { copyToClipboard, useWindowSize } from "../utils";
 import mermaid from "mermaid";
-import Locale from "../locales";
 import LoadingIcon from "../icons/three-dots.svg";
 import ReloadButtonIcon from "../icons/reload.svg";
 import React from "react";
@@ -24,6 +23,7 @@ import { IconButton } from "./button";
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
+import { useTranslation } from "react-i18next";
 
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -176,6 +176,7 @@ export function PreCode(props: { children: any }) {
 }
 
 function CustomCode(props: { children: any; className?: string }) {
+  const { t } = useTranslation();
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
   const chatStore = useNewChatStore();
@@ -208,7 +209,8 @@ function CustomCode(props: { children: any; className?: string }) {
             expanded: !collapsed,
           })}
         >
-          <button onClick={toggleCollapsed}>{Locale.NewChat.More}</button>
+          {/* <button onClick={toggleCollapsed}>{Locale.NewChat.More}</button> */}
+          <button onClick={toggleCollapsed}>{t("NewChat.More")}</button>
         </div>
       );
     }

@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -30,10 +29,10 @@ const jp: PartialLocaleType = {
       "🥳 NextChat AIの発売特典で、OpenAI o1、GPT-4o、Claude-3.5などの最新の大規模モデルを今すぐアンロック",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count}件の会話`,
+    ChatItemCount: `{{count}}件の会話`,
   },
   Chat: {
-    SubTitle: (count: number) => `合計${count}件の会話`,
+    SubTitle: `合計{{count}}件の会話`,
     EditMessage: {
       Title: "メッセージ履歴を編集",
       Topic: {
@@ -80,19 +79,17 @@ const jp: PartialLocaleType = {
     },
     Rename: "チャットの名前を変更",
     Typing: "入力中…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey}で送信`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "、Shift + Enterで改行";
-      }
-      return inputHints + "、/で補完をトリガー、:でコマンドをトリガー";
-    },
+    Input: "{{submitKey}}で送信、/で補完をトリガー、:でコマンドをトリガー",
     Send: "送信",
     Config: {
       Reset: "メモリをクリア",
       SaveAs: "マスクとして保存",
     },
     IsContext: "プリセットプロンプト",
+    Metis: {
+      Title: "こんにちは~私はMETISです",
+      Content: "検索や質問にお答えできます。何でも聞いてくださいね！",
+    },
   },
   Export: {
     Title: "チャット履歴を共有",
@@ -182,11 +179,11 @@ const jp: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `現在のバージョン：${x}`,
+      Version: `現在のバージョン：{{x}}`,
       IsLatest: "最新バージョンです",
       CheckUpdate: "更新を確認",
       IsChecking: "更新を確認中...",
-      FoundUpdate: (x: string) => `新しいバージョンを発見：${x}`,
+      FoundUpdate: `新しいバージョンを発見：{{x}}`,
       GoToUpdate: "更新へ進む",
     },
     SendKey: "送信キー",
@@ -239,9 +236,8 @@ const jp: PartialLocaleType = {
       },
 
       LocalState: "ローカルデータ",
-      Overview: (overview: any) => {
-        return `${overview.chat} 回の対話、${overview.message} 件のメッセージ、${overview.prompt} 件のプロンプト、${overview.mask} 件のマスク`;
-      },
+      Overview:
+        "{{chat}} 回の対話、{{message}} 件のメッセージ、{{prompt}} 件のプロンプト、{{mask}} 件のマスク",
       ImportFailed: "インポートに失敗しました",
     },
     Mask: {
@@ -260,8 +256,7 @@ const jp: PartialLocaleType = {
         SubTitle: "入力フィールドの先頭に / を入力して自動補完をトリガー",
       },
       List: "カスタムプロンプトリスト",
-      ListCount: (builtin: number, custom: number) =>
-        `内蔵 ${builtin} 件、ユーザー定義 ${custom} 件`,
+      ListCount: "内蔵 {{builtin}} 件、ユーザー定義 {{custom}} 件",
       Edit: "編集",
       Modal: {
         Title: "プロンプトリスト",
@@ -283,9 +278,7 @@ const jp: PartialLocaleType = {
 
     Usage: {
       Title: "残高確認",
-      SubTitle(used: any, total: any) {
-        return `今月の使用量 $${used}、サブスクリプション合計 $${total}`;
-      },
+      SubTitle: "今月の使用量 ${{used}}、サブスクリプション合計 ${{total}}",
       IsChecking: "確認中…",
       Check: "再確認",
       NoAccess: "APIキーまたはアクセスパスワードを入力して残高を確認",
@@ -458,8 +451,7 @@ const jp: PartialLocaleType = {
     BotHello: "何かお手伝いできますか？",
     Error: "エラーが発生しました。後でもう一度試してください",
     Prompt: {
-      History: (content: string) =>
-        "これは前提としての履歴チャットの要約です：" + content,
+      History: "これは前提としての履歴チャットの要約です：{{content}}",
       Topic:
         "この文の簡潔なテーマを四から五文字で返してください。説明、句読点、感嘆詞、余計なテキストは不要です。太字も不要です。テーマがない場合は「雑談」と返してください",
       Summarize:
@@ -475,7 +467,7 @@ const jp: PartialLocaleType = {
     Failed: "ダウンロードに失敗しました",
   },
   Context: {
-    Toast: (x: any) => `${x} 件のプリセットプロンプトが含まれています`,
+    Toast: "{{x}} 件のプリセットプロンプトが含まれています",
     Edit: "現在の対話設定",
     Add: "対話を追加",
     Clear: "コンテキストがクリアされました",
@@ -499,7 +491,7 @@ const jp: PartialLocaleType = {
       NoData: "データがありません",
       Loading: "読み込み中",
 
-      SubTitle: (count: number) => `${count} 件の結果が見つかりました`,
+      SubTitle: "{{count}} 件の結果が見つかりました",
     },
     Item: {
       View: "表示",
@@ -509,12 +501,12 @@ const jp: PartialLocaleType = {
     Name: "マスク",
     Page: {
       Title: "プリセットキャラクターマスク",
-      SubTitle: (count: number) => `${count} 件のプリセットキャラクター定義`,
+      SubTitle: "{{count}} 件のプリセットキャラクター定義",
       Search: "キャラクターマスクを検索",
       Create: "新規作成",
     },
     Item: {
-      Info: (count: number) => `${count} 件のプリセット対話が含まれています`,
+      Info: `{{count}} 件のプリセット対話が含まれています`,
       Chat: "対話",
       View: "表示",
       Edit: "編集",
@@ -522,8 +514,8 @@ const jp: PartialLocaleType = {
       DeleteConfirm: "削除してもよろしいですか？",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `プリセットマスクの編集 ${readonly ? "（読み取り専用）" : ""}`,
+      Title: "プリセットマスクの編集",
+      ReadOnlyTitle: "プリセットマスクの編集 （読み取り専用）",
       Download: "プリセットをダウンロード",
       Clone: "プリセットをクローン",
     },

@@ -4,7 +4,7 @@ import { RequestMessage } from "../typing";
 import { ModelType } from "./config";
 import {
   ChatStat,
-  DEFAULT_TOPIC,
+  // DEFAULT_TOPIC,
   ModelConfig,
   useAccessStore,
   useAppConfig,
@@ -24,7 +24,7 @@ import {
   SUMMARIZE_MODEL,
   ServiceProvider,
 } from "../constant";
-import Locale, { getLang } from "../locales";
+import { getLang } from "../locales";
 import { nanoid } from "nanoid";
 import { prettyObject } from "../utils/format";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
@@ -36,6 +36,7 @@ import { GetHistory, PostAddOrUpdateSession } from "../client/smarties";
 import { ConvertSession, JSONParse } from "../utils/convert";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
 import { isEmpty } from "lodash-es";
+import { t } from "i18next";
 
 export type ChatMessageTool = {
   id: string;
@@ -197,10 +198,22 @@ function countMessages(msgs: ChatMessage[]) {
   );
 }
 
+export const getDefaultTopic = () => {
+  return t("Store.DefaultTopic");
+};
+
+export const getBotHello = (): ChatMessage => {
+  return createMessage({
+    role: "assistant",
+    content: t("Store.BotHello"),
+  });
+};
+
 function createEmptySession(): ChatSession {
   return {
     id: nanoid(),
-    topic: DEFAULT_TOPIC,
+    // topic: DEFAULT_TOPIC,
+    topic: getDefaultTopic(),
     memoryPrompt: "",
     messages: [],
     stat: {
@@ -580,7 +593,10 @@ export const useNewChatStore = create<ChatStoreType>()(
         if (session?.memoryPrompt?.length) {
           return {
             role: "system",
-            content: Locale.Store.Prompt.History(session.memoryPrompt),
+            // content: Locale.Store.Prompt.History(session.memoryPrompt),
+            content: t("Store.Prompt.History", {
+              content: session.memoryPrompt,
+            }),
             date: "",
           } as ChatMessage;
         }
@@ -652,7 +668,8 @@ export const useNewChatStore = create<ChatStoreType>()(
         const SUMMARIZE_MIN_LEN = 50;
         if (
           (config.enableAutoGenerateTitle &&
-            session.topic === DEFAULT_TOPIC &&
+            // session.topic === DEFAULT_TOPIC &&
+            session.topic === getDefaultTopic() &&
             countMessages(messages) >= SUMMARIZE_MIN_LEN) ||
           refreshTitle
         ) {
@@ -668,7 +685,8 @@ export const useNewChatStore = create<ChatStoreType>()(
             .concat(
               createMessage({
                 role: "user",
-                content: Locale.Store.Prompt.Topic,
+                // content: Locale.Store.Prompt.Topic,
+                content: t("Store.Prompt.Topic"),
               }),
             );
           api.llm.chat({
@@ -684,7 +702,10 @@ export const useNewChatStore = create<ChatStoreType>()(
                   session,
                   (session) =>
                     (session.topic =
-                      message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
+                      // message.length > 0 ? trimTopic(message) : DEFAULT_TOPIC),
+                      message.length > 0
+                        ? trimTopic(message)
+                        : getDefaultTopic()),
                   true,
                 );
               }
@@ -734,7 +755,8 @@ export const useNewChatStore = create<ChatStoreType>()(
             messages: toBeSummarizedMsgs.concat(
               createMessage({
                 role: "system",
-                content: Locale.Store.Prompt.Summarize,
+                // content: Locale.Store.Prompt.Summarize,
+                content: t("Store.Prompt.Summarize"),
                 date: "",
               }),
             ),
@@ -798,9 +820,11 @@ export const useNewChatStore = create<ChatStoreType>()(
         }));
 
         showToast(
-          Locale.Home.DeleteToast,
+          // Locale.Home.DeleteToast,
+          t("Home.DeleteToast"),
           {
-            text: Locale.Home.Revert,
+            // text: Locale.Home.Revert,
+            text: t("Home.Revert"),
             onClick() {
               set(() => restoreState);
             },

@@ -18,6 +18,7 @@ import { showConfirm } from "./ui-lib";
 import { BUILTIN_MASK_STORE } from "../masks";
 import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
+import { useTranslation } from "react-i18next";
 
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
@@ -76,6 +77,7 @@ function useMaskGroup(masks: Mask[]) {
 }
 
 export function NewChat() {
+  const { t } = useTranslation();
   const chatStore = useNewChatStore();
   const maskStore = useMaskStore();
 
@@ -118,12 +120,14 @@ export function NewChat() {
       <div className={styles["mask-header"]}>
         <IconButton
           icon={<LeftIcon />}
-          text={Locale.NewChat.Return}
+          // text={Locale.NewChat.Return}
+          text={t("NewChat.Return")}
           onClick={() => navigate(Path.Home)}
         ></IconButton>
         {!state?.fromHome && (
           <IconButton
-            text={Locale.NewChat.NotShow}
+            // text={Locale.NewChat.NotShow}
+            text={t("NewChat.NotShow")}
             onClick={async () => {
               if (await showConfirm(Locale.NewChat.ConfirmNoShow)) {
                 startChat();
@@ -147,12 +151,16 @@ export function NewChat() {
         </div>
       </div>
 
-      <div className={styles["title"]}>{Locale.NewChat.Title}</div>
-      <div className={styles["sub-title"]}>{Locale.NewChat.SubTitle}</div>
+      {/* <div className={styles["title"]}>{Locale.NewChat.Title}</div>
+      <div className={styles["sub-title"]}>{Locale.NewChat.SubTitle}</div> */}
+
+      <div className={styles["title"]}>{t("NewChat.Title")}</div>
+      <div className={styles["sub-title"]}>{t("NewChat.SubTitle")}</div>
 
       <div className={styles["actions"]}>
         <IconButton
-          text={Locale.NewChat.More}
+          // text={Locale.NewChat.More}
+          text={t("NewChat.More")}
           onClick={() => navigate(Path.Masks)}
           icon={<EyeIcon />}
           bordered
@@ -160,7 +168,8 @@ export function NewChat() {
         />
 
         <IconButton
-          text={Locale.NewChat.Skip}
+          // text={Locale.NewChat.Skip}
+          text={t("NewChat.Skip")}
           onClick={() => startChat()}
           icon={<LightningIcon />}
           type="primary"

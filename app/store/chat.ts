@@ -38,6 +38,7 @@ import { collectModelsWithDefaultModel } from "../utils/model";
 import { createEmptyMask, Mask } from "./mask";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
+import i18next from "i18next";
 
 const localStorage = safeLocalStorage();
 
@@ -99,6 +100,7 @@ export interface ChatSession {
 }
 
 export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
+
 export const BOT_HELLO: ChatMessage = createMessage({
   role: "assistant",
   content: Locale.Store.BotHello,
@@ -369,9 +371,11 @@ export const useChatStore = createPersistStore(
         }));
 
         showToast(
-          Locale.Home.DeleteToast,
+          // Locale.Home.DeleteToast,
+          i18next.t("Home.DeleteToast"),
           {
-            text: Locale.Home.Revert,
+            // text: Locale.Home.Revert,
+            text: i18next.t("Home.Revert"),
             onClick() {
               set(() => restoreState);
             },
@@ -536,7 +540,11 @@ export const useChatStore = createPersistStore(
         if (session.memoryPrompt.length) {
           return {
             role: "system",
-            content: Locale.Store.Prompt.History(session.memoryPrompt),
+            // content: Locale.Store.Prompt.History(session.memoryPrompt),
+            content: i18next.t("Store.Prompt.History", {
+              content: session.memoryPrompt,
+            }),
+
             date: "",
           } as ChatMessage;
         }
@@ -705,7 +713,8 @@ export const useChatStore = createPersistStore(
             .concat(
               createMessage({
                 role: "user",
-                content: Locale.Store.Prompt.Topic,
+                // content: Locale.Store.Prompt.Topic,
+                content: i18next.t("Store.Prompt.Topic"),
               }),
             );
           api.llm.chat({
@@ -770,7 +779,8 @@ export const useChatStore = createPersistStore(
             messages: toBeSummarizedMsgs.concat(
               createMessage({
                 role: "system",
-                content: Locale.Store.Prompt.Summarize,
+                // content: Locale.Store.Prompt.Summarize,
+                content: i18next.t("Store.Prompt.Summarize"),
                 date: "",
               }),
             ),

@@ -1,5 +1,4 @@
 import { getClientConfig } from "../config/client";
-import { SubmitKey } from "../store/config";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
 import { PartialLocaleType } from "./index";
 
@@ -28,10 +27,10 @@ const da: PartialLocaleType = {
     SaasTips: "Hvis det er for svært, kan du starte nu",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} beskeder`,
+    ChatItemCount: `{{count}} beskeder`,
   },
   Chat: {
-    SubTitle: (count: number) => `${count} beskeder`,
+    SubTitle: `{{count}} beskeder`,
     EditMessage: {
       Title: "Rediger beskeder",
       Topic: {
@@ -82,15 +81,8 @@ const da: PartialLocaleType = {
     },
     Rename: "Omdøb chat",
     Typing: "Skriver…",
-    Input: (submitKey: string) => {
-      let inputHints = `${submitKey} for at sende`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += ", Shift + Enter for ny linje";
-      }
-      return (
-        inputHints + ", / for at søge i prompts, : for at bruge kommandoer"
-      );
-    },
+    Input:
+      "{{submitKey}} for at sende, / for at søge i prompts, : for at bruge kommandoer",
     Send: "Send",
     StartSpeak: "Start oplæsning",
     StopSpeak: "Stop oplæsning",
@@ -107,6 +99,11 @@ const da: PartialLocaleType = {
       copyLastCode: "Kopiér sidste kodeblok",
       showShortcutKey: "Vis hurtigtaster",
       clearContext: "Ryd kontekst",
+    },
+    Metis: {
+      Title: "Hej~ Jeg er METIS",
+      Content:
+        "Jeg kan hjælpe dig med at søge og besvare spørgsmål. Spørg mig hvad som helst!",
     },
   },
   Export: {
@@ -199,11 +196,11 @@ const da: PartialLocaleType = {
       SubTitle: "Den seneste besked placeres i denne skabelon",
     },
     Update: {
-      Version: (x: string) => `Version: ${x}`,
+      Version: `Version: {{x}}`,
       IsLatest: "Du har nyeste version",
       CheckUpdate: "Tjek efter opdatering",
       IsChecking: "Tjekker...",
-      FoundUpdate: (x: string) => `Ny version fundet: ${x}`,
+      FoundUpdate: `Ny version fundet: {{x}}`,
       GoToUpdate: "Opdatér",
       Success: "Opdatering lykkedes.",
       Failed: "Opdatering mislykkedes.",
@@ -253,8 +250,8 @@ const da: PartialLocaleType = {
         },
       },
       LocalState: "Lokale data",
-      Overview: (overview: any) =>
-        `${overview.chat} chats, ${overview.message} beskeder, ${overview.prompt} prompts, ${overview.mask} personaer`,
+      Overview:
+        "{{chat}} chats, {{message}} beskeder, {{prompt}} prompts, {{mask}} personaer",
       ImportFailed: "Import mislykkedes",
     },
     Mask: {
@@ -273,8 +270,7 @@ const da: PartialLocaleType = {
         SubTitle: "Tast / for at få forslag",
       },
       List: "Prompt-liste",
-      ListCount: (builtin: number, custom: number) =>
-        `${builtin} indbygget, ${custom} brugerdefineret`,
+      ListCount: "{{builtin}} indbygget, {{custom}} brugerdefineret",
       Edit: "Rediger",
       Modal: {
         Title: "Prompt-liste",
@@ -296,9 +292,8 @@ const da: PartialLocaleType = {
     },
     Usage: {
       Title: "Brug og saldo",
-      SubTitle(used: any, total: any) {
-        return `Du har brugt $${used} i denne måned, og din grænse er $${total}.`;
-      },
+      SubTitle:
+        "Du har brugt ${{used}} i denne måned, og din grænse er ${{total}}.",
       IsChecking: "Tjekker...",
       Check: "Tjek igen",
       NoAccess: "Indtast API-nøgle for at se forbrug",
@@ -602,8 +597,7 @@ const da: PartialLocaleType = {
     BotHello: "Hej! Hvordan kan jeg hjælpe dig i dag?",
     Error: "Noget gik galt. Prøv igen senere.",
     Prompt: {
-      History: (content: string) =>
-        "Her er et kort resume af, hvad vi har snakket om: " + content,
+      History: "Her er et kort resume af, hvad vi har snakket om: {{content}}",
       Topic:
         "Find en kort overskrift med 4-5 ord om emnet. Ingen tegnsætning eller anførselstegn.",
       Summarize:
@@ -619,7 +613,7 @@ const da: PartialLocaleType = {
     Failed: "Download fejlede.",
   },
   Context: {
-    Toast: (x: any) => `Inkluderer ${x} ekstra prompts`,
+    Toast: "Inkluderer {{x}} ekstra prompts",
     Edit: "Chatindstillinger",
     Add: "Tilføj prompt",
     Clear: "Kontekst ryddet",
@@ -642,7 +636,8 @@ const da: PartialLocaleType = {
       NoResult: "Ingen resultater",
       NoData: "Ingen data",
       Loading: "Henter...",
-      SubTitle: (count: number) => `Fandt ${count} resultater`,
+
+      SubTitle: "Fandt {{count}} resultater",
     },
     Item: {
       View: "Vis",
@@ -652,13 +647,13 @@ const da: PartialLocaleType = {
     Name: "Plugin",
     Page: {
       Title: "Plugins",
-      SubTitle: (count: number) => `${count} plugins`,
+      SubTitle: "{{count}} plugins",
       Search: "Søg plugin",
       Create: "Opret nyt",
       Find: "Du kan finde flere plugins på GitHub: ",
     },
     Item: {
-      Info: (count: number) => `${count} metode`,
+      Info: "{{count}} metode",
       View: "Vis",
       Edit: "Rediger",
       Delete: "Slet",
@@ -679,8 +674,8 @@ const da: PartialLocaleType = {
       LocationBody: "Body",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Rediger Plugin ${readonly ? "(skrivebeskyttet)" : ""}`,
+      Title: "Rediger Plugin",
+      ReadOnlyTitle: "Rediger Plugin (skrivebeskyttet)",
       Download: "Download",
       Auth: "Godkendelsestype",
       Content: "OpenAPI Schema",
@@ -693,12 +688,12 @@ const da: PartialLocaleType = {
     Name: "Persona",
     Page: {
       Title: "Prompts som personaer",
-      SubTitle: (count: number) => `${count} skabeloner`,
+      SubTitle: "{{count}} skabeloner",
       Search: "Søg skabeloner",
       Create: "Opret ny",
     },
     Item: {
-      Info: (count: number) => `${count} prompts`,
+      Info: `{{count}} prompts`,
       Chat: "Chat",
       View: "Vis",
       Edit: "Rediger",
@@ -706,8 +701,8 @@ const da: PartialLocaleType = {
       DeleteConfirm: "Vil du slette?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Rediger skabelon ${readonly ? "(skrivebeskyttet)" : ""}`,
+      Title: "Rediger skabelon",
+      ReadOnlyTitle: "Rediger skabelon (skrivebeskyttet)",
       Download: "Download",
       Clone: "Klon",
     },
@@ -775,7 +770,7 @@ const da: PartialLocaleType = {
   SdPanel: {
     Prompt: "Prompt",
     NegativePrompt: "Negativ prompt",
-    PleaseInput: (name: string) => `Indtast: ${name}`,
+    PleaseInput: `Indtast: {{name}}`,
     AspectRatio: "Billedformat",
     ImageStyle: "Stil",
     OutFormat: "Uddataformat",

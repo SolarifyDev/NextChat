@@ -4,7 +4,6 @@ import homeStyles from "@/app/components/home.module.scss";
 
 import { IconButton } from "@/app/components/button";
 import ReturnIcon from "@/app/icons/return.svg";
-import Locale from "@/app/locales";
 import { Path } from "@/app/constant";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -37,25 +36,31 @@ import { SideBar } from "./sd-sidebar";
 import { WindowContent } from "@/app/components/home";
 import { params } from "./sd-panel";
 import clsx from "clsx";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 function getSdTaskStatus(item: any) {
   let s: string;
   let color: Property.Color | undefined = undefined;
   switch (item.status) {
     case "success":
-      s = Locale.Sd.Status.Success;
+      // s = Locale.Sd.Status.Success;
+      s = t("Sd.Status.Success");
       color = "green";
       break;
     case "error":
-      s = Locale.Sd.Status.Error;
+      // s = Locale.Sd.Status.Error;
+      s = t("Sd.Status.Error");
       color = "red";
       break;
     case "wait":
-      s = Locale.Sd.Status.Wait;
+      // s = Locale.Sd.Status.Wait;
+      s = t("Sd.Status.Wait");
       color = "yellow";
       break;
     case "running":
-      s = Locale.Sd.Status.Running;
+      // s = Locale.Sd.Status.Running;
+      s = t("Sd.Status.Running");
       color = "blue";
       break;
     default:
@@ -64,14 +69,16 @@ function getSdTaskStatus(item: any) {
   return (
     <p className={styles["line-1"]} title={item.error} style={{ color: color }}>
       <span>
-        {Locale.Sd.Status.Name}: {s}
+        {/* {Locale.Sd.Status.Name}: {s} */}
+        {t("Sd.Status.Name")}: {s}
       </span>
       {item.status === "error" && (
         <span
           className="clickable"
           onClick={() => {
             showModal({
-              title: Locale.Sd.Detail,
+              // title: Locale.Sd.Detail,
+              title: t("Sd.Detail"),
               children: (
                 <div style={{ color: color, userSelect: "text" }}>
                   {item.error}
@@ -88,6 +95,7 @@ function getSdTaskStatus(item: any) {
 }
 
 export function Sd() {
+  const { t } = useTranslation();
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
   const location = useLocation();
@@ -115,7 +123,8 @@ export function Sd() {
                   <IconButton
                     icon={<ReturnIcon />}
                     bordered
-                    title={Locale.Chat.Actions.ChatList}
+                    // title={Locale.Chat.Actions.ChatList}
+                    title={t("Chat.Actions.ChatList")}
                     onClick={() => navigate(Path.Sd)}
                   />
                 </div>
@@ -129,7 +138,8 @@ export function Sd() {
             >
               <div className={`window-header-main-title`}>Stability AI</div>
               <div className="window-header-sub-title">
-                {Locale.Sd.SubTitle(sdImages.length || 0)}
+                {/* {Locale.Sd.SubTitle(sdImages.length || 0)} */}
+                {t("Sd.SubTitle", { count: sdImages.length || 0 })}
               </div>
             </div>
 
@@ -137,7 +147,8 @@ export function Sd() {
               {showMaxIcon && (
                 <div className="window-action-button">
                   <IconButton
-                    aria={Locale.Chat.Actions.FullScreen}
+                    // aria={Locale.Chat.Actions.FullScreen}
+                    aria={t("Chat.Actions.FullScreen")}
                     icon={config.tightBorder ? <MinIcon /> : <MaxIcon />}
                     bordered
                     onClick={() => {
@@ -193,13 +204,15 @@ export function Sd() {
                         className={styles["sd-img-item-info"]}
                       >
                         <p className={styles["line-1"]}>
-                          {Locale.SdPanel.Prompt}:{" "}
+                          {/* {Locale.SdPanel.Prompt}:{" "} */}
+                          {t("SdPanel.Prompt")}:{" "}
                           <span
                             className="clickable"
                             title={item.params.prompt}
                             onClick={() => {
                               showModal({
-                                title: Locale.Sd.Detail,
+                                // title: Locale.Sd.Detail,
+                                title: t("Sd.Detail"),
                                 children: (
                                   <div style={{ userSelect: "text" }}>
                                     {item.params.prompt}
@@ -212,18 +225,21 @@ export function Sd() {
                           </span>
                         </p>
                         <p>
-                          {Locale.SdPanel.AIModel}: {item.model_name}
+                          {/* {Locale.SdPanel.AIModel}: {item.model_name} */}
+                          {t("SdPanel.AIModel")}: {item.model_name}
                         </p>
                         {getSdTaskStatus(item)}
                         <p>{item.created_at}</p>
                         <div className={chatStyles["chat-message-actions"]}>
                           <div className={chatStyles["chat-input-actions"]}>
                             <ChatAction
-                              text={Locale.Sd.Actions.Params}
+                              // text={Locale.Sd.Actions.Params}
+                              text={t("Sd.Actions.Params")}
                               icon={<PromptIcon />}
                               onClick={() => {
                                 showModal({
-                                  title: Locale.Sd.GenerateParams,
+                                  // title: Locale.Sd.GenerateParams,
+                                  title: t("Sd.GenerateParams"),
                                   children: (
                                     <div style={{ userSelect: "text" }}>
                                       {Object.keys(item.params).map((key) => {
@@ -231,25 +247,30 @@ export function Sd() {
                                         let value = item.params[key];
                                         switch (label) {
                                           case "prompt":
-                                            label = Locale.SdPanel.Prompt;
+                                            // label = Locale.SdPanel.Prompt;
+                                            label = t("SdPanel.Prompt");
                                             break;
                                           case "negative_prompt":
                                             label =
-                                              Locale.SdPanel.NegativePrompt;
+                                              // Locale.SdPanel.NegativePrompt;
+                                              t("SdPanel.NegativePrompt");
                                             break;
                                           case "aspect_ratio":
-                                            label = Locale.SdPanel.AspectRatio;
+                                            // label = Locale.SdPanel.AspectRatio;
+                                            label = t("SdPanel.AspectRatio");
                                             break;
                                           case "seed":
                                             label = "Seed";
                                             value = value || 0;
                                             break;
                                           case "output_format":
-                                            label = Locale.SdPanel.OutFormat;
+                                            // label = Locale.SdPanel.OutFormat;
+                                            label = t("SdPanel.OutFormat");
                                             value = value?.toUpperCase();
                                             break;
                                           case "style":
-                                            label = Locale.SdPanel.ImageStyle;
+                                            // label = Locale.SdPanel.ImageStyle;
+                                            label = t("SdPanel.ImageStyle");
                                             value = params
                                               .find(
                                                 (item) =>
@@ -279,7 +300,8 @@ export function Sd() {
                               }}
                             />
                             <ChatAction
-                              text={Locale.Sd.Actions.Copy}
+                              // text={Locale.Sd.Actions.Copy}
+                              text={t("Sd.Actions.Copy")}
                               icon={<CopyIcon />}
                               onClick={() =>
                                 copyToClipboard(
@@ -291,7 +313,8 @@ export function Sd() {
                               }
                             />
                             <ChatAction
-                              text={Locale.Sd.Actions.Retry}
+                              // text={Locale.Sd.Actions.Retry}
+                              text={t("Sd.Actions.Retry")}
                               icon={<ResetIcon />}
                               onClick={() => {
                                 const reqData = {
@@ -306,11 +329,13 @@ export function Sd() {
                               }}
                             />
                             <ChatAction
-                              text={Locale.Sd.Actions.Delete}
+                              // text={Locale.Sd.Actions.Delete}
+                              text={t("Sd.Actions.Delete")}
                               icon={<DeleteIcon />}
                               onClick={async () => {
                                 if (
-                                  await showConfirm(Locale.Sd.Danger.Delete)
+                                  // await showConfirm(Locale.Sd.Danger.Delete)
+                                  await showConfirm(t("Sd.Danger.Delete"))
                                 ) {
                                   // remove img_data + remove item in list
                                   removeImage(item.img_data).finally(() => {
@@ -329,7 +354,8 @@ export function Sd() {
                   );
                 })
               ) : (
-                <div>{Locale.Sd.EmptyRecord}</div>
+                // <div>{Locale.Sd.EmptyRecord}</div>
+                <div>{t("Sd.EmptyRecord")}</div>
               )}
             </div>
           </div>

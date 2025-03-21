@@ -12,9 +12,9 @@ import { getCSSVar, useMobileScreen } from "../utils";
 
 import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
-import { ErrorBoundary } from "./error";
+import ErrorBoundary from "./error";
 
-import { getISOLang, getLang } from "../locales";
+import { Lang, changeLang, getISOLang, getLang } from "../locales";
 
 import {
   HashRouter as Router,
@@ -32,6 +32,9 @@ import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 import isEmpty from "lodash-es/isEmpty";
 import { useNewChatStore } from "../store/new-chat";
+import "../locales/i18n";
+import i18next from "i18next";
+import { isNil } from "lodash-es";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -283,6 +286,9 @@ export function Home() {
             if (!isEmpty(params?.isFromApp)) {
               appConfig.setIsFromApp(params?.isFromApp ?? false);
             }
+            if (!isEmpty(params?.lanauge)) {
+              changeLang(params?.lanauge);
+            }
           }
         } catch {}
       } else {
@@ -291,6 +297,12 @@ export function Home() {
           !event.origin.includes("localhost")
         ) {
           return; // 如果不是信任的源，忽略消息
+        }
+
+        const lang = localStorage.getItem("lang");
+
+        if (lang !== i18next.language && !isNil(lang)) {
+          changeLang(lang as Lang);
         }
 
         if (!isEmpty(event?.data?.ometoken)) {

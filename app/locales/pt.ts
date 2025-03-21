@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import { PartialLocaleType } from "../locales/index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -30,10 +29,10 @@ const pt: PartialLocaleType = {
       "🥳 Oferta de Lançamento do NextChat AI, desbloqueie o OpenAI o1, GPT-4o, Claude-3.5 e os mais recentes grandes modelos agora",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} mensagens`,
+    ChatItemCount: `{{count}} mensagens`,
   },
   Chat: {
-    SubTitle: (count: number) => `${count} mensagens`,
+    SubTitle: `{{count}} mensagens`,
     EditMessage: {
       Title: "Editar Todas as Mensagens",
       Topic: {
@@ -79,19 +78,19 @@ const pt: PartialLocaleType = {
     },
     Rename: "Renomear Chat",
     Typing: "Digitando…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} para enviar`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += ", Shift + Enter para quebrar linha";
-      }
-      return inputHints + ", / para buscar prompts, : para usar comandos";
-    },
+    Input:
+      "{{submitKey}} para enviar, / para buscar prompts, : para usar comandos",
     Send: "Enviar",
     Config: {
       Reset: "Redefinir para Padrão",
       SaveAs: "Salvar como Máscara",
     },
     IsContext: "Prompt Contextual",
+    Metis: {
+      Title: "Oi~ Eu sou o METIS",
+      Content:
+        "Posso ajudar você a pesquisar e responder perguntas. Pergunte-me qualquer coisa!",
+    },
   },
   Export: {
     Title: "Exportar Mensagens",
@@ -181,11 +180,11 @@ const pt: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Versão: ${x}`,
+      Version: `Versão: {{x}}`,
       IsLatest: "Última versão",
       CheckUpdate: "Verificar Atualização",
       IsChecking: "Verificando atualização...",
-      FoundUpdate: (x: string) => `Nova versão encontrada: ${x}`,
+      FoundUpdate: "Nova versão encontrada: {{x}}",
       GoToUpdate: "Atualizar",
     },
     SendKey: "Tecla de Envio",
@@ -237,9 +236,8 @@ const pt: PartialLocaleType = {
       },
 
       LocalState: "Dados Locais",
-      Overview: (overview: any) => {
-        return `${overview.chat} chats，${overview.message} mensagens，${overview.prompt} prompts，${overview.mask} máscaras`;
-      },
+      Overview:
+        "{{chat}} chats，{{message}} mensagens，{{prompt}} prompts，{{mask}} máscaras",
       ImportFailed: "Falha ao importar do arquivo",
     },
     Mask: {
@@ -259,8 +257,7 @@ const pt: PartialLocaleType = {
         SubTitle: "Digite / para acionar auto-completar",
       },
       List: "Lista de Prompts",
-      ListCount: (builtin: number, custom: number) =>
-        `${builtin} embutidos, ${custom} definidos pelo usuário`,
+      ListCount: "{{builtin}} embutidos, {{custom}} definidos pelo usuário",
       Edit: "Editar",
       Modal: {
         Title: "Lista de Prompts",
@@ -283,9 +280,7 @@ const pt: PartialLocaleType = {
 
     Usage: {
       Title: "Saldo da Conta",
-      SubTitle(used: any, total: any) {
-        return `Usado este mês ${used}, assinatura ${total}`;
-      },
+      SubTitle: "Usado este mês {{used}}, assinatura {{total}}",
       IsChecking: "Verificando...",
       Check: "Verificar",
       NoAccess: "Insira a Chave API para verificar o saldo",
@@ -398,9 +393,8 @@ const pt: PartialLocaleType = {
     BotHello: "Olá! Como posso ajudá-lo hoje?",
     Error: "Algo deu errado, por favor tente novamente mais tarde.",
     Prompt: {
-      History: (content: string) =>
-        "Este é um resumo do histórico de chat como um recapitulativo: " +
-        content,
+      History:
+        "Este é um resumo do histórico de chat como um recapitulativo: {{content}}",
       Topic:
         "Por favor, gere um título de quatro a cinco palavras resumindo nossa conversa sem qualquer introdução, pontuação, aspas, períodos, símbolos ou texto adicional. Remova as aspas que o envolvem.",
       Summarize:
@@ -417,7 +411,7 @@ const pt: PartialLocaleType = {
     Failed: "Falha no download.",
   },
   Context: {
-    Toast: (x: any) => `Com ${x} prompts contextuais`,
+    Toast: "Com {{x}} prompts contextuais",
     Edit: "Configurações do Chat Atual",
     Add: "Adicionar um Prompt",
     Clear: "Contexto Limpo",
@@ -438,7 +432,7 @@ const pt: PartialLocaleType = {
       NoData: "Sem dados",
       Loading: "Carregando",
 
-      SubTitle: (count: number) => `Encontrado ${count} resultados`,
+      SubTitle: "Encontrado {{count}} resultados",
     },
     Item: {
       View: "Ver",
@@ -448,12 +442,12 @@ const pt: PartialLocaleType = {
     Name: "Máscara",
     Page: {
       Title: "Template de Prompt",
-      SubTitle: (count: number) => `${count} templates de prompt`,
+      SubTitle: "{{count}} templates de prompt",
       Search: "Buscar Templates",
       Create: "Criar",
     },
     Item: {
-      Info: (count: number) => `${count} prompts`,
+      Info: `{{count}} prompts`,
       Chat: "Chat",
       View: "Visualizar",
       Edit: "Editar",
@@ -461,8 +455,8 @@ const pt: PartialLocaleType = {
       DeleteConfirm: "Confirmar para deletar?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Editar Template de Prompt ${readonly ? "(somente leitura)" : ""}`,
+      Title: "Editar Template de Prompt",
+      ReadOnlyTitle: "Editar Template de Prompt (somente leitura)",
       Download: "Baixar",
       Clone: "Clonar",
     },

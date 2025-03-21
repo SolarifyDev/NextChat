@@ -1,4 +1,3 @@
-import { SubmitKey } from "../store/config";
 import type { PartialLocaleType } from "./index";
 import { getClientConfig } from "../config/client";
 import { SAAS_CHAT_UTM_URL } from "@/app/constant";
@@ -31,10 +30,10 @@ const fr: PartialLocaleType = {
       "🥳 Offre de lancement NextChat AI, débloquez OpenAI o1, GPT-4o, Claude-3.5 et les derniers grands modèles",
   },
   ChatItem: {
-    ChatItemCount: (count: number) => `${count} conversations`,
+    ChatItemCount: `{{count}} conversations`,
   },
   Chat: {
-    SubTitle: (count: number) => `Total de ${count} conversations`,
+    SubTitle: `Total de {{count}} conversations`,
     EditMessage: {
       Title: "Modifier l'historique des messages",
       Topic: {
@@ -81,19 +80,19 @@ const fr: PartialLocaleType = {
     },
     Rename: "Renommer la discussion",
     Typing: "En train d'écrire…",
-    Input: (submitKey: string) => {
-      var inputHints = `${submitKey} pour envoyer`;
-      if (submitKey === String(SubmitKey.Enter)) {
-        inputHints += "，Shift + Enter pour passer à la ligne";
-      }
-      return inputHints + "，/ pour compléter, : pour déclencher des commandes";
-    },
+    Input:
+      "{{submitKey}} pour envoyer，/ pour compléter, : pour déclencher des commandes",
     Send: "Envoyer",
     Config: {
       Reset: "Effacer la mémoire",
       SaveAs: "Enregistrer comme masque",
     },
     IsContext: "Prompt prédéfini",
+    Metis: {
+      Title: "Salut~ Je suis METIS",
+      Content:
+        "Je peux vous aider à rechercher et à répondre aux questions. Posez-moi toutes vos questions !",
+    },
   },
   Export: {
     Title: "Partager l'historique des discussions",
@@ -188,11 +187,11 @@ const fr: PartialLocaleType = {
     },
 
     Update: {
-      Version: (x: string) => `Version actuelle : ${x}`,
+      Version: `Version actuelle : {{x}}`,
       IsLatest: "Vous avez la dernière version",
       CheckUpdate: "Vérifier les mises à jour",
       IsChecking: "Vérification des mises à jour en cours...",
-      FoundUpdate: (x: string) => `Nouvelle version trouvée : ${x}`,
+      FoundUpdate: `Nouvelle version trouvée : {{x}}`,
       GoToUpdate: "Aller à la mise à jour",
     },
     SendKey: "Touche d'envoi",
@@ -247,9 +246,8 @@ const fr: PartialLocaleType = {
       },
 
       LocalState: "Données locales",
-      Overview: (overview: any) => {
-        return `${overview.chat} discussions, ${overview.message} messages, ${overview.prompt} invites, ${overview.mask} masques`;
-      },
+      Overview:
+        "{{chat}} discussions, {{message}} messages, {{prompt}} invites, {{mask}} masques",
       ImportFailed: "Échec de l'importation",
     },
     Mask: {
@@ -271,8 +269,7 @@ const fr: PartialLocaleType = {
           "Saisir / au début de la zone de texte pour déclencher la complétion automatique",
       },
       List: "Liste des invites personnalisées",
-      ListCount: (builtin: number, custom: number) =>
-        `${builtin} intégrées, ${custom} définies par l'utilisateur`,
+      ListCount: "{{builtin}} intégrées, {{custom}} définies par l'utilisateur",
       Edit: "Modifier",
       Modal: {
         Title: "Liste des invites",
@@ -295,9 +292,8 @@ const fr: PartialLocaleType = {
 
     Usage: {
       Title: "Vérification du solde",
-      SubTitle(used: any, total: any) {
-        return `Utilisé ce mois-ci : $${used}, Total d'abonnement : $${total}`;
-      },
+      SubTitle:
+        "Utilisé ce mois-ci : ${{used}}, Total d'abonnement : ${{total}}",
       IsChecking: "Vérification en cours…",
       Check: "Re-vérifier",
       NoAccess:
@@ -476,8 +472,7 @@ const fr: PartialLocaleType = {
     BotHello: "Comment puis-je vous aider ?",
     Error: "Une erreur est survenue, veuillez réessayer plus tard",
     Prompt: {
-      History: (content: string) =>
-        "Voici le résumé de la discussion précédente : " + content,
+      History: "Voici le résumé de la discussion précédente : {{content}}",
       Topic:
         "Utilisez quatre à cinq mots pour retourner le sujet succinct de cette phrase, sans explication, sans ponctuation, sans interjections, sans texte superflu, sans gras. Si aucun sujet, retournez simplement « discussion informelle »",
       Summarize:
@@ -493,7 +488,7 @@ const fr: PartialLocaleType = {
     Failed: "Échec du téléchargement.",
   },
   Context: {
-    Toast: (x: any) => `Contient ${x} invites prédéfinies`,
+    Toast: "Contient {{x}} invites prédéfinies",
     Edit: "Paramètres de la discussion actuelle",
     Add: "Ajouter une discussion",
     Clear: "Contexte effacé",
@@ -514,7 +509,7 @@ const fr: PartialLocaleType = {
       NoData: "Aucune donnée",
       Loading: "Chargement",
 
-      SubTitle: (count: number) => `${count} résultats trouvés`,
+      SubTitle: "{{count}} résultats trouvés",
     },
     Item: {
       View: "Voir",
@@ -524,12 +519,12 @@ const fr: PartialLocaleType = {
     Name: "Masque",
     Page: {
       Title: "Masques de rôle prédéfinis",
-      SubTitle: (count: number) => `${count} définitions de rôle prédéfinies`,
+      SubTitle: "{{count}} définitions de rôle prédéfinies",
       Search: "Rechercher des masques de rôle",
       Create: "Créer",
     },
     Item: {
-      Info: (count: number) => `Contient ${count} discussions prédéfinies`,
+      Info: `Contient {{count}} discussions prédéfinies`,
       Chat: "Discussion",
       View: "Voir",
       Edit: "Modifier",
@@ -537,8 +532,8 @@ const fr: PartialLocaleType = {
       DeleteConfirm: "Confirmer la suppression ?",
     },
     EditModal: {
-      Title: (readonly: boolean) =>
-        `Modifier le masque prédéfini ${readonly ? " (lecture seule)" : ""}`,
+      Title: "Modifier le masque prédéfini",
+      ReadOnlyTitle: "Modifier le masque prédéfini (lecture seule)",
       Download: "Télécharger le masque",
       Clone: "Cloner le masque",
     },

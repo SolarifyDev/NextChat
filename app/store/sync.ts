@@ -10,8 +10,8 @@ import {
 } from "../utils/sync";
 import { downloadAs, readFromFile } from "../utils";
 import { showToast } from "../components/ui-lib";
-import Locale from "../locales";
 import { createSyncClient, ProviderType } from "../utils/cloud";
+import { t } from "i18next";
 
 export interface WebDavConfig {
   server: string;
@@ -78,7 +78,8 @@ export const useSyncStore = createPersistStore(
         location.reload();
       } catch (e) {
         console.error("[Import]", e);
-        showToast(Locale.Settings.Sync.ImportFailed);
+        // showToast(Locale.Settings.Sync.ImportFailed);
+        showToast(t("Settings.Sync.ImportFailed"));
       }
     },
 

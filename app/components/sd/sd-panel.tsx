@@ -2,20 +2,24 @@ import styles from "./sd-panel.module.scss";
 import React from "react";
 import { Select } from "@/app/components/ui-lib";
 import { IconButton } from "@/app/components/button";
-import Locale from "@/app/locales";
 import { useSdStore } from "@/app/store/sd";
 import clsx from "clsx";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export const params = [
   {
-    name: Locale.SdPanel.Prompt,
+    // name: Locale.SdPanel.Prompt,
+    name: t("SdPanel.Prompt"),
     value: "prompt",
     type: "textarea",
-    placeholder: Locale.SdPanel.PleaseInput(Locale.SdPanel.Prompt),
+    // placeholder: Locale.SdPanel.PleaseInput(Locale.SdPanel.Prompt),
+    placeholder: t("SdPanel.PleaseInput", { name: t("SdPanel.Prompt") }),
     required: true,
   },
   {
-    name: Locale.SdPanel.ModelVersion,
+    // name: Locale.SdPanel.ModelVersion,
+    name: t("SdPanel.ModelVersion"),
     value: "model",
     type: "select",
     default: "sd3-medium",
@@ -27,13 +31,18 @@ export const params = [
     ],
   },
   {
-    name: Locale.SdPanel.NegativePrompt,
+    // name: Locale.SdPanel.NegativePrompt,
+    name: t("SdPanel.NegativePrompt"),
     value: "negative_prompt",
     type: "textarea",
-    placeholder: Locale.SdPanel.PleaseInput(Locale.SdPanel.NegativePrompt),
+    // placeholder: Locale.SdPanel.PleaseInput(Locale.SdPanel.NegativePrompt),
+    placeholder: t("SdPanel.PleaseInput", {
+      name: t("SdPanel.NegativePrompt"),
+    }),
   },
   {
-    name: Locale.SdPanel.AspectRatio,
+    // name: Locale.SdPanel.AspectRatio,
+    name: t("SdPanel.AspectRatio"),
     value: "aspect_ratio",
     type: "select",
     default: "1:1",
@@ -50,32 +59,53 @@ export const params = [
     ],
   },
   {
-    name: Locale.SdPanel.ImageStyle,
+    // name: Locale.SdPanel.ImageStyle,
+    name: t("SdPanel.ImageStyle"),
     value: "style",
     type: "select",
     default: "3d-model",
     support: ["core"],
     options: [
-      { name: Locale.SdPanel.Styles.D3Model, value: "3d-model" },
-      { name: Locale.SdPanel.Styles.AnalogFilm, value: "analog-film" },
-      { name: Locale.SdPanel.Styles.Anime, value: "anime" },
-      { name: Locale.SdPanel.Styles.Cinematic, value: "cinematic" },
-      { name: Locale.SdPanel.Styles.ComicBook, value: "comic-book" },
-      { name: Locale.SdPanel.Styles.DigitalArt, value: "digital-art" },
-      { name: Locale.SdPanel.Styles.Enhance, value: "enhance" },
-      { name: Locale.SdPanel.Styles.FantasyArt, value: "fantasy-art" },
-      { name: Locale.SdPanel.Styles.Isometric, value: "isometric" },
-      { name: Locale.SdPanel.Styles.LineArt, value: "line-art" },
-      { name: Locale.SdPanel.Styles.LowPoly, value: "low-poly" },
+      // { name: Locale.SdPanel.Styles.D3Model, value: "3d-model" },
+      // { name: Locale.SdPanel.Styles.AnalogFilm, value: "analog-film" },
+      // { name: Locale.SdPanel.Styles.Anime, value: "anime" },
+      // { name: Locale.SdPanel.Styles.Cinematic, value: "cinematic" },
+      // { name: Locale.SdPanel.Styles.ComicBook, value: "comic-book" },
+      // { name: Locale.SdPanel.Styles.DigitalArt, value: "digital-art" },
+      // { name: Locale.SdPanel.Styles.Enhance, value: "enhance" },
+      // { name: Locale.SdPanel.Styles.FantasyArt, value: "fantasy-art" },
+      // { name: Locale.SdPanel.Styles.Isometric, value: "isometric" },
+      // { name: Locale.SdPanel.Styles.LineArt, value: "line-art" },
+      // { name: Locale.SdPanel.Styles.LowPoly, value: "low-poly" },
+      // {
+      //   name: Locale.SdPanel.Styles.ModelingCompound,
+      //   value: "modeling-compound",
+      // },
+      // { name: Locale.SdPanel.Styles.NeonPunk, value: "neon-punk" },
+      // { name: Locale.SdPanel.Styles.Origami, value: "origami" },
+      // { name: Locale.SdPanel.Styles.Photographic, value: "photographic" },
+      // { name: Locale.SdPanel.Styles.PixelArt, value: "pixel-art" },
+      // { name: Locale.SdPanel.Styles.TileTexture, value: "tile-texture" },
+      { name: t("SdPanel.Styles.D3Model"), value: "3d-model" },
+      { name: t("SdPanel.Styles.AnalogFilm"), value: "analog-film" },
+      { name: t("SdPanel.Styles.Anime"), value: "anime" },
+      { name: t("SdPanel.Styles.Cinematic"), value: "cinematic" },
+      { name: t("SdPanel.Styles.ComicBook"), value: "comic-book" },
+      { name: t("SdPanel.Styles.DigitalArt"), value: "digital-art" },
+      { name: t("SdPanel.Styles.Enhance"), value: "enhance" },
+      { name: t("SdPanel.Styles.FantasyArt"), value: "fantasy-art" },
+      { name: t("SdPanel.Styles.Isometric"), value: "isometric" },
+      { name: t("SdPanel.Styles.LineArt"), value: "line-art" },
+      { name: t("SdPanel.Styles.LowPoly"), value: "low-poly" },
       {
-        name: Locale.SdPanel.Styles.ModelingCompound,
+        name: t("SdPanel.Styles.ModelingCompound"),
         value: "modeling-compound",
       },
-      { name: Locale.SdPanel.Styles.NeonPunk, value: "neon-punk" },
-      { name: Locale.SdPanel.Styles.Origami, value: "origami" },
-      { name: Locale.SdPanel.Styles.Photographic, value: "photographic" },
-      { name: Locale.SdPanel.Styles.PixelArt, value: "pixel-art" },
-      { name: Locale.SdPanel.Styles.TileTexture, value: "tile-texture" },
+      { name: t("SdPanel.Styles.NeonPunk"), value: "neon-punk" },
+      { name: t("SdPanel.Styles.Origami"), value: "origami" },
+      { name: t("SdPanel.Styles.Photographic"), value: "photographic" },
+      { name: t("SdPanel.Styles.PixelArt"), value: "pixel-art" },
+      { name: t("SdPanel.Styles.TileTexture"), value: "tile-texture" },
     ],
   },
   {
@@ -87,7 +117,8 @@ export const params = [
     max: 4294967294,
   },
   {
-    name: Locale.SdPanel.OutFormat,
+    // name: Locale.SdPanel.OutFormat,
+    name: t("SdPanel.OutFormat"),
     value: "output_format",
     type: "select",
     default: "png",
@@ -277,6 +308,7 @@ export const getParams = (model: any, params: any) => {
 };
 
 export function SdPanel() {
+  const { t } = useTranslation();
   const sdStore = useSdStore();
   const currentModel = sdStore.currentModel;
   const setCurrentModel = sdStore.setCurrentModel;
@@ -296,7 +328,8 @@ export function SdPanel() {
 
   return (
     <>
-      <ControlParamItem title={Locale.SdPanel.AIModel}>
+      {/* <ControlParamItem title={Locale.SdPanel.AIModel}> */}
+      <ControlParamItem title={t("SdPanel.AIModel")}>
         <div className={styles["ai-models"]}>
           {models.map((item) => {
             return (

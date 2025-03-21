@@ -1,5 +1,5 @@
 import { IconButton } from "./button";
-import { ErrorBoundary } from "./error";
+import ErrorBoundary from "./error";
 
 import styles from "./mask.module.scss";
 
@@ -32,7 +32,7 @@ import {
   showConfirm,
 } from "./ui-lib";
 import { Avatar, AvatarPicker } from "./emoji";
-import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
+import { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
 import { useNavigate } from "react-router-dom";
 
 import chatStyle from "./chat.module.scss";
@@ -56,6 +56,7 @@ import {
 import { getMessageTextContent } from "../utils";
 import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
+import { useTranslation } from "react-i18next";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -80,6 +81,7 @@ export function MaskConfig(props: {
   readonly?: boolean;
   shouldSyncFromGlobal?: boolean;
 }) {
+  const { t } = useTranslation();
   const [showPicker, setShowPicker] = useState(false);
 
   const updateConfig = (updater: (config: ModelConfig) => void) => {
@@ -113,7 +115,8 @@ export function MaskConfig(props: {
       />
 
       <List>
-        <ListItem title={Locale.Mask.Config.Avatar}>
+        {/* <ListItem title={Locale.Mask.Config.Avatar}> */}
+        <ListItem title={t("Mask.Config.Avatar")}>
           <Popover
             content={
               <AvatarPicker
@@ -128,7 +131,8 @@ export function MaskConfig(props: {
           >
             <div
               tabIndex={0}
-              aria-label={Locale.Mask.Config.Avatar}
+              // aria-label={Locale.Mask.Config.Avatar}
+              aria-label={t("Mask.Config.Avatar")}
               onClick={() => setShowPicker(true)}
               style={{ cursor: "pointer" }}
             >
@@ -139,9 +143,11 @@ export function MaskConfig(props: {
             </div>
           </Popover>
         </ListItem>
-        <ListItem title={Locale.Mask.Config.Name}>
+        {/* <ListItem title={Locale.Mask.Config.Name}> */}
+        <ListItem title={t("Mask.Config.Name")}>
           <input
-            aria-label={Locale.Mask.Config.Name}
+            // aria-label={Locale.Mask.Config.Name}
+            aria-label={t("Mask.Config.Name")}
             type="text"
             value={props.mask.name}
             onInput={(e) =>
@@ -152,11 +158,14 @@ export function MaskConfig(props: {
           ></input>
         </ListItem>
         <ListItem
-          title={Locale.Mask.Config.HideContext.Title}
-          subTitle={Locale.Mask.Config.HideContext.SubTitle}
+          // title={Locale.Mask.Config.HideContext.Title}
+          // subTitle={Locale.Mask.Config.HideContext.SubTitle}
+          title={t("Mask.Config.HideContext.Title")}
+          subTitle={t("Mask.Config.HideContext.SubTitle")}
         >
           <input
-            aria-label={Locale.Mask.Config.HideContext.Title}
+            // aria-label={Locale.Mask.Config.HideContext.Title}
+            aria-label={t("Mask.Config.HideContext.Title")}
             type="checkbox"
             checked={props.mask.hideContext}
             onChange={(e) => {
@@ -169,11 +178,14 @@ export function MaskConfig(props: {
 
         {globalConfig.enableArtifacts && (
           <ListItem
-            title={Locale.Mask.Config.Artifacts.Title}
-            subTitle={Locale.Mask.Config.Artifacts.SubTitle}
+            // title={Locale.Mask.Config.Artifacts.Title}
+            // subTitle={Locale.Mask.Config.Artifacts.SubTitle}
+            title={t("Mask.Config.Artifacts.Title")}
+            subTitle={t("Mask.Config.Artifacts.SubTitle")}
           >
             <input
-              aria-label={Locale.Mask.Config.Artifacts.Title}
+              // aria-label={Locale.Mask.Config.Artifacts.Title}
+              aria-label={t("Mask.Config.Artifacts.Title")}
               type="checkbox"
               checked={props.mask.enableArtifacts !== false}
               onChange={(e) => {
@@ -186,11 +198,14 @@ export function MaskConfig(props: {
         )}
         {globalConfig.enableCodeFold && (
           <ListItem
-            title={Locale.Mask.Config.CodeFold.Title}
-            subTitle={Locale.Mask.Config.CodeFold.SubTitle}
+            // title={Locale.Mask.Config.CodeFold.Title}
+            title={t("Mask.Config.CodeFold.Title")}
+            // subTitle={Locale.Mask.Config.CodeFold.SubTitle}
+            subTitle={t("Mask.Config.CodeFold.SubTitle")}
           >
             <input
-              aria-label={Locale.Mask.Config.CodeFold.Title}
+              // aria-label={Locale.Mask.Config.CodeFold.Title}
+              aria-label={t("Mask.Config.CodeFold.Title")}
               type="checkbox"
               checked={props.mask.enableCodeFold !== false}
               onChange={(e) => {
@@ -204,13 +219,17 @@ export function MaskConfig(props: {
 
         {!props.shouldSyncFromGlobal ? (
           <ListItem
-            title={Locale.Mask.Config.Share.Title}
-            subTitle={Locale.Mask.Config.Share.SubTitle}
+            // title={Locale.Mask.Config.Share.Title}
+            title={t("Mask.Config.Share.Title")}
+            // subTitle={Locale.Mask.Config.Share.SubTitle}
+            subTitle={t("Mask.Config.Share.SubTitle")}
           >
             <IconButton
-              aria={Locale.Mask.Config.Share.Title}
+              // aria={Locale.Mask.Config.Share.Title}
+              aria={t("Mask.Config.Share.Title")}
               icon={<CopyIcon />}
-              text={Locale.Mask.Config.Share.Action}
+              // text={Locale.Mask.Config.Share.Action}
+              text={t("Mask.Config.Share.Action")}
               onClick={copyMaskLink}
             />
           </ListItem>
@@ -218,18 +237,22 @@ export function MaskConfig(props: {
 
         {props.shouldSyncFromGlobal ? (
           <ListItem
-            title={Locale.Mask.Config.Sync.Title}
-            subTitle={Locale.Mask.Config.Sync.SubTitle}
+            // title={Locale.Mask.Config.Sync.Title}
+            title={t("Mask.Config.Sync.Title")}
+            // subTitle={Locale.Mask.Config.Sync.SubTitle}
+            subTitle={t("Mask.Config.Sync.SubTitle")}
           >
             <input
-              aria-label={Locale.Mask.Config.Sync.Title}
+              // aria-label={Locale.Mask.Config.Sync.Title}
+              aria-label={t("Mask.Config.Sync.Title")}
               type="checkbox"
               checked={props.mask.syncGlobalConfig}
               onChange={async (e) => {
                 const checked = e.currentTarget.checked;
                 if (
                   checked &&
-                  (await showConfirm(Locale.Mask.Config.Sync.Confirm))
+                  // (await showConfirm(Locale.Mask.Config.Sync.Confirm))
+                  (await showConfirm(t("Mask.Config.Sync.Confirm")))
                 ) {
                   props.updateMask((mask) => {
                     mask.syncGlobalConfig = checked;
@@ -327,6 +350,8 @@ export function ContextPrompts(props: {
 }) {
   const context = props.context;
 
+  const { t } = useTranslation();
+
   const addContextPrompt = (prompt: ChatMessage, i: number) => {
     props.updateContext((context) => context.splice(i, 0, prompt));
   };
@@ -418,7 +443,8 @@ export function ContextPrompts(props: {
           <div className={chatStyle["context-prompt-row"]}>
             <IconButton
               icon={<AddIcon />}
-              text={Locale.Context.Add}
+              // text={Locale.Context.Add}
+              text={t("Context.Add")}
               bordered
               className={chatStyle["context-prompt-button"]}
               onClick={() =>
@@ -440,6 +466,8 @@ export function ContextPrompts(props: {
 }
 
 export function MaskPage() {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
 
   const maskStore = useMaskStore();
@@ -503,10 +531,14 @@ export function MaskPage() {
         <div className="window-header">
           <div className="window-header-title">
             <div className="window-header-main-title">
-              {Locale.Mask.Page.Title}
+              {/* {Locale.Mask.Page.Title} */}
+              {t("Mask.Page.Title")}
             </div>
             <div className="window-header-submai-title">
-              {Locale.Mask.Page.SubTitle(allMasks.length)}
+              {/* {Locale.Mask.Page.SubTitle(allMasks.length)} */}
+              {t("Mask.Page.SubTitle", {
+                count: allMasks.length,
+              })}
             </div>
           </div>
 
@@ -516,13 +548,15 @@ export function MaskPage() {
                 icon={<DownloadIcon />}
                 bordered
                 onClick={downloadAll}
-                text={Locale.UI.Export}
+                // text={Locale.UI.Export}
+                text={t("UI.Export")}
               />
             </div>
             <div className="window-action-button">
               <IconButton
                 icon={<UploadIcon />}
-                text={Locale.UI.Import}
+                // text={Locale.UI.Import}
+                text={t("UI.Import")}
                 bordered
                 onClick={() => importFromFile()}
               />
@@ -542,24 +576,29 @@ export function MaskPage() {
             <input
               type="text"
               className={styles["search-bar"]}
-              placeholder={Locale.Mask.Page.Search}
+              // placeholder={Locale.Mask.Page.Search}
+              placeholder={t("Mask.Page.Search")}
               autoFocus
               onInput={(e) => onSearch(e.currentTarget.value)}
             />
             <Select
               className={styles["mask-filter-lang"]}
-              value={filterLang ?? Locale.Settings.Lang.All}
+              // value={filterLang ?? Locale.Settings.Lang.All}
+              value={filterLang ?? t("Settings.Lang.All")}
               onChange={(e) => {
                 const value = e.currentTarget.value;
-                if (value === Locale.Settings.Lang.All) {
+                // if (value === Locale.Settings.Lang.All) {
+                if (value === t("Settings.Lang.All")) {
                   maskStore.setLanguage(undefined);
                 } else {
                   maskStore.setLanguage(value as Lang);
                 }
               }}
             >
-              <option key="all" value={Locale.Settings.Lang.All}>
-                {Locale.Settings.Lang.All}
+              {/* <option key="all" value={Locale.Settings.Lang.All}> */}
+              <option key="all" value={t("Settings.Lang.All")}>
+                {/* {Locale.Settings.Lang.All} */}
+                {t("Settings.Lang.All")}
               </option>
               {AllLangs.map((lang) => (
                 <option value={lang} key={lang}>
@@ -571,7 +610,8 @@ export function MaskPage() {
             <IconButton
               className={styles["mask-create"]}
               icon={<AddIcon />}
-              text={Locale.Mask.Page.Create}
+              // text={Locale.Mask.Page.Create}
+              text={t("Mask.Page.Create")}
               bordered
               onClick={() => {
                 const createdMask = maskStore.create();
@@ -590,7 +630,8 @@ export function MaskPage() {
                   <div className={styles["mask-title"]}>
                     <div className={styles["mask-name"]}>{m.name}</div>
                     <div className={clsx(styles["mask-info"], "one-line")}>
-                      {`${Locale.Mask.Item.Info(m.context.length)} / ${
+                      {/* {`${Locale.Mask.Item.Info(m.context.length)} / ${ */}
+                      {`${t("Mask.Item.Info", { count: m.context.length })} / ${
                         ALL_LANG_OPTIONS[m.lang]
                       } / ${m.modelConfig.model}`}
                     </div>
@@ -599,7 +640,8 @@ export function MaskPage() {
                 <div className={styles["mask-actions"]}>
                   <IconButton
                     icon={<AddIcon />}
-                    text={Locale.Mask.Item.Chat}
+                    // text={Locale.Mask.Item.Chat}
+                    text={t("Mask.Item.Chat")}
                     onClick={() => {
                       chatStore.newSession(m, () => navigate(Path.Chat));
                     }}
@@ -607,22 +649,26 @@ export function MaskPage() {
                   {m.builtin ? (
                     <IconButton
                       icon={<EyeIcon />}
-                      text={Locale.Mask.Item.View}
+                      // text={Locale.Mask.Item.View}
+                      text={t("Mask.Item.View")}
                       onClick={() => setEditingMaskId(m.id)}
                     />
                   ) : (
                     <IconButton
                       icon={<EditIcon />}
-                      text={Locale.Mask.Item.Edit}
+                      // text={Locale.Mask.Item.Edit}
+                      text={t("Mask.Item.Edit")}
                       onClick={() => setEditingMaskId(m.id)}
                     />
                   )}
                   {!m.builtin && (
                     <IconButton
                       icon={<DeleteIcon />}
-                      text={Locale.Mask.Item.Delete}
+                      // text={Locale.Mask.Item.Delete}
+                      text={t("Mask.Item.Delete")}
                       onClick={async () => {
-                        if (await showConfirm(Locale.Mask.Item.DeleteConfirm)) {
+                        // if (await showConfirm(Locale.Mask.Item.DeleteConfirm)) {
+                        if (await showConfirm(t("Mask.Item.DeleteConfirm"))) {
                           maskStore.delete(m.id);
                         }
                       }}
@@ -638,12 +684,18 @@ export function MaskPage() {
       {editingMask && (
         <div className="modal-mask">
           <Modal
-            title={Locale.Mask.EditModal.Title(editingMask?.builtin)}
+            // title={Locale.Mask.EditModal.Title(editingMask?.builtin)}
+            title={
+              editingMask?.builtin
+                ? t("Mask.EditModal.ReadOnlyTitle")
+                : t("Mask.EditModal.Title")
+            }
             onClose={closeMaskModal}
             actions={[
               <IconButton
                 icon={<DownloadIcon />}
-                text={Locale.Mask.EditModal.Download}
+                // text={Locale.Mask.EditModal.Download}
+                text={t("Mask.EditModal.Download")}
                 key="export"
                 bordered
                 onClick={() =>
@@ -657,7 +709,8 @@ export function MaskPage() {
                 key="copy"
                 icon={<CopyIcon />}
                 bordered
-                text={Locale.Mask.EditModal.Clone}
+                // text={Locale.Mask.EditModal.Clone}
+                text={t("Mask.EditModal.Clone")}
                 onClick={() => {
                   navigate(Path.Masks);
                   maskStore.create(editingMask);

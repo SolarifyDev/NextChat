@@ -3,7 +3,6 @@ import GithubIcon from "@/app/icons/github.svg";
 import SDIcon from "@/app/icons/sd.svg";
 import ReturnIcon from "@/app/icons/return.svg";
 import HistoryIcon from "@/app/icons/history.svg";
-import Locale from "@/app/locales";
 
 import { Path, REPO_URL } from "@/app/constant";
 
@@ -22,6 +21,7 @@ import { getParams, getModelParamBasicData } from "./sd-panel";
 import { useSdStore } from "@/app/store/sd";
 import { showToast } from "@/app/components/ui-lib";
 import { useMobileScreen } from "@/app/utils";
+import { useTranslation } from "react-i18next";
 
 const SdPanel = dynamic(
   async () => (await import("@/app/components/sd")).SdPanel,
@@ -31,6 +31,7 @@ const SdPanel = dynamic(
 );
 
 export function SideBar(props: { className?: string }) {
+  const { t } = useTranslation();
   useHotKey();
   const isMobileScreen = useMobileScreen();
   const { onDragStart, shouldNarrow } = useDragSideBar();
@@ -48,7 +49,8 @@ export function SideBar(props: { className?: string }) {
       reqParams[item.value] = params[item.value] ?? null;
       if (item.required) {
         if (!reqParams[item.value]) {
-          showToast(Locale.SdPanel.ParamIsRequired(item.name));
+          // showToast(Locale.SdPanel.ParamIsRequired(item.name));
+          showToast(t("SdPanel.ParamIsRequired", { name: item.name }));
           return;
         }
       }
@@ -87,7 +89,8 @@ export function SideBar(props: { className?: string }) {
               <IconButton
                 icon={<ReturnIcon />}
                 bordered
-                title={Locale.Sd.Actions.ReturnHome}
+                // title={Locale.Sd.Actions.ReturnHome}
+                title={t("Sd.Actions.ReturnHome")}
                 onClick={() => navigate(Path.Home)}
               />
             </div>
@@ -98,7 +101,8 @@ export function SideBar(props: { className?: string }) {
               <IconButton
                 icon={<HistoryIcon />}
                 bordered
-                title={Locale.Sd.Actions.History}
+                // title={Locale.Sd.Actions.History}
+                title={t("Sd.Actions.History")}
                 onClick={() => navigate(Path.SdNew)}
               />
             </div>
@@ -110,7 +114,8 @@ export function SideBar(props: { className?: string }) {
             <IconButton
               icon={<ReturnIcon />}
               bordered
-              title={Locale.Sd.Actions.ReturnHome}
+              // title={Locale.Sd.Actions.ReturnHome}
+              title={t("Sd.Actions.ReturnHome")}
               onClick={() => navigate(Path.Home)}
             />
           }
@@ -128,7 +133,8 @@ export function SideBar(props: { className?: string }) {
         }
         secondaryAction={
           <IconButton
-            text={Locale.SdPanel.Submit}
+            // text={Locale.SdPanel.Submit}
+            text={t("SdPanel.Submit")}
             type="primary"
             shadow
             onClick={handleSubmit}

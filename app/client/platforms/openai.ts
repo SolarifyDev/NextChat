@@ -34,7 +34,6 @@ import {
   MultimodalContent,
   SpeechOptions,
 } from "../api";
-import Locale from "../../locales";
 import { getClientConfig } from "@/app/config/client";
 import {
   getMessageTextContent,
@@ -44,6 +43,7 @@ import {
 } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
 import { useNewChatStore } from "@/app/store/new-chat";
+import { t } from "i18next";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -442,7 +442,8 @@ export class ChatGPTApi implements LLMApi {
     ]);
 
     if (used.status === 401) {
-      throw new Error(Locale.Error.Unauthorized);
+      // throw new Error(Locale.Error.Unauthorized);
+      throw new Error(t("Error.Unauthorized"));
     }
 
     if (!used.ok || !subs.ok) {

@@ -1,5 +1,5 @@
 import { IconButton } from "./button";
-import { ErrorBoundary } from "./error";
+import ErrorBoundary from "./error";
 import styles from "./mcp-market.module.scss";
 import EditIcon from "../icons/edit.svg";
 import AddIcon from "../icons/add.svg";
