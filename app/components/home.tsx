@@ -302,6 +302,10 @@ export function Home() {
         if (!isEmpty(event?.data?.omeUserId)) {
           appConfig.setOmeUserId(event?.data?.omeUserId);
         }
+
+        if (!isEmpty(event?.data?.omeUserName)) {
+          appConfig.setOmeUserId(event?.data?.omeUserName);
+        }
       }
     };
 

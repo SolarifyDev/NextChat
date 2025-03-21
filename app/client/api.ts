@@ -356,6 +356,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
 
   headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
 
+  headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+
   return headers;
 }
 

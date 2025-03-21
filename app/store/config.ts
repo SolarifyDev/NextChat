@@ -107,6 +107,7 @@ export const DEFAULT_CONFIG = {
   },
   omeToken: "",
   omeUserId: "",
+  omeUserName: "",
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;
@@ -168,9 +169,9 @@ export const useAppConfig = createPersistStore(
   { ...DEFAULT_CONFIG },
   (set, get) => ({
     reset() {
-      const { omeToken, omeUserId } = get();
+      const { omeToken, omeUserId, omeUserName } = get();
 
-      set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId }));
+      set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId, omeUserName }));
     },
 
     setDefaultModel() {
@@ -185,6 +186,10 @@ export const useAppConfig = createPersistStore(
             providerName: "DeepSeek" as ServiceProvider,
           },
         }));
+    },
+
+    setOmeUserName(omeUserName: string) {
+      set(() => ({ omeUserName }));
     },
 
     setOmeToken(omeToken: string) {
