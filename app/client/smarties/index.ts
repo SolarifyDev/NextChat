@@ -17,12 +17,14 @@ export interface ISession {
 export const GetHistory = async (
   token: string,
   userId: string,
+  userName: string,
 ): Promise<ISession[]> => {
   return (
     await api.get("/api/v1/histories", {
       headers: {
         "Ome-Metis-Authorization": token,
         "OME-METIS-UserId": userId,
+        "Ome-Metis-Username": userName,
       },
     })
   ).data;
@@ -31,6 +33,7 @@ export const GetHistory = async (
 export const PostAddOrUpdateSession = async (
   token: string,
   userId: string,
+  userName: string,
   data: Partial<ISession>,
 ): Promise<ISession> => {
   return (
@@ -38,6 +41,7 @@ export const PostAddOrUpdateSession = async (
       headers: {
         "Ome-Metis-Authorization": token,
         "OME-METIS-UserId": userId,
+        "Ome-Metis-Username": userName,
       },
     })
   ).data;

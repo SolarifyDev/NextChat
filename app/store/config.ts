@@ -107,6 +107,7 @@ export const DEFAULT_CONFIG = {
   },
   omeToken: "",
   omeUserId: "",
+  omeUserName: "",
   isFromApp: false,
 };
 
@@ -169,9 +170,33 @@ export const useAppConfig = createPersistStore(
   { ...DEFAULT_CONFIG },
   (set, get) => ({
     reset() {
-      const { omeToken, omeUserId, isFromApp } = get();
+      const { omeToken, omeUserId, omeUserName, isFromApp } = get();
 
-      set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId, isFromApp }));
+      set(() => ({
+        ...DEFAULT_CONFIG,
+        omeToken,
+        omeUserId,
+        omeUserName,
+        isFromApp,
+      }));
+    },
+
+    setDefaultModel() {
+      const { modelConfig } = get();
+
+      if (!modelConfig.model.toLowerCase().includes("deepseek"))
+        set(() => ({
+          ...DEFAULT_CONFIG,
+          modelConfig: {
+            ...modelConfig,
+            model: "deepseek-chat" as ModelType,
+            providerName: "DeepSeek" as ServiceProvider,
+          },
+        }));
+    },
+
+    setOmeUserName(omeUserName: string) {
+      set(() => ({ omeUserName }));
     },
 
     setOmeToken(omeToken: string) {

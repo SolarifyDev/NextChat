@@ -266,6 +266,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           const data = await GetHistory(
             useAppConfig.getState().omeToken,
             useAppConfig.getState().omeUserId,
+            useAppConfig.getState().omeUserName,
           );
           const newData: ChatSession[] = data.map((item) => ({
             ...item,
@@ -490,7 +491,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           (session?.mask?.modelConfig?.model.startsWith("gpt-") ||
             session?.mask?.modelConfig?.model.startsWith("chatgpt-"));
 
-        const mcpEnabled = await isMcpEnabled();
+        const mcpEnabled = (await isMcpEnabled()) ?? false;
         const mcpSystemPrompt = mcpEnabled ? await getMcpSystemPrompt() : "";
 
         var systemPrompts: ChatMessage[] = [];
@@ -608,6 +609,7 @@ export const useNewChatStore = create<ChatStoreType>()(
             await PostAddOrUpdateSession(
               config.omeToken,
               config.omeUserId,
+              config.omeUserName,
               ConvertSession("update", sessions[index]),
             )
               .then(() => console.log("更新成功"))
@@ -810,6 +812,7 @@ export const useNewChatStore = create<ChatStoreType>()(
             await PostAddOrUpdateSession(
               useAppConfig.getState().omeToken,
               useAppConfig.getState().omeUserId,
+              useAppConfig.getState().omeUserName,
               data,
             )
               .then(() => {
@@ -847,7 +850,12 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         const data = ConvertSession("add", newSession);
 
-        await PostAddOrUpdateSession(config.omeToken, config.omeUserId, data)
+        await PostAddOrUpdateSession(
+          config.omeToken,
+          config.omeUserId,
+          config.omeUserName,
+          data,
+        )
           .then((res) => {
             if (res) {
               newSession.sessionId = res.sessionId;
@@ -891,6 +899,7 @@ export const useNewChatStore = create<ChatStoreType>()(
         await PostAddOrUpdateSession(
           useAppConfig.getState().omeToken,
           useAppConfig.getState().omeUserId,
+          useAppConfig.getState().omeUserName,
           data,
         )
           .then((res) => {

@@ -305,6 +305,10 @@ export function Home() {
         if (!isEmpty(event?.data?.omeUserId)) {
           appConfig.setOmeUserId(event?.data?.omeUserId);
         }
+
+        if (!isEmpty(event?.data?.omeUserName)) {
+          appConfig.setOmeUserName(event?.data?.omeUserName);
+        }
       }
     };
 
@@ -328,6 +332,8 @@ export function Home() {
       } else {
         window.parent.postMessage("omemetis is ready", "*");
       }
+
+      appConfig.setDefaultModel();
     }
   }, [appConfig._hasHydrated]);
 
