@@ -84,6 +84,7 @@ export type ChatStoreType = {
   sessions: ChatSession[];
   lastInput: string;
   isDown: boolean;
+  isLoading: boolean;
   selectSession: (i: number) => void;
   getSession: () => Promise<void>;
   getCurrentSession: () => ChatSession;
@@ -267,19 +268,26 @@ export const useNewChatStore = create<ChatStoreType>()(
       sessions: [],
       lastInput: "",
       isDown: false,
+      isReady: false,
       setIsDown: (isDown: boolean) => {
         set({ isDown });
       },
+      isLoading: false,
       selectSession: (i: number) => {
         set({ currentSessionIndex: i });
       },
 
       getSession: async () => {
         try {
+          set({
+            isLoading: true,
+          });
+
           const data = await GetHistory(
             useAppConfig.getState().omeToken,
             useAppConfig.getState().omeUserId,
             useAppConfig.getState().omeUserName,
+            useAppConfig.getState().omelinkUserId,
           );
           const newData: ChatSession[] = data.map((item) => ({
             ...item,
@@ -289,13 +297,19 @@ export const useNewChatStore = create<ChatStoreType>()(
           }));
           set({
             sessions: newData,
+            isLoading: false,
           });
         } catch {
           set({
             sessions: [],
+            isLoading: false,
           });
           showToast("获取聊天失败");
         }
+      },
+
+      setIsLoading(isLoading: boolean) {
+        set({ isLoading });
       },
 
       getCurrentSession: () => {
@@ -303,7 +317,12 @@ export const useNewChatStore = create<ChatStoreType>()(
       },
 
       clearCurrent: () => {
-        set({ currentSessionIndex: -1, sessions: [], isDown: false });
+        set({
+          currentSessionIndex: -1,
+          sessions: [],
+          isDown: false,
+          isLoading: false,
+        });
       },
 
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
@@ -626,6 +645,7 @@ export const useNewChatStore = create<ChatStoreType>()(
               config.omeToken,
               config.omeUserId,
               config.omeUserName,
+              config.omelinkUserId,
               ConvertSession("update", sessions[index]),
             )
               .then(() => console.log("更新成功"))
@@ -837,6 +857,7 @@ export const useNewChatStore = create<ChatStoreType>()(
               useAppConfig.getState().omeToken,
               useAppConfig.getState().omeUserId,
               useAppConfig.getState().omeUserName,
+              useAppConfig.getState().omelinkUserId,
               data,
             )
               .then(() => {
@@ -878,6 +899,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           config.omeToken,
           config.omeUserId,
           config.omeUserName,
+          config.omelinkUserId,
           data,
         )
           .then((res) => {
@@ -924,6 +946,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           useAppConfig.getState().omeToken,
           useAppConfig.getState().omeUserId,
           useAppConfig.getState().omeUserName,
+          useAppConfig.getState().omelinkUserId,
           data,
         )
           .then((res) => {

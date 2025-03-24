@@ -32,6 +32,7 @@ import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { useDebounceFn } from "ahooks";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -251,6 +252,13 @@ export function SideBar(props: { className?: string }) {
 
   const { getSession } = useNewChatStore();
 
+  const { run: addConversation } = useDebounceFn(
+    () => {
+      chatStore.newSession(undefined, () => navigate(Path.Chat));
+    },
+    { wait: 300 },
+  );
+
   useEffect(() => {
     // 检查 MCP 是否启用
     const checkMcpStatus = async () => {
@@ -392,9 +400,7 @@ export function SideBar(props: { className?: string }) {
               fontSize: 16,
               marginTop: 8,
             }}
-            onClick={() => {
-              chatStore.newSession(undefined, () => navigate(Path.Chat));
-            }}
+            onClick={() => addConversation}
           >
             <PhoneIcon />{" "}
             {/* <div>{shouldNarrow ? undefined : Locale.Home.NewChat}</div> */}

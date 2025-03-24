@@ -175,8 +175,17 @@ function Screen() {
   const shouldTightBorder =
     getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
 
+  // useEffect(() => {
+  //   loadAsyncGoogleFont();
+  // }, []);
+
   useEffect(() => {
-    loadAsyncGoogleFont();
+    const linkEl = document.createElement("link");
+    const googleFontUrl =
+      "https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;700;900&display=swap";
+    linkEl.rel = "stylesheet";
+    linkEl.href = googleFontUrl;
+    document.head.appendChild(linkEl);
   }, []);
 
   if (isArtifact) {
@@ -278,7 +287,6 @@ export function Home() {
           if (params?.from === "OmeOfficeApp") {
             if (!isEmpty(params?.ometoken)) {
               appConfig.setOmeToken(params?.ometoken ?? "");
-              useNewChatStore.getState().setIsDown(true);
             }
             if (!isEmpty(params?.omeUserId)) {
               appConfig.setOmeUserId(params?.omeUserId ?? "");
@@ -286,7 +294,11 @@ export function Home() {
             if (!isEmpty(params?.omeUserName)) {
               appConfig.setOmeUserName(params?.omeUserName ?? "");
             }
+            if (!isEmpty(params?.omelinkUserId)) {
+              appConfig.setOmelinkUserId(params?.omelinkUserId ?? "");
+            }
             appConfig.setIsFromApp(true);
+            useNewChatStore.getState().setIsDown(true);
             if (!isEmpty(params?.lanauge)) {
               changeLang(params?.lanauge);
             }

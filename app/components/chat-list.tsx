@@ -12,6 +12,7 @@ import { useMobileScreen } from "../utils";
 import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { Spin } from "antd";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -100,8 +101,13 @@ export function ChatItem(props: {
 }
 
 export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
-  const { currentSessionIndex, sessions, selectSession, deleteSession } =
-    useNewChatStore();
+  const {
+    currentSessionIndex,
+    sessions,
+    selectSession,
+    deleteSession,
+    isLoading,
+  } = useNewChatStore();
   const { t } = useTranslation();
 
   const navigate = useNavigate();
@@ -132,33 +138,44 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
       // ref={provided.innerRef}
       // {...provided.droppableProps}
     >
-      {sessions.map((item, i) => (
-        <ChatItem
-          title={item.topic}
-          time={new Date(item.lastUpdate).toLocaleString()}
-          count={item?.messages?.length ?? 0}
-          key={item.id}
-          id={item.id}
-          index={i}
-          selected={i === currentSessionIndex}
-          onClick={() => {
-            navigate(Path.Chat);
-            selectSession(i);
+      {props.isFromApp && isLoading && (
+        <Spin
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
           }}
-          onDelete={async () => {
-            if (
-              (!props.narrow && !isMobileScreen) ||
-              // (await showConfirm(Locale.Home.DeleteChat))
-              (await showConfirm(t("Home.DeleteChat")))
-            ) {
-              deleteSession(i);
-            }
-          }}
-          narrow={props.narrow}
-          mask={item.mask}
-          isFromApp={props?.isFromApp ?? false}
         />
-      ))}
+      )}
+      {!isLoading &&
+        sessions.map((item, i) => (
+          <ChatItem
+            title={item.topic}
+            time={new Date(item.lastUpdate).toLocaleString()}
+            count={item?.messages?.length ?? 0}
+            key={item.id}
+            id={item.id}
+            index={i}
+            selected={i === currentSessionIndex}
+            onClick={() => {
+              navigate(Path.Chat);
+              selectSession(i);
+            }}
+            onDelete={async () => {
+              if (
+                (!props.narrow && !isMobileScreen) ||
+                // (await showConfirm(Locale.Home.DeleteChat))
+                (await showConfirm(t("Home.DeleteChat")))
+              ) {
+                deleteSession(i);
+              }
+            }}
+            narrow={props.narrow}
+            mask={item.mask}
+            isFromApp={props?.isFromApp ?? false}
+          />
+        ))}
       {/* {provided.placeholder} */}
     </div>
     //     )}

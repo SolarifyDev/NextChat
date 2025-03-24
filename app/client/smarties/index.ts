@@ -18,6 +18,7 @@ export const GetHistory = async (
   token: string,
   userId: string,
   userName: string,
+  omelinkUserId: string,
 ): Promise<ISession[]> => {
   return (
     await api.get("/api/v1/histories", {
@@ -25,6 +26,7 @@ export const GetHistory = async (
         "Ome-Metis-Authorization": token,
         "OME-METIS-UserId": userId,
         "Ome-Metis-Username": userName,
+        "Omelink-Metis-Userid": omelinkUserId,
       },
     })
   ).data;
@@ -34,6 +36,7 @@ export const PostAddOrUpdateSession = async (
   token: string,
   userId: string,
   userName: string,
+  omelinkUserId: string,
   data: Partial<ISession>,
 ): Promise<ISession> => {
   return (
@@ -42,6 +45,7 @@ export const PostAddOrUpdateSession = async (
         "Ome-Metis-Authorization": token,
         "OME-METIS-UserId": userId,
         "Ome-Metis-Username": userName,
+        "Omelink-Metis-Userid": omelinkUserId,
       },
     })
   ).data;
