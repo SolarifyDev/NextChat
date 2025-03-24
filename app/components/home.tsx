@@ -285,7 +285,7 @@ export function Home() {
           const params = JSON.parse(data);
 
           if (!isEmpty(params?.from)) {
-            appConfig.setFrom(params.from || "");
+            appConfig.setFrom(params.from ?? "");
           }
           if (!isEmpty(params?.ometoken)) {
             appConfig.setOmeToken(params?.ometoken ?? "");
