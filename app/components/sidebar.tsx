@@ -358,8 +358,7 @@ export function SideBar(props: { className?: string }) {
           >
             <ArrowLeftIcon />
           </div>
-          <p>歷史對話</p>
-          {t("Mask.Name")}
+          <p>{t("Home.History")}</p>
         </div>
       )}
 
