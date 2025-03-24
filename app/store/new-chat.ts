@@ -289,8 +289,8 @@ export const useNewChatStore = create<ChatStoreType>()(
 
           const data = await GetHistory(
             getHeaders(
-              "OmeOfficeApp",
-              true,
+              useAppConfig.getState().from,
+              useAppConfig.getState().isFromApp,
               useAppConfig.getState().omeUserId,
               useAppConfig.getState().omeUserName,
               useAppConfig.getState().omeToken,
