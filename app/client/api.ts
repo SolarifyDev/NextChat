@@ -352,13 +352,26 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   }
   // console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
 
-  headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
+  if (appConfig.isFromApp) {
+    switch (appConfig.from) {
+      case "OmeOfficeApp":
+        headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
 
-  headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
+        headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
 
-  headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+        headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+        break;
+      case "omelink":
+        headers["Omelink-Metis-Userid"] = appConfig.omeUserId || "";
+        break;
+    }
+  } else {
+    headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
 
-  headers["Omelink-Metis-Userid"] = appConfig.omelinkUserId || "";
+    headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
+
+    headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+  }
 
   return headers;
 }

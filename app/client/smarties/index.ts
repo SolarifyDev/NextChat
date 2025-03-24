@@ -14,39 +14,62 @@ export interface ISession {
   clearContextIndex: number | null;
 }
 
-export const GetHistory = async (
-  token: string,
+export function getHeaders(
+  from: string,
+  isFromApp: boolean,
   userId: string,
   userName: string,
-  omelinkUserId: string,
-): Promise<ISession[]> => {
+  token: string,
+) {
+  let headers: { [key: string]: string } = {};
+
+  if (isFromApp) {
+    switch (from) {
+      case "OmeOfficeApp":
+        headers = {
+          "Ome-Metis-Authorization": token,
+          "Ome-Metis-Userid": userId,
+          "Ome-Metis-Username": userName,
+        };
+        break;
+      case "omelink":
+        headers = {
+          "Omelink-Metis-Userid": userId,
+        };
+        break;
+      default:
+        return {};
+    }
+  } else {
+    headers = {
+      "Ome-Metis-Authorization": token,
+      "Ome-Metis-Userid": userId,
+      "Ome-Metis-Username": userName,
+    };
+  }
+
+  return headers;
+}
+
+export const GetHistory = async (headers: {
+  [key: string]: string;
+}): Promise<ISession[]> => {
   return (
     await api.get("/api/v1/histories", {
-      headers: {
-        "Ome-Metis-Authorization": token,
-        "OME-METIS-UserId": userId,
-        "Ome-Metis-Username": userName,
-        "Omelink-Metis-Userid": omelinkUserId,
-      },
+      headers,
     })
   ).data;
 };
 
 export const PostAddOrUpdateSession = async (
-  token: string,
-  userId: string,
-  userName: string,
-  omelinkUserId: string,
+  headers: {
+    [key: string]: string;
+  },
   data: Partial<ISession>,
 ): Promise<ISession> => {
   return (
     await api.post("/api/v1/history/addOrUpdate", data, {
-      headers: {
-        "Ome-Metis-Authorization": token,
-        "OME-METIS-UserId": userId,
-        "Ome-Metis-Username": userName,
-        "Omelink-Metis-Userid": omelinkUserId,
-      },
+      headers,
     })
   ).data;
 };

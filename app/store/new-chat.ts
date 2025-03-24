@@ -32,7 +32,11 @@ import { getMessageTextContent, isDalle3, trimTopic } from "../utils";
 import { estimateTokenLength } from "../utils/token";
 import { collectModelsWithDefaultModel } from "../utils/model";
 import { showToast } from "../components/ui-lib";
-import { GetHistory, PostAddOrUpdateSession } from "../client/smarties";
+import {
+  GetHistory,
+  PostAddOrUpdateSession,
+  getHeaders,
+} from "../client/smarties";
 import { ConvertSession, JSONParse } from "../utils/convert";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
 import { isEmpty } from "lodash-es";
@@ -284,10 +288,13 @@ export const useNewChatStore = create<ChatStoreType>()(
           });
 
           const data = await GetHistory(
-            useAppConfig.getState().omeToken,
-            useAppConfig.getState().omeUserId,
-            useAppConfig.getState().omeUserName,
-            useAppConfig.getState().omelinkUserId,
+            getHeaders(
+              "OmeOfficeApp",
+              true,
+              useAppConfig.getState().omeUserId,
+              useAppConfig.getState().omeUserName,
+              useAppConfig.getState().omeToken,
+            ),
           );
           const newData: ChatSession[] = data.map((item) => ({
             ...item,
@@ -642,10 +649,13 @@ export const useNewChatStore = create<ChatStoreType>()(
 
             const config = useAppConfig.getState();
             await PostAddOrUpdateSession(
-              config.omeToken,
-              config.omeUserId,
-              config.omeUserName,
-              config.omelinkUserId,
+              getHeaders(
+                useAppConfig.getState().from,
+                useAppConfig.getState().isFromApp,
+                useAppConfig.getState().omeUserId,
+                useAppConfig.getState().omeUserName,
+                useAppConfig.getState().omeToken,
+              ),
               ConvertSession("update", sessions[index]),
             )
               .then(() => console.log("更新成功"))
@@ -854,10 +864,13 @@ export const useNewChatStore = create<ChatStoreType>()(
             const data = ConvertSession("delete", deletedSession);
 
             await PostAddOrUpdateSession(
-              useAppConfig.getState().omeToken,
-              useAppConfig.getState().omeUserId,
-              useAppConfig.getState().omeUserName,
-              useAppConfig.getState().omelinkUserId,
+              getHeaders(
+                useAppConfig.getState().from,
+                useAppConfig.getState().isFromApp,
+                useAppConfig.getState().omeUserId,
+                useAppConfig.getState().omeUserName,
+                useAppConfig.getState().omeToken,
+              ),
               data,
             )
               .then(() => {
@@ -896,10 +909,13 @@ export const useNewChatStore = create<ChatStoreType>()(
         const data = ConvertSession("add", newSession);
 
         await PostAddOrUpdateSession(
-          config.omeToken,
-          config.omeUserId,
-          config.omeUserName,
-          config.omelinkUserId,
+          getHeaders(
+            useAppConfig.getState().from,
+            useAppConfig.getState().isFromApp,
+            useAppConfig.getState().omeUserId,
+            useAppConfig.getState().omeUserName,
+            useAppConfig.getState().omeToken,
+          ),
           data,
         )
           .then((res) => {
@@ -943,10 +959,13 @@ export const useNewChatStore = create<ChatStoreType>()(
         const data = ConvertSession("add", session);
 
         await PostAddOrUpdateSession(
-          useAppConfig.getState().omeToken,
-          useAppConfig.getState().omeUserId,
-          useAppConfig.getState().omeUserName,
-          useAppConfig.getState().omelinkUserId,
+          getHeaders(
+            useAppConfig.getState().from,
+            useAppConfig.getState().isFromApp,
+            useAppConfig.getState().omeUserId,
+            useAppConfig.getState().omeUserName,
+            useAppConfig.getState().omeToken,
+          ),
           data,
         )
           .then((res) => {

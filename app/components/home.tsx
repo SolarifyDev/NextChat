@@ -284,24 +284,22 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
-          if (params?.from === "OmeOfficeApp") {
-            if (!isEmpty(params?.ometoken)) {
-              appConfig.setOmeToken(params?.ometoken ?? "");
-            }
-            if (!isEmpty(params?.omeUserId)) {
-              appConfig.setOmeUserId(params?.omeUserId ?? "");
-            }
-            if (!isEmpty(params?.omeUserName)) {
-              appConfig.setOmeUserName(params?.omeUserName ?? "");
-            }
-            if (!isEmpty(params?.omelinkUserId)) {
-              appConfig.setOmelinkUserId(params?.omelinkUserId ?? "");
-            }
-            appConfig.setIsFromApp(true);
-            useNewChatStore.getState().setIsDown(true);
-            if (!isEmpty(params?.lanauge)) {
-              changeLang(params?.lanauge);
-            }
+          if (!isEmpty(params?.from)) {
+            appConfig.setFrom(params.from || "");
+          }
+          if (!isEmpty(params?.ometoken)) {
+            appConfig.setOmeToken(params?.ometoken ?? "");
+          }
+          if (!isEmpty(params?.omeUserId)) {
+            appConfig.setOmeUserId(params?.omeUserId ?? "");
+          }
+          if (!isEmpty(params?.omeUserName)) {
+            appConfig.setOmeUserName(params?.omeUserName ?? "");
+          }
+          appConfig.setIsFromApp(true);
+          useNewChatStore.getState().setIsDown(true);
+          if (!isEmpty(params?.lanauge)) {
+            changeLang(params?.lanauge);
           }
         } catch {}
       } else {

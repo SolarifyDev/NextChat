@@ -108,7 +108,7 @@ export const DEFAULT_CONFIG = {
   omeToken: "",
   omeUserId: "",
   omeUserName: "",
-  omelinkUserId: "",
+  from: "",
   isFromApp: false,
 };
 
@@ -171,16 +171,15 @@ export const useAppConfig = createPersistStore(
   { ...DEFAULT_CONFIG },
   (set, get) => ({
     reset() {
-      const { omeToken, omeUserId, omeUserName, isFromApp, omelinkUserId } =
-        get();
+      const { omeToken, omeUserId, omeUserName, isFromApp, from } = get();
 
       set(() => ({
         ...DEFAULT_CONFIG,
         omeToken,
         omeUserId,
         omeUserName,
-        omelinkUserId,
         isFromApp,
+        from,
       }));
     },
 
@@ -214,8 +213,8 @@ export const useAppConfig = createPersistStore(
       set(() => ({ isFromApp }));
     },
 
-    setOmelinkUserId(omelinkUserId: string) {
-      set(() => ({ omelinkUserId }));
+    setFrom(from: string) {
+      set(() => ({ from }));
     },
 
     mergeModels(newModels: LLMModel[]) {
