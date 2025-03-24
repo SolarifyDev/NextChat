@@ -1992,50 +1992,57 @@ export function _Chat_NEW() {
                         <div className={styles["chat-message-container"]}>
                           <div className={styles["chat-message-header"]}>
                             <div className={styles["chat-message-avatar"]}>
-                              <div className={styles["chat-message-edit"]}>
-                                <IconButton
-                                  icon={<EditIcon />}
-                                  // aria={Locale.Chat.Actions.Edit}
-                                  aria={t("Chat.Actions.Edit")}
-                                  onClick={async () => {
-                                    const newMessage = await showPrompt(
-                                      // Locale.Chat.Actions.Edit,
-                                      t("Chat.Actions.Edit"),
-                                      getMessageTextContent(message),
-                                      10,
-                                    );
-                                    let newContent:
-                                      | string
-                                      | MultimodalContent[] = newMessage;
-                                    const images = getMessageImages(message);
-                                    if (images.length > 0) {
-                                      newContent = [
-                                        { type: "text", text: newMessage },
-                                      ];
-                                      for (let i = 0; i < images.length; i++) {
-                                        newContent.push({
-                                          type: "image_url",
-                                          image_url: {
-                                            url: images[i],
-                                          },
-                                        });
-                                      }
-                                    }
-                                    chatStore.updateTargetSession(
-                                      session,
-                                      (session) => {
-                                        const m = session.mask.context
-                                          .concat(session.messages)
-                                          .find((m) => m.id === message.id);
-                                        if (m) {
-                                          m.content = newContent;
+                              {!config.isFromApp && (
+                                <div className={styles["chat-message-edit"]}>
+                                  <IconButton
+                                    icon={<EditIcon />}
+                                    // aria={Locale.Chat.Actions.Edit}
+                                    aria={t("Chat.Actions.Edit")}
+                                    onClick={async () => {
+                                      const newMessage = await showPrompt(
+                                        // Locale.Chat.Actions.Edit,
+                                        t("Chat.Actions.Edit"),
+                                        getMessageTextContent(message),
+                                        10,
+                                      );
+                                      let newContent:
+                                        | string
+                                        | MultimodalContent[] = newMessage;
+                                      const images = getMessageImages(message);
+                                      if (images.length > 0) {
+                                        newContent = [
+                                          { type: "text", text: newMessage },
+                                        ];
+                                        for (
+                                          let i = 0;
+                                          i < images.length;
+                                          i++
+                                        ) {
+                                          newContent.push({
+                                            type: "image_url",
+                                            image_url: {
+                                              url: images[i],
+                                            },
+                                          });
                                         }
-                                      },
-                                      true,
-                                    );
-                                  }}
-                                ></IconButton>
-                              </div>
+                                      }
+                                      chatStore.updateTargetSession(
+                                        session,
+                                        (session) => {
+                                          const m = session.mask.context
+                                            .concat(session.messages)
+                                            .find((m) => m.id === message.id);
+                                          if (m) {
+                                            m.content = newContent;
+                                          }
+                                        },
+                                        true,
+                                      );
+                                    }}
+                                  ></IconButton>
+                                </div>
+                              )}
+
                               {isUser ? (
                                 <Avatar avatar={config.avatar} />
                               ) : (
@@ -2060,7 +2067,7 @@ export function _Chat_NEW() {
                               </div>
                             )}
 
-                            {showActions && (
+                            {showActions && !config.isFromApp && (
                               <div className={styles["chat-message-actions"]}>
                                 <div className={styles["chat-input-actions"]}>
                                   {message.streaming ? (
