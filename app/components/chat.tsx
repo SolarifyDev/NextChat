@@ -9,6 +9,9 @@
 //   useState,
 // } from "react";
 
+import { useNewChatStore } from "../store/new-chat";
+import { _Chat_NEW } from "./chat-copy";
+
 // import SendWhiteIcon from "../icons/send-white.svg";
 // import BrainIcon from "../icons/brain.svg";
 // import RenameIcon from "../icons/rename.svg";
@@ -2170,19 +2173,19 @@
 //   );
 // }
 
-// // export function Chat() {
-// //   const chatStore = useChatStore();
-// //   const session = chatStore.currentSession();
-
-// //   return <_Chat key={session.id}></_Chat>;
-// // }
-
 // export function Chat() {
-//   const { currentSessionIndex } = useNewChatStore();
+//   const chatStore = useChatStore();
+//   const session = chatStore.currentSession();
 
-//   if (currentSessionIndex < 0) {
-//     return <></>;
-//   }
-
-//   return <_Chat_NEW key={currentSessionIndex}></_Chat_NEW>;
+//   return <_Chat key={session.id}></_Chat>;
 // }
+
+export function Chat() {
+  const { currentSessionIndex } = useNewChatStore();
+
+  if (currentSessionIndex < 0) {
+    return <></>;
+  }
+
+  return <_Chat_NEW key={currentSessionIndex}></_Chat_NEW>;
+}
