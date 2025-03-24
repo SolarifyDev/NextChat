@@ -16,7 +16,6 @@ import { useAppConfig } from "@/app/store";
 import MinIcon from "@/app/icons/min.svg";
 import MaxIcon from "@/app/icons/max.svg";
 import { getClientConfig } from "@/app/config/client";
-import { ChatAction } from "@/app/components/chat";
 import DeleteIcon from "@/app/icons/clear.svg";
 import CopyIcon from "@/app/icons/copy.svg";
 import PromptIcon from "@/app/icons/prompt.svg";
@@ -38,6 +37,7 @@ import { params } from "./sd-panel";
 import clsx from "clsx";
 import { t } from "i18next";
 import { useTranslation } from "react-i18next";
+import { ChatAction } from "../chat-copy";
 
 function getSdTaskStatus(item: any) {
   let s: string;
