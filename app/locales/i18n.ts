@@ -85,7 +85,7 @@ i18n.use(initReactI18next).init({
       translation: sk,
     },
   },
-  lng: localStorage.getItem("metis_lanuage") || "en",
+  lng: "en",
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,
