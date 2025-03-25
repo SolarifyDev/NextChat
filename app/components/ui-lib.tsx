@@ -24,8 +24,8 @@ import React, {
 import { IconButton } from "./button";
 import { Avatar } from "./emoji";
 import clsx from "clsx";
-import { useAppConfig } from "../store";
 import { t } from "i18next";
+import { useOmeStore } from "../store/ome";
 
 export function Popover(props: {
   children: JSX.Element;
@@ -516,7 +516,7 @@ export function Selector<T>(props: {
   onClose?: () => void;
   multiple?: boolean;
 }) {
-  const config = useAppConfig();
+  const omeStore = useOmeStore();
   const [selectedValues, setSelectedValues] = useState<T[]>(
     Array.isArray(props.defaultSelectedValue)
       ? props.defaultSelectedValue
@@ -564,7 +564,7 @@ export function Selector<T>(props: {
                 }}
               >
                 {selected ? (
-                  config.isFromApp ? (
+                  omeStore.isFromApp ? (
                     <OkIcon />
                   ) : (
                     <div

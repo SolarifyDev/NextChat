@@ -14,7 +14,7 @@ import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
 import ErrorBoundary from "./error";
 
-import { Lang, changeLang, getISOLang, getLang } from "../locales";
+import { getISOLang, getLang } from "../locales";
 
 import {
   HashRouter as Router,
@@ -33,8 +33,8 @@ import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 import isEmpty from "lodash-es/isEmpty";
 import { useNewChatStore } from "../store/new-chat";
 import "../locales/i18n";
+import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
-import { isNil } from "lodash-es";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -255,6 +255,8 @@ export function Home() {
 
   const appConfig = useAppConfig();
 
+  const omeStore = useOmeStore();
+
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
     useAccessStore.getState().fetch();
@@ -285,21 +287,21 @@ export function Home() {
           const params = JSON.parse(data);
 
           if (!isEmpty(params?.from)) {
-            appConfig.setFrom(params.from ?? "");
+            omeStore.setFrom(params.from ?? "");
           }
           if (!isEmpty(params?.ometoken)) {
-            appConfig.setOmeToken(params?.ometoken ?? "");
+            omeStore.setToken(params?.ometoken ?? "");
           }
           if (!isEmpty(params?.omeUserId)) {
-            appConfig.setOmeUserId(params?.omeUserId ?? "");
+            omeStore.setUserId(params?.omeUserId ?? "");
           }
           if (!isEmpty(params?.omeUserName)) {
-            appConfig.setOmeUserName(params?.omeUserName ?? "");
+            omeStore.setUserName(params?.omeUserName ?? "");
           }
-          appConfig.setIsFromApp(true);
+          omeStore.setIsFromApp(true);
           useNewChatStore.getState().setIsDown(true);
           if (!isEmpty(params?.lanauge)) {
-            changeLang(params?.lanauge);
+            omeStore.setLanguage(params?.lanauge);
           }
         } catch {}
       } else {
@@ -310,27 +312,21 @@ export function Home() {
           return; // 如果不是信任的源，忽略消息
         }
 
-        const lang = localStorage.getItem("lang");
-
-        if (lang !== i18next.language && !isNil(lang)) {
-          changeLang(lang as Lang);
-        }
-
         if (!isEmpty(event?.data?.ometoken)) {
           console.log(
             "[OmeToken] got ometoken from iframe",
             event.data.ometoken,
           );
-          appConfig.setOmeToken(event.data.ometoken);
+          omeStore.setToken(event.data.ometoken);
           useNewChatStore.getState().setIsDown(true);
         }
 
         if (!isEmpty(event?.data?.omeUserId)) {
-          appConfig.setOmeUserId(event?.data?.omeUserId);
+          omeStore.setUserId(event?.data?.omeUserId);
         }
 
         if (!isEmpty(event?.data?.omeUserName)) {
-          appConfig.setOmeUserName(event?.data?.omeUserName);
+          omeStore.setUserName(event?.data?.omeUserName);
         }
       }
     };
@@ -359,6 +355,11 @@ export function Home() {
       appConfig.setDefaultModel();
     }
   }, [appConfig._hasHydrated]);
+
+  useEffect(() => {
+    localStorage.setItem("metis_lanuage", omeStore.language);
+    i18next.changeLanguage(omeStore.language);
+  }, [omeStore.language]);
 
   if (!useHasHydrated()) {
     return <Loading />;

@@ -41,6 +41,7 @@ import { ConvertSession, JSONParse } from "../utils/convert";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
 import { isEmpty } from "lodash-es";
 import { t } from "i18next";
+import { useOmeStore } from "./ome";
 
 export type ChatMessageTool = {
   id: string;
@@ -289,11 +290,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
           const data = await GetHistory(
             getHeaders(
-              useAppConfig.getState().from,
-              useAppConfig.getState().isFromApp,
-              useAppConfig.getState().omeUserId,
-              useAppConfig.getState().omeUserName,
-              useAppConfig.getState().omeToken,
+              useOmeStore.getState().from,
+              useOmeStore.getState().isFromApp,
+              useOmeStore.getState().userId,
+              useOmeStore.getState().userName,
+              useOmeStore.getState().token,
             ),
           );
           const newData: ChatSession[] = data.map((item) => ({
@@ -650,11 +651,11 @@ export const useNewChatStore = create<ChatStoreType>()(
             const config = useAppConfig.getState();
             await PostAddOrUpdateSession(
               getHeaders(
-                useAppConfig.getState().from,
-                useAppConfig.getState().isFromApp,
-                useAppConfig.getState().omeUserId,
-                useAppConfig.getState().omeUserName,
-                useAppConfig.getState().omeToken,
+                useOmeStore.getState().from,
+                useOmeStore.getState().isFromApp,
+                useOmeStore.getState().userId,
+                useOmeStore.getState().userName,
+                useOmeStore.getState().token,
               ),
               ConvertSession("update", sessions[index]),
             )
@@ -865,11 +866,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
             await PostAddOrUpdateSession(
               getHeaders(
-                useAppConfig.getState().from,
-                useAppConfig.getState().isFromApp,
-                useAppConfig.getState().omeUserId,
-                useAppConfig.getState().omeUserName,
-                useAppConfig.getState().omeToken,
+                useOmeStore.getState().from,
+                useOmeStore.getState().isFromApp,
+                useOmeStore.getState().userId,
+                useOmeStore.getState().userName,
+                useOmeStore.getState().token,
               ),
               data,
             )
@@ -910,11 +911,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         await PostAddOrUpdateSession(
           getHeaders(
-            useAppConfig.getState().from,
-            useAppConfig.getState().isFromApp,
-            useAppConfig.getState().omeUserId,
-            useAppConfig.getState().omeUserName,
-            useAppConfig.getState().omeToken,
+            useOmeStore.getState().from,
+            useOmeStore.getState().isFromApp,
+            useOmeStore.getState().userId,
+            useOmeStore.getState().userName,
+            useOmeStore.getState().token,
           ),
           data,
         )
@@ -960,11 +961,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         await PostAddOrUpdateSession(
           getHeaders(
-            useAppConfig.getState().from,
-            useAppConfig.getState().isFromApp,
-            useAppConfig.getState().omeUserId,
-            useAppConfig.getState().omeUserName,
-            useAppConfig.getState().omeToken,
+            useOmeStore.getState().from,
+            useOmeStore.getState().isFromApp,
+            useOmeStore.getState().userId,
+            useOmeStore.getState().userName,
+            useOmeStore.getState().token,
           ),
           data,
         )

@@ -33,6 +33,7 @@ import { isMcpEnabled } from "../mcp/actions";
 import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
+import { useOmeStore } from "../store/ome";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -248,6 +249,7 @@ export function SideBar(props: { className?: string }) {
   const navigate = useNavigate();
   const config = useAppConfig();
   const chatStore = useNewChatStore();
+  const omeStore = useOmeStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
   const { getSession } = useNewChatStore();
@@ -270,19 +272,19 @@ export function SideBar(props: { className?: string }) {
   }, []);
 
   useEffect(() => {
-    if (config._hasHydrated && chatStore.isDown) {
+    if (chatStore.isDown) {
       getSession();
     }
-  }, [config._hasHydrated, chatStore.isDown]);
+  }, [chatStore.isDown]);
 
   return (
     <SideBarContainer
-      onDragStart={!config.isFromApp ? onDragStart : () => {}}
+      onDragStart={!omeStore.isFromApp ? onDragStart : () => {}}
       shouldNarrow={shouldNarrow}
-      isFromApp={config.isFromApp}
+      isFromApp={omeStore.isFromApp}
       {...props}
     >
-      {!config.isFromApp ? (
+      {!omeStore.isFromApp ? (
         <SideBarHeader
           title="NextChat"
           subTitle="Build your own AI assistant."
@@ -377,9 +379,9 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
-        <ChatList narrow={shouldNarrow} isFromApp={config.isFromApp} />
+        <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp} />
       </SideBarBody>
-      {config.isFromApp ? (
+      {omeStore.isFromApp ? (
         <div
           style={{
             width: "100%",

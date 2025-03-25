@@ -137,6 +137,7 @@ import { nanoid } from "nanoid";
 import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
+import { useOmeStore } from "../store/ome";
 
 const localStorage = safeLocalStorage();
 
@@ -542,6 +543,7 @@ export function ChatActions(props: {
   const { t } = useTranslation();
 
   const config = useAppConfig();
+  const omeStore = useOmeStore();
   const navigate = useNavigate();
   const chatStore = useNewChatStore();
   const pluginStore = usePluginStore();
@@ -664,7 +666,7 @@ export function ChatActions(props: {
             icon={<BottomIcon />}
           />
         )}
-        {props.hitBottom && !config.isFromApp && (
+        {props.hitBottom && !omeStore.isFromApp && (
           <ChatAction
             onClick={props.showPromptModal}
             // text={Locale.Chat.InputActions.Settings}
@@ -681,7 +683,7 @@ export function ChatActions(props: {
             icon={
               props.uploading ? (
                 <LoadingButtonIcon />
-              ) : config.isFromApp ? (
+              ) : omeStore.isFromApp ? (
                 <AppImage />
               ) : (
                 <ImageIcon />
@@ -706,7 +708,7 @@ export function ChatActions(props: {
           }
         />
 
-        {!config.isFromApp && (
+        {!omeStore.isFromApp && (
           <ChatAction
             onClick={props.showPromptHints}
             // text={Locale.Chat.InputActions.Prompt}
@@ -715,7 +717,7 @@ export function ChatActions(props: {
           />
         )}
 
-        {!config.isFromApp && (
+        {!omeStore.isFromApp && (
           <ChatAction
             onClick={() => {
               navigate(Path.Masks);
@@ -726,7 +728,7 @@ export function ChatActions(props: {
           />
         )}
 
-        {!config.isFromApp && (
+        {!omeStore.isFromApp && (
           <ChatAction
             // text={Locale.Chat.InputActions.Clear}
             text={t("Chat.InputActions.Clear")}
@@ -751,7 +753,7 @@ export function ChatActions(props: {
         <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
-          icon={config.isFromApp ? <AppRobot /> : <RobotIcon />}
+          icon={omeStore.isFromApp ? <AppRobot /> : <RobotIcon />}
         />
 
         {showModelSelector && (
@@ -871,7 +873,7 @@ export function ChatActions(props: {
         )}
 
         {showPlugins(currentProviderName, currentModel) &&
-          !config.isFromApp && (
+          !omeStore.isFromApp && (
             <ChatAction
               onClick={() => {
                 if (pluginStore.getAll().length == 0) {
@@ -1393,7 +1395,7 @@ export function _Chat_NEW() {
     });
   };
 
-  const appstore = useAppConfig();
+  const omeStore = useOmeStore();
   const accessStore = useAccessStore();
   const [speechStatus, setSpeechStatus] = useState(false);
   const [speechLoading, setSpeechLoading] = useState(false);
@@ -1456,13 +1458,13 @@ export function _Chat_NEW() {
     const copiedHello = Object.assign({}, data);
 
     if (!accessStore.isAuthorized()) {
-      if (!isEmpty(appstore.omeToken)) {
+      if (!isEmpty(omeStore.token)) {
       } else {
         // copiedHello.content = Locale.Error.Unauthorized;
         copiedHello.content = t("Error.Unauthorized");
       }
     }
-    if (!config.isFromApp) context.push(copiedHello);
+    if (!omeStore.isFromApp) context.push(copiedHello);
   }
 
   // preview messages
@@ -1810,10 +1812,10 @@ export function _Chat_NEW() {
   return (
     <>
       <div
-        className={config.isFromApp ? styles["chat-is-app"] : styles.chat}
+        className={omeStore.isFromApp ? styles["chat-is-app"] : styles.chat}
         key={session.id}
       >
-        {config.isFromApp ? (
+        {omeStore.isFromApp ? (
           <div
             style={{
               textAlign: "center",
@@ -1992,7 +1994,7 @@ export function _Chat_NEW() {
                         <div className={styles["chat-message-container"]}>
                           <div className={styles["chat-message-header"]}>
                             <div className={styles["chat-message-avatar"]}>
-                              {!config.isFromApp && (
+                              {!omeStore.isFromApp && (
                                 <div className={styles["chat-message-edit"]}>
                                   <IconButton
                                     icon={<EditIcon />}
@@ -2067,7 +2069,7 @@ export function _Chat_NEW() {
                               </div>
                             )}
 
-                            {showActions && !config.isFromApp && (
+                            {showActions && !omeStore.isFromApp && (
                               <div className={styles["chat-message-actions"]}>
                                 <div className={styles["chat-input-actions"]}>
                                   {message.streaming ? (
@@ -2241,7 +2243,7 @@ export function _Chat_NEW() {
                     </Fragment>
                   );
                 })}
-              {messages.length === 0 && config.isFromApp && (
+              {messages.length === 0 && omeStore.isFromApp && (
                 <div
                   style={{
                     position: "absolute",
