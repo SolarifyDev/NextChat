@@ -353,8 +353,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   // console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
 
   if (appConfig.isFromApp) {
-    switch (appConfig.from) {
-      case "OmeOfficeApp":
+    switch (appConfig.from.toLowerCase()) {
+      case "omeofficeapp":
         headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
 
         headers["OME-METIS-UserId"] = appConfig.omeUserId || "";

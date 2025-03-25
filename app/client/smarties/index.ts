@@ -24,8 +24,8 @@ export function getHeaders(
   let headers: { [key: string]: string } = {};
 
   if (isFromApp) {
-    switch (from) {
-      case "OmeOfficeApp":
+    switch (from.toLowerCase()) {
+      case "omeofficeapp":
         headers = {
           "Ome-Metis-Authorization": token,
           "Ome-Metis-Userid": userId,
