@@ -400,7 +400,7 @@ export function SideBar(props: { className?: string }) {
               fontSize: 16,
               marginTop: 8,
             }}
-            onClick={() => addConversation}
+            onClick={() => addConversation()}
           >
             <PhoneIcon />{" "}
             {/* <div>{shouldNarrow ? undefined : Locale.Home.NewChat}</div> */}
