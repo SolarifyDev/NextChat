@@ -45,7 +45,12 @@ export function ChatItem(props: {
       className={clsx(styles["chat-item"], {
         [styles["chat-item-selected"]]:
           props.selected &&
-          (currentPath === Path.Chat || currentPath === Path.Home),
+          (currentPath === Path.Chat || currentPath === Path.Home) &&
+          !props.isFromApp,
+        [styles["chat-item-selected-is-app"]]:
+          props.selected &&
+          (currentPath === Path.Chat || currentPath === Path.Home) &&
+          props.isFromApp,
       })}
       onClick={props.onClick}
       // ref={(ele) => {

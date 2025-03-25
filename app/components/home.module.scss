@@ -192,6 +192,10 @@
 }
 
 .chat-item-selected {
+  border-color: var(--primary);
+}
+
+.chat-item-selected-is-app {
   // border-color: var(--primary);
   border-color: #28b446;
 }

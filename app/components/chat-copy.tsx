@@ -50,6 +50,7 @@ import ArrowLeftIcon from "../icons/arrow-left.svg";
 import SendIcon from "../icons/send.svg";
 import AppImage from "../icons/app-gallery.svg";
 import AppRobot from "../icons/app-robot.svg";
+import SendWhiteIcon from "../icons/send-white.svg";
 import MetisIcon from "../icons/Footer.png";
 
 import NextImage from "next/image";
@@ -1215,6 +1216,7 @@ export function _Chat_NEW() {
 
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
+    if (session.messages.some((i) => i.streaming)) return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
@@ -2330,14 +2332,24 @@ export function _Chat_NEW() {
                 setShowChatSidePanel={setShowChatSidePanel}
               />
               <div
-                className={styles["chat-input-panel-inner-is-app"]}
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: "32px",
-                  backgroundColor: "#FFFFFF",
-                  display: "flex",
-                  flexDirection: "row",
-                }}
+                className={
+                  omeStore.isFromApp
+                    ? styles["chat-input-panel-inner-is-app"]
+                    : styles["chat-input-panel-inner"]
+                }
+                style={
+                  omeStore.isFromApp
+                    ? {
+                        padding: "12px 16px",
+                        borderRadius: "32px",
+                        display: "flex",
+                        flexDirection: "row",
+                      }
+                    : {
+                        padding: "10px 10px",
+                        position: "relative",
+                      }
+                }
               >
                 <div
                   style={{
@@ -2347,7 +2359,11 @@ export function _Chat_NEW() {
                   <Input.TextArea
                     id="chat-input"
                     ref={textareaRef}
-                    className={styles["chat-input-is-app"]}
+                    className={
+                      omeStore.isFromApp
+                        ? styles["chat-input-is-app"]
+                        : styles["chat-input"]
+                    }
                     // placeholder={Locale.Chat.Input(submitKey, config.isFromApp)}
                     placeholder={t("Chat.Input", {
                       submitKey,
@@ -2360,13 +2376,15 @@ export function _Chat_NEW() {
                     onPaste={handlePaste}
                     autoFocus={autoFocus}
                     autoSize={{
-                      minRows: 1,
+                      minRows: omeStore.isFromApp ? 1 : 2,
                       maxRows: 6,
                     }}
                     style={{
                       fontSize: config.fontSize,
                       fontFamily: config.fontFamily,
-                      backgroundColor: "white",
+                      backgroundColor: omeStore.isFromApp
+                        ? "#fafaff"
+                        : undefined,
                       marginRight: 2,
                       border: "none",
                       marginBottom: attachImages.length != 0 ? "8px" : 0,
@@ -2400,15 +2418,56 @@ export function _Chat_NEW() {
 
                 <div
                   style={{
-                    maxHeight: 30,
-                    backgroundColor: "white",
+                    maxHeight: omeStore.isFromApp ? 30 : undefined,
+                    marginLeft: 4,
                     display: "flex",
                     justifyContent: "center",
-                    alignItems: "center",
+                    alignItems: omeStore.isFromApp ? "center" : "end",
+                    position: !omeStore.isFromApp ? "absolute" : undefined,
+                    right: !omeStore.isFromApp ? "20px" : undefined,
+                    bottom: !omeStore.isFromApp ? "10px" : undefined,
                   }}
-                  onClick={() => doSubmit(userInput)}
                 >
-                  <SendIcon />
+                  {omeStore.isFromApp ? (
+                    <SendIcon onClick={() => doSubmit(userInput)} />
+                  ) : (
+                    <button
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 10,
+                        border: "none",
+                        outline: "none",
+                        cursor: "pointer",
+                        color: "var(--black)",
+                        backgroundColor: "var(--primary)",
+                        padding: "10px",
+                      }}
+                    >
+                      <SendWhiteIcon />
+                      <div
+                        style={{
+                          fontSize: 12,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          marginLeft: 5,
+                          color: "white",
+                        }}
+                      >
+                        {t("Chat.Send")}
+                      </div>
+                    </button>
+                    // <IconButton
+                    //   icon={<SendWhiteIcon />}
+                    //   // text={Locale.Chat.Send}
+                    //   text={t("Chat.Send")}
+                    //   className={styles["chat-input-send"]}
+                    //   type="primary"
+                    //   onClick={() => doSubmit(userInput)}
+                    // />
+                  )}
                 </div>
               </div>
               {/* <label
