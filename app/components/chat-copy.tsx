@@ -2459,14 +2459,6 @@ export function _Chat_NEW() {
                         {t("Chat.Send")}
                       </div>
                     </button>
-                    // <IconButton
-                    //   icon={<SendWhiteIcon />}
-                    //   // text={Locale.Chat.Send}
-                    //   text={t("Chat.Send")}
-                    //   className={styles["chat-input-send"]}
-                    //   type="primary"
-                    //   onClick={() => doSubmit(userInput)}
-                    // />
                   )}
                 </div>
               </div>
