@@ -138,6 +138,7 @@ import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
+import { useUpdateEffect } from "ahooks";
 
 const localStorage = safeLocalStorage();
 
@@ -647,6 +648,12 @@ export function ChatActions(props: {
     }
   }, [chatStore, currentModel, models, session]);
 
+  useUpdateEffect(() => {
+    if (omeStore.isFromApp) {
+      config.update((config) => (config.theme = Theme.Light));
+    }
+  }, [omeStore.isFromApp]);
+
   return (
     <div className={styles["chat-input-actions"]}>
       <>
@@ -691,22 +698,24 @@ export function ChatActions(props: {
             }
           />
         )}
-        <ChatAction
-          onClick={nextTheme}
-          // text={Locale.Chat.InputActions.Theme[theme]}
-          text={t(`Chat.InputActions.Theme.${theme}`)}
-          icon={
-            <>
-              {theme === Theme.Auto ? (
-                <AutoIcon />
-              ) : theme === Theme.Light ? (
-                <LightIcon />
-              ) : theme === Theme.Dark ? (
-                <DarkIcon />
-              ) : null}
-            </>
-          }
-        />
+        {!omeStore.isFromApp && (
+          <ChatAction
+            onClick={nextTheme}
+            // text={Locale.Chat.InputActions.Theme[theme]}
+            text={t(`Chat.InputActions.Theme.${theme}`)}
+            icon={
+              <>
+                {theme === Theme.Auto ? (
+                  <AutoIcon />
+                ) : theme === Theme.Light ? (
+                  <LightIcon />
+                ) : theme === Theme.Dark ? (
+                  <DarkIcon />
+                ) : null}
+              </>
+            }
+          />
+        )}
 
         {!omeStore.isFromApp && (
           <ChatAction
@@ -2170,7 +2179,13 @@ export function _Chat_NEW() {
                               ))}
                             </div>
                           )}
-                          <div className={styles["chat-message-item"]}>
+                          <div
+                            className={
+                              omeStore.isFromApp
+                                ? styles["chat-message-item-is-app"]
+                                : styles["chat-message-item"]
+                            }
+                          >
                             <Markdown
                               key={message.streaming ? "loading" : "done"}
                               content={getMessageTextContent(message)}
@@ -2231,12 +2246,14 @@ export function _Chat_NEW() {
                             </div>
                           )}
 
-                          <div className={styles["chat-message-action-date"]}>
-                            {isContext
-                              ? // ? Locale.Chat.IsContext
-                                t("Chat.IsContext")
-                              : message.date.toLocaleString()}
-                          </div>
+                          {!omeStore.isFromApp && (
+                            <div className={styles["chat-message-action-date"]}>
+                              {isContext
+                                ? // ? Locale.Chat.IsContext
+                                  t("Chat.IsContext")
+                                : message.date.toLocaleString()}
+                            </div>
+                          )}
                         </div>
                       </div>
                       {shouldShowClearContextDivider && <ClearContextDivider />}

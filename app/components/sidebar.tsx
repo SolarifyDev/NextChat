@@ -34,6 +34,7 @@ import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
+import { MessageEnum } from "../enum";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -261,6 +262,22 @@ export function SideBar(props: { className?: string }) {
     { wait: 300 },
   );
 
+  const { run: quitMetis } = useDebounceFn(
+    () => {
+      if (window.ReactNativeWebView) {
+        try {
+          const message = {
+            data: {},
+            msg: "quit",
+            type: MessageEnum.Quit,
+          };
+          window.ReactNativeWebView.postMessage(JSON.stringify(message));
+        } catch {}
+      }
+    },
+    { wait: 300 },
+  );
+
   useEffect(() => {
     // 检查 MCP 是否启用
     const checkMcpStatus = async () => {
@@ -362,9 +379,7 @@ export function SideBar(props: { className?: string }) {
               top: "50%",
               transform: "translateY(-50%)",
             }}
-            onClick={() => {
-              console.log("click");
-            }}
+            onClick={() => quitMetis()}
           >
             <ArrowLeftIcon />
           </div>

@@ -35,6 +35,7 @@ import { useNewChatStore } from "../store/new-chat";
 import "../locales/i18n";
 import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
+import { MessageEnum } from "../enum";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -343,8 +344,9 @@ export function Home() {
       if (window.ReactNativeWebView) {
         try {
           const message = {
-            data: "omemetis is ready",
-            url: location.origin,
+            data: {},
+            msg: "omemetis is ready",
+            type: MessageEnum.Send,
           };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } catch {}
