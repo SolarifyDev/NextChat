@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useAppConfig } from "../store";
+import { useOmeStore } from "../store/ome";
 
 export const api = axios.create({
   baseURL: "https://api.example.com",
@@ -8,9 +8,9 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    const appConfig = useAppConfig.getState();
+    const appConfig = useOmeStore.getState();
 
-    const authorizeToken = appConfig?.omeToken;
+    const authorizeToken = appConfig?.token;
 
     authorizeToken &&
       (config.headers.Authorization = `Bearer ${authorizeToken}`);
