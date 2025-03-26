@@ -8,7 +8,7 @@ export type OmeStoreType = {
   userId: string;
   userName: string;
   from: string;
-  isFromApp: boolean;
+  isFromApp: boolean | null;
   language: Lang;
   clearCurrent: () => void;
   setToken: (token: string) => void;
@@ -26,7 +26,7 @@ export const useOmeStore = create<OmeStoreType>()(
       userId: "",
       userName: "",
       from: "",
-      isFromApp: false,
+      isFromApp: null,
       language: "cn",
       clearCurrent: () => {
         set({
@@ -34,7 +34,7 @@ export const useOmeStore = create<OmeStoreType>()(
           userId: "",
           userName: "",
           from: "",
-          isFromApp: false,
+          isFromApp: null,
         });
       },
       setToken: (token: string) => {

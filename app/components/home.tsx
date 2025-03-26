@@ -36,6 +36,7 @@ import "../locales/i18n";
 import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
 import { MessageEnum } from "../enum";
+import { isNil } from "lodash-es";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -329,6 +330,7 @@ export function Home() {
         if (!isEmpty(event?.data?.omeUserName)) {
           omeStore.setUserName(event?.data?.omeUserName);
         }
+        omeStore.setIsFromApp(false);
       }
     };
 
@@ -363,7 +365,7 @@ export function Home() {
     i18next.changeLanguage(omeStore.language);
   }, [omeStore.language]);
 
-  if (!useHasHydrated()) {
+  if (!useHasHydrated() || isNil(omeStore.isFromApp)) {
     return <Loading />;
   }
 

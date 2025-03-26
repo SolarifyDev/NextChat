@@ -363,7 +363,7 @@ export function getHeaders(ignoreHeaders: boolean = false) {
 
         headers["Ome-Metis-Username"] = omeStore.userName || "";
         break;
-      case "omelink":
+      case "omelinkapp":
         headers["Omelink-Metis-Userid"] = omeStore.userId || "";
         break;
     }
