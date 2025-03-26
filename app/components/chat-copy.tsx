@@ -649,12 +649,6 @@ export function ChatActions(props: {
     }
   }, [chatStore, currentModel, models, session]);
 
-  useUpdateEffect(() => {
-    if (omeStore.isFromApp) {
-      config.update((config) => (config.theme = Theme.Light));
-    }
-  }, [omeStore.isFromApp]);
-
   return (
     <div className={styles["chat-input-actions"]}>
       <>
@@ -1813,6 +1807,12 @@ export function _Chat_NEW() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [messages, chatStore, navigate, session]);
+
+  useUpdateEffect(() => {
+    if (omeStore.isFromApp) {
+      config.update((config) => (config.theme = Theme.Light));
+    }
+  }, [omeStore.isFromApp]);
 
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
