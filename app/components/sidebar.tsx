@@ -298,7 +298,7 @@ export function SideBar(props: { className?: string }) {
     <SideBarContainer
       onDragStart={!omeStore.isFromApp ? onDragStart : () => {}}
       shouldNarrow={shouldNarrow}
-      isFromApp={omeStore.isFromApp}
+      isFromApp={omeStore.isFromApp!}
       {...props}
     >
       {!omeStore.isFromApp ? (
@@ -394,7 +394,7 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
-        <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp} />
+        <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp!} />
       </SideBarBody>
       {omeStore.isFromApp ? (
         <div
