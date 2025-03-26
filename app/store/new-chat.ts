@@ -291,7 +291,7 @@ export const useNewChatStore = create<ChatStoreType>()(
           const data = await GetHistory(
             getHeaders(
               useOmeStore.getState().from,
-              useOmeStore.getState().isFromApp,
+              useOmeStore.getState().isFromApp!,
               useOmeStore.getState().userId,
               useOmeStore.getState().userName,
               useOmeStore.getState().token,
@@ -652,7 +652,7 @@ export const useNewChatStore = create<ChatStoreType>()(
             await PostAddOrUpdateSession(
               getHeaders(
                 useOmeStore.getState().from,
-                useOmeStore.getState().isFromApp,
+                useOmeStore.getState().isFromApp!,
                 useOmeStore.getState().userId,
                 useOmeStore.getState().userName,
                 useOmeStore.getState().token,
@@ -867,7 +867,7 @@ export const useNewChatStore = create<ChatStoreType>()(
             await PostAddOrUpdateSession(
               getHeaders(
                 useOmeStore.getState().from,
-                useOmeStore.getState().isFromApp,
+                useOmeStore.getState().isFromApp!,
                 useOmeStore.getState().userId,
                 useOmeStore.getState().userName,
                 useOmeStore.getState().token,
@@ -912,7 +912,7 @@ export const useNewChatStore = create<ChatStoreType>()(
         await PostAddOrUpdateSession(
           getHeaders(
             useOmeStore.getState().from,
-            useOmeStore.getState().isFromApp,
+            useOmeStore.getState().isFromApp!,
             useOmeStore.getState().userId,
             useOmeStore.getState().userName,
             useOmeStore.getState().token,
@@ -962,7 +962,7 @@ export const useNewChatStore = create<ChatStoreType>()(
         await PostAddOrUpdateSession(
           getHeaders(
             useOmeStore.getState().from,
-            useOmeStore.getState().isFromApp,
+            useOmeStore.getState().isFromApp!,
             useOmeStore.getState().userId,
             useOmeStore.getState().userName,
             useOmeStore.getState().token,
