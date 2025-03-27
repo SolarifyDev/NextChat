@@ -1,7 +1,7 @@
 import { MessageEnum } from "@/app/enum";
 import axios from "axios";
 
-export const api = axios.create({ baseURL: "" });
+export const api = axios.create({ baseURL: "", timeout: 30000 });
 
 api.interceptors.request.use(
   async (config) => {
