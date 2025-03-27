@@ -80,6 +80,7 @@ const vi: PartialLocaleType = {
     Rename: "Đổi tên cuộc trò chuyện",
     Typing: "Đang nhập…",
     Input: "{{submitKey}} gửi，/ kích hoạt hoàn chỉnh, : kích hoạt lệnh",
+    AppInput: "Hãy bắt đầu trò chuyện nào~",
     Send: "Gửi",
     Config: {
       Reset: "Xóa trí nhớ",

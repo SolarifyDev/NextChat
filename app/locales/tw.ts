@@ -80,6 +80,7 @@ const tw = {
     Rename: "重新命名對話",
     Typing: "正在輸入…",
     Input: "輸入訊息後，按下 {{submitKey}} 鍵即可傳送",
+    AppInput: "開始聊天吧～",
     Send: "傳送",
     Config: {
       Reset: "重設",

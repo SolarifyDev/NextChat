@@ -80,6 +80,7 @@ const tr: PartialLocaleType = {
     Rename: "Sohbeti yeniden adlandır",
     Typing: "Yazıyor…",
     Input: "{{submitKey}} gönder, / tamamlama için, : komutlar için",
+    AppInput: "Hadi sohbet edelim~",
     Send: "Gönder",
     Config: {
       Reset: "Hafızayı temizle",

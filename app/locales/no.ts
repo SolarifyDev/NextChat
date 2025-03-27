@@ -83,6 +83,7 @@ const no: PartialLocaleType = {
     Typing: "Skriver…",
     Input:
       "{{submitKey}} send，/ for å utløse autoutfylling, : for å utløse kommando",
+    AppInput: "La oss starte å prate~",
     Send: "Send",
     Config: {
       Reset: "Fjern minne",

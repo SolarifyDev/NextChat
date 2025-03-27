@@ -82,6 +82,7 @@ const fr: PartialLocaleType = {
     Typing: "En train d'écrire…",
     Input:
       "{{submitKey}} pour envoyer，/ pour compléter, : pour déclencher des commandes",
+    AppInput: "Commençons à discuter~",
     Send: "Envoyer",
     Config: {
       Reset: "Effacer la mémoire",

@@ -83,6 +83,7 @@ const da: PartialLocaleType = {
     Typing: "Skriver…",
     Input:
       "{{submitKey}} for at sende, / for at søge i prompts, : for at bruge kommandoer",
+    AppInput: "Lad os begynde at chatte~",
     Send: "Send",
     StartSpeak: "Start oplæsning",
     StopSpeak: "Stop oplæsning",

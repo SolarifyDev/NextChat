@@ -234,7 +234,7 @@ export function SideBarTail(props: {
 }
 
 export function SideBar(props: { className?: string }) {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   const DISCOVERY = [
     // { name: Locale.Plugin.Name, path: Path.Plugins },
@@ -402,6 +402,7 @@ export function SideBar(props: { className?: string }) {
             width: "100%",
             display: "flex",
             justifyContent: "center",
+            paddingBottom: "8px",
           }}
         >
           <div

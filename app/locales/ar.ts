@@ -80,6 +80,7 @@ const ar: PartialLocaleType = {
     Rename: "إعادة تسمية الدردشة",
     Typing: "يكتب…",
     Input: "{{submitKey}} إرسال، / لتفعيل الإكمال التلقائي، : لتفعيل الأوامر",
+    AppInput: "لنبدأ الدردشة～",
     Send: "إرسال",
     Config: {
       Reset: "مسح الذاكرة",

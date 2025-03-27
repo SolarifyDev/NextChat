@@ -81,6 +81,7 @@ const de: PartialLocaleType = {
     Rename: "Gespräch umbenennen",
     Typing: "Tippt…",
     Input: "{{submitKey}} senden，/ für Autovervollständigung, : für Befehle",
+    AppInput: "Lass uns plaudern~",
     Send: "Senden",
     Config: {
       Reset: "Erinnerung löschen",

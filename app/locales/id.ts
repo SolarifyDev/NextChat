@@ -80,6 +80,7 @@ const id: PartialLocaleType = {
     Rename: "Ganti Nama Obrolan",
     Typing: "Sedang Mengetik…",
     Input: "{{submitKey}} kirim，/ untuk melengkapi, : untuk memicu perintah",
+    AppInput: "Mari mulai mengobrol~",
     Send: "Kirim",
     Config: {
       Reset: "Hapus Memori",

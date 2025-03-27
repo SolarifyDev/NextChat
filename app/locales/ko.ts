@@ -80,6 +80,7 @@ const ko: PartialLocaleType = {
     Rename: "채팅 이름 변경",
     Typing: "입력 중…",
     Input: "{{submitKey}} 전송，/ 자동 완성，: 명령어 입력",
+    AppInput: "채팅을 시작해 보세요～",
     Send: "전송",
     Config: {
       Reset: "기억 지우기",

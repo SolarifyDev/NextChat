@@ -84,6 +84,7 @@ const cn = {
     Rename: "重命名对话",
     Typing: "正在输入…",
     Input: "{{submitKey}} 发送，/ 触发补全，: 触发命令",
+    AppInput: "开始聊天吧～",
     Send: "发送",
     StartSpeak: "说话",
     StopSpeak: "停止",

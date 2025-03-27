@@ -82,6 +82,7 @@ const it: PartialLocaleType = {
     Typing: "Digitazione in corso…",
     Input:
       "{{submitKey}} per inviare，/ per attivare il completamento automatico, : per attivare il comando",
+    AppInput: "Iniziamo a chattare~",
     Send: "Invia",
     Config: {
       Reset: "Pulisci memoria",

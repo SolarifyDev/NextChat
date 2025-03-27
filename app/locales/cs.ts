@@ -80,6 +80,7 @@ const cs: PartialLocaleType = {
     Rename: "Přejmenovat konverzaci",
     Typing: "Píše se…",
     Input: "{submitKey} odeslat，/ pro doplnění, : pro příkaz",
+    AppInput: "Začněme si povídat~",
     Send: "Odeslat",
     Config: {
       Reset: "Vymazat paměť",

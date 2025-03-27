@@ -80,6 +80,7 @@ const pt: PartialLocaleType = {
     Typing: "Digitando…",
     Input:
       "{{submitKey}} para enviar, / para buscar prompts, : para usar comandos",
+    AppInput: "Vamos começar a conversar~",
     Send: "Enviar",
     Config: {
       Reset: "Redefinir para Padrão",

@@ -2365,9 +2365,13 @@ export function _Chat_NEW() {
                         : styles["chat-input"]
                     }
                     // placeholder={Locale.Chat.Input(submitKey, config.isFromApp)}
-                    placeholder={t("Chat.Input", {
-                      submitKey,
-                    })}
+                    placeholder={
+                      omeStore.isFromApp
+                        ? t("Chat.AppInput")
+                        : t("Chat.Input", {
+                            submitKey,
+                          })
+                    }
                     onInput={(e) => onInput(e.currentTarget.value)}
                     value={userInput}
                     onKeyDown={onInputKeyDown}

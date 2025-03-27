@@ -81,6 +81,7 @@ const sk: PartialLocaleType = {
     Typing: "Písanie…",
     Input:
       "{{submitKey}} na odoslanie, / na vyhľadávanie výziev, : na použitie príkazov",
+    AppInput: "Poďme si pokecať~",
     Send: "Odoslať",
     Config: {
       Reset: "Resetovať na predvolené",

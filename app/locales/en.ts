@@ -85,6 +85,7 @@ const en: LocaleType = {
     Rename: "Rename Chat",
     Typing: "Typing…",
     Input: "{{submitKey}} to send, / to search prompts, : to use commands",
+    AppInput: "Let's start chatting~",
     Send: "Send",
     StartSpeak: "Start Speak",
     StopSpeak: "Stop Speak",

@@ -80,6 +80,7 @@ const jp: PartialLocaleType = {
     Rename: "チャットの名前を変更",
     Typing: "入力中…",
     Input: "{{submitKey}}で送信、/で補完をトリガー、:でコマンドをトリガー",
+    AppInput: "チャットを始めましょう～",
     Send: "送信",
     Config: {
       Reset: "メモリをクリア",

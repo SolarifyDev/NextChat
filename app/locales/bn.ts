@@ -80,6 +80,7 @@ const bn: PartialLocaleType = {
     Rename: "চ্যাট নাম পরিবর্তন করুন",
     Typing: "লিখছে…",
     Input: "{{submitKey}} পাঠান，/ পূর্ণতা সক্রিয় করুন，: কমান্ড সক্রিয় করুন",
+    AppInput: "চলো কথা শুরু করি～",
     Send: "পাঠান",
     Config: {
       Reset: "মেমরি মুছে ফেলুন",

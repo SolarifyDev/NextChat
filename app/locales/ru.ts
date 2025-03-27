@@ -80,6 +80,7 @@ const ru: PartialLocaleType = {
     Rename: "Переименовать чат",
     Typing: "Печатает…",
     Input: "{{submitKey}} Отправить，/ для автозаполнения，: для команд",
+    AppInput: "Давайте начнём общаться～",
     Send: "Отправить",
     Config: {
       Reset: "Очистить память",
