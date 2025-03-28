@@ -139,7 +139,6 @@ import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
-import { useUpdateEffect } from "ahooks";
 
 const localStorage = safeLocalStorage();
 
@@ -588,8 +587,22 @@ export function ChatActions(props: {
         ...deepseekModels.filter((m) => m !== defaultModel),
         ...otherModels.filter((m) => m !== defaultModel),
       ];
+      if (omeStore.isFromApp) {
+        return arr.filter((i) =>
+          ["gpt-4o", "o1-mini", "deepseek-chat", "deepseek-reasoner"].some(
+            (item) => item === i.displayName.toLowerCase(),
+          ),
+        );
+      }
       return arr;
     } else {
+      if (omeStore.isFromApp) {
+        return [...deepseekModels, ...otherModels].filter((i) =>
+          ["gpt-4o", "o1-mini", "deepseek-chat", "deepseek-reasoner"].some(
+            (item) => item === i.displayName.toLowerCase(),
+          ),
+        );
+      }
       return [...deepseekModels, ...otherModels];
     }
   }, [allModels]);
@@ -1808,7 +1821,7 @@ export function _Chat_NEW() {
     };
   }, [messages, chatStore, navigate, session]);
 
-  useUpdateEffect(() => {
+  useEffect(() => {
     if (omeStore.isFromApp) {
       config.update((config) => (config.theme = Theme.Light));
     }
