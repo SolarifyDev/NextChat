@@ -91,10 +91,7 @@ export function ListItem(props: {
 export function List(props: { children: React.ReactNode; id?: string }) {
   const { isFromApp } = useOmeStore();
   return (
-    <div
-      className={isFromApp ? styles["list-is-app"] : styles.list}
-      id={props.id}
-    >
+    <div className={styles.list} id={props.id}>
       {props.children}
     </div>
   );

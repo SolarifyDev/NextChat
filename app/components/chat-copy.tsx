@@ -465,12 +465,7 @@ export function ChatAction(props: {
 
   return (
     <div
-      className={clsx(
-        isFromApp
-          ? styles["chat-input-action-is-app"]
-          : styles["chat-input-action"],
-        "clickable",
-      )}
+      className={clsx(styles["chat-input-action"], "clickable")}
       onClick={() => {
         props.onClick();
         setTimeout(updateWidth, 1);
