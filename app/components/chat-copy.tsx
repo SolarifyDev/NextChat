@@ -48,6 +48,7 @@ import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import ArrowLeftIcon from "../icons/arrow-left.svg";
 import SendIcon from "../icons/send.svg";
+import GraySendIcon from "../icons/gray-send.svg";
 import AppImage from "../icons/app-gallery.svg";
 import AppRobot from "../icons/app-robot.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
@@ -443,6 +444,7 @@ export function ChatAction(props: {
   icon: JSX.Element;
   onClick: () => void;
 }) {
+  const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState({
@@ -463,7 +465,12 @@ export function ChatAction(props: {
 
   return (
     <div
-      className={clsx(styles["chat-input-action"], "clickable")}
+      className={clsx(
+        isFromApp
+          ? styles["chat-input-action-is-app"]
+          : styles["chat-input-action"],
+        "clickable",
+      )}
       onClick={() => {
         props.onClick();
         setTimeout(updateWidth, 1);
@@ -1223,7 +1230,6 @@ export function _Chat_NEW() {
 
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
-    if (session.messages.some((i) => i.streaming)) return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
@@ -2446,7 +2452,11 @@ export function _Chat_NEW() {
                   }}
                 >
                   {omeStore.isFromApp ? (
-                    <SendIcon onClick={() => doSubmit(userInput)} />
+                    isEmpty(userInput) ? (
+                      <GraySendIcon onClick={() => doSubmit(userInput)} />
+                    ) : (
+                      <SendIcon onClick={() => doSubmit(userInput)} />
+                    )
                   ) : (
                     <button
                       style={{

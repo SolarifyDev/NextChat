@@ -334,6 +334,25 @@
         }
       }
     }
+
+    .list-is-app {
+      max-height: 90vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 16px;
+
+      .list-item {
+        cursor: pointer;
+        background-color: var(--white);
+
+        &:hover {
+          filter: brightness(0.95);
+        }
+
+        &:active {
+          filter: brightness(0.9);
+        }
+      }
+    }
   }
 }
-
