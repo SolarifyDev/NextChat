@@ -81,9 +81,15 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) and (pointer: fine) {
   :root {
     @include dark;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (pointer: coarse) {
+  :root {
+    @include light;
   }
 }
 

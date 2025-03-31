@@ -47,12 +47,12 @@ import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import ArrowLeftIcon from "../icons/arrow-left.svg";
-import SendIcon from "../icons/send.svg";
-import GraySendIcon from "../icons/gray-send.svg";
 import AppImage from "../icons/app-gallery.svg";
 import AppRobot from "../icons/app-robot.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
-import MetisIcon from "../icons/Footer.png";
+import MetisIcon from "../icons/metis.png";
+import SendIcon from "../icons/green-send.png";
+import GraySendIcon from "../icons/gray-send.png";
 
 import NextImage from "next/image";
 
@@ -2453,9 +2453,21 @@ export function _Chat_NEW() {
                 >
                   {omeStore.isFromApp ? (
                     isEmpty(userInput) ? (
-                      <GraySendIcon onClick={() => doSubmit(userInput)} />
+                      <NextImage
+                        src={GraySendIcon.src}
+                        alt=""
+                        width={32}
+                        height={32}
+                        onClick={() => doSubmit(userInput)}
+                      />
                     ) : (
-                      <SendIcon onClick={() => doSubmit(userInput)} />
+                      <NextImage
+                        src={SendIcon.src}
+                        alt=""
+                        width={32}
+                        height={32}
+                        onClick={() => doSubmit(userInput)}
+                      />
                     )
                   ) : (
                     <button
