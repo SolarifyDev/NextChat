@@ -92,6 +92,7 @@ const vi: PartialLocaleType = {
       Content:
         "Tôi có thể giúp bạn tìm kiếm và trả lời câu hỏi. Hãy hỏi tôi bất cứ điều gì!",
     },
+    UploadImageTips: "Chỉ được phép tải lên tối đa ba hình ảnh!",
   },
   Export: {
     Title: "Chia sẻ ghi chép trò chuyện",

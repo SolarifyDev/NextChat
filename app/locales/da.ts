@@ -106,6 +106,7 @@ const da: PartialLocaleType = {
       Content:
         "Jeg kan hjælpe dig med at søge og besvare spørgsmål. Spørg mig hvad som helst!",
     },
+    UploadImageTips: "Der må kun uploades maksimalt tre billeder!",
   },
   Export: {
     Title: "Eksportér beskeder",

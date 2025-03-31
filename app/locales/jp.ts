@@ -91,6 +91,7 @@ const jp: PartialLocaleType = {
       Title: "こんにちは~私はMETISです",
       Content: "検索や質問にお答えできます。何でも聞いてくださいね！",
     },
+    UploadImageTips: "アップロードできる画像は最大3枚までです!",
   },
   Export: {
     Title: "チャット履歴を共有",

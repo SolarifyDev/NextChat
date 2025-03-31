@@ -94,6 +94,7 @@ const it: PartialLocaleType = {
       Content:
         "Posso aiutarti a cercare e rispondere alle domande. Chiedimi qualsiasi cosa!",
     },
+    UploadImageTips: "È consentito caricare un massimo di tre immagini!",
   },
   Export: {
     Title: "Condividi cronologia chat",

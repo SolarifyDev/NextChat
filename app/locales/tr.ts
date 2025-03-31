@@ -92,6 +92,7 @@ const tr: PartialLocaleType = {
       Content:
         "Arama yapabilir ve sorularınızı yanıtlayabilirim. Bana istediğinizi sorabilirsiniz!",
     },
+    UploadImageTips: "En fazla üç resim yüklenebilir!",
   },
   Export: {
     Title: "Sohbet kayıtlarını paylaş",

@@ -92,6 +92,7 @@ const id: PartialLocaleType = {
       Content:
         "Saya bisa membantu Anda mencari dan menjawab pertanyaan. Silakan tanyakan apa saja!",
     },
+    UploadImageTips: "Hanya boleh mengunggah maksimal tiga gambar!",
   },
   Export: {
     Title: "Bagikan Riwayat Obrolan",

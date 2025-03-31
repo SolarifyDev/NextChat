@@ -93,6 +93,7 @@ const sk: PartialLocaleType = {
       Content:
         "Môžem vám pomôcť s vyhľadávaním a odpovedaním na otázky. Spýtajte sa ma na čokoľvek!",
     },
+    UploadImageTips: "Povolené je nahrať maximálne tri obrázky!",
   },
   Export: {
     Title: "Export správ",

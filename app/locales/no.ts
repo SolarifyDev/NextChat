@@ -95,6 +95,7 @@ const no: PartialLocaleType = {
       Content:
         "Jeg kan hjelpe deg med å søke og svare på spørsmål. Spør meg om hva som helst!",
     },
+    UploadImageTips: "Bare maksimalt tre bilete kan lastast opp!",
   },
   Export: {
     Title: "Del samtalehistorikk",

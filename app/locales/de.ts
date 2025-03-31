@@ -93,6 +93,7 @@ const de: PartialLocaleType = {
       Content:
         "Ich kann dir bei der Suche helfen und Fragen beantworten. Frag mich einfach alles!",
     },
+    UploadImageTips: "Es dürfen maximal drei Bilder hochgeladen werden!",
   },
   Export: {
     Title: "Chatverlauf teilen",

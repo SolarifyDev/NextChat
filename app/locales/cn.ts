@@ -106,6 +106,7 @@ const cn = {
       Title: "Hi~我是METIS",
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
+    UploadImageTips: "最多只允许上传三张图片!",
   },
   Export: {
     Title: "分享聊天记录",

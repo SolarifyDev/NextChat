@@ -100,6 +100,7 @@ const tw = {
       Title: "Hi~我是METIS",
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
+    UploadImageTips: "最多只允許上傳三張圖片",
   },
   Export: {
     Title: "將聊天記錄匯出為 Markdown",

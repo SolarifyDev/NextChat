@@ -95,6 +95,7 @@ const es: PartialLocaleType = {
       Content:
         "Puedo ayudarte a buscar y responder preguntas. ¡Pregúntame lo que quieras!",
     },
+    UploadImageTips: "¡Solo se permite subir un máximo de tres imágenes!",
   },
   Export: {
     Title: "Compartir historial de chat",

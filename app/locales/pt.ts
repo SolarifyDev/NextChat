@@ -92,6 +92,7 @@ const pt: PartialLocaleType = {
       Content:
         "Posso ajudar você a pesquisar e responder perguntas. Pergunte-me qualquer coisa!",
     },
+    UploadImageTips: "É permitido enviar no máximo três imagens!",
   },
   Export: {
     Title: "Exportar Mensagens",

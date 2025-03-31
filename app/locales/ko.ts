@@ -91,6 +91,7 @@ const ko: PartialLocaleType = {
       Title: "안녕하세요~ 저는 METIS입니다",
       Content: "검색과 질문에 답해드릴 수 있어요. 무엇이든 물어보세요!",
     },
+    UploadImageTips: "최대 세 장의 이미지만 업로드할 수 있습니다!",
   },
   Export: {
     Title: "채팅 기록 공유",

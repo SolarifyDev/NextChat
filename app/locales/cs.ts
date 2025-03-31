@@ -92,6 +92,7 @@ const cs: PartialLocaleType = {
       Content:
         "Mohu vám pomoci s hledáním a odpověďmi na otázky. Ptejte se na cokoliv!",
     },
+    UploadImageTips: "Je povoleno nahrát maximálně tři obrázky!",
   },
   Export: {
     Title: "Sdílet konverzace",

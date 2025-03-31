@@ -94,6 +94,8 @@ const fr: PartialLocaleType = {
       Content:
         "Je peux vous aider à rechercher et à répondre aux questions. Posez-moi toutes vos questions !",
     },
+    UploadImageTips:
+      "Il est permis de télécharger un maximum de trois images seulement !",
   },
   Export: {
     Title: "Partager l'historique des discussions",

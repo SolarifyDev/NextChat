@@ -1700,6 +1700,9 @@ export function _Chat_NEW() {
   );
 
   async function uploadImage() {
+    if (attachImages.length >= 3) {
+      return showToast(t("Chat.UploadImageTips"));
+    }
     const images: string[] = [];
     images.push(...attachImages);
 
