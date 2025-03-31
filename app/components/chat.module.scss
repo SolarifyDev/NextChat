@@ -652,6 +652,25 @@
   }
 }
 
+.chat-input-panel-is-app {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  padding-top: 10px;
+  box-sizing: border-box;
+  flex-direction: column;
+  box-shadow: var(--card-shadow);
+
+  .chat-input-actions {
+    .chat-input-action {
+      margin-bottom: 10px;
+    }
+    .chat-input-action-is-app {
+      margin-bottom: 10px;
+    }
+  }
+}
+
 @mixin single-line {
   white-space: nowrap;
   overflow: hidden;

@@ -2323,7 +2323,13 @@ export function _Chat_NEW() {
                 </div>
               )}
             </div>
-            <div className={styles["chat-input-panel"]}>
+            <div
+              className={
+                omeStore.isFromApp
+                  ? styles["chat-input-panel-is-app"]
+                  : styles["chat-input-panel"]
+              }
+            >
               <PromptHints
                 prompts={promptHints}
                 onPromptSelect={onPromptSelect}
