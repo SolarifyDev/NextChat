@@ -473,7 +473,7 @@ export function ChatAction(props: {
         isFromApp
           ? styles["chat-input-action-is-app"]
           : styles["chat-input-action"],
-        "clickable",
+        isFromApp ? "clickable-is-app" : "clickable",
       )}
       onClick={() => {
         props.onClick();
