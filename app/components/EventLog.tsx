@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-function Event({ event, timestamp }) {
+interface DeltaEvents {
+  [key: string]: any;
+}
+
+function Event({ event, timestamp }: { event: any; timestamp: any }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const isClient = event.event_id && !event.event_id.startsWith("event_");
@@ -27,11 +31,11 @@ function Event({ event, timestamp }) {
   );
 }
 
-export default function EventLog({ events }) {
-  const eventsToDisplay = [];
-  let deltaEvents = {};
+export default function EventLog({ events }: { events: any }) {
+  const eventsToDisplay: any[] = [];
+  let deltaEvents: DeltaEvents = {};
 
-  events.forEach((event) => {
+  events.forEach((event: any) => {
     if (event.type.endsWith("delta")) {
       if (deltaEvents[event.type]) {
         // for now just log a single event per render pass

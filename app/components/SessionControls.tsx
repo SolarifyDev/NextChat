@@ -1,7 +1,11 @@
 import { Button } from "antd";
 import { useState } from "react";
 
-function SessionStopped({ startSession }) {
+function SessionStopped({
+  startSession,
+}: {
+  startSession: () => Promise<void>;
+}) {
   const [isActivating, setIsActivating] = useState(false);
 
   function handleStartSession() {
@@ -23,7 +27,13 @@ function SessionStopped({ startSession }) {
   );
 }
 
-function SessionActive({ stopSession, sendTextMessage }) {
+function SessionActive({
+  stopSession,
+  sendTextMessage,
+}: {
+  stopSession: any;
+  sendTextMessage: any;
+}) {
   const [message, setMessage] = useState("");
 
   function handleSendClientEvent() {
@@ -65,6 +75,11 @@ export default function SessionControls({
   stopSession,
   sendTextMessage,
   isSessionActive,
+}: {
+  startSession: () => Promise<void>;
+  stopSession: () => void;
+  sendTextMessage: (message: any) => void;
+  isSessionActive: boolean;
 }) {
   return (
     <div className="flex gap-4 border-t-2 border-gray-200 h-full rounded-md">
