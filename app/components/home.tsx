@@ -287,6 +287,7 @@ export function Home() {
   }, []);
 
   useEffect(() => {
+    omeStore.setIsFromApp(false);
     const handleMessage = (event: any) => {
       const data = event.data;
 
