@@ -2492,7 +2492,7 @@ export function _Chat_NEW() {
                   }}
                 >
                   {omeStore.isFromApp ? (
-                    isEmpty(userInput) ? (
+                    isEmpty(userInput) && attachImages.length === 0 ? (
                       <NextImage
                         src={GraySendIcon.src}
                         alt=""
