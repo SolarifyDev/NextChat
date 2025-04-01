@@ -454,7 +454,7 @@ export function ChatAction(props: {
     icon: 16,
   });
 
-  const isMouseEnter = useRef<boolean>(false);
+  const [isMouseEnter, setIsMouseenter] = useState<boolean>(false);
 
   function updateWidth() {
     if (!iconRef.current || !textRef.current) return;
@@ -480,15 +480,19 @@ export function ChatAction(props: {
         setTimeout(updateWidth, 1);
       }}
       onMouseEnter={() => {
-        isMouseEnter.current = true;
+        setIsMouseenter(true);
         updateWidth();
       }}
-      onMouseLeave={() => (isMouseEnter.current = false)}
+      onMouseLeave={() => {
+        setIsMouseenter(false);
+      }}
       onTouchStart={() => {
-        isMouseEnter.current = true;
+        setIsMouseenter(true);
         updateWidth();
       }}
-      onTouchEnd={() => (isMouseEnter.current = false)}
+      onTouchEnd={() => {
+        setIsMouseenter(false);
+      }}
       style={
         {
           "--icon-width": `${width.icon}px`,
@@ -497,7 +501,11 @@ export function ChatAction(props: {
       }
     >
       <div ref={iconRef} className={styles["icon"]}>
-        {isMouseEnter.current ? props.hoverIcon || props.icon : props.icon}
+        {isFromApp
+          ? isMouseEnter
+            ? props.hoverIcon || props.icon
+            : props.icon
+          : props.icon}
       </div>
       <div className={styles["text"]} ref={textRef}>
         {props.text}
