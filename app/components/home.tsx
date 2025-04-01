@@ -89,6 +89,13 @@ const McpMarketPage = dynamic(
   },
 );
 
+const RealTimeAdio = dynamic(
+  async () => (await import("./realtime-audio")).RealTimeAdio,
+  {
+    loading: () => null,
+  },
+);
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -218,6 +225,7 @@ function Screen() {
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
+            <Route path={Path.RealTimeAdio} element={<RealTimeAdio />} />
           </Routes>
         </WindowContent>
       </>

@@ -35,6 +35,7 @@ import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
+import { Button } from "antd";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -396,6 +397,7 @@ export function SideBar(props: { className?: string }) {
       >
         <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp!} />
       </SideBarBody>
+      <Button onClick={() => navigate(Path.RealTimeAdio)}>通话</Button>
       {omeStore.isFromApp ? (
         <div
           style={{
