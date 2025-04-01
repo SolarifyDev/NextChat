@@ -39,6 +39,7 @@ import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 import RobotIcon from "../icons/robot.svg";
+import GreenRobotIcon from "../icons/green-robot.svg";
 import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
 import StyleIcon from "../icons/palette.svg";
@@ -443,6 +444,7 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
+  hoverIcon?: JSX.Element;
 }) {
   const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
@@ -451,6 +453,8 @@ export function ChatAction(props: {
     full: 16,
     icon: 16,
   });
+
+  const isMouseEnter = useRef<boolean>(false);
 
   function updateWidth() {
     if (!iconRef.current || !textRef.current) return;
@@ -475,8 +479,16 @@ export function ChatAction(props: {
         props.onClick();
         setTimeout(updateWidth, 1);
       }}
-      onMouseEnter={updateWidth}
-      onTouchStart={updateWidth}
+      onMouseEnter={() => {
+        isMouseEnter.current = true;
+        updateWidth();
+      }}
+      onMouseLeave={() => (isMouseEnter.current = false)}
+      onTouchStart={() => {
+        isMouseEnter.current = true;
+        updateWidth();
+      }}
+      onTouchEnd={() => (isMouseEnter.current = false)}
       style={
         {
           "--icon-width": `${width.icon}px`,
@@ -485,7 +497,7 @@ export function ChatAction(props: {
       }
     >
       <div ref={iconRef} className={styles["icon"]}>
-        {props.icon}
+        {isMouseEnter.current ? props.hoverIcon || props.icon : props.icon}
       </div>
       <div className={styles["text"]} ref={textRef}>
         {props.text}
@@ -777,7 +789,18 @@ export function ChatActions(props: {
         <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
-          icon={omeStore.isFromApp ? <AppRobot /> : <RobotIcon />}
+          icon={
+            omeStore.isFromApp ? (
+              showModelSelector ? (
+                <GreenRobotIcon />
+              ) : (
+                <AppRobot />
+              )
+            ) : (
+              <RobotIcon />
+            )
+          }
+          hoverIcon={<GreenRobotIcon />}
         />
 
         {showModelSelector && (
