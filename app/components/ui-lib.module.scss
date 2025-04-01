@@ -90,13 +90,11 @@
 }
 
 .list-is-app {
-  border: var(--border-in-light);
-  border-radius: 10px;
+  border-radius: 16px;
   box-shadow: var(--card-shadow);
   margin-bottom: 20px;
   animation: slide-in ease 0.3s;
   background: var(--white);
-  padding: 16px;
 }
 
 .list-is-app .list-item:last-child {
