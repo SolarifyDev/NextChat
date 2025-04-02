@@ -53,6 +53,7 @@ export enum Path {
   SearchChat = "/search-chat",
   McpMarket = "/mcp-market",
   RealTimeAdio = "/realtime-audio",
+  Test = "/test",
 }
 
 export enum ApiPath {

@@ -96,6 +96,10 @@ const RealTimeAdio = dynamic(
   },
 );
 
+const Test = dynamic(async () => (await import("./test")).Index, {
+  loading: () => null,
+});
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -226,6 +230,7 @@ function Screen() {
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
             <Route path={Path.RealTimeAdio} element={<RealTimeAdio />} />
+            <Route path={Path.Test} element={<Test />} />
           </Routes>
         </WindowContent>
       </>
@@ -287,7 +292,6 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    omeStore.setIsFromApp(false);
     const handleMessage = (event: any) => {
       const data = event.data;
 

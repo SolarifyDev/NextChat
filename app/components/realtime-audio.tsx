@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import EventLog from "./EventLog";
 import SessionControls from "./SessionControls";
+import { SessionStatus } from "../typing";
 
 export function RealTimeAdio() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -8,6 +9,22 @@ export function RealTimeAdio() {
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const audioElement = useRef<HTMLAudioElement | null>(null);
+
+  const [sessionStatus, setSessionStatus] =
+    useState<SessionStatus>("DISCONNECTED");
+
+  const fetchEphemeralKey = async (): Promise<string | null> => {
+    const tokenResponse = await fetch("/api/session");
+    const data = await tokenResponse.json();
+
+    if (!data.client_secret?.value) {
+      console.error("No ephemeral key provided by the server");
+      setSessionStatus("DISCONNECTED");
+      return null;
+    }
+
+    return data.client_secret.value;
+  };
 
   async function startSession() {
     // Get a session token for OpenAI Realtime API
@@ -145,7 +162,7 @@ export function RealTimeAdio() {
   return (
     <div
       style={{
-        backgroundColor: "red",
+        // backgroundColor: "red",
         width: "100%",
         height: "100%",
         display: "flex",
@@ -154,7 +171,7 @@ export function RealTimeAdio() {
     >
       <div
         style={{
-          backgroundColor: "blue",
+          // backgroundColor: "blue",
           flex: 1,
         }}
       >
