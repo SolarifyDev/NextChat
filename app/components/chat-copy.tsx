@@ -604,33 +604,49 @@ export function ChatActions(props: {
     const deepseekModels = filteredModels.filter((m) =>
       m.displayName.toLowerCase().includes("deepseek"),
     );
+    const metisModels = filteredModels.filter((m) =>
+      m.displayName.toLowerCase().includes("metis"),
+    );
     const otherModels = filteredModels.filter(
-      (m) => !m.displayName.toLowerCase().includes("deepseek"),
+      (m) =>
+        !m.displayName.toLowerCase().includes("deepseek") &&
+        !m.displayName.toLowerCase().includes("metis"),
     );
 
     if (defaultModel) {
       const arr = [
         defaultModel,
         ...deepseekModels.filter((m) => m !== defaultModel),
+        ...metisModels.filter((m) => m !== defaultModel),
         ...otherModels.filter((m) => m !== defaultModel),
       ];
       if (omeStore.isFromApp) {
         return arr.filter((i) =>
-          ["gpt-4o", "o1-mini", "deepseek-chat", "deepseek-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
+          [
+            "gpt-4o",
+            "o1-mini",
+            "deepseek-chat",
+            "deepseek-reasoner",
+            "metis-chat",
+            "metis-reasoner",
+          ].some((item) => item === i.displayName.toLowerCase()),
         );
       }
       return arr;
     } else {
       if (omeStore.isFromApp) {
-        return [...deepseekModels, ...otherModels].filter((i) =>
-          ["gpt-4o", "o1-mini", "deepseek-chat", "deepseek-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
+        return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
+          [
+            "gpt-4o",
+            "o1-mini",
+            "deepseek-chat",
+            "deepseek-reasoner",
+            "metis-chat",
+            "metis-reasoner",
+          ].some((item) => item === i.displayName.toLowerCase()),
         );
       }
-      return [...deepseekModels, ...otherModels];
+      return [...deepseekModels, ...metisModels, ...otherModels];
     }
   }, [allModels]);
   const currentModelName = useMemo(() => {

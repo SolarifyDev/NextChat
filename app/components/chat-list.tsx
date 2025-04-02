@@ -87,18 +87,16 @@ export function ChatItem(props: {
         </>
       )}
 
-      {!props?.isFromApp && (
-        <div
-          className={styles["chat-item-delete"]}
-          onClickCapture={(e) => {
-            props.onDelete?.();
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <DeleteIcon />
-        </div>
-      )}
+      <div
+        className={styles["chat-item-delete"]}
+        onClickCapture={(e) => {
+          props.onDelete?.();
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <DeleteIcon />
+      </div>
     </div>
     //   )}
     // </Draggable>
