@@ -5,7 +5,6 @@ import {
   ModelProvider,
   ServiceProvider,
 } from "@/app/constant";
-import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
@@ -33,8 +32,9 @@ export async function handle(
     const response = await request(req);
     return response;
   } catch (e) {
-    console.error("[DeepSeek] ", e);
-    return NextResponse.json(prettyObject(e));
+    return new Response("請檢查您的網絡後重試");
+    // console.error("[DeepSeek] ", e);
+    // return NextResponse.json(prettyObject(e));
   }
 }
 

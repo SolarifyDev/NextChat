@@ -1,7 +1,6 @@
 import { type OpenAIListModelResponse } from "@/app/client/platforms/openai";
 import { getServerSideConfig } from "@/app/config/server";
 import { ModelProvider, OpenaiPath } from "@/app/constant";
-import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./auth";
 import { requestOpenai } from "./common";
@@ -72,7 +71,8 @@ export async function handle(
 
     return response;
   } catch (e) {
-    console.error("[OpenAI] ", e);
-    return NextResponse.json(prettyObject(e));
+    return new Response("請檢查您的網絡後重試");
+    // console.error("[OpenAI] ", e);
+    // return NextResponse.json(prettyObject(e));
   }
 }
