@@ -31,8 +31,9 @@ export async function handle(
   try {
     const response = await request(req);
     return response;
-  } catch (e) {
-    return new Response("請檢查您的網絡後重試");
+  } catch (e: any) {
+    console.error("[DeepSeek] ", e);
+    return new Response(e?.content || "請檢查您的網絡後重試");
     // console.error("[DeepSeek] ", e);
     // return NextResponse.json(prettyObject(e));
   }

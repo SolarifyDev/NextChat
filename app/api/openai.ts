@@ -70,8 +70,9 @@ export async function handle(
     }
 
     return response;
-  } catch (e) {
-    return new Response("請檢查您的網絡後重試");
+  } catch (e: any) {
+    console.error("[OpenAI] ", e);
+    return new Response(e?.content || "請檢查您的網絡後重試");
     // console.error("[OpenAI] ", e);
     // return NextResponse.json(prettyObject(e));
   }
