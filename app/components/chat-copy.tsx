@@ -1764,7 +1764,6 @@ export function _Chat_NEW() {
             const file = event.target.files[i];
             console.log("file", file);
 
-            showToast(file.type);
             if (!validImageTypes.includes(file.type)) {
               if (i === files.length - 1) {
                 setUploading(false);
