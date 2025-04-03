@@ -733,7 +733,6 @@ export function ChatActions(props: {
                 <ImageIcon />
               )
             }
-            // hoverIcon={<AppGreenImage />}
             isHaveHover={true}
           />
         )}
@@ -813,7 +812,6 @@ export function ChatActions(props: {
               <RobotIcon />
             )
           }
-          // hoverIcon={<GreenRobotIcon />}
           isHaveHover={true}
         />
 
