@@ -61,10 +61,11 @@ export function ListItem(props: {
   onClick?: (e: MouseEvent) => void;
   vertical?: boolean;
 }) {
+  const { isFromApp } = useOmeStore();
   return (
     <div
       className={clsx(
-        styles["list-item"],
+        isFromApp ? styles["list-item-is-app"] : styles["list-item"],
         {
           [styles["vertical"]]: props.vertical,
         },
@@ -74,7 +75,11 @@ export function ListItem(props: {
     >
       <div className={styles["list-header"]}>
         {props.icon && <div className={styles["list-icon"]}>{props.icon}</div>}
-        <div className={styles["list-item-title"]}>
+        <div
+          className={
+            isFromApp ? styles["list-item--is-app"] : styles["list-item-title"]
+          }
+        >
           <div>{props.title}</div>
           {props.subTitle && (
             <div className={styles["list-item-sub-title"]}>

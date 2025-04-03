@@ -360,6 +360,16 @@ pre {
 
 .clickable-is-app {
   cursor: pointer;
+
+  .is-hover-show {
+    svg {
+      fill: #6e6c8a !important;
+    }
+  }
+}
+
+.clickable-is-app:hover .is-hover-show svg {
+  fill: rgba(40, 180, 70, 1) !important;
 }
 
 .error {

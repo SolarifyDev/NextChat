@@ -37,9 +37,10 @@ import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
+import AppBottomIcon from "../icons/app-bottom.svg";
 import StopIcon from "../icons/pause.svg";
+import AppStopIcon from "../icons/app-pause.svg";
 import RobotIcon from "../icons/robot.svg";
-import GreenRobotIcon from "../icons/green-robot.svg";
 import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
 import StyleIcon from "../icons/palette.svg";
@@ -444,7 +445,7 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
-  hoverIcon?: JSX.Element;
+  isHaveHover?: boolean;
 }) {
   const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
@@ -453,8 +454,6 @@ export function ChatAction(props: {
     full: 16,
     icon: 16,
   });
-
-  const [isMouseEnter, setIsMouseenter] = useState<boolean>(false);
 
   function updateWidth() {
     if (!iconRef.current || !textRef.current) return;
@@ -479,20 +478,8 @@ export function ChatAction(props: {
         props.onClick();
         setTimeout(updateWidth, 1);
       }}
-      onMouseEnter={() => {
-        setIsMouseenter(true);
-        updateWidth();
-      }}
-      onMouseLeave={() => {
-        setIsMouseenter(false);
-      }}
-      onTouchStart={() => {
-        setIsMouseenter(true);
-        updateWidth();
-      }}
-      onTouchEnd={() => {
-        setIsMouseenter(false);
-      }}
+      onMouseEnter={updateWidth}
+      onTouchStart={updateWidth}
       style={
         {
           "--icon-width": `${width.icon}px`,
@@ -500,12 +487,11 @@ export function ChatAction(props: {
         } as React.CSSProperties
       }
     >
-      <div ref={iconRef} className={styles["icon"]}>
-        {isFromApp
-          ? isMouseEnter
-            ? props.hoverIcon || props.icon
-            : props.icon
-          : props.icon}
+      <div
+        ref={iconRef}
+        className={clsx(styles["icon"], props.isHaveHover && "is-hover-show")}
+      >
+        {props.icon}
       </div>
       <div className={styles["text"]} ref={textRef}>
         {props.text}
@@ -713,7 +699,7 @@ export function ChatActions(props: {
             onClick={stopAll}
             // text={Locale.Chat.InputActions.Stop}
             text={t("Chat.InputActions.Stop")}
-            icon={<StopIcon />}
+            icon={omeStore.isFromApp ? <AppStopIcon /> : <StopIcon />}
           />
         )}
         {!props.hitBottom && (
@@ -721,7 +707,7 @@ export function ChatActions(props: {
             onClick={props.scrollToBottom}
             // text={Locale.Chat.InputActions.ToBottom}
             text={t("Chat.InputActions.ToBottom")}
-            icon={<BottomIcon />}
+            icon={omeStore.isFromApp ? <AppBottomIcon /> : <BottomIcon />}
           />
         )}
         {props.hitBottom && !omeStore.isFromApp && (
@@ -747,6 +733,8 @@ export function ChatActions(props: {
                 <ImageIcon />
               )
             }
+            // hoverIcon={<AppGreenImage />}
+            isHaveHover={true}
           />
         )}
         {!omeStore.isFromApp && (
@@ -815,16 +803,18 @@ export function ChatActions(props: {
           text={currentModelName}
           icon={
             omeStore.isFromApp ? (
-              showModelSelector ? (
-                <GreenRobotIcon />
-              ) : (
-                <AppRobot />
-              )
+              // showModelSelector ? (
+              //   <GreenRobotIcon />
+              // ) : (
+              //   <AppRobot />
+              // )
+              <AppRobot />
             ) : (
               <RobotIcon />
             )
           }
-          hoverIcon={<GreenRobotIcon />}
+          // hoverIcon={<GreenRobotIcon />}
+          isHaveHover={true}
         />
 
         {showModelSelector && (

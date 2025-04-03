@@ -88,7 +88,11 @@ export function ChatItem(props: {
       )}
 
       <div
-        className={styles["chat-item-delete"]}
+        className={
+          props.isFromApp
+            ? styles["chat-item-delete-is-app"]
+            : styles["chat-item-delete"]
+        }
         onClickCapture={(e) => {
           props.onDelete?.();
           e.preventDefault();
