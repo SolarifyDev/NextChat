@@ -1752,9 +1752,22 @@ export function _Chat_NEW() {
           setUploading(true);
           const files = event.target.files;
           const imagesData: string[] = [];
+          const validImageTypes = [
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/heic",
+            "image/heif",
+          ];
+
           for (let i = 0; i < files.length; i++) {
             const file = event.target.files[i];
             console.log("file", file);
+
+            if (!validImageTypes.includes(file.type)) {
+              continue;
+            }
+
             uploadImageRemote(file)
               .then((dataUrl) => {
                 imagesData.push(dataUrl);
