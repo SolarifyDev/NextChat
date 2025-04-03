@@ -1765,7 +1765,12 @@ export function _Chat_NEW() {
             console.log("file", file);
 
             if (!validImageTypes.includes(file.type)) {
-              continue;
+              if (i === files.length - 1) {
+                setUploading(false);
+                rej(new Error("No valid images were selected."));
+              } else {
+                continue;
+              }
             }
 
             uploadImageRemote(file)
