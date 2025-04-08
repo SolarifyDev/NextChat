@@ -20,7 +20,6 @@ import {
   ModelConfig,
   ModelType,
   useAppConfig,
-  useChatStore,
 } from "../store";
 import { MultimodalContent, ROLES } from "../client/api";
 import {
@@ -56,6 +55,7 @@ import {
 } from "@hello-pangea/dnd";
 import { getMessageTextContent } from "../utils";
 import clsx from "clsx";
+import { useNewChatStore } from "../store/new-chat";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -443,7 +443,7 @@ export function MaskPage() {
   const navigate = useNavigate();
 
   const maskStore = useMaskStore();
-  const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
 
   const filterLang = maskStore.language;
 
@@ -601,8 +601,7 @@ export function MaskPage() {
                     icon={<AddIcon />}
                     text={Locale.Mask.Item.Chat}
                     onClick={() => {
-                      chatStore.newSession(m);
-                      navigate(Path.Chat);
+                      chatStore.newSession(m, () => navigate(Path.Chat));
                     }}
                   />
                   {m.builtin ? (

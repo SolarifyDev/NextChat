@@ -31,6 +31,7 @@ import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 import isEmpty from "lodash-es/isEmpty";
+import { useNewChatStore } from "../store/new-chat";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -271,8 +272,14 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
-          if (!isEmpty(params?.ometoken) && params?.from === "OmeOfficeApp") {
-            appConfig.setOmeToken(params?.ometoken ?? "");
+          if (params?.from === "OmeOfficeApp") {
+            if (!isEmpty(params?.ometoken)) {
+              appConfig.setOmeToken(params?.ometoken ?? "");
+              useNewChatStore.getState().setIsDown(true);
+            }
+            if (!isEmpty(params?.omeUserId)) {
+              appConfig.setOmeUserId(params?.omeUserId ?? "");
+            }
           }
         } catch {}
       } else {
@@ -289,6 +296,15 @@ export function Home() {
             event.data.ometoken,
           );
           appConfig.setOmeToken(event.data.ometoken);
+          useNewChatStore.getState().setIsDown(true);
+        }
+
+        if (!isEmpty(event?.data?.omeUserId)) {
+          appConfig.setOmeUserId(event?.data?.omeUserId);
+        }
+
+        if (!isEmpty(event?.data?.omeUserName)) {
+          appConfig.setOmeUserName(event?.data?.omeUserName);
         }
       }
     };
@@ -313,6 +329,8 @@ export function Home() {
       } else {
         window.parent.postMessage("omemetis is ready", "*");
       }
+
+      appConfig.setDefaultModel();
     }
   }, [appConfig._hasHydrated]);
 

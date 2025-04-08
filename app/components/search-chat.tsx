@@ -8,7 +8,7 @@ import EyeIcon from "../icons/eye.svg";
 import Locale from "../locales";
 import { Path } from "../constant";
 
-import { useChatStore } from "../store";
+import { useNewChatStore } from "../store/new-chat";
 
 type Item = {
   id: number;
@@ -18,7 +18,8 @@ type Item = {
 export function SearchChatPage() {
   const navigate = useNavigate();
 
-  const chatStore = useChatStore();
+  // const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
 
   const sessions = chatStore.sessions;
   const selectSession = chatStore.selectSession;

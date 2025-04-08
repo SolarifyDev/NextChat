@@ -240,6 +240,10 @@ export function isModelNotavailableInServer(
     return true;
   }
 
+  if(modelName.toLowerCase().includes('metis')){
+    return false;
+  }
+  
   const modelTable = collectModelTable(DEFAULT_MODELS, customModels);
 
   const providerNamesArray = Array.isArray(providerNames)

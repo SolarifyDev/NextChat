@@ -106,6 +106,8 @@ export const DEFAULT_CONFIG = {
     voice: "alloy" as Voice,
   },
   omeToken: "",
+  omeUserId: "",
+  omeUserName: "",
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;
@@ -167,13 +169,35 @@ export const useAppConfig = createPersistStore(
   { ...DEFAULT_CONFIG },
   (set, get) => ({
     reset() {
-      const { omeToken } = get();
+      const { omeToken, omeUserId, omeUserName } = get();
 
-      set(() => ({ ...DEFAULT_CONFIG, omeToken }));
+      set(() => ({ ...DEFAULT_CONFIG, omeToken, omeUserId, omeUserName }));
+    },
+
+    setDefaultModel() {
+      const { modelConfig } = get();
+
+      if (!modelConfig.model.toLowerCase().includes("deepseek"))
+        set(() => ({
+          ...DEFAULT_CONFIG,
+          modelConfig: {
+            ...modelConfig,
+            model: "deepseek-chat" as ModelType,
+            providerName: "DeepSeek" as ServiceProvider,
+          },
+        }));
+    },
+
+    setOmeUserName(omeUserName: string) {
+      set(() => ({ omeUserName }));
     },
 
     setOmeToken(omeToken: string) {
       set(() => ({ omeToken }));
+    },
+
+    setOmeUserId(omeUserId: string) {
+      set(() => ({ omeUserId }));
     },
 
     mergeModels(newModels: LLMModel[]) {
