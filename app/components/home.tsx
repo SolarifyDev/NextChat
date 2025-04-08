@@ -14,8 +14,6 @@ import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
 import ErrorBoundary from "./error";
 
-import { getISOLang, getLang } from "../locales";
-
 import {
   HashRouter as Router,
   Route,
@@ -121,8 +119,14 @@ export function useSwitchTheme() {
 }
 
 function useHtmlLang() {
+  const { language } = useOmeStore();
   useEffect(() => {
-    const lang = getISOLang();
+    const isoLangString: Record<string, string> = {
+      cn: "zh-Hans",
+      tw: "zh-Hant",
+    };
+
+    const lang = isoLangString[language] ?? language;
     const htmlLang = document.documentElement.lang;
 
     if (lang !== htmlLang) {
@@ -167,6 +171,7 @@ export function WindowContent(props: { children: React.ReactNode }) {
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
+  const omeStore = useOmeStore();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -228,7 +233,7 @@ function Screen() {
     <div
       className={clsx(styles.container, {
         [styles["tight-container"]]: shouldTightBorder,
-        [styles["rtl-screen"]]: getLang() === "ar",
+        [styles["rtl-screen"]]: omeStore.language === "ar",
       })}
     >
       {renderContent()}

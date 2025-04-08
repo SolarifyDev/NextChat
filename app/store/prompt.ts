@@ -1,8 +1,8 @@
 import Fuse from "fuse.js";
 import { nanoid } from "nanoid";
 import { StoreKey } from "../constant";
-import { getLang } from "../locales";
 import { createPersistStore } from "../utils/store";
+import { useOmeStore } from "./ome";
 
 export interface Prompt {
   id: string;
@@ -160,7 +160,7 @@ export const usePromptStore = createPersistStore(
         .then((res) => res.json())
         .then((res) => {
           let fetchPrompts = [res.en, res.tw, res.cn];
-          if (getLang() === "cn") {
+          if (useOmeStore.getState().language === "cn") {
             fetchPrompts = fetchPrompts.reverse();
           }
           const builtinPrompts = fetchPrompts.map((promptList: PromptList) => {
