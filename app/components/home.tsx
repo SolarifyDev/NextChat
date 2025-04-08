@@ -258,7 +258,7 @@ export function useLoadData() {
 export function Home() {
   useSwitchTheme();
   useLoadData();
-  useHtmlLang();
+  // useHtmlLang();
 
   const appConfig = useAppConfig();
 
@@ -368,6 +368,18 @@ export function Home() {
   useEffect(() => {
     localStorage.setItem("metis_lanuage", omeStore.language);
     i18next.changeLanguage(omeStore.language);
+
+    const isoLangString: Record<string, string> = {
+      cn: "zh-Hans",
+      tw: "zh-Hant",
+    };
+
+    const lang = isoLangString[omeStore.language] ?? omeStore.language;
+    const htmlLang = document.documentElement.lang;
+
+    if (lang !== htmlLang) {
+      document.documentElement.lang = lang;
+    }
   }, [omeStore.language]);
 
   if (!useHasHydrated() || isNil(omeStore.isFromApp)) {
