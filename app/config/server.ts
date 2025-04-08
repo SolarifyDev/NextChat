@@ -92,6 +92,10 @@ declare global {
       DEFAULT_INPUT_TEMPLATE?: string;
 
       ENABLE_MCP?: string; // enable mcp functionality
+
+      SMART_TALK_KEY: string;
+
+      SMART_TALK_URL: string;
     }
   }
 }

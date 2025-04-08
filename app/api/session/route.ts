@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST(req: Request) {
   try {
+    const { offerSdp } = await req.json();
+
     const response = await fetch(
-      "https://api.openai.com/v1/realtime/sessions",
+      `${process.env.SMART_TALK_URL}/api/AiSpeechAssistant/realtime/connect`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "x-api-key": process.env.SMART_TALK_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-realtime-preview-2024-12-17",
+          offerSdp,
         }),
       },
     );

@@ -1,5 +1,4 @@
 import { RefObject } from "react";
-import { PostRealTime } from "../client/smarttalk";
 
 export async function createRealtimeConnection(
   audioElement: RefObject<HTMLAudioElement | null>,
@@ -28,11 +27,22 @@ export async function createRealtimeConnection(
   const offer = await pc.createOffer();
   await pc.setLocalDescription(offer);
 
-  const sdpResponse = await PostRealTime(offer.sdp!);
+  // const sdpResponse = await PostRealTime(offer.sdp!);
+  const sdpResponse = await fetch("/api/session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      offerSdp: offer.sdp,
+    }),
+  });
+
+  const data = await sdpResponse.json();
 
   const answer: RTCSessionDescriptionInit = {
     type: "answer",
-    sdp: sdpResponse,
+    sdp: data.data,
   };
 
   await pc.setRemoteDescription(answer);
