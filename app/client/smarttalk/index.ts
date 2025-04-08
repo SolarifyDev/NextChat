@@ -9,7 +9,7 @@ export const PostRealTime = async (offerSdp: string) => {
       },
       {
         headers: {
-          "x-api-key": "BjkdnCCdmd56",
+          "x-api-key": "xxx",
         },
       },
     )
