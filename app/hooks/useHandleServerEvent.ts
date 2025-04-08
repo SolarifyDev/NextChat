@@ -1,9 +1,8 @@
 "use client";
 
-import { ServerEvent, SessionStatus, AgentConfig } from "@/app/typing";
-
+import { useTranscript } from "@/app/contexts/TranscriptContext";
 import { useRef } from "react";
-import { useTranscript } from "../contexts/TranscriptContext";
+import { AgentConfig, ServerEvent, SessionStatus } from "../typing";
 
 export interface UseHandleServerEventParams {
   setSessionStatus: (status: SessionStatus) => void;
@@ -102,6 +101,7 @@ export function useHandleServerEvent({
   };
 
   const handleServerEvent = (serverEvent: ServerEvent) => {
+    console.log("[Server Event]", serverEvent);
     switch (serverEvent.type) {
       case "session.created": {
         if (serverEvent.session?.id) {

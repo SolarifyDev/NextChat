@@ -398,7 +398,7 @@ export function SideBar(props: { className?: string }) {
         <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp!} />
       </SideBarBody>
       {!omeStore.isFromApp && (
-        <Button onClick={() => navigate(Path.RealTimeAdio)}>通话</Button>
+        <Button onClick={() => navigate(Path.Test)}>通话</Button>
       )}
 
       {omeStore.isFromApp ? (

@@ -1,9 +1,13 @@
 import { RefObject } from "react";
+import { PostRealTime } from "../client/smarttalk";
 
 export async function createRealtimeConnection(
-  EPHEMERAL_KEY: string,
   audioElement: RefObject<HTMLAudioElement | null>,
-): Promise<{ pc: RTCPeerConnection; dc: RTCDataChannel }> {
+): Promise<{
+  pc: RTCPeerConnection;
+  dc: RTCDataChannel;
+  mediaStream: MediaStream;
+}> {
   const pc = new RTCPeerConnection();
 
   pc.ontrack = (e) => {
@@ -12,33 +16,26 @@ export async function createRealtimeConnection(
     }
   };
 
-  const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
-  pc.addTrack(ms.getTracks()[0]);
+  const mediaStream = await navigator.mediaDevices.getUserMedia({
+    audio: true,
+  });
+  const audioTrack = mediaStream.getAudioTracks()[0];
+
+  pc.addTrack(audioTrack);
 
   const dc = pc.createDataChannel("oai-events");
 
   const offer = await pc.createOffer();
   await pc.setLocalDescription(offer);
 
-  const baseUrl = "https://api.openai.com/v1/realtime";
-  const model = "gpt-4o-realtime-preview-2024-12-17";
+  const sdpResponse = await PostRealTime(offer.sdp!);
 
-  const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
-    method: "POST",
-    body: offer.sdp,
-    headers: {
-      Authorization: `Bearer ${EPHEMERAL_KEY}`,
-      "Content-Type": "application/sdp",
-    },
-  });
-
-  const answerSdp = await sdpResponse.text();
   const answer: RTCSessionDescriptionInit = {
     type: "answer",
-    sdp: answerSdp,
+    sdp: sdpResponse,
   };
 
   await pc.setRemoteDescription(answer);
 
-  return { pc, dc };
+  return { pc, dc, mediaStream };
 }

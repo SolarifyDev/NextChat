@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { AgentConfig, SessionStatus } from "../typing";
-import { createRealtimeConnection } from "../lib/realtimeConnection";
-import { useHandleServerEvent } from "../hooks/useHandleServerEvent";
-import { useSearchParams } from "next/navigation";
-import { allAgentSets, defaultAgentSetKey } from "../agentConfigs";
 import { useTranscript } from "../contexts/TranscriptContext";
-import { nanoid } from "nanoid";
+import { AgentConfig, SessionStatus } from "../typing";
+import { useHandleServerEvent } from "../hooks/useHandleServerEvent";
+import { createRealtimeConnection } from "../lib/realtimeConnection";
+
+import { v4 as uuidv4 } from "uuid";
+import ReactMarkdown from "react-markdown";
+import { Button } from "antd";
 
 export function Index() {
-  const searchParams = useSearchParams();
-
-  const { transcriptItems, addTranscriptMessage, addTranscriptBreadcrumb } =
-    useTranscript();
+  const {
+    transcriptItems,
+    addTranscriptMessage,
+    addTranscriptBreadcrumb,
+    toggleTranscriptItemExpand,
+  } = useTranscript();
 
   const [selectedAgentName, setSelectedAgentName] = useState<string>("");
   const [selectedAgentConfigSet, setSelectedAgentConfigSet] = useState<
@@ -21,14 +24,16 @@ export function Index() {
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const [sessionStatus, setSessionStatus] =
     useState<SessionStatus>("DISCONNECTED");
 
   const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
   const [isPTTUserSpeaking, setIsPTTUserSpeaking] = useState<boolean>(false);
+  const transcriptRef = useRef<HTMLDivElement | null>(null);
 
-  const sendClientEvent = (eventObj: any) => {
+  const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (dcRef.current && dcRef.current.readyState === "open") {
       dcRef.current.send(JSON.stringify(eventObj));
     } else {
@@ -48,80 +53,31 @@ export function Index() {
   });
 
   useEffect(() => {
-    let finalAgentConfig = searchParams.get("agentConfig");
-    if (!finalAgentConfig || !allAgentSets[finalAgentConfig]) {
-      finalAgentConfig = defaultAgentSetKey;
-      const url = new URL(window.location.toString());
-      url.searchParams.set("agentConfig", finalAgentConfig);
-      window.location.replace(url.toString());
-      return;
-    }
-
-    const agents = allAgentSets[finalAgentConfig];
-    const agentKeyToUse = agents[0]?.name || "";
-
-    setSelectedAgentName(agentKeyToUse);
-    setSelectedAgentConfigSet(agents);
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (selectedAgentName && sessionStatus === "DISCONNECTED") {
+    if (sessionStatus === "DISCONNECTED") {
       connectToRealtime();
     }
-  }, [selectedAgentName]);
-
-  useEffect(() => {
-    if (
-      sessionStatus === "CONNECTED" &&
-      selectedAgentConfigSet &&
-      selectedAgentName
-    ) {
-      const currentAgent = selectedAgentConfigSet.find(
-        (a) => a.name === selectedAgentName,
-      );
-      addTranscriptBreadcrumb(`Agent: ${selectedAgentName}`, currentAgent);
-      updateSession(true);
-    }
-  }, [selectedAgentConfigSet, selectedAgentName, sessionStatus]);
-
-  // 获取key
-  const fetchEphemeralKey = async (): Promise<string | null> => {
-    const tokenResponse = await fetch("/api/session");
-    const data = await tokenResponse.json();
-
-    if (!data.client_secret?.value) {
-      console.error("No ephemeral key provided by the server");
-      setSessionStatus("DISCONNECTED");
-      return null;
-    }
-
-    return data.client_secret.value;
-  };
+  }, []);
 
   const connectToRealtime = async () => {
     if (sessionStatus !== "DISCONNECTED") return;
     setSessionStatus("CONNECTING");
 
     try {
-      const EPHEMERAL_KEY = await fetchEphemeralKey();
-      if (!EPHEMERAL_KEY) {
-        return;
-      }
-
       if (!audioElementRef.current) {
         audioElementRef.current = document.createElement("audio");
       }
-      audioElementRef.current.autoplay = true;
+      // audioElementRef.current.autoplay = isAudioPlaybackEnabled;
 
-      const { pc, dc } = await createRealtimeConnection(
-        EPHEMERAL_KEY,
-        audioElementRef,
-      );
+      const { pc, dc, mediaStream } =
+        await createRealtimeConnection(audioElementRef);
       pcRef.current = pc;
       dcRef.current = dc;
+      mediaStreamRef.current = mediaStream;
 
+      dc.addEventListener("open", () => {});
+      dc.addEventListener("close", () => {});
+      dc.addEventListener("error", (err: any) => {});
       dc.addEventListener("message", (e: MessageEvent) => {
-        console.log("[Realtime] Received message: ", JSON.parse(e.data));
         handleServerEventRef.current(JSON.parse(e.data));
       });
 
@@ -143,69 +99,34 @@ export function Index() {
       pcRef.current.close();
       pcRef.current = null;
     }
+    dcRef.current = null;
     setDataChannel(null);
     setSessionStatus("DISCONNECTED");
     setIsPTTUserSpeaking(false);
   };
 
   const sendSimulatedUserMessage = (text: string) => {
-    const id = nanoid();
+    const id = uuidv4().slice(0, 32);
     addTranscriptMessage(id, "user", text, true);
 
-    sendClientEvent({
-      type: "conversation.item.create",
-      item: {
-        id,
-        type: "message",
-        role: "user",
-        content: [{ type: "input_text", text }],
+    sendClientEvent(
+      {
+        type: "conversation.item.create",
+        item: {
+          id,
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text }],
+        },
       },
-    });
-    sendClientEvent({ type: "response.create" });
-  };
-
-  const updateSession = (shouldTriggerResponse: boolean = false) => {
-    sendClientEvent({ type: "input_audio_buffer.clear" });
-
-    const currentAgent = selectedAgentConfigSet?.find(
-      (a) => a.name === selectedAgentName,
+      "(simulated user text message)",
     );
-
-    const turnDetection = isPTTActive
-      ? null
-      : {
-          type: "server_vad",
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 200,
-          create_response: true,
-        };
-
-    const instructions = currentAgent?.instructions || "";
-    const tools = currentAgent?.tools || [];
-
-    const sessionUpdateEvent = {
-      type: "session.update",
-      session: {
-        modalities: ["text", "audio"],
-        instructions,
-        voice: "coral",
-        input_audio_format: "pcm16",
-        output_audio_format: "pcm16",
-        input_audio_transcription: { model: "whisper-1" },
-        turn_detection: turnDetection,
-        tools,
-      },
-    };
-
-    sendClientEvent(sessionUpdateEvent);
-
-    if (shouldTriggerResponse) {
-      sendSimulatedUserMessage("hi");
-    }
+    sendClientEvent(
+      { type: "response.create" },
+      "(trigger response after simulated user text message)",
+    );
   };
 
-  // 取消AI语音
   const cancelAssistantSpeech = async () => {
     const mostRecentAssistantMessage = [...transcriptItems]
       .reverse()
@@ -226,8 +147,263 @@ export function Index() {
       content_index: 0,
       audio_end_ms: Date.now() - mostRecentAssistantMessage.createdAtMs,
     });
-    sendClientEvent({ type: "response.cancel" });
+    sendClientEvent(
+      { type: "response.cancel" },
+      "(cancel due to user interruption)",
+    );
   };
 
-  return <div>1</div>;
+  const handleTalkButtonDown = () => {
+    if (sessionStatus !== "CONNECTED" || dataChannel?.readyState !== "open")
+      return;
+    cancelAssistantSpeech();
+
+    setIsPTTUserSpeaking(true);
+    sendClientEvent({ type: "input_audio_buffer.clear" }, "clear PTT buffer");
+  };
+
+  const handleTalkButtonUp = () => {
+    if (
+      sessionStatus !== "CONNECTED" ||
+      dataChannel?.readyState !== "open" ||
+      !isPTTUserSpeaking
+    )
+      return;
+
+    setIsPTTUserSpeaking(false);
+    sendClientEvent({ type: "input_audio_buffer.commit" }, "commit PTT");
+    sendClientEvent({ type: "response.create" }, "trigger response PTT");
+  };
+
+  // Stop current session, clean up peer connection and data channel
+  function stopSession() {
+    if (dataChannel) {
+      dataChannel.close();
+    }
+
+    if (pcRef.current)
+      pcRef.current.getSenders().forEach((sender) => {
+        if (sender.track) {
+          sender.track.stop();
+        }
+      });
+
+    if (pcRef.current) {
+      pcRef.current.close();
+    }
+
+    setDataChannel(null);
+    pcRef.current = null;
+  }
+
+  const muteMicrophone = () => {
+    if (mediaStreamRef.current) {
+      const audioTracks = mediaStreamRef.current.getAudioTracks();
+      audioTracks.forEach((track) => {
+        track.enabled = false;
+      });
+    }
+  };
+
+  const unmuteMicrophone = () => {
+    if (mediaStreamRef.current) {
+      const audioTracks = mediaStreamRef.current.getAudioTracks();
+      audioTracks.forEach((track) => {
+        track.enabled = true;
+      });
+    }
+  };
+
+  // 或者一个切换函数
+  const toggleMute = () => {
+    if (!mediaStreamRef.current) return;
+
+    const audioTracks = mediaStreamRef.current.getAudioTracks();
+    const isMuted = !audioTracks[0].enabled;
+
+    audioTracks.forEach((track) => {
+      track.enabled = isMuted;
+    });
+  };
+
+  // useUpdateEffect(() => {
+  //   console.log(transcriptItems, "transcriptItems");
+  // }, [transcriptItems]);
+
+  return (
+    <div>
+      <div className="relative flex-1 min-h-0">
+        <div
+          ref={transcriptRef}
+          className="overflow-auto p-4 flex flex-col gap-y-4 h-full"
+          style={{
+            overflowY: "scroll",
+            height: "400px",
+            backgroundColor: "#f5f5f5",
+          }}
+        >
+          {transcriptItems.map((item) => {
+            const {
+              itemId,
+              type,
+              role,
+              data,
+              expanded,
+              timestamp,
+              title = "",
+              isHidden,
+            } = item;
+
+            if (isHidden) {
+              return null;
+            }
+
+            if (type === "MESSAGE") {
+              const isUser = role === "user";
+              const baseContainer = "flex justify-end flex-col";
+              const containerClasses = `${baseContainer} ${
+                isUser ? "items-end" : "items-start"
+              }`;
+              const bubbleBase = `max-w-lg p-3 rounded-xl ${
+                isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"
+              }`;
+              const isBracketedMessage =
+                title.startsWith("[") && title.endsWith("]");
+              const messageStyle = isBracketedMessage
+                ? "italic text-gray-400"
+                : "";
+              const displayTitle = isBracketedMessage
+                ? title.slice(1, -1)
+                : title;
+
+              return (
+                <div key={itemId} className={containerClasses}>
+                  <div className={bubbleBase}>
+                    <div
+                      className={`text-xs ${
+                        isUser ? "text-gray-400" : "text-gray-500"
+                      } font-mono`}
+                    >
+                      {timestamp}
+                    </div>
+                    <div className={`whitespace-pre-wrap ${messageStyle}`}>
+                      <ReactMarkdown>{displayTitle}</ReactMarkdown>
+                    </div>
+                  </div>
+                </div>
+              );
+            } else if (type === "BREADCRUMB") {
+              return (
+                <div
+                  key={itemId}
+                  className="flex flex-col justify-start items-start text-gray-500 text-sm"
+                >
+                  <span className="text-xs font-mono">{timestamp}</span>
+                  <div
+                    className={`whitespace-pre-wrap flex items-center font-mono text-sm text-gray-800 ${
+                      data ? "cursor-pointer" : ""
+                    }`}
+                    onClick={() => data && toggleTranscriptItemExpand(itemId)}
+                  >
+                    {data && (
+                      <span
+                        className={`text-gray-400 mr-1 transform transition-transform duration-200 select-none font-mono ${
+                          expanded ? "rotate-90" : "rotate-0"
+                        }`}
+                      >
+                        ▶
+                      </span>
+                    )}
+                    {title}
+                  </div>
+                  {expanded && data && (
+                    <div className="text-gray-800 text-left">
+                      <pre className="border-l-2 ml-1 border-gray-200 whitespace-pre-wrap break-words font-mono text-xs mb-2 mt-2 pl-2">
+                        {JSON.stringify(data, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              );
+            } else {
+              // Fallback if type is neither MESSAGE nor BREADCRUMB
+              return (
+                <div
+                  key={itemId}
+                  className="flex justify-center text-gray-500 text-sm italic font-mono"
+                >
+                  Unknown item type: {type}{" "}
+                  <span className="ml-2 text-xs">{timestamp}</span>
+                </div>
+              );
+            }
+          })}
+        </div>
+      </div>
+      <div>
+        <Button onClick={() => toggleMute()}>静音</Button>
+      </div>
+      {/* <div>
+        1<Button onClick={() => stopSession()}>STOP</Button>
+        <Button
+          onMouseUp={handleTalkButtonUp}
+          onMouseDown={handleTalkButtonDown}
+        >
+          up
+        </Button>
+      </div> */}
+    </div>
+  );
 }
+
+// export function Index() {
+//   const audioElementRef = useRef<HTMLAudioElement | null>(null);
+
+//   const connectToRealtime = async () => {
+//     if (!audioElementRef.current) {
+//       audioElementRef.current = document.createElement("audio");
+//     }
+
+//     const pc = new RTCPeerConnection();
+
+//     pc.ontrack = (e) => {
+//       if (audioElementRef.current) {
+//         audioElementRef.current.srcObject = e.streams[0];
+//       }
+//     };
+
+//     const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
+//     pc.addTrack(ms.getTracks()[0]);
+
+//     const dc = pc.createDataChannel("oai-events");
+
+//     const offer = await pc.createOffer();
+//     await pc.setLocalDescription(offer);
+
+//     try {
+//       const sdpResponse = await PostRealTime(offer.sdp!);
+//       console.log("[Realtime] Connected sdpResponse", sdpResponse);
+//       // const answerSdp = await sdpResponse;
+//       // console.log("[Realtime] Connected answerSdp", answerSdp);
+
+//       const answer: RTCSessionDescriptionInit = {
+//         type: "answer",
+//         sdp: sdpResponse,
+//       };
+//       console.log("[Realtime] Received answer answer", answer);
+
+//       await pc.setRemoteDescription(answer);
+//       return { pc, dc };
+//     } catch (err) {
+//       console.log(err, "err");
+
+//       return null;
+//     }
+//   };
+
+//   useEffect(() => {
+//     connectToRealtime();
+//   }, []);
+
+//   return <div>1</div>;
+// }
