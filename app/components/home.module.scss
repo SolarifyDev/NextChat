@@ -229,6 +229,19 @@
   opacity: 1;
 }
 
+.chat-item-delete-is-app {
+  position: absolute;
+  top: 0;
+  right: 0;
+  // transition: all ease 0.3s;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.chat-item:hover > .chat-item-delete-is-app:hover {
+  opacity: 1;
+}
+
 .chat-item-info {
   display: flex;
   justify-content: space-between;

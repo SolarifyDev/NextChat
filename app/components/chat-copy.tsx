@@ -37,9 +37,10 @@ import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
+import AppBottomIcon from "../icons/app-bottom.svg";
 import StopIcon from "../icons/pause.svg";
+import AppStopIcon from "../icons/app-pause.svg";
 import RobotIcon from "../icons/robot.svg";
-import GreenRobotIcon from "../icons/green-robot.svg";
 import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
 import StyleIcon from "../icons/palette.svg";
@@ -444,7 +445,7 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
-  hoverIcon?: JSX.Element;
+  isHaveHover?: boolean;
 }) {
   const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
@@ -453,8 +454,6 @@ export function ChatAction(props: {
     full: 16,
     icon: 16,
   });
-
-  const [isMouseEnter, setIsMouseenter] = useState<boolean>(false);
 
   function updateWidth() {
     if (!iconRef.current || !textRef.current) return;
@@ -479,20 +478,8 @@ export function ChatAction(props: {
         props.onClick();
         setTimeout(updateWidth, 1);
       }}
-      onMouseEnter={() => {
-        setIsMouseenter(true);
-        updateWidth();
-      }}
-      onMouseLeave={() => {
-        setIsMouseenter(false);
-      }}
-      onTouchStart={() => {
-        setIsMouseenter(true);
-        updateWidth();
-      }}
-      onTouchEnd={() => {
-        setIsMouseenter(false);
-      }}
+      onMouseEnter={updateWidth}
+      onTouchStart={updateWidth}
       style={
         {
           "--icon-width": `${width.icon}px`,
@@ -500,12 +487,11 @@ export function ChatAction(props: {
         } as React.CSSProperties
       }
     >
-      <div ref={iconRef} className={styles["icon"]}>
-        {isFromApp
-          ? isMouseEnter
-            ? props.hoverIcon || props.icon
-            : props.icon
-          : props.icon}
+      <div
+        ref={iconRef}
+        className={clsx(styles["icon"], props.isHaveHover && "is-hover-show")}
+      >
+        {props.icon}
       </div>
       <div className={styles["text"]} ref={textRef}>
         {props.text}
@@ -604,33 +590,49 @@ export function ChatActions(props: {
     const deepseekModels = filteredModels.filter((m) =>
       m.displayName.toLowerCase().includes("deepseek"),
     );
+    const metisModels = filteredModels.filter((m) =>
+      m.displayName.toLowerCase().includes("metis"),
+    );
     const otherModels = filteredModels.filter(
-      (m) => !m.displayName.toLowerCase().includes("deepseek"),
+      (m) =>
+        !m.displayName.toLowerCase().includes("deepseek") &&
+        !m.displayName.toLowerCase().includes("metis"),
     );
 
     if (defaultModel) {
       const arr = [
         defaultModel,
         ...deepseekModels.filter((m) => m !== defaultModel),
+        ...metisModels.filter((m) => m !== defaultModel),
         ...otherModels.filter((m) => m !== defaultModel),
       ];
       if (omeStore.isFromApp) {
         return arr.filter((i) =>
-          ["gpt-4o", "o1-mini", "deepseek-chat", "deepseek-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
+          [
+            "gpt-4o",
+            "o1-mini",
+            "deepseek-chat",
+            "deepseek-reasoner",
+            "metis-chat",
+            "metis-reasoner",
+          ].some((item) => item === i.displayName.toLowerCase()),
         );
       }
       return arr;
     } else {
       if (omeStore.isFromApp) {
-        return [...deepseekModels, ...otherModels].filter((i) =>
-          ["gpt-4o", "o1-mini", "deepseek-chat", "deepseek-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
+        return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
+          [
+            "gpt-4o",
+            "o1-mini",
+            "deepseek-chat",
+            "deepseek-reasoner",
+            "metis-chat",
+            "metis-reasoner",
+          ].some((item) => item === i.displayName.toLowerCase()),
         );
       }
-      return [...deepseekModels, ...otherModels];
+      return [...deepseekModels, ...metisModels, ...otherModels];
     }
   }, [allModels]);
   const currentModelName = useMemo(() => {
@@ -697,7 +699,7 @@ export function ChatActions(props: {
             onClick={stopAll}
             // text={Locale.Chat.InputActions.Stop}
             text={t("Chat.InputActions.Stop")}
-            icon={<StopIcon />}
+            icon={omeStore.isFromApp ? <AppStopIcon /> : <StopIcon />}
           />
         )}
         {!props.hitBottom && (
@@ -705,7 +707,7 @@ export function ChatActions(props: {
             onClick={props.scrollToBottom}
             // text={Locale.Chat.InputActions.ToBottom}
             text={t("Chat.InputActions.ToBottom")}
-            icon={<BottomIcon />}
+            icon={omeStore.isFromApp ? <AppBottomIcon /> : <BottomIcon />}
           />
         )}
         {props.hitBottom && !omeStore.isFromApp && (
@@ -731,6 +733,7 @@ export function ChatActions(props: {
                 <ImageIcon />
               )
             }
+            isHaveHover={true}
           />
         )}
         {!omeStore.isFromApp && (
@@ -799,16 +802,17 @@ export function ChatActions(props: {
           text={currentModelName}
           icon={
             omeStore.isFromApp ? (
-              showModelSelector ? (
-                <GreenRobotIcon />
-              ) : (
-                <AppRobot />
-              )
+              // showModelSelector ? (
+              //   <GreenRobotIcon />
+              // ) : (
+              //   <AppRobot />
+              // )
+              <AppRobot />
             ) : (
               <RobotIcon />
             )
           }
-          hoverIcon={<GreenRobotIcon />}
+          isHaveHover={true}
         />
 
         {showModelSelector && (
@@ -1748,9 +1752,27 @@ export function _Chat_NEW() {
           setUploading(true);
           const files = event.target.files;
           const imagesData: string[] = [];
+          const validImageTypes = [
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/heic",
+            "image/heif",
+          ];
+
           for (let i = 0; i < files.length; i++) {
             const file = event.target.files[i];
             console.log("file", file);
+
+            if (!validImageTypes.includes(file.type)) {
+              if (i === files.length - 1) {
+                setUploading(false);
+                rej(new Error("No valid images were selected."));
+              } else {
+                continue;
+              }
+            }
+
             uploadImageRemote(file)
               .then((dataUrl) => {
                 imagesData.push(dataUrl);
