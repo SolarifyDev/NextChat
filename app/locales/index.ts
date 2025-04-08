@@ -77,7 +77,7 @@ export const ALL_LANG_OPTIONS: Record<Lang, string> = {
   sk: "Slovensky",
 };
 
-const LANG_KEY = "lang";
+const LANG_KEY = "metis_lanuage";
 const DEFAULT_LANG = "en";
 
 const fallbackLang = en;
