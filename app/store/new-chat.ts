@@ -24,7 +24,6 @@ import {
   SUMMARIZE_MODEL,
   ServiceProvider,
 } from "../constant";
-import { getLang } from "../locales";
 import { nanoid } from "nanoid";
 import { prettyObject } from "../utils/format";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
@@ -151,7 +150,7 @@ function fillTemplateWith(input: string, modelConfig: ModelConfig) {
     cutoff,
     model: modelConfig.model,
     time: new Date().toString(),
-    lang: getLang(),
+    lang: useOmeStore.getState().language,
     input: input,
   };
 
