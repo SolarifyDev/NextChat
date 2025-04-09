@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useTranscript } from "../contexts/TranscriptContext";
-import { AgentConfig, SessionStatus } from "../typing";
+import { AgentConfig, SessionStatus, TranscriptItem } from "../typing";
 import { useHandleServerEvent } from "../hooks/useHandleServerEvent";
 import { createRealtimeConnection } from "../lib/realtimeConnection";
 
 import { v4 as uuidv4 } from "uuid";
-import ReactMarkdown from "react-markdown";
 import { Button } from "antd";
+import ReactMarkdown from "react-markdown";
 
 export function Index() {
   const {
@@ -25,13 +25,20 @@ export function Index() {
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioTrackRef = useRef<MediaStreamTrack | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  const sessionRef = useRef<Record<string, any>>({});
+  const senderRef = useRef<RTCRtpSender | null>(null);
   const [sessionStatus, setSessionStatus] =
     useState<SessionStatus>("DISCONNECTED");
 
   const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
   const [isPTTUserSpeaking, setIsPTTUserSpeaking] = useState<boolean>(false);
+
   const transcriptRef = useRef<HTMLDivElement | null>(null);
+  const [prevLogs, setPrevLogs] = useState<TranscriptItem[]>([]);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [userText, setUserText] = useState<string>("");
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (dcRef.current && dcRef.current.readyState === "open") {
@@ -52,11 +59,22 @@ export function Index() {
     setSelectedAgentName,
   });
 
+  // 连接实时通话
   useEffect(() => {
     if (sessionStatus === "DISCONNECTED") {
       connectToRealtime();
     }
   }, []);
+
+  // 更新对话配置配置
+  useEffect(() => {
+    if (sessionStatus === "CONNECTED") {
+      console.log(
+        `updatingSession, isPTTACtive=${isPTTActive} sessionStatus=${sessionStatus}`,
+      );
+      updateSession();
+    }
+  }, [isPTTActive]);
 
   const connectToRealtime = async () => {
     if (sessionStatus !== "DISCONNECTED") return;
@@ -66,13 +84,16 @@ export function Index() {
       if (!audioElementRef.current) {
         audioElementRef.current = document.createElement("audio");
       }
-      // audioElementRef.current.autoplay = isAudioPlaybackEnabled;
+      audioElementRef.current.autoplay = true;
 
-      const { pc, dc, mediaStream } =
+      const { pc, dc, sender, session } =
         await createRealtimeConnection(audioElementRef);
       pcRef.current = pc;
       dcRef.current = dc;
-      mediaStreamRef.current = mediaStream;
+      // mediaStreamRef.current = mediaStream;
+      // audioTrackRef.current = audioTrack;
+      senderRef.current = sender;
+      sessionRef.current = session;
 
       dc.addEventListener("open", () => {});
       dc.addEventListener("close", () => {});
@@ -85,6 +106,16 @@ export function Index() {
     } catch (err) {
       console.error("Error connecting to realtime:", err);
       setSessionStatus("DISCONNECTED");
+    }
+  };
+
+  // 关闭实时通话
+  const onToggleConnection = () => {
+    if (sessionStatus === "CONNECTED" || sessionStatus === "CONNECTING") {
+      disconnectFromRealtime();
+      setSessionStatus("DISCONNECTED");
+    } else {
+      connectToRealtime();
     }
   };
 
@@ -153,28 +184,6 @@ export function Index() {
     );
   };
 
-  const handleTalkButtonDown = () => {
-    if (sessionStatus !== "CONNECTED" || dataChannel?.readyState !== "open")
-      return;
-    cancelAssistantSpeech();
-
-    setIsPTTUserSpeaking(true);
-    sendClientEvent({ type: "input_audio_buffer.clear" }, "clear PTT buffer");
-  };
-
-  const handleTalkButtonUp = () => {
-    if (
-      sessionStatus !== "CONNECTED" ||
-      dataChannel?.readyState !== "open" ||
-      !isPTTUserSpeaking
-    )
-      return;
-
-    setIsPTTUserSpeaking(false);
-    sendClientEvent({ type: "input_audio_buffer.commit" }, "commit PTT");
-    sendClientEvent({ type: "response.create" }, "trigger response PTT");
-  };
-
   // Stop current session, clean up peer connection and data channel
   function stopSession() {
     if (dataChannel) {
@@ -196,50 +205,97 @@ export function Index() {
     pcRef.current = null;
   }
 
-  const muteMicrophone = () => {
-    if (mediaStreamRef.current) {
-      const audioTracks = mediaStreamRef.current.getAudioTracks();
-      audioTracks.forEach((track) => {
-        track.enabled = false;
-      });
-    }
+  const updateSession = (shouldTriggerResponse: boolean = false) => {
+    sendClientEvent(
+      { type: "input_audio_buffer.clear" },
+      "clear audio buffer on session update",
+    );
+
+    const session = senderRef.current;
+
+    const sessionUpdateEvent = {
+      type: "session.update",
+      session: session,
+    };
+
+    sendClientEvent(sessionUpdateEvent);
+
+    // if (shouldTriggerResponse) {
+    //   sendSimulatedUserMessage("hi");
+    // }
   };
 
-  const unmuteMicrophone = () => {
-    if (mediaStreamRef.current) {
-      const audioTracks = mediaStreamRef.current.getAudioTracks();
-      audioTracks.forEach((track) => {
-        track.enabled = true;
-      });
-    }
+  const handleSendTextMessage = () => {
+    if (!userText.trim()) return;
+    cancelAssistantSpeech();
+
+    sendClientEvent(
+      {
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: userText.trim() }],
+        },
+      },
+      "(send user text message)",
+    );
+    setUserText("");
+
+    sendClientEvent({ type: "response.create" }, "trigger response");
   };
 
-  // 或者一个切换函数
-  const toggleMute = () => {
-    if (!mediaStreamRef.current) return;
+  function scrollToBottom() {
+    if (transcriptRef.current) {
+      transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
+    }
+  }
 
-    const audioTracks = mediaStreamRef.current.getAudioTracks();
-    const isMuted = !audioTracks[0].enabled;
-
-    audioTracks.forEach((track) => {
-      track.enabled = isMuted;
+  useEffect(() => {
+    const hasNewMessage = transcriptItems.length > prevLogs.length;
+    const hasUpdatedMessage = transcriptItems.some((newItem, index) => {
+      const oldItem = prevLogs[index];
+      return (
+        oldItem &&
+        (newItem.title !== oldItem.title || newItem.data !== oldItem.data)
+      );
     });
-  };
 
-  // useUpdateEffect(() => {
-  //   console.log(transcriptItems, "transcriptItems");
-  // }, [transcriptItems]);
+    if (hasNewMessage || hasUpdatedMessage) {
+      scrollToBottom();
+    }
+
+    setPrevLogs(transcriptItems);
+  }, [transcriptItems]);
 
   return (
-    <div>
-      <div className="relative flex-1 min-h-0">
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        backgroundColor: "yellow",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          flexGrow: 1,
+          backgroundColor: "red",
+        }}
+      >
         <div
           ref={transcriptRef}
-          className="overflow-auto p-4 flex flex-col gap-y-4 h-full"
           style={{
-            overflowY: "scroll",
-            height: "400px",
+            overflow: "auto",
+            height: "100%",
             backgroundColor: "#f5f5f5",
+            padding: "16px",
+            display: "flex",
+            flexDirection: "column",
+            rowGap: "16px",
           }}
         >
           {transcriptItems.map((item) => {
@@ -260,33 +316,78 @@ export function Index() {
 
             if (type === "MESSAGE") {
               const isUser = role === "user";
-              const baseContainer = "flex justify-end flex-col";
-              const containerClasses = `${baseContainer} ${
-                isUser ? "items-end" : "items-start"
-              }`;
-              const bubbleBase = `max-w-lg p-3 rounded-xl ${
-                isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"
-              }`;
+              // const baseContainer = "flex justify-end flex-col";
+
+              const baseContainer = {
+                display: "flex",
+                justifyContent: "flex-end",
+                flexDirection: "column",
+              };
+              // const containerClasses = `${baseContainer} ${
+              //   isUser ? "items-end" : "items-start"
+              // }`;
+
+              const containerClasses = {
+                ...baseContainer,
+
+                alignItems: isUser ? "flex-end" : "flex-start",
+              };
+
+              // const bubbleBase = `max-w-lg p-3 rounded-xl ${
+              //   isUser ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-black"
+              // }`;
+              let bubbleBase: Record<string, string> = {
+                padding: "12px",
+                borderRadius: "12px",
+              };
+
+              if (isUser) {
+                bubbleBase = {
+                  ...bubbleBase,
+                  backgroundColor: "oklch(21% 0.034 264.665)",
+                  color: "oklch(96.7% 0.003 264.542)",
+                };
+              } else {
+                bubbleBase = {
+                  ...bubbleBase,
+                  backgroundColor: "oklch(96.7% 0.003 264.542)",
+                  color: "black",
+                };
+              }
+
               const isBracketedMessage =
                 title.startsWith("[") && title.endsWith("]");
+              // const messageStyle = isBracketedMessage
+              //   ? "italic text-gray-400"
+              //   : "";
               const messageStyle = isBracketedMessage
-                ? "italic text-gray-400"
-                : "";
+                ? {
+                    fontStyle: "italic",
+                    color: "oklch(70.7% 0.022 261.325)",
+                  }
+                : {};
               const displayTitle = isBracketedMessage
                 ? title.slice(1, -1)
                 : title;
 
               return (
-                <div key={itemId} className={containerClasses}>
-                  <div className={bubbleBase}>
+                <div key={itemId} style={containerClasses as CSSProperties}>
+                  <div style={bubbleBase as CSSProperties}>
                     <div
-                      className={`text-xs ${
-                        isUser ? "text-gray-400" : "text-gray-500"
-                      } font-mono`}
+                      // className={`text-xs ${
+                      //   isUser ? "text-gray-400" : "text-gray-500"
+                      // } font-mono`}
+                      style={{
+                        fontSize: "12px",
+                        color: isUser
+                          ? "oklch(70.7% 0.022 261.325)"
+                          : "oklch(55.1% 0.027 264.364)",
+                        fontFamily: "monospace",
+                      }}
                     >
                       {timestamp}
                     </div>
-                    <div className={`whitespace-pre-wrap ${messageStyle}`}>
+                    <div style={{ ...messageStyle, whiteSpace: "pre-wrap" }}>
                       <ReactMarkdown>{displayTitle}</ReactMarkdown>
                     </div>
                   </div>
@@ -296,20 +397,57 @@ export function Index() {
               return (
                 <div
                   key={itemId}
-                  className="flex flex-col justify-start items-start text-gray-500 text-sm"
+                  // className="flex flex-col justify-start items-start text-gray-500 text-sm"
+                  style={{
+                    display: "flex", // flex
+                    flexDirection: "column", // flex-col
+                    justifyContent: "flex-start", // justify-start
+                    alignItems: "flex-start", // items-start
+                    color: "#6b7280", // text-gray-500 (Tailwind 的 gray-500 对应 #6b7280)
+                    fontSize: "0.875rem", // text-sm (Tailwind 的 text-sm 是 14px/0.875rem)
+                    lineHeight: "1.25rem",
+                  }}
                 >
-                  <span className="text-xs font-mono">{timestamp}</span>
+                  <span
+                    style={{
+                      fontSize: "0.75rem", // text-xs (12px)
+                      lineHeight: "1rem", // text-xs 默认行高
+                      fontFamily: "monospace", // font-mono
+                    }}
+                  >
+                    {timestamp}
+                  </span>
                   <div
-                    className={`whitespace-pre-wrap flex items-center font-mono text-sm text-gray-800 ${
-                      data ? "cursor-pointer" : ""
-                    }`}
+                    // className={`whitespace-pre-wrap flex items-center font-mono text-sm text-gray-800 ${
+                    //   data ? "cursor-pointer" : ""
+                    // }`}
+                    style={{
+                      whiteSpace: "pre-wrap", // whitespace-pre-wrap
+                      display: "flex", // flex
+                      alignItems: "center", // items-center
+                      fontFamily: "monospace", // font-mono
+                      fontSize: "0.875rem", // text-sm (14px)
+                      lineHeight: "1.25rem", // text-sm default line-height
+                      color: "#1f2937", // text-gray-800 (Tailwind's gray-800)
+                      cursor: data ? "pointer" : "default", // conditional cursor-pointer
+                    }}
                     onClick={() => data && toggleTranscriptItemExpand(itemId)}
                   >
                     {data && (
                       <span
-                        className={`text-gray-400 mr-1 transform transition-transform duration-200 select-none font-mono ${
-                          expanded ? "rotate-90" : "rotate-0"
-                        }`}
+                        // className={`text-gray-400 mr-1 transform transition-transform duration-200 select-none font-mono ${
+                        //   expanded ? "rotate-90" : "rotate-0"
+                        // }`}
+                        style={{
+                          color: "#9ca3af", // text-gray-400
+                          marginRight: "0.25rem", // mr-1 (4px)
+                          transition: "transform 200ms", // transition-transform duration-200
+                          userSelect: "none", // select-none
+                          fontFamily: "monospace", // font-mono
+                          transform: expanded
+                            ? "rotate(90deg)"
+                            : "rotate(0deg)", // conditional rotation
+                        }}
                       >
                         ▶
                       </span>
@@ -317,8 +455,26 @@ export function Index() {
                     {title}
                   </div>
                   {expanded && data && (
-                    <div className="text-gray-800 text-left">
-                      <pre className="border-l-2 ml-1 border-gray-200 whitespace-pre-wrap break-words font-mono text-xs mb-2 mt-2 pl-2">
+                    <div
+                      style={{
+                        color: "#1f2937", // text-gray-800
+                        textAlign: "left", // text-left
+                      }}
+                    >
+                      <pre
+                        style={{
+                          borderLeft: "2px solid #e5e7eb", // border-l-2 border-gray-200
+                          marginLeft: "0.25rem", // ml-1 (4px)
+                          whiteSpace: "pre-wrap", // whitespace-pre-wrap
+                          wordBreak: "break-word", // break-words
+                          fontFamily: "monospace", // font-mono
+                          fontSize: "0.75rem", // text-xs (12px)
+                          lineHeight: "1rem", // text-xs default line-height
+                          marginBottom: "0.5rem", // mb-2 (8px)
+                          marginTop: "0.5rem", // mt-2 (8px)
+                          paddingLeft: "0.5rem", // pl-2 (8px)
+                        }}
+                      >
                         {JSON.stringify(data, null, 2)}
                       </pre>
                     </div>
@@ -330,10 +486,27 @@ export function Index() {
               return (
                 <div
                   key={itemId}
-                  className="flex justify-center text-gray-500 text-sm italic font-mono"
+                  // className="flex justify-center text-gray-500 text-sm italic font-mono"
+                  style={{
+                    display: "flex", // flex
+                    justifyContent: "center", // justify-center
+                    color: "#6b7280", // text-gray-500
+                    fontSize: "0.875rem", // text-sm (14px)
+                    lineHeight: "1.25rem", // text-sm default line-height
+                    fontStyle: "italic", // italic
+                    fontFamily: "monospace", // font-mono
+                  }}
                 >
                   Unknown item type: {type}{" "}
-                  <span className="ml-2 text-xs">{timestamp}</span>
+                  <span
+                    style={{
+                      marginLeft: "0.5rem", // ml-2 (8px in Tailwind)
+                      fontSize: "0.75rem", // text-xs (12px)
+                      lineHeight: "1rem", // text-xs default line-height
+                    }}
+                  >
+                    {timestamp}
+                  </span>
                 </div>
               );
             }
@@ -341,7 +514,8 @@ export function Index() {
         </div>
       </div>
       <div>
-        <Button onClick={() => toggleMute()}>静音</Button>
+        <Button onClick={() => setIsPTTActive((prev) => !prev)}>静音</Button>
+        <Button onClick={() => onToggleConnection()}>切换</Button>
       </div>
       {/* <div>
         1<Button onClick={() => stopSession()}>STOP</Button>

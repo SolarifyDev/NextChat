@@ -5,7 +5,8 @@ export async function createRealtimeConnection(
 ): Promise<{
   pc: RTCPeerConnection;
   dc: RTCDataChannel;
-  mediaStream: MediaStream;
+  sender: RTCRtpSender;
+  session: Record<string, any>;
 }> {
   const pc = new RTCPeerConnection();
 
@@ -20,7 +21,7 @@ export async function createRealtimeConnection(
   });
   const audioTrack = mediaStream.getAudioTracks()[0];
 
-  pc.addTrack(audioTrack);
+  const sender = pc.addTrack(audioTrack);
 
   const dc = pc.createDataChannel("oai-events");
 
@@ -40,12 +41,16 @@ export async function createRealtimeConnection(
 
   const data = await sdpResponse.json();
 
+  const answerSdp = data.data.answerSdp;
+
+  const session = data.data.session;
+
   const answer: RTCSessionDescriptionInit = {
     type: "answer",
-    sdp: data.data,
+    sdp: answerSdp,
   };
 
   await pc.setRemoteDescription(answer);
 
-  return { pc, dc, mediaStream };
+  return { pc, dc, sender, session };
 }
