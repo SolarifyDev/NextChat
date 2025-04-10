@@ -60,6 +60,7 @@ export function Index() {
   // 连接实时通话
   useEffect(() => {
     if (sessionStatus === "DISCONNECTED") {
+      console.log("connectToRealtime");
       connectToRealtime();
     }
   }, []);
@@ -189,7 +190,7 @@ export function Index() {
     return () => {
       disconnectFromRealtime();
     };
-  });
+  }, []);
 
   return (
     <div
@@ -198,7 +199,6 @@ export function Index() {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "red",
         alignItems: "center",
         justifyContent: "center",
       }}
@@ -207,6 +207,7 @@ export function Index() {
         ref={transcriptRef}
         style={{
           overflow: "auto",
+          width: "100%",
           height: "100%",
           backgroundColor: "#f5f5f5",
           padding: "16px",
