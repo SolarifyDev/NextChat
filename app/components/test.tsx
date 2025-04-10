@@ -4,9 +4,9 @@ import { AgentConfig, SessionStatus, TranscriptItem } from "../typing";
 import { useHandleServerEvent } from "../hooks/useHandleServerEvent";
 import { createRealtimeConnection } from "../lib/realtimeConnection";
 
+import { clone } from "lodash-es";
 import { Button } from "antd";
 import ReactMarkdown from "react-markdown";
-import { clone } from "lodash-es";
 
 export function Index() {
   const {
@@ -187,7 +187,7 @@ export function Index() {
 
   useEffect(() => {
     return () => {
-      connectToRealtime();
+      disconnectFromRealtime();
     };
   });
 
@@ -195,9 +195,12 @@ export function Index() {
     <div
       style={{
         width: "100%",
-        height: "100vh",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
+        backgroundColor: "red",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <div
@@ -433,15 +436,6 @@ export function Index() {
           {getConnectionButtonLabel()}
         </Button>
       </div>
-      {/* <div>
-        1<Button onClick={() => stopSession()}>STOP</Button>
-        <Button
-          onMouseUp={handleTalkButtonUp}
-          onMouseDown={handleTalkButtonDown}
-        >
-          up
-        </Button>
-      </div> */}
     </div>
   );
 }
