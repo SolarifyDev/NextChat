@@ -53,9 +53,6 @@ export function Index() {
   // 通信事件----------
   useEffect(() => {
     if (sessionStatus === "CONNECTED") {
-      console.log(
-        `updatingSession, isPTTACtive=${isPTTActive} sessionStatus=${sessionStatus}`,
-      );
       updateSession();
     }
   }, [isPTTActive]);
@@ -80,8 +77,6 @@ export function Index() {
     async () => {
       if (sessionStatus !== "DISCONNECTED") return;
       setSessionStatus("CONNECTING");
-
-      console.log("ininin");
 
       try {
         if (!audioElementRef.current) {
