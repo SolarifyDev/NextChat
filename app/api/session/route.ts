@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { offerSdp } = await req.json();
+    const { offerSdp, assistantId } = await req.json();
 
     const response = await fetch(
       `${process.env.SMART_TALK_URL}/api/AiSpeechAssistant/realtime/connect`,
@@ -14,6 +14,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           offerSdp,
+          assistantId,
         }),
       },
     );

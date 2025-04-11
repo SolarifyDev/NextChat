@@ -2,23 +2,22 @@
 
 import { useTranscript } from "@/app/contexts/TranscriptContext";
 import { useRef } from "react";
-import { AgentConfig, ServerEvent, SessionStatus } from "../typing";
+import { ServerEvent, SessionStatus } from "../typing";
 
 export interface UseHandleServerEventParams {
   setSessionStatus: (status: SessionStatus) => void;
-  selectedAgentName: string;
-  selectedAgentConfigSet: AgentConfig[] | null;
+  // selectedAgentName: string;
+  // selectedAgentConfigSet: AgentConfig[] | null;
   sendClientEvent: (eventObj: any, eventNameSuffix?: string) => void;
-  setSelectedAgentName: (name: string) => void;
+  // setSelectedAgentName: (name: string) => void;
   shouldForceResponse?: boolean;
 }
 
 export function useHandleServerEvent({
   setSessionStatus,
-  selectedAgentName,
-  selectedAgentConfigSet,
-  sendClientEvent,
-  setSelectedAgentName,
+  // selectedAgentName,
+  // selectedAgentConfigSet,
+  sendClientEvent, // setSelectedAgentName,
 }: UseHandleServerEventParams) {
   const {
     transcriptItems,
@@ -28,77 +27,77 @@ export function useHandleServerEvent({
     updateTranscriptItemStatus,
   } = useTranscript();
 
-  const handleFunctionCall = async (functionCallParams: {
-    name: string;
-    call_id?: string;
-    arguments: string;
-  }) => {
-    const args = JSON.parse(functionCallParams.arguments);
-    const currentAgent = selectedAgentConfigSet?.find(
-      (a) => a.name === selectedAgentName,
-    );
+  // const handleFunctionCall = async (functionCallParams: {
+  //   name: string;
+  //   call_id?: string;
+  //   arguments: string;
+  // }) => {
+  //   const args = JSON.parse(functionCallParams.arguments);
+  //   const currentAgent = selectedAgentConfigSet?.find(
+  //     (a) => a.name === selectedAgentName,
+  //   );
 
-    addTranscriptBreadcrumb(`function call: ${functionCallParams.name}`, args);
+  //   addTranscriptBreadcrumb(`function call: ${functionCallParams.name}`, args);
 
-    if (currentAgent?.toolLogic?.[functionCallParams.name]) {
-      const fn = currentAgent.toolLogic[functionCallParams.name];
-      const fnResult = await fn(args, transcriptItems);
-      addTranscriptBreadcrumb(
-        `function call result: ${functionCallParams.name}`,
-        fnResult,
-      );
+  //   if (currentAgent?.toolLogic?.[functionCallParams.name]) {
+  //     const fn = currentAgent.toolLogic[functionCallParams.name];
+  //     const fnResult = await fn(args, transcriptItems);
+  //     addTranscriptBreadcrumb(
+  //       `function call result: ${functionCallParams.name}`,
+  //       fnResult,
+  //     );
 
-      sendClientEvent({
-        type: "conversation.item.create",
-        item: {
-          type: "function_call_output",
-          call_id: functionCallParams.call_id,
-          output: JSON.stringify(fnResult),
-        },
-      });
-      sendClientEvent({ type: "response.create" });
-    } else if (functionCallParams.name === "transferAgents") {
-      const destinationAgent = args.destination_agent;
-      const newAgentConfig =
-        selectedAgentConfigSet?.find((a) => a.name === destinationAgent) ||
-        null;
-      if (newAgentConfig) {
-        setSelectedAgentName(destinationAgent);
-      }
-      const functionCallOutput = {
-        destination_agent: destinationAgent,
-        did_transfer: !!newAgentConfig,
-      };
-      sendClientEvent({
-        type: "conversation.item.create",
-        item: {
-          type: "function_call_output",
-          call_id: functionCallParams.call_id,
-          output: JSON.stringify(functionCallOutput),
-        },
-      });
-      addTranscriptBreadcrumb(
-        `function call: ${functionCallParams.name} response`,
-        functionCallOutput,
-      );
-    } else {
-      const simulatedResult = { result: true };
-      addTranscriptBreadcrumb(
-        `function call fallback: ${functionCallParams.name}`,
-        simulatedResult,
-      );
+  //     sendClientEvent({
+  //       type: "conversation.item.create",
+  //       item: {
+  //         type: "function_call_output",
+  //         call_id: functionCallParams.call_id,
+  //         output: JSON.stringify(fnResult),
+  //       },
+  //     });
+  //     sendClientEvent({ type: "response.create" });
+  //   } else if (functionCallParams.name === "transferAgents") {
+  //     const destinationAgent = args.destination_agent;
+  //     const newAgentConfig =
+  //       selectedAgentConfigSet?.find((a) => a.name === destinationAgent) ||
+  //       null;
+  //     if (newAgentConfig) {
+  //       setSelectedAgentName(destinationAgent);
+  //     }
+  //     const functionCallOutput = {
+  //       destination_agent: destinationAgent,
+  //       did_transfer: !!newAgentConfig,
+  //     };
+  //     sendClientEvent({
+  //       type: "conversation.item.create",
+  //       item: {
+  //         type: "function_call_output",
+  //         call_id: functionCallParams.call_id,
+  //         output: JSON.stringify(functionCallOutput),
+  //       },
+  //     });
+  //     addTranscriptBreadcrumb(
+  //       `function call: ${functionCallParams.name} response`,
+  //       functionCallOutput,
+  //     );
+  //   } else {
+  //     const simulatedResult = { result: true };
+  //     addTranscriptBreadcrumb(
+  //       `function call fallback: ${functionCallParams.name}`,
+  //       simulatedResult,
+  //     );
 
-      sendClientEvent({
-        type: "conversation.item.create",
-        item: {
-          type: "function_call_output",
-          call_id: functionCallParams.call_id,
-          output: JSON.stringify(simulatedResult),
-        },
-      });
-      sendClientEvent({ type: "response.create" });
-    }
-  };
+  //     sendClientEvent({
+  //       type: "conversation.item.create",
+  //       item: {
+  //         type: "function_call_output",
+  //         call_id: functionCallParams.call_id,
+  //         output: JSON.stringify(simulatedResult),
+  //       },
+  //     });
+  //     sendClientEvent({ type: "response.create" });
+  //   }
+  // };
 
   const handleServerEvent = (serverEvent: ServerEvent) => {
     console.log("[Server Event]", serverEvent);
@@ -165,11 +164,11 @@ export function useHandleServerEvent({
               outputItem.name &&
               outputItem.arguments
             ) {
-              handleFunctionCall({
-                name: outputItem.name,
-                call_id: outputItem.call_id,
-                arguments: outputItem.arguments,
-              });
+              // handleFunctionCall({
+              //   name: outputItem.name,
+              //   call_id: outputItem.call_id,
+              //   arguments: outputItem.arguments,
+              // });
             }
           });
         }

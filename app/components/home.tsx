@@ -94,7 +94,7 @@ const RealTimeAdio = dynamic(
   },
 );
 
-const Test = dynamic(async () => (await import("./test")).Index, {
+const Test = dynamic(async () => (await import("./test-copy")).Index, {
   loading: () => null,
 });
 

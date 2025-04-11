@@ -30,6 +30,7 @@ type TranscriptContextValue = {
     itemId: string,
     newStatus: "IN_PROGRESS" | "DONE",
   ) => void;
+  setTranscriptItems: React.Dispatch<React.SetStateAction<TranscriptItem[]>>;
 };
 
 const TranscriptContext = createContext<TranscriptContextValue | undefined>(
@@ -138,6 +139,7 @@ export const TranscriptProvider: FC<PropsWithChildren> = ({ children }) => {
         addTranscriptBreadcrumb,
         toggleTranscriptItemExpand,
         updateTranscriptItemStatus,
+        setTranscriptItems,
       }}
     >
       {children}
