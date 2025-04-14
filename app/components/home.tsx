@@ -347,6 +347,13 @@ export function Home() {
   }, []);
 
   useEffect(() => {
+    if (localStorage.getItem("lang")) {
+      localStorage.removeItem("lang");
+      console.log("lang 已从 localStorage 中删除");
+    }
+  }, []);
+
+  useEffect(() => {
     if (appConfig._hasHydrated) {
       if (window.ReactNativeWebView) {
         try {
