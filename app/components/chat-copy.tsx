@@ -2545,6 +2545,7 @@ export function _Chat_NEW() {
                         backgroundColor: "var(--primary)",
                         padding: "10px",
                       }}
+                      onClick={() => doSubmit(userInput)}
                     >
                       <SendWhiteIcon />
                       <div
