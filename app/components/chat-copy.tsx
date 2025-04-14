@@ -1762,7 +1762,6 @@ export function _Chat_NEW() {
 
           for (let i = 0; i < files.length; i++) {
             const file = event.target.files[i];
-            console.log("file", file);
 
             if (!validImageTypes.includes(file.type)) {
               if (i === files.length - 1) {
