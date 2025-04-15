@@ -398,16 +398,14 @@ export function SideBar(props: { className?: string }) {
         <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp!} />
       </SideBarBody>
 
-      {!omeStore.isFromApp && (
-        <Button
-          style={{
-            marginTop: "10px",
-          }}
-          onClick={() => navigate(Path.Test)}
-        >
-          通话
-        </Button>
-      )}
+      <Button
+        style={{
+          marginTop: "10px",
+        }}
+        onClick={() => navigate(Path.Test)}
+      >
+        通话
+      </Button>
 
       {omeStore.isFromApp ? (
         <div
