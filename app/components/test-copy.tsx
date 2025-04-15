@@ -9,14 +9,28 @@ import { clone } from "lodash-es";
 
 import styles from "./test.module.scss";
 import { useTranscript } from "../contexts/TranscriptContext";
-import { Markdown } from "./markdown";
 import { Button, Select } from "antd";
 import { showToast } from "./ui-lib";
+import {
+  AudioMutedOutlined,
+  AudioOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
+import clsx from "clsx";
+import SubtitlesIcon from "../icons/subtitles.png";
+import SubtitlesIcon1 from "../icons/subtitles1.png";
+import Image from "next/image";
+import ReactMarkdown from "react-markdown";
 
 export function Index() {
   const { transcriptItems, setTranscriptItems } = useTranscript();
-  const { audioTracks, isMicrophoneLoading, startMicrophone, stopMicrophone } =
-    useMicrophone();
+  const {
+    audioTracks,
+    isMicrophoneLoading,
+    audioDevices,
+    startMicrophone,
+    stopMicrophone,
+  } = useMicrophone();
 
   const {
     assistants,
@@ -30,7 +44,9 @@ export function Index() {
     useState<SessionStatus>("DISCONNECTED");
 
   // 当前获取的本地音频
-  const mediaAudioTrackRef = useRef<MediaStreamTrack | null>(null);
+  // const mediaAudioTrackRef = useRef<MediaStreamTrack | null>(null);
+
+  const [mediaDevice, setMediaDevice] = useState<MediaDeviceInfo | null>(null);
 
   // rtc数据
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
@@ -50,12 +66,19 @@ export function Index() {
   // 字幕
   const [isShowSubtitles, setIsShowSubtitles] = useState<boolean>(false);
 
+  // 是否在说话
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+
   // 通信事件----------
   useEffect(() => {
     if (sessionStatus === "CONNECTED") {
       updateSession();
     }
   }, [isPTTActive]);
+
+  const handleChangeIsSpeaking = (isSpeaking: boolean) => {
+    setIsSpeaking(isSpeaking);
+  };
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (dcRef.current && dcRef.current.readyState === "open") {
@@ -71,6 +94,7 @@ export function Index() {
   const handleServerEventRef = useHandleServerEvent({
     setSessionStatus,
     sendClientEvent,
+    handleChangeIsSpeaking,
   });
 
   const { run: connectToRealtime } = useDebounceFn(
@@ -87,11 +111,14 @@ export function Index() {
         const connection = await createRealtimeConnection(
           audioElementRef,
           selectedAssistant ? selectedAssistant.id : null,
-          mediaAudioTrackRef.current!,
+          // mediaAudioTrackRef.current!,
+          mediaDevice?.deviceId || "",
         );
 
         if (!connection) {
           setSessionStatus("DISCONNECTED");
+          stopMicrophone();
+          disconnectFromRealtime();
 
           return;
         }
@@ -110,8 +137,9 @@ export function Index() {
 
         setDataChannel(dc);
       } catch (err) {
-        console.error("Error connecting to realtime:", err);
         setSessionStatus("DISCONNECTED");
+        stopMicrophone();
+        disconnectFromRealtime();
       }
     },
     {
@@ -198,8 +226,13 @@ export function Index() {
 
   useEffect(() => {
     if (sessionStatus === "DISCONNECTED") {
-      startMicrophone(mediaAudioTrackRef);
+      // startMicrophone(mediaAudioTrackRef);
+      startMicrophone((mediaDevice: MediaDeviceInfo | null) => {
+        setMediaDevice(mediaDevice);
+      });
       getAssistants();
+      setIsPTTActive(false);
+      setIsShowSubtitles(false);
     }
   }, [sessionStatus]);
 
@@ -258,11 +291,25 @@ export function Index() {
               >
                 选择助理后连接或按默认配置连接
               </div>
-              <div>
-                <span>助理</span>{" "}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <span
+                  style={{
+                    flexShrink: 0,
+                  }}
+                >
+                  助理
+                </span>{" "}
                 <Select
+                  style={{
+                    minWidth: "150px",
+                  }}
                   value={selectedAssistant?.id || undefined}
-                  style={{ width: 150 }}
                   onChange={(e) => {
                     selectAssistant(
                       !e
@@ -274,21 +321,37 @@ export function Index() {
                   options={renderAssistantList}
                   loading={isAssistantLoading}
                   disabled={isAssistantLoading}
-                  placeholder="选填"
+                  placeholder="可选填"
                 />
               </div>
 
-              <div>
-                <span>音频</span>{" "}
-                <Select
-                  style={{ width: 150 }}
-                  value={mediaAudioTrackRef?.current?.label || undefined}
-                  onChange={(e) => {
-                    mediaAudioTrackRef.current =
-                      audioTracks.filter((item) => item.id === e)[0] || null;
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <span
+                  style={{
+                    flexShrink: 0,
                   }}
-                  options={audioTracks.map((item) => ({
-                    value: item.id,
+                >
+                  音频
+                </span>{" "}
+                <Select
+                  style={{
+                    minWidth: "150px",
+                  }}
+                  value={mediaDevice?.label || undefined}
+                  onChange={(e) => {
+                    setMediaDevice(
+                      audioDevices.filter((item) => item.deviceId === e)[0] ||
+                        null,
+                    );
+                  }}
+                  options={audioDevices.map((item) => ({
+                    value: item.deviceId,
                     label: item.label,
                   }))}
                   loading={isMicrophoneLoading}
@@ -298,10 +361,7 @@ export function Index() {
 
               <Button
                 onClick={() => {
-                  if (
-                    sessionStatus === "DISCONNECTED" &&
-                    mediaAudioTrackRef.current
-                  ) {
+                  if (sessionStatus === "DISCONNECTED") {
                     connectToRealtime();
                   } else {
                     showToast("请先选择本地音频设备");
@@ -321,81 +381,111 @@ export function Index() {
                   padding: "10px",
                   display: "flex",
                   justifyContent: "center",
+                  gap: "10px",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
                 {isShowSubtitles ? (
                   <div
-                    ref={transcriptRef}
                     style={{
-                      overflow: "auto",
-                      width: "100%",
-                      minWidth: "200px",
-                      maxWidth: "400px",
-                      height: "100%",
                       display: "flex",
                       flexDirection: "column",
-                      rowGap: "8px",
-                      flexShrink: 1,
+                      alignItems: "center",
+                      width: "100%",
+                      height: "100%",
+                      gap: "10px",
                     }}
                   >
-                    {transcriptItems.map((item) => {
-                      const {
-                        itemId,
-                        type,
-                        role,
-                        data,
-                        expanded,
-                        timestamp,
-                        title = "",
-                        isHidden,
-                      } = item;
+                    <span
+                      style={{
+                        fontSize: "24px",
+                      }}
+                    >
+                      {selectedAssistant?.name || "默认助理"}
+                    </span>
+                    <div
+                      ref={transcriptRef}
+                      style={{
+                        overflow: "auto",
+                        width: "100%",
+                        minWidth: "200px",
+                        maxWidth: "400px",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        rowGap: "8px",
+                        flexShrink: 1,
+                      }}
+                    >
+                      {transcriptItems.map((item) => {
+                        const {
+                          itemId,
+                          type,
+                          role,
+                          data,
+                          expanded,
+                          timestamp,
+                          title = "",
+                          isHidden,
+                        } = item;
 
-                      if (isHidden) {
-                        return null;
-                      }
-                      const isBracketedMessage =
-                        title.startsWith("[") && title.endsWith("]");
+                        if (isHidden) {
+                          return null;
+                        }
+                        const isBracketedMessage =
+                          title.startsWith("[") && title.endsWith("]");
 
-                      const displayTitle = isBracketedMessage
-                        ? title.slice(1, -1)
-                        : title;
+                        const displayTitle = isBracketedMessage
+                          ? title.slice(1, -1)
+                          : title;
 
-                      if (type === "MESSAGE") {
-                        return (
-                          <div
-                            key={itemId}
-                            style={{
-                              width: "100%",
-                            }}
-                          >
+                        if (type === "MESSAGE") {
+                          const isUser = role === "user";
+
+                          return (
                             <div
+                              key={itemId}
                               style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "flex-start",
-                                justifyContent: "flex-start",
-                                textAlign: "left",
+                                width: "100%",
                               }}
                             >
                               <div
                                 style={{
-                                  fontSize: "12px",
-                                  fontFamily: "monospace",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: isUser
+                                    ? "flex-end"
+                                    : "flex-start",
+                                  justifyContent: "flex-start",
+                                  textAlign: "left",
                                 }}
                               >
-                                {timestamp}
-                              </div>
-                              <div>
-                                <Markdown
-                                  content={displayTitle}
-                                  fontSize={20}
-                                ></Markdown>
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    fontFamily: "monospace",
+                                  }}
+                                >
+                                  {timestamp}
+                                </div>
+                                <div
+                                  style={{
+                                    backgroundColor: isUser
+                                      ? "oklch(92.2% 0 0)"
+                                      : "transparent",
+                                    borderRadius: "16px",
+                                    padding: "0 10px",
+                                  }}
+                                >
+                                  <ReactMarkdown>{displayTitle}</ReactMarkdown>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      }
-                    })}
+                          );
+                        }
+                      })}
+                    </div>
                   </div>
                 ) : (
                   <div
@@ -407,44 +497,86 @@ export function Index() {
                       height: "100%",
                     }}
                   >
-                    <div
-                      style={{
-                        width: 150,
-                        height: 150,
-                        borderRadius: "50%",
-                        backgroundColor: "rgba(255,255,255,0.3)",
-                        border: "2px solid white",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        boxShadow: "0 0 10px rgba(0,0,0,0.5)",
-                        fontSize: "24px",
-                      }}
-                    >
-                      Metis
-                    </div>
+                    {sessionStatus === "CONNECTING" ? (
+                      <div className={styles["pulse-circle"]}></div>
+                    ) : (
+                      <div
+                        className={
+                          isSpeaking ? styles["big"] : styles["big-stop"]
+                        }
+                        style={{
+                          width: 150,
+                          height: 150,
+                          borderRadius: "50%",
+                          backgroundColor: "rgba(255,255,255,0.3)",
+                          border: "2px solid white",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          textAlign: "center",
+                          boxShadow: "0 0 10px rgba(0,0,0,0.5)",
+                          fontSize: "24px",
+                        }}
+                      >
+                        Metis
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
               <div className={styles["btn-group"]}>
                 <div
-                  className={styles["btn-item"]}
+                  className={clsx(
+                    styles["btn-item"],
+                    isPTTActive && styles["btn-item-err"],
+                  )}
                   onClick={() => setIsPTTActive((prev) => !prev)}
                 >
-                  {!isPTTActive ? "关麦" : "开麦"}
+                  {isPTTActive ? (
+                    <AudioMutedOutlined
+                      style={{
+                        fontSize: "24px",
+                        color: "red",
+                      }}
+                    />
+                  ) : (
+                    <AudioOutlined
+                      style={{
+                        fontSize: "24px",
+                        color: "black",
+                      }}
+                    />
+                  )}
                 </div>
                 <div
                   className={styles["btn-item"]}
                   onClick={() => onToggleConnection()}
                 >
-                  关闭
+                  <CloseOutlined
+                    style={{
+                      fontSize: "24px",
+                    }}
+                  />
                 </div>
                 <div
                   className={styles["btn-item"]}
                   onClick={() => setIsShowSubtitles((prev) => !prev)}
                 >
-                  {isShowSubtitles ? "隐藏字幕" : "显示字幕"}
+                  {isShowSubtitles ? (
+                    <Image
+                      src={SubtitlesIcon.src}
+                      alt=""
+                      width={32}
+                      height={32}
+                    />
+                  ) : (
+                    <Image
+                      src={SubtitlesIcon1.src}
+                      alt=""
+                      width={32}
+                      height={32}
+                    />
+                  )}
                 </div>
               </div>
             </>
@@ -492,10 +624,6 @@ export function Index() {
             />
           </g>
         </svg>
-
-        {sessionStatus === "CONNECTING" && (
-          <div className={styles["mask-layer"]}>通话连接中...</div>
-        )}
       </div>
     </div>
   );

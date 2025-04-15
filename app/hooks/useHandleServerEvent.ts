@@ -11,6 +11,7 @@ export interface UseHandleServerEventParams {
   sendClientEvent: (eventObj: any, eventNameSuffix?: string) => void;
   // setSelectedAgentName: (name: string) => void;
   shouldForceResponse?: boolean;
+  handleChangeIsSpeaking: (isSpeaking: boolean) => void;
 }
 
 export function useHandleServerEvent({
@@ -18,6 +19,7 @@ export function useHandleServerEvent({
   // selectedAgentName,
   // selectedAgentConfigSet,
   sendClientEvent, // setSelectedAgentName,
+  handleChangeIsSpeaking,
 }: UseHandleServerEventParams) {
   const {
     transcriptItems,
@@ -180,6 +182,18 @@ export function useHandleServerEvent({
         if (itemId) {
           updateTranscriptItemStatus(itemId, "DONE");
         }
+        break;
+      }
+
+      case "input_audio_buffer.speech_started":
+      case "output_audio_buffer.started": {
+        handleChangeIsSpeaking(true);
+        break;
+      }
+
+      case "input_audio_buffer.speech_stopped":
+      case "output_audio_buffer.stopped": {
+        handleChangeIsSpeaking(false);
         break;
       }
 

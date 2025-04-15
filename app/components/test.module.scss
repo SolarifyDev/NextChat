@@ -5,7 +5,8 @@
   flex-direction: column;
   text-align: center;
   background: linear-gradient(to bottom, #bdceee, #bdd2ef);
-  color: white;
+  // background-color: white;
+  color: black;
   position: relative;
 }
 
@@ -39,8 +40,8 @@
   gap: 12px;
 
   .btn-item {
-    width: 100px;
-    height: 100px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.3);
     font-weight: 600;
@@ -49,6 +50,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .btn-item-err {
+    background-color: oklch(88.5% 0.062 18.334) !important;
   }
 }
 
@@ -130,3 +135,90 @@
 //     height: 30vh;
 //   }
 // }
+
+.pulse-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: black;
+  animation: growAndPulse 10s ease-in-out infinite;
+}
+
+@keyframes growAndPulse {
+  0% {
+    transform: scale(1);
+    background-color: black;
+  }
+  12.5% {
+    transform: scale(1.2);
+    background-color: #444;
+  }
+  25% {
+    transform: scale(1.4);
+    background-color: black;
+  }
+  37.5% {
+    transform: scale(1.6);
+    background-color: #444;
+  }
+  50% {
+    transform: scale(1.7);
+    background-color: black;
+  }
+  62.5% {
+    transform: scale(1.8);
+    background-color: #444;
+  }
+  75% {
+    transform: scale(1.9);
+    background-color: black;
+  }
+  87.5% {
+    transform: scale(2);
+    background-color: #444;
+  }
+  100% {
+    transform: scale(2.1);
+    background-color: black;
+  }
+}
+
+.big {
+  animation: growAndPulse1 10s ease-in-out infinite;
+  animation-fill-mode: none;
+}
+
+.big-stop {
+  transform: scale(1);
+  transition: transform 0.5s ease-in-out !important;
+}
+
+@keyframes growAndPulse1 {
+  0% {
+    transform: scale(1);
+  }
+  12.5% {
+    transform: scale(1.1);
+  }
+  25% {
+    transform: scale(1.2);
+  }
+  37.5% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  62.5% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.2);
+  }
+  87.5% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
