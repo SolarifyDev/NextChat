@@ -10,7 +10,6 @@ import { clone } from "lodash-es";
 import styles from "./test.module.scss";
 import { useTranscript } from "../contexts/TranscriptContext";
 import { Button, Select } from "antd";
-import { showToast } from "./ui-lib";
 import {
   AudioMutedOutlined,
   AudioOutlined,
@@ -360,13 +359,13 @@ export function Index() {
               </div>
 
               <Button
-                onClick={() => {
-                  if (sessionStatus === "DISCONNECTED") {
-                    connectToRealtime();
-                  } else {
-                    showToast("请先选择本地音频设备");
-                  }
-                }}
+              // onClick={() => {
+              //   if (sessionStatus === "DISCONNECTED") {
+              //     connectToRealtime();
+              //   } else {
+              //     showToast("请先选择本地音频设备");
+              //   }
+              // }}
               >
                 连接
               </Button>
@@ -581,6 +580,14 @@ export function Index() {
               </div>
             </>
           )}
+
+          {audioDevices.map((item, index) => {
+            return (
+              <div key={index}>
+                {item.label} {index} {item.deviceId}
+              </div>
+            );
+          })}
         </div>
 
         <svg
