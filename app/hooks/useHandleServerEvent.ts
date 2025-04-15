@@ -102,7 +102,6 @@ export function useHandleServerEvent({
   // };
 
   const handleServerEvent = (serverEvent: ServerEvent) => {
-    console.log("[Server Event]", serverEvent);
     switch (serverEvent.type) {
       case "session.created": {
         if (serverEvent.session?.id) {
