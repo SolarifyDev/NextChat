@@ -402,7 +402,7 @@ export function Index() {
                         fontSize: "24px",
                       }}
                     >
-                      {selectedAssistant?.name || "默认助理"}
+                      {`与${selectedAssistant?.name || "默认助理"}对话`}
                     </span>
                     <div
                       ref={transcriptRef}
