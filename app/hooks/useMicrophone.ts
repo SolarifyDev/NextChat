@@ -1,5 +1,6 @@
 // hooks/useMicrophone.ts
 import { useEffect, useState } from "react";
+import { useOmeStore } from "../store/ome";
 
 export const useMicrophone = () => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
@@ -24,6 +25,11 @@ export const useMicrophone = () => {
   ) => {
     setIsMicrophoneLoading(true);
     try {
+      if (useOmeStore.getState().isFromApp) {
+        await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+      }
       // 先获取设备列表（此时可能没有设备名称，只有 deviceId）
       const devices = await navigator.mediaDevices.enumerateDevices();
 

@@ -402,7 +402,7 @@ export function SideBar(props: { className?: string }) {
         style={{
           marginTop: "10px",
         }}
-        onClick={() => navigate(Path.Test1)}
+        onClick={() => navigate(Path.Test)}
       >
         通话
       </Button>
