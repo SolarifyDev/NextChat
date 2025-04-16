@@ -609,8 +609,8 @@ export function ChatActions(props: {
       if (omeStore.isFromApp) {
         return arr.filter((i) =>
           [
-            "gpt-4o",
-            "o1-mini",
+            "gpt-4.1",
+            "gpt-4.1-mini",
             "deepseek-chat",
             "deepseek-reasoner",
             "metis-chat",
@@ -623,8 +623,8 @@ export function ChatActions(props: {
       if (omeStore.isFromApp) {
         return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
           [
-            "gpt-4o",
-            "o1-mini",
+            "gpt-4.1",
+            "gpt-4.1-mini",
             "deepseek-chat",
             "deepseek-reasoner",
             "metis-chat",
