@@ -1,6 +1,5 @@
 // hooks/useMicrophone.ts
 import { useEffect, useState } from "react";
-import { showToast } from "../components/ui-lib";
 
 export const useMicrophone = () => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
@@ -33,12 +32,8 @@ export const useMicrophone = () => {
         (device) => device.kind === "audioinput",
       );
 
-      showToast(microphones.length.toString());
-
       setAudioDevices(microphones);
 
-      // const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // console.log("stream", stream);
       // setMediaStream(stream);
       // setAudioTracks(stream.getAudioTracks());
 

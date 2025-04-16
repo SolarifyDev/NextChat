@@ -98,6 +98,10 @@ const Test = dynamic(async () => (await import("./test-copy")).Index, {
   loading: () => null,
 });
 
+const Test1 = dynamic(async () => (await import("./test")).Index, {
+  loading: () => null,
+});
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -236,6 +240,7 @@ function Screen() {
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
             <Route path={Path.RealTimeAdio} element={<RealTimeAdio />} />
             <Route path={Path.Test} element={<Test />} />
+            <Route path={Path.Test1} element={<Test1 />} />
           </Routes>
         </WindowContent>
       </>
