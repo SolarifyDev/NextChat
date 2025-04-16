@@ -1,6 +1,7 @@
 // hooks/useMicrophone.ts
 import { useEffect, useState } from "react";
 import { useOmeStore } from "../store/ome";
+import { isEmpty } from "lodash-es";
 
 export const useMicrophone = () => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
@@ -26,16 +27,20 @@ export const useMicrophone = () => {
     setIsMicrophoneLoading(true);
     try {
       if (useOmeStore.getState().isFromApp) {
-        await navigator.mediaDevices.getUserMedia({
+        const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         });
+
+        // 2. 立即关闭流（避免占用麦克风）
+        stream.getTracks().forEach((track) => track.stop());
       }
+
       // 先获取设备列表（此时可能没有设备名称，只有 deviceId）
       const devices = await navigator.mediaDevices.enumerateDevices();
 
       // 过滤出音频输入设备（麦克风）
       const microphones = devices.filter(
-        (device) => device.kind === "audioinput",
+        (device) => device.kind === "audioinput" && !isEmpty(device.deviceId),
       );
 
       setAudioDevices(microphones);
