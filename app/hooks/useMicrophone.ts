@@ -40,7 +40,10 @@ export const useMicrophone = () => {
 
       // 过滤出音频输入设备（麦克风）
       const microphones = devices.filter(
-        (device) => device.kind === "audioinput" && !isEmpty(device.deviceId),
+        (device) =>
+          device.kind === "audioinput" &&
+          !isEmpty(device.deviceId) &&
+          !isEmpty(device.label),
       );
 
       setAudioDevices(microphones);
