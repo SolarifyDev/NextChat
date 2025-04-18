@@ -76,6 +76,7 @@ const ko: PartialLocaleType = {
       Clear: "채팅 지우기",
       Settings: "채팅 설정",
       UploadImage: "이미지 업로드",
+      OnlineSearch: "온라인 검색",
     },
     Rename: "채팅 이름 변경",
     Typing: "입력 중…",

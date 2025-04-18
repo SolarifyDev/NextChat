@@ -646,6 +646,7 @@ export function ChatActions(props: {
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [showPluginSelector, setShowPluginSelector] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
+  const [searchEnabled, setSerchEnabled] = useState(false);
 
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [showQualitySelector, setShowQualitySelector] = useState(false);
@@ -800,6 +801,28 @@ export function ChatActions(props: {
         <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
+          icon={
+            omeStore.isFromApp ? (
+              // showModelSelector ? (
+              //   <GreenRobotIcon />
+              // ) : (
+              //   <AppRobot />
+              // )
+              <AppRobot />
+            ) : (
+              <RobotIcon />
+            )
+          }
+          isHaveHover={true}
+        />
+
+        <ChatAction
+          onClick={() =>
+            useOmeStore
+              .getState()
+              .setOnlineSearch(!useOmeStore.getState().onlineSearch)
+          }
+          text={t("Chat.InputActions.OnlineSearch")}
           icon={
             omeStore.isFromApp ? (
               // showModelSelector ? (

@@ -77,6 +77,7 @@ const fr: PartialLocaleType = {
       Clear: "Effacer la discussion",
       Settings: "Paramètres de la discussion",
       UploadImage: "Télécharger une image",
+      OnlineSearch: "Recherche en ligne",
     },
     Rename: "Renommer la discussion",
     Typing: "En train d'écrire…",
