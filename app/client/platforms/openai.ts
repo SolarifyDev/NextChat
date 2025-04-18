@@ -44,6 +44,7 @@ import {
 import { fetch } from "@/app/utils/stream";
 import { useNewChatStore } from "@/app/store/new-chat";
 import { t } from "i18next";
+import { useOmeStore } from "@/app/store/ome";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -68,6 +69,7 @@ export interface RequestPayload {
   max_tokens?: number;
   max_completion_tokens?: number;
   drop_params?: boolean;
+  onlineSearch?: boolean;
 }
 
 export interface DalleRequestPayload {
@@ -249,6 +251,8 @@ export class ChatGPTApi implements LLMApi {
       if (visionModel) {
         requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
       }
+
+      requestPayload["onlineSearch"] = useOmeStore.getState().onlineSearch;
     }
 
     console.log("[Request] openai payload: ", requestPayload);
