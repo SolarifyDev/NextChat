@@ -608,7 +608,7 @@ export function ChatActions(props: {
       ];
       if (omeStore.isFromApp) {
         return arr.filter((i) =>
-          ["gpt-4o", "o1-mini", "metis-chat", "metis-reasoner"].some(
+          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
             (item) => item === i.displayName.toLowerCase(),
           ),
         );
@@ -617,7 +617,7 @@ export function ChatActions(props: {
     } else {
       if (omeStore.isFromApp) {
         return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
-          ["gpt-4o", "o1-mini", "metis-chat", "metis-reasoner"].some(
+          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
             (item) => item === i.displayName.toLowerCase(),
           ),
         );
