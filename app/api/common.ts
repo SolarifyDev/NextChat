@@ -89,7 +89,7 @@ export async function requestOpenai(req: NextRequest) {
   }
 
   const fetchUrl = cloudflareAIGatewayUrl(`${baseUrl}/${path}`);
-  console.log("fetchUrl", fetchUrl);
+  console.log("fetchUrl", fetchUrl, req.headers.get("OnlineSearch"));
   const fetchOptions: RequestInit = {
     headers: {
       "Content-Type": "application/json",
