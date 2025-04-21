@@ -375,6 +375,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
     headers["Ome-Metis-Username"] = omeStore.userName || "";
   }
 
+  headers["OnlineSearch"] = (omeStore.onlineSearch ? 1 : 0).toString();
+
   return headers;
 }
 
