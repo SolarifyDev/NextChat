@@ -356,6 +356,18 @@ pre {
   &:focus {
     filter: brightness(0.95);
   }
+
+  .is-clicked-show {
+    svg {
+      fill: rgba(86, 146, 169, 1) !important;
+    }
+  }
+
+  .is-hover-show {
+    svg {
+      fill: #333 !important;
+    }
+  }
 }
 
 .clickable-is-app {
@@ -366,10 +378,12 @@ pre {
       fill: #6e6c8a !important;
     }
   }
-}
 
-.clickable-is-app:hover .is-hover-show svg {
-  fill: rgba(40, 180, 70, 1) !important;
+  .is-clicked-show {
+    svg {
+      fill: rgba(40, 180, 70, 1) !important;
+    }
+  }
 }
 
 .error {
