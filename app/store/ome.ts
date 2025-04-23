@@ -38,6 +38,7 @@ export const useOmeStore = create<OmeStoreType>()(
           userName: "",
           from: "",
           isFromApp: null,
+          onlineSearch: false,
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {

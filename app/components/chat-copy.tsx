@@ -533,7 +533,8 @@ export function ChatAction(props: {
 
           props.isClick || isActive
             ? "is-clicked-show"
-            : (!isNil(props.isClick) || props.isHaveHover) && "is-hover-show",
+            : (!isNil(props.isClick) || (isFromApp && props.isHaveHover)) &&
+                "is-hover-show",
           props.isWebClick && props.isClick && "no-dark",
         )}
       >
