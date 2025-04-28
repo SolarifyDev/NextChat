@@ -608,28 +608,18 @@ export function ChatActions(props: {
       ];
       if (omeStore.isFromApp) {
         return arr.filter((i) =>
-          [
-            "gpt-4.1",
-            "gpt-4.1-mini",
-            "deepseek-chat",
-            "deepseek-reasoner",
-            "metis-chat",
-            "metis-reasoner",
-          ].some((item) => item === i.displayName.toLowerCase()),
+          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
+            (item) => item === i.displayName.toLowerCase(),
+          ),
         );
       }
       return arr;
     } else {
       if (omeStore.isFromApp) {
         return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
-          [
-            "gpt-4.1",
-            "gpt-4.1-mini",
-            "deepseek-chat",
-            "deepseek-reasoner",
-            "metis-chat",
-            "metis-reasoner",
-          ].some((item) => item === i.displayName.toLowerCase()),
+          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
+            (item) => item === i.displayName.toLowerCase(),
+          ),
         );
       }
       return [...deepseekModels, ...metisModels, ...otherModels];
