@@ -95,6 +95,7 @@ export class DeepSeekApi implements LLMApi {
       frequency_penalty: modelConfig.frequency_penalty,
       top_p: modelConfig.top_p,
       onlineSearch: useOmeStore.getState().onlineSearch,
+      isSummary: options.isSummary || false,
       // max_tokens: Math.max(modelConfig.max_tokens, 1024),
       // Please do not ask me why not send max_tokens, no reason, this param is just shit, I dont want to explain anymore.
     };

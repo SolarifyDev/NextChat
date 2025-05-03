@@ -740,6 +740,7 @@ export const useNewChatStore = create<ChatStoreType>()(
                 );
               }
             },
+            isSummary: true,
           });
         }
         const summarizeIndex = Math.max(
