@@ -727,10 +727,6 @@ export const useNewChatStore = create<ChatStoreType>()(
               providerName,
             },
             onFinish(message, responseRes) {
-              console.log(
-                "---summarizeSession---",
-                message.length > 0 ? trimTopic(message) : getDefaultTopic(),
-              );
               if (responseRes?.status === 200) {
                 get().updateTargetSession(
                   session,
