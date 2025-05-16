@@ -51,6 +51,8 @@ import HeadphoneIcon from "../icons/headphone.svg";
 import ArrowLeftIcon from "../icons/arrow-left.svg";
 import AppImage from "../icons/app-gallery.svg";
 import AppRobot from "../icons/app-robot.svg";
+import SearchOnlineIcon from "../icons/search-online.svg";
+import AppSearchOnlineIcon from "../icons/search-online-app.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
 import MetisIcon from "../icons/metis.png";
 import SendIcon from "../icons/green-send.png";
@@ -127,7 +129,7 @@ import { ClientApi, MultimodalContent } from "../client/api";
 import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
-import { isEmpty } from "lodash-es";
+import { isEmpty, isNil } from "lodash-es";
 import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
@@ -142,6 +144,7 @@ import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
+import { useDebounceFn } from "ahooks";
 
 const localStorage = safeLocalStorage();
 
@@ -445,11 +448,15 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
-  isHaveHover?: boolean;
+  isHaveHover?: boolean; // 是否有hover效果
+  isClick?: boolean; // 是否需要点击效果
+  isWebClick?: boolean; // web端是否有选中样式
+  isChangeSvgStroke?: boolean; // svg样式是调整stroke 还是 fill
 }) {
   const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const [isActive, setIsActive] = useState(false);
   const [width, setWidth] = useState({
     full: 16,
     icon: 16,
@@ -466,20 +473,52 @@ export function ChatAction(props: {
     });
   }
 
+  const { run: onClick } = useDebounceFn(
+    () => {
+      props.onClick();
+      setTimeout(updateWidth, 1);
+    },
+    {
+      wait: 300,
+    },
+  );
+
   return (
     <div
       className={clsx(
-        isFromApp
-          ? styles["chat-input-action-is-app"]
-          : styles["chat-input-action"],
-        isFromApp ? "clickable-is-app" : "clickable",
+        {
+          // app端样式
+          [styles["chat-input-action-is-app"]]: isFromApp && !isActive, // 默认
+          [styles["chat-input-action-is-app-hover"]]: isFromApp && isActive, // hover
+          [styles["chat-input-action-is-app-clicked"]]:
+            isFromApp && !isActive && props.isClick, // 选中
+          "clickable-is-app": isFromApp, // 设置svg样式
+        },
+        {
+          // web端样式
+          [styles["chat-input-action"]]: !isFromApp, // 默认
+          [styles["chat-input-action-clicked"]]:
+            !isFromApp && props.isClick && props.isWebClick, // 选中
+          clickable: !isFromApp, // 设置svg样式
+        },
       )}
-      onClick={() => {
-        props.onClick();
-        setTimeout(updateWidth, 1);
-      }}
+      onClick={onClick}
       onMouseEnter={updateWidth}
-      onTouchStart={updateWidth}
+      onTouchStart={() => {
+        if (isFromApp) {
+          setIsActive(!isActive);
+        }
+        updateWidth();
+      }}
+      onTouchEnd={() => {
+        setTimeout(() => {
+          if (isFromApp) {
+            if (isActive) {
+              setIsActive(false);
+            }
+          }
+        }, 1000);
+      }}
       style={
         {
           "--icon-width": `${width.icon}px`,
@@ -489,7 +528,24 @@ export function ChatAction(props: {
     >
       <div
         ref={iconRef}
-        className={clsx(styles["icon"], props.isHaveHover && "is-hover-show")}
+        // className={clsx(styles["icon"], props.isHaveHover && "is-hover-show")}
+        className={clsx(
+          styles["icon"],
+
+          props.isClick || isActive
+            ? isFromApp
+              ? props.isChangeSvgStroke
+                ? "is-clicked-show-stroke"
+                : "is-clicked-show-fill"
+              : "is-clicked-show"
+            : (!isNil(props.isClick) || (isFromApp && props.isHaveHover)) &&
+                (isFromApp
+                  ? props.isChangeSvgStroke
+                    ? "is-hover-show-stroke"
+                    : "is-hover-show-fill"
+                  : "is-hover-show"),
+          props.isWebClick && props.isClick && "no-dark",
+        )}
       >
         {props.icon}
       </div>
@@ -690,6 +746,8 @@ export function ChatActions(props: {
             // text={Locale.Chat.InputActions.Stop}
             text={t("Chat.InputActions.Stop")}
             icon={omeStore.isFromApp ? <AppStopIcon /> : <StopIcon />}
+            isChangeSvgStroke={true}
+            isHaveHover={true}
           />
         )}
         {!props.hitBottom && (
@@ -698,6 +756,8 @@ export function ChatActions(props: {
             // text={Locale.Chat.InputActions.ToBottom}
             text={t("Chat.InputActions.ToBottom")}
             icon={omeStore.isFromApp ? <AppBottomIcon /> : <BottomIcon />}
+            isChangeSvgStroke={true}
+            isHaveHover={true}
           />
         )}
         {props.hitBottom && !omeStore.isFromApp && (
@@ -790,19 +850,24 @@ export function ChatActions(props: {
         <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
+          icon={omeStore.isFromApp ? <AppRobot /> : <RobotIcon />}
+          isHaveHover={true}
+          isClick={showModelSelector}
+        />
+
+        <ChatAction
+          onClick={() =>
+            useOmeStore
+              .getState()
+              .setOnlineSearch(!useOmeStore.getState().onlineSearch)
+          }
+          text={t("Chat.InputActions.OnlineSearch")}
           icon={
-            omeStore.isFromApp ? (
-              // showModelSelector ? (
-              //   <GreenRobotIcon />
-              // ) : (
-              //   <AppRobot />
-              // )
-              <AppRobot />
-            ) : (
-              <RobotIcon />
-            )
+            omeStore.isFromApp ? <AppSearchOnlineIcon /> : <SearchOnlineIcon />
           }
           isHaveHover={true}
+          isClick={useOmeStore.getState().onlineSearch}
+          isWebClick={true}
         />
 
         {showModelSelector && (

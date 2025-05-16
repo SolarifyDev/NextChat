@@ -78,6 +78,7 @@ const da: PartialLocaleType = {
       Clear: "Ryd kontekst",
       Settings: "Indstillinger",
       UploadImage: "Upload billeder",
+      OnlineSearch: "Online søgning",
     },
     Rename: "Omdøb chat",
     Typing: "Skriver…",

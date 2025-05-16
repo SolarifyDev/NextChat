@@ -76,6 +76,7 @@ const cs: PartialLocaleType = {
       Clear: "Vymazat konverzaci",
       Settings: "Nastavení konverzace",
       UploadImage: "Nahrát obrázek",
+      OnlineSearch: "Online vyhledávání",
     },
     Rename: "Přejmenovat konverzaci",
     Typing: "Píše se…",

@@ -10,7 +10,9 @@ export type OmeStoreType = {
   from: string;
   isFromApp: boolean | null;
   language: Lang;
+  onlineSearch: boolean;
   clearCurrent: () => void;
+  setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
   setUserId: (userId: string) => void;
   setUserName: (userName: string) => void;
@@ -28,6 +30,7 @@ export const useOmeStore = create<OmeStoreType>()(
       from: "",
       isFromApp: null,
       language: "cn",
+      onlineSearch: false,
       clearCurrent: () => {
         set({
           token: "",
@@ -35,7 +38,11 @@ export const useOmeStore = create<OmeStoreType>()(
           userName: "",
           from: "",
           isFromApp: null,
+          onlineSearch: false,
         });
+      },
+      setOnlineSearch: (onlineSearch: boolean) => {
+        set({ onlineSearch });
       },
       setToken: (token: string) => {
         set({ token });

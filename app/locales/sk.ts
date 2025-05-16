@@ -76,6 +76,7 @@ const sk: PartialLocaleType = {
       Masks: "Masky",
       Clear: "Vymazať kontext",
       Settings: "Nastavenia",
+      OnlineSearch: "Online vyhľadávanie",
     },
     Rename: "Premenovať Chat",
     Typing: "Písanie…",

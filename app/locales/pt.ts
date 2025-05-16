@@ -75,6 +75,7 @@ const pt: PartialLocaleType = {
       Masks: "Máscaras",
       Clear: "Limpar Contexto",
       Settings: "Configurações",
+      OnlineSearch: "Pesquisa online",
     },
     Rename: "Renomear Chat",
     Typing: "Digitando…",

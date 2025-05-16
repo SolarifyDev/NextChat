@@ -79,6 +79,8 @@ export interface ChatOptions {
   onController?: (controller: AbortController) => void;
   onBeforeTool?: (tool: ChatMessageTool) => void;
   onAfterTool?: (tool: ChatMessageTool) => void;
+
+  isSummary?: boolean; // 给接口控制当前是否是总结
 }
 
 export interface LLMUsage {
@@ -374,6 +376,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
 
     headers["Ome-Metis-Username"] = omeStore.userName || "";
   }
+
+  headers["OnlineSearch"] = (omeStore.onlineSearch ? 1 : 0).toString();
 
   return headers;
 }

@@ -78,6 +78,7 @@ const es: PartialLocaleType = {
       Clear: "Limpiar chat",
       Settings: "Configuración de conversación",
       UploadImage: "Subir imagen",
+      OnlineSearch: "Búsqueda en línea",
     },
     Rename: "Renombrar conversación",
     Typing: "Escribiendo…",
