@@ -451,6 +451,7 @@ export function ChatAction(props: {
   isHaveHover?: boolean; // 是否有hover效果
   isClick?: boolean; // 是否需要点击效果
   isWebClick?: boolean; // web端是否有选中样式
+  isChangeSvgStroke?: boolean; // svg样式是调整stroke 还是 fill
 }) {
   const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
@@ -532,9 +533,17 @@ export function ChatAction(props: {
           styles["icon"],
 
           props.isClick || isActive
-            ? "is-clicked-show"
+            ? isFromApp
+              ? props.isChangeSvgStroke
+                ? "is-clicked-show-stroke"
+                : "is-clicked-show-fill"
+              : "is-clicked-show"
             : (!isNil(props.isClick) || (isFromApp && props.isHaveHover)) &&
-                "is-hover-show",
+                (isFromApp
+                  ? props.isChangeSvgStroke
+                    ? "is-hover-show-stroke"
+                    : "is-hover-show-fill"
+                  : "is-hover-show"),
           props.isWebClick && props.isClick && "no-dark",
         )}
       >
@@ -737,6 +746,8 @@ export function ChatActions(props: {
             // text={Locale.Chat.InputActions.Stop}
             text={t("Chat.InputActions.Stop")}
             icon={omeStore.isFromApp ? <AppStopIcon /> : <StopIcon />}
+            isChangeSvgStroke={true}
+            isHaveHover={true}
           />
         )}
         {!props.hitBottom && (
@@ -745,6 +756,8 @@ export function ChatActions(props: {
             // text={Locale.Chat.InputActions.ToBottom}
             text={t("Chat.InputActions.ToBottom")}
             icon={omeStore.isFromApp ? <AppBottomIcon /> : <BottomIcon />}
+            isChangeSvgStroke={true}
+            isHaveHover={true}
           />
         )}
         {props.hitBottom && !omeStore.isFromApp && (
