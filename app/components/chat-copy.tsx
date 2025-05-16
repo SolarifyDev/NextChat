@@ -850,16 +850,7 @@ export function ChatActions(props: {
           }
           text={t("Chat.InputActions.OnlineSearch")}
           icon={
-            omeStore.isFromApp ? (
-              // showModelSelector ? (
-              //   <GreenRobotIcon />
-              // ) : (
-              //   <AppRobot />
-              // )
-              <AppSearchOnlineIcon />
-            ) : (
-              <SearchOnlineIcon />
-            )
+            omeStore.isFromApp ? <AppSearchOnlineIcon /> : <SearchOnlineIcon />
           }
           isHaveHover={true}
           isClick={useOmeStore.getState().onlineSearch}
