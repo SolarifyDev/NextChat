@@ -1,5 +1,3 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { RequestMessage } from "../typing";
 import { ModelType } from "./config";
 import {
@@ -41,6 +39,8 @@ import { extractMcpJson, isMcpJson } from "../mcp/utils";
 import { isEmpty } from "lodash-es";
 import { t } from "i18next";
 import { useOmeStore } from "./ome";
+import { createPersistStore } from "../utils/store";
+import { indexedDBStorage } from "../utils/indexedDB-storage";
 
 export type ChatMessageTool = {
   id: string;
@@ -265,14 +265,25 @@ function getSummarizeModel(
   return [currentModel, providerName];
 }
 
-export const useNewChatStore = create<ChatStoreType>()(
-  persist(
-    (set, get) => ({
-      currentSessionIndex: -1,
-      sessions: [],
-      lastInput: "",
-      isDown: false,
-      isReady: false,
+const detaultSessions: ChatSession[] = [];
+
+export const useNewChatStore = createPersistStore(
+  {
+    currentSessionIndex: -1,
+    sessions: detaultSessions,
+    lastInput: "",
+    isDown: false,
+    isLoading: false,
+  },
+  (set, _get) => {
+    function get() {
+      return {
+        ..._get(),
+        ...methods,
+      };
+    }
+
+    const methods = {
       setIsDown: (isDown: boolean) => {
         set({ isDown });
       },
@@ -326,7 +337,7 @@ export const useNewChatStore = create<ChatStoreType>()(
       clearCurrent: () => {
         set({
           currentSessionIndex: -1,
-          sessions: [],
+          sessions: detaultSessions,
           isDown: false,
           isLoading: false,
         });
@@ -988,17 +999,20 @@ export const useNewChatStore = create<ChatStoreType>()(
             showToast("创建新聊天失败");
           });
       },
-      clearAllData() {
+      async clearAllData() {
+        await indexedDBStorage.clear();
         localStorage.clear();
         location.reload();
       },
-    }),
-    {
-      name: "CHAT_STORE",
-      // storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        state?.clearCurrent();
-      },
+    };
+
+    return methods;
+  },
+
+  {
+    name: "CHAT_STORE",
+    onRehydrateStorage: (state) => {
+      state?.clearCurrent();
     },
-  ),
+  },
 );
