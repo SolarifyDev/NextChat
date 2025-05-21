@@ -77,11 +77,13 @@ const fr: PartialLocaleType = {
       Clear: "Effacer la discussion",
       Settings: "Paramètres de la discussion",
       UploadImage: "Télécharger une image",
+      OnlineSearch: "Recherche en ligne",
     },
     Rename: "Renommer la discussion",
     Typing: "En train d'écrire…",
     Input:
       "{{submitKey}} pour envoyer，/ pour compléter, : pour déclencher des commandes",
+    AppInput: "Commençons à discuter~",
     Send: "Envoyer",
     Config: {
       Reset: "Effacer la mémoire",
@@ -93,6 +95,8 @@ const fr: PartialLocaleType = {
       Content:
         "Je peux vous aider à rechercher et à répondre aux questions. Posez-moi toutes vos questions !",
     },
+    UploadImageTips:
+      "Il est permis de télécharger un maximum de trois images seulement !",
   },
   Export: {
     Title: "Partager l'historique des discussions",

@@ -5,7 +5,6 @@ import {
   ModelProvider,
   ServiceProvider,
 } from "@/app/constant";
-import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
@@ -32,9 +31,11 @@ export async function handle(
   try {
     const response = await request(req);
     return response;
-  } catch (e) {
+  } catch (e: any) {
     console.error("[DeepSeek] ", e);
-    return NextResponse.json(prettyObject(e));
+    return new Response(e?.content || "請檢查您的網絡後重試");
+    // console.error("[DeepSeek] ", e);
+    // return NextResponse.json(prettyObject(e));
   }
 }
 
@@ -74,6 +75,7 @@ async function request(req: NextRequest) {
       "OME-METIS-UserId": req.headers.get("OME-METIS-UserId") || "",
       "Ome-Metis-Username": req.headers.get("Ome-Metis-Username") || "",
       "Omelink-Metis-Userid": req.headers.get("Omelink-Metis-Userid") || "",
+      OnlineSearch: req.headers.get("OnlineSearch") || "0",
     },
     method: req.method,
     body: req.body,

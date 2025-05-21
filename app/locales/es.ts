@@ -78,11 +78,13 @@ const es: PartialLocaleType = {
       Clear: "Limpiar chat",
       Settings: "Configuración de conversación",
       UploadImage: "Subir imagen",
+      OnlineSearch: "Búsqueda en línea",
     },
     Rename: "Renombrar conversación",
     Typing: "Escribiendo…",
     Input:
       "{{submitKey}} para enviar，/ para activar autocompletado，: para activar comandos",
+    AppInput: "¡Empecemos a charlar~",
     Send: "Enviar",
     Config: {
       Reset: "Borrar memoria",
@@ -94,6 +96,7 @@ const es: PartialLocaleType = {
       Content:
         "Puedo ayudarte a buscar y responder preguntas. ¡Pregúntame lo que quieras!",
     },
+    UploadImageTips: "¡Solo se permite subir un máximo de tres imágenes!",
   },
   Export: {
     Title: "Compartir historial de chat",
@@ -139,6 +142,7 @@ const es: PartialLocaleType = {
     DeleteChat: "¿Confirmar la eliminación de la conversación seleccionada?",
     DeleteToast: "Conversación eliminada",
     Revert: "Deshacer",
+    History: "diálogo histórico",
   },
   Settings: {
     Title: "Configuración",

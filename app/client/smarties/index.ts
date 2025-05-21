@@ -32,7 +32,7 @@ export function getHeaders(
           "Ome-Metis-Username": userName,
         };
         break;
-      case "omelink":
+      case "omelinkapp":
         headers = {
           "Omelink-Metis-Userid": userId,
         };

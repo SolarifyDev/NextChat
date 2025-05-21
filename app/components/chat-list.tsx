@@ -13,6 +13,7 @@ import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
+import { useOmeStore } from "../store/ome";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -45,7 +46,12 @@ export function ChatItem(props: {
       className={clsx(styles["chat-item"], {
         [styles["chat-item-selected"]]:
           props.selected &&
-          (currentPath === Path.Chat || currentPath === Path.Home),
+          (currentPath === Path.Chat || currentPath === Path.Home) &&
+          !props.isFromApp,
+        [styles["chat-item-selected-is-app"]]:
+          props.selected &&
+          (currentPath === Path.Chat || currentPath === Path.Home) &&
+          props.isFromApp,
       })}
       onClick={props.onClick}
       // ref={(ele) => {
@@ -82,18 +88,20 @@ export function ChatItem(props: {
         </>
       )}
 
-      {!props?.isFromApp && (
-        <div
-          className={styles["chat-item-delete"]}
-          onClickCapture={(e) => {
-            props.onDelete?.();
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <DeleteIcon />
-        </div>
-      )}
+      <div
+        className={
+          props.isFromApp
+            ? styles["chat-item-delete-is-app"]
+            : styles["chat-item-delete"]
+        }
+        onClickCapture={(e) => {
+          props.onDelete?.();
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <DeleteIcon />
+      </div>
     </div>
     //   )}
     // </Draggable>
@@ -112,6 +120,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
+  const { onlineSearch, setOnlineSearch } = useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
@@ -161,6 +170,9 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             onClick={() => {
               navigate(Path.Chat);
               selectSession(i);
+              if (onlineSearch) {
+                setOnlineSearch(false);
+              }
             }}
             onDelete={async () => {
               if (

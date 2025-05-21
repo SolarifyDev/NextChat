@@ -24,8 +24,8 @@ import React, {
 import { IconButton } from "./button";
 import { Avatar } from "./emoji";
 import clsx from "clsx";
-import { useAppConfig } from "../store";
 import { t } from "i18next";
+import { useOmeStore } from "../store/ome";
 
 export function Popover(props: {
   children: JSX.Element;
@@ -61,10 +61,11 @@ export function ListItem(props: {
   onClick?: (e: MouseEvent) => void;
   vertical?: boolean;
 }) {
+  const { isFromApp } = useOmeStore();
   return (
     <div
       className={clsx(
-        styles["list-item"],
+        isFromApp ? styles["list-item-is-app"] : styles["list-item"],
         {
           [styles["vertical"]]: props.vertical,
         },
@@ -74,7 +75,11 @@ export function ListItem(props: {
     >
       <div className={styles["list-header"]}>
         {props.icon && <div className={styles["list-icon"]}>{props.icon}</div>}
-        <div className={styles["list-item-title"]}>
+        <div
+          className={
+            isFromApp ? styles["list-item--is-app"] : styles["list-item-title"]
+          }
+        >
           <div>{props.title}</div>
           {props.subTitle && (
             <div className={styles["list-item-sub-title"]}>
@@ -89,8 +94,12 @@ export function ListItem(props: {
 }
 
 export function List(props: { children: React.ReactNode; id?: string }) {
+  const { isFromApp } = useOmeStore();
   return (
-    <div className={styles.list} id={props.id}>
+    <div
+      className={isFromApp ? styles["list-is-app"] : styles.list}
+      id={props.id}
+    >
       {props.children}
     </div>
   );
@@ -516,7 +525,7 @@ export function Selector<T>(props: {
   onClose?: () => void;
   multiple?: boolean;
 }) {
-  const config = useAppConfig();
+  const omeStore = useOmeStore();
   const [selectedValues, setSelectedValues] = useState<T[]>(
     Array.isArray(props.defaultSelectedValue)
       ? props.defaultSelectedValue
@@ -564,7 +573,7 @@ export function Selector<T>(props: {
                 }}
               >
                 {selected ? (
-                  config.isFromApp ? (
+                  omeStore.isFromApp ? (
                     <OkIcon />
                   ) : (
                     <div

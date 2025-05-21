@@ -1,6 +1,7 @@
+import { MessageEnum } from "@/app/enum";
 import axios from "axios";
 
-export const api = axios.create({ baseURL: "" });
+export const api = axios.create({ baseURL: "", timeout: 30000 });
 
 api.interceptors.request.use(
   async (config) => {
@@ -29,5 +30,19 @@ api.interceptors.response.use(
   },
   async (error) => {
     console.log(error, "error");
+    const { status } = error.response;
+
+    if (status === 401) {
+      if (window.ReactNativeWebView) {
+        try {
+          const message = {
+            data: {},
+            msg: "quit",
+            type: MessageEnum.Quit,
+          };
+          window.ReactNativeWebView.postMessage(JSON.stringify(message));
+        } catch {}
+      }
+    }
   },
 );

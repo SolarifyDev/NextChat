@@ -76,10 +76,12 @@ const ar: PartialLocaleType = {
       Clear: "مسح الدردشة",
       Settings: "إعدادات الدردشة",
       UploadImage: "تحميل صورة",
+      OnlineSearch: "بحث عبر الإنترنت",
     },
     Rename: "إعادة تسمية الدردشة",
     Typing: "يكتب…",
     Input: "{{submitKey}} إرسال، / لتفعيل الإكمال التلقائي، : لتفعيل الأوامر",
+    AppInput: "لنبدأ الدردشة～",
     Send: "إرسال",
     Config: {
       Reset: "مسح الذاكرة",
@@ -91,6 +93,7 @@ const ar: PartialLocaleType = {
       Content:
         "يمكنني مساعدتك في البحث والإجابة على الأسئلة. اسألني عن أي شيء!",
     },
+    UploadImageTips: "يُسمح بتحميل ثلاث صور كحد أقصى فقط!",
   },
   Export: {
     Title: "مشاركة سجل الدردشة",

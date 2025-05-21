@@ -76,10 +76,12 @@ const jp: PartialLocaleType = {
       Clear: "チャットをクリア",
       Settings: "チャット設定",
       UploadImage: "画像をアップロード",
+      OnlineSearch: "オンライン検索",
     },
     Rename: "チャットの名前を変更",
     Typing: "入力中…",
     Input: "{{submitKey}}で送信、/で補完をトリガー、:でコマンドをトリガー",
+    AppInput: "チャットを始めましょう～",
     Send: "送信",
     Config: {
       Reset: "メモリをクリア",
@@ -90,6 +92,7 @@ const jp: PartialLocaleType = {
       Title: "こんにちは~私はMETISです",
       Content: "検索や質問にお答えできます。何でも聞いてくださいね！",
     },
+    UploadImageTips: "アップロードできる画像は最大3枚までです!",
   },
   Export: {
     Title: "チャット履歴を共有",

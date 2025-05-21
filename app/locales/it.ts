@@ -77,11 +77,13 @@ const it: PartialLocaleType = {
       Clear: "Pulisci chat",
       Settings: "Impostazioni conversazione",
       UploadImage: "Carica immagine",
+      OnlineSearch: "Ricerca online",
     },
     Rename: "Rinomina conversazione",
     Typing: "Digitazione in corso…",
     Input:
       "{{submitKey}} per inviare，/ per attivare il completamento automatico, : per attivare il comando",
+    AppInput: "Iniziamo a chattare~",
     Send: "Invia",
     Config: {
       Reset: "Pulisci memoria",
@@ -93,6 +95,7 @@ const it: PartialLocaleType = {
       Content:
         "Posso aiutarti a cercare e rispondere alle domande. Chiedimi qualsiasi cosa!",
     },
+    UploadImageTips: "È consentito caricare un massimo di tre immagini!",
   },
   Export: {
     Title: "Condividi cronologia chat",

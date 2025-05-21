@@ -75,11 +75,13 @@ const pt: PartialLocaleType = {
       Masks: "Máscaras",
       Clear: "Limpar Contexto",
       Settings: "Configurações",
+      OnlineSearch: "Pesquisa online",
     },
     Rename: "Renomear Chat",
     Typing: "Digitando…",
     Input:
       "{{submitKey}} para enviar, / para buscar prompts, : para usar comandos",
+    AppInput: "Vamos começar a conversar~",
     Send: "Enviar",
     Config: {
       Reset: "Redefinir para Padrão",
@@ -91,6 +93,7 @@ const pt: PartialLocaleType = {
       Content:
         "Posso ajudar você a pesquisar e responder perguntas. Pergunte-me qualquer coisa!",
     },
+    UploadImageTips: "É permitido enviar no máximo três imagens!",
   },
   Export: {
     Title: "Exportar Mensagens",

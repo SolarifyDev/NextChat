@@ -80,10 +80,12 @@ const cn = {
       Clear: "清除聊天",
       Settings: "对话设置",
       UploadImage: "上传图片",
+      OnlineSearch: "联网搜索",
     },
     Rename: "重命名对话",
     Typing: "正在输入…",
     Input: "{{submitKey}} 发送，/ 触发补全，: 触发命令",
+    AppInput: "开始聊天吧～",
     Send: "发送",
     StartSpeak: "说话",
     StopSpeak: "停止",
@@ -105,6 +107,7 @@ const cn = {
       Title: "Hi~我是METIS",
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
+    UploadImageTips: "最多只允许上传三张图片!",
   },
   Export: {
     Title: "分享聊天记录",
@@ -620,7 +623,7 @@ const cn = {
     Prompt: {
       History: "这是历史聊天总结作为前情提要：{{content}}",
       Topic:
-        "使用四到五个字直接返回这句话的简要主题，不要解释、不要标点、不要语气词、不要多余文本，不要加粗，如果没有主题，请直接返回“闲聊”",
+        "使用四到五个字直接返回历史对话信息的简要主题，不要解释、不要标点、不要语气词、不要多余文本，不要加粗，如果没有主题，请直接返回“闲聊”",
       Summarize:
         "简要总结一下对话内容，用作后续的上下文提示 prompt，控制在 200 字以内",
     },

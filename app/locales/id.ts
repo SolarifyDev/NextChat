@@ -76,10 +76,12 @@ const id: PartialLocaleType = {
       Clear: "Hapus Obrolan",
       Settings: "Pengaturan Obrolan",
       UploadImage: "Unggah Gambar",
+      OnlineSearch: "Pencarian online",
     },
     Rename: "Ganti Nama Obrolan",
     Typing: "Sedang Mengetik…",
     Input: "{{submitKey}} kirim，/ untuk melengkapi, : untuk memicu perintah",
+    AppInput: "Mari mulai mengobrol~",
     Send: "Kirim",
     Config: {
       Reset: "Hapus Memori",
@@ -91,6 +93,7 @@ const id: PartialLocaleType = {
       Content:
         "Saya bisa membantu Anda mencari dan menjawab pertanyaan. Silakan tanyakan apa saja!",
     },
+    UploadImageTips: "Hanya boleh mengunggah maksimal tiga gambar!",
   },
   Export: {
     Title: "Bagikan Riwayat Obrolan",
