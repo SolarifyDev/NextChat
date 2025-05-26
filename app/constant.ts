@@ -52,6 +52,10 @@ export enum Path {
   Artifacts = "/artifacts",
   SearchChat = "/search-chat",
   McpMarket = "/mcp-market",
+  AIKid = "/ai-kid",
+  AddOrUpdateKid = "/add-or-update-kid",
+  SelectVoice = "/select-voice",
+  Tab = "/tab", // 二合一页面 Chat + AIKid
 }
 
 export enum ApiPath {
