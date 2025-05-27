@@ -95,6 +95,14 @@ const SelectVoice = dynamic(async () => (await import("./kid")).SelectVoice, {
   loading: () => null,
 });
 
+const AddOrUpdateKid = dynamic(
+  async () =>
+    (await import("./kid/component/add-or-update-kid")).AddOrUpdateKid,
+  {
+    loading: () => null,
+  },
+);
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -232,6 +240,7 @@ function Screen() {
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
             <Route path={Path.SelectVoice} element={<SelectVoice />} />
+            <Route path={Path.AddOrUpdateKid} element={<AddOrUpdateKid />} />
           </Routes>
         </WindowContent>
       </>

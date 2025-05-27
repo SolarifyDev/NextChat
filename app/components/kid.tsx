@@ -9,10 +9,6 @@ export function AIKid() {
   return <div>123</div>;
 }
 
-export function AddOrUpdateKid() {
-  return <div>456</div>;
-}
-
 export function SelectVoice() {
   const tabsData: TabItem[] = [
     {
