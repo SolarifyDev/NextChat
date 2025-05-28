@@ -1,92 +1,51 @@
-import clsx from "clsx";
-import styles from "./kid.module.scss";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AidHelpIcon from "../../../icons/kid-help.svg";
+import CreateKidIcon from "../../../icons/create-kid.svg";
 import { Path } from "@/app/constant";
 
-import ArrowLeftIcon from "../../../icons/arrow-left.svg";
-import AddKidIcon from "../../../icons/add-kid.svg";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useOmeStore } from "@/app/store/ome";
-import { useUpdateEffect } from "ahooks";
+import styles from "./kid.module.scss";
 
 export function Kid() {
-  const tabs = [
-    {
-      title: "METIS",
-    },
-    {
-      title: "My AI Kid",
-    },
-  ];
-
-  const showScrollbar = false;
-  const [activeTab, setActiveTab] = useState<number>(0);
-
   const navigate = useNavigate();
 
-  const location = useLocation();
-
-  const omeStore = useOmeStore();
-
-  useUpdateEffect(() => {
-    switch (activeTab) {
-      case 0:
-        navigate(Path.Chat);
-        break;
-      case 1:
-        navigate(Path.AIKid);
-        break;
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
-    setActiveTab(location.pathname === "/chat" ? 0 : 1);
-  }, []);
-
   return (
-    <>
-      <div
-        className={clsx(styles["tab-container"], {
-          [styles["show-scrollbar"]]: showScrollbar,
-          [styles["hide-scrollbar"]]: !showScrollbar,
-        })}
-      >
-        <div className={styles["tab-header"]}>
-          <div
-            className={styles["tab-left-button"]}
-            style={{
-              visibility: omeStore.isFromApp ? "visible" : "hidden",
-            }}
-            onClick={() => navigate(Path.Home)}
-          >
-            <ArrowLeftIcon />
-          </div>
-          <div className={styles["tab-nav"]}>
-            {tabs.map((tab, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveTab(index)}
-                className={clsx(styles["tab-button"], {
-                  [styles["active"]]: activeTab === index,
-                })}
-              >
-                {tab.title}
-              </button>
-            ))}
-          </div>
-          <div
-            className={styles["tab-right-button"]}
-            style={{
-              visibility: activeTab !== 0 ? "visible" : "hidden",
-            }}
-          >
-            <AddKidIcon />
-          </div>
+    <div className={styles["container"]}>
+      <div className={styles["centerContent"]}>
+        <AidHelpIcon />
+        <div className={styles["noKidText"]}>你還沒有 AI Kid 哦~</div>
+        <div className={styles["instructionText"]}>
+          點擊下方「+」召喚屬於自己的 AI Kid 吧~
         </div>
-        <div className={styles["tab-content"]}>
-          <Outlet />
+        <div
+          className={styles["createButton"]}
+          onClick={() => {
+            navigate(Path.AddOrUpdateKid);
+          }}
+        >
+          <CreateKidIcon />
+          创建
         </div>
       </div>
-    </>
+
+      {[
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      ].map((item, index) => {
+        return (
+          <div key={index} className={styles["listItem"]}>
+            <div className={styles["avatar"]}>123</div>
+            <div className={styles["content"]}>
+              <div className={styles["name"]}>NANCY.Y NANCY.Y NAN</div>
+              <div className={styles["message"]}>
+                早上好！很高興能為您提供支持。最近的輿情動態對餐飲行業影響早上好！很高興能為您提供支持。最近的輿情動態對餐飲行業影響早上好！很高興能為您提供支持。最近的輿情動態對餐飲行業影響早上好！很高興能為您提供支持。最近的輿情動態對餐飲行業影響早上好！很高興能為您提供支持。最近的輿情動態對餐飲行業影響
+              </div>
+            </div>
+            <div className={styles["actions"]}>
+              <div className={styles["actionButton"]}>1</div>
+              <div className={styles["actionButton"]}>2</div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }

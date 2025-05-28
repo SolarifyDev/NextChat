@@ -87,13 +87,16 @@ const McpMarketPage = dynamic(
   },
 );
 
-const AIKid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
+const HomeTab = dynamic(async () => (await import("./home-tab")).HomeTab, {
   loading: () => null,
 });
 
-const SelectVoice = dynamic(async () => (await import("./kid")).SelectVoice, {
-  loading: () => null,
-});
+const SelectVoice = dynamic(
+  async () => (await import("./kid/component/select-voice")).SelectVoice,
+  {
+    loading: () => null,
+  },
+);
 
 const AddOrUpdateKid = dynamic(
   async () =>
@@ -103,7 +106,7 @@ const AddOrUpdateKid = dynamic(
   },
 );
 
-const AI = dynamic(async () => (await import("./kid")).AI, {
+const Kid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
   loading: () => null,
 });
 
@@ -246,8 +249,8 @@ function Screen() {
             <Route path={Path.SelectVoice} element={<SelectVoice />} />
             <Route path={Path.AddOrUpdateKid} element={<AddOrUpdateKid />} />
 
-            <Route element={<AIKid />}>
-              <Route path={Path.AIKid} element={<AI />} />
+            <Route element={<HomeTab />}>
+              <Route path={Path.AIKid} element={<Kid />} />
               <Route path={Path.Chat} element={<Chat />} />
             </Route>
           </Routes>

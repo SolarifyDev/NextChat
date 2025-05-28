@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import styles from "./add-or-update-kid.module.scss";
 import clsx from "clsx";
 import { Input } from "antd";
-import { showToast } from "../../ui-lib";
 
 export function AddOrUpdateKid() {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ export function AddOrUpdateKid() {
         <div className={styles.header}>
           <div
             className={styles.backButton}
-            onClick={() => navigate(Path.Home)}
+            onClick={() => navigate(Path.AIKid)}
           >
             <ArrowLeftIcon />
           </div>
@@ -38,15 +37,12 @@ export function AddOrUpdateKid() {
           <div
             className={styles.avatar}
             onClick={() => {
-              showToast("556");
               const fileInput = document.createElement("input");
               fileInput.type = "file";
               fileInput.accept = "image/png, image/jpeg";
               fileInput.onchange = (event: any) => {
                 const files = event.target.files;
                 const validImageTypes = ["image/png", "image/jpeg"];
-
-                showToast(files.length.toString());
               };
               fileInput.click();
             }}
@@ -72,6 +68,7 @@ export function AddOrUpdateKid() {
                       e.target.blur();
                     }
                   }}
+                  placeholder="输入名称"
                 />
               </div>
             </div>
@@ -93,9 +90,13 @@ export function AddOrUpdateKid() {
                     alignItems: "center",
                     cursor: "pointer",
                   }}
-                  onClick={() => {}}
+                  onClick={() => {
+                    navigate(Path.SelectVoice);
+                  }}
                 >
-                  <div className={styles.cardTitle}>成熟優雅</div>
+                  <div className={styles.cardTitle}>
+                    创建专属音声 | 成熟優雅
+                  </div>
 
                   <ArrowRightIcon />
                 </div>
@@ -143,7 +144,8 @@ export function AddOrUpdateKid() {
               <Input.TextArea
                 className={clsx(styles.Input, styles.textLeft)}
                 style={{
-                  padding: "0",
+                  paddingLeft: "0px",
+                  paddingRight: "0px",
                 }}
                 autoSize={{
                   minRows: 1,
@@ -169,7 +171,8 @@ export function AddOrUpdateKid() {
               <Input.TextArea
                 className={clsx(styles.Input, styles.textLeft)}
                 style={{
-                  padding: "0",
+                  paddingLeft: "0px",
+                  paddingRight: "0px",
                 }}
                 autoSize={{
                   minRows: 1,
@@ -195,7 +198,8 @@ export function AddOrUpdateKid() {
               <Input.TextArea
                 className={clsx(styles.Input, styles.textLeft)}
                 style={{
-                  padding: "0",
+                  paddingLeft: "0px",
+                  paddingRight: "0px",
                 }}
                 autoSize={{
                   minRows: 1,
@@ -218,7 +222,14 @@ export function AddOrUpdateKid() {
 
         {/* 底部按钮 - 固定在底部 */}
         <div className={styles.footer}>
-          <div className={styles.saveButton}>保存</div>
+          <div
+            className={styles.saveButton}
+            onClick={() => {
+              navigate(Path.AIKid);
+            }}
+          >
+            保存
+          </div>
         </div>
       </div>
     </>
