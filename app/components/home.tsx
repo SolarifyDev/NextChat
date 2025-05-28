@@ -87,8 +87,8 @@ const McpMarketPage = dynamic(
   },
 );
 
-const AIKid = dynamic(async () => (await import("./kid")).AIKid, {
-  loading: () => <Loading noLogo />,
+const AIKid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
+  loading: () => null,
 });
 
 const SelectVoice = dynamic(async () => (await import("./kid")).SelectVoice, {
@@ -102,6 +102,10 @@ const AddOrUpdateKid = dynamic(
     loading: () => null,
   },
 );
+
+const AI = dynamic(async () => (await import("./kid")).AI, {
+  loading: () => null,
+});
 
 export function useSwitchTheme() {
   const config = useAppConfig();
@@ -236,11 +240,16 @@ function Screen() {
             <Route path={Path.Masks} element={<MaskPage />} />
             <Route path={Path.Plugins} element={<PluginPage />} />
             <Route path={Path.SearchChat} element={<SearchChat />} />
-            <Route path={Path.Chat} element={<Chat />} />
+            {/* <Route path={Path.Chat} element={<Chat />} /> */}
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
             <Route path={Path.SelectVoice} element={<SelectVoice />} />
             <Route path={Path.AddOrUpdateKid} element={<AddOrUpdateKid />} />
+
+            <Route element={<AIKid />}>
+              <Route path={Path.AIKid} element={<AI />} />
+              <Route path={Path.Chat} element={<Chat />} />
+            </Route>
           </Routes>
         </WindowContent>
       </>

@@ -9,7 +9,7 @@ export interface TabItem {
 }
 
 // TabComponent的Props类型定义
-interface TabComponentProps {
+export interface TabComponentProps {
   tabs: TabItem[];
   header: ReactNode;
   defaultTab?: number;

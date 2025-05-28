@@ -1,0 +1,45 @@
+.voice-selector-header {
+  font-weight: 600;
+  position: relative;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+
+  .title {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+    font-size: 18px;
+  }
+
+  .complete-button {
+    margin-left: 8px;
+    background-color: #28b446;
+    border-radius: 48px;
+    color: white;
+    flex-shrink: 0;
+    font-size: 16px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: 500;
+
+    &:hover {
+      background-color: darken(#28b446, 5%);
+    }
+
+    &:active {
+      background-color: darken(#28b446, 10%);
+    }
+  }
+}
