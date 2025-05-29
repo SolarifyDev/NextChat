@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { IType, useKidStore } from "@/app/store/kid";
 import { Spin } from "antd";
+import clsx from "clsx";
 
 export function Kid() {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ export function Kid() {
               </div>
               <div className={styles["actions"]}>
                 <div
-                  className={styles["actionButton"]}
+                  className={clsx("no-dark", styles["actionButton"])}
                   onClick={() => {
                     handleChangeType(IType.Edit);
                     // handleChangeCurrentKidIndex(item.id);
@@ -80,7 +81,7 @@ export function Kid() {
                   <KidEditIcon />
                 </div>
                 <div
-                  className={styles["actionButton"]}
+                  className={clsx("no-dark", styles["actionButton"])}
                   onClick={() => {
                     navigate(Path.Realtime);
                   }}

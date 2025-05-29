@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useKidStore } from "@/app/store/kid";
 import { AiKidVoiceType } from "@/app/client/smarties";
 import { clone } from "lodash-es";
+import clsx from "clsx";
 
 interface VoiceData {
   title: string;
@@ -79,7 +80,7 @@ export function SelectVoice() {
         </div>
         {selectNumber === item.type && (
           <div className={styles["actions"]}>
-            <div className={styles["audio-icon"]}>
+            <div className={clsx("no-dark", styles["audio-icon"])}>
               <AudioSvg />
             </div>
             <div className={styles["selected-text"]}>

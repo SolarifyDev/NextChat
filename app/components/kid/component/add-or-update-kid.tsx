@@ -51,7 +51,7 @@ export function AddOrUpdateKid() {
           <div className={styles.title}>
             {kidStore.type === IType.Add
               ? t("AddOrUpdateAiKid.Create")
-              : t("AddOrUpdateAiKid.Edit")}
+              : t("AddOrUpdateAiKid.Edit")}{" "}
             My AI Kid
           </div>
         </div>
@@ -131,7 +131,7 @@ export function AddOrUpdateKid() {
               />
             )}
 
-            <div className={styles.avatarBadge}>
+            <div className={clsx("no-dark", styles.avatarBadge)}>
               <EditPhoto />
             </div>
           </div>
@@ -178,31 +178,30 @@ export function AddOrUpdateKid() {
               <div
                 className=""
                 style={{
-                  width: "100%",
                   display: "flex",
                   justifyContent: "end",
                   alignItems: "center",
                   flexGrow: 0,
+                  minWidth: 0,
+                  flex: 1,
+                  textAlign: "right",
+                }}
+                onClick={() => {
+                  navigate(Path.SelectVoice);
                 }}
               >
+                <div className={styles.cardText}>
+                  {kidStore.notSavekid
+                    ? kidStore.notSavekid.voice === AiKidVoiceType.Male
+                      ? t("SelectVoice.MatureMale")
+                      : t("SelectVoice.GentleFemale")
+                    : t("AddOrUpdateAiKid.CreateCustomVoice")}
+                </div>
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    navigate(Path.SelectVoice);
                   }}
                 >
-                  <div className={styles.cardTitle}>
-                    {kidStore.notSavekid
-                      ? kidStore.notSavekid.voice === AiKidVoiceType.Male
-                        ? t("SelectVoice.MatureMale")
-                        : t("SelectVoice.GentleFemale")
-                      : t("AddOrUpdateAiKid.CreateCustomVoice")}
-                  </div>
-
                   <ArrowRightIcon />
                 </div>
               </div>

@@ -20,17 +20,17 @@
 
 .noKidText {
   margin-top: 6px;
-  color: #9e9db8;
+  color: var(--kid-item-text-color);
 }
 
 .instructionText {
-  color: #9e9db8;
+  color: var(--kid-item-text-color);
 }
 
 .createButton {
   margin-top: 34px;
   cursor: pointer;
-  background-color: #28b446;
+  background-color: var(--kid-create-btn-color);
   padding: 12px 82px;
   color: white;
   border-radius: 24px;
@@ -43,18 +43,21 @@
 
 .listItem {
   width: 100%;
-  background-color: white;
+  background-color: var(--white);
   padding: 10px 20px;
   box-sizing: border-box;
   display: flex;
   gap: 16px;
+
+  &:hover {
+    background-color: var(--gray);
+  }
 }
 
 .avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: white;
   flex-shrink: 0;
 }
 
@@ -68,11 +71,11 @@
 .name {
   flex: 1;
   font-size: 18px;
-  color: #3a3a47;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--kid-tab-title-color);
 }
 
 .message {

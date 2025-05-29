@@ -2,7 +2,7 @@
 .tab-container {
   width: 100%;
   height: 100%;
-  background-color: #f7f7fa;
+  background-color: var(--kid-select-voice);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -31,7 +31,7 @@
 // Tab标题栏
 .tab-header {
   border-top: 1px solid #e5e7eb;
-  background-color: white;
+  background-color: var(--kid-select-voice);
   flex-shrink: 0;
 }
 
@@ -52,7 +52,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--kid-tab-title-color);
   position: relative;
   transform: translateZ(0);
 
@@ -74,8 +74,8 @@
   &.active {
     font-size: 18px;
     font-weight: 600;
-    color: #3a3a47;
-    background-color: white;
+    color: var(--black);
+    background-color: var(--kid-select-voice);
 
     &::after {
       content: "";
