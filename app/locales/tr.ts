@@ -587,6 +587,42 @@ const tr: PartialLocaleType = {
     Topic: "Konu",
     Time: "Zaman",
   },
+  Kid: {
+    NoKidText: "Henüz bir AI Kid'in yok~",
+    InstructionText:
+      "Aşağıdaki「+」simgesine tıklayarak kendi AI Kid'ini çağırabilirsin~",
+    Create: "Oluştur",
+  },
+  SelectVoice: {
+    Title: "Ses Seç",
+    Recommended: "Önerilen",
+    Female: "Kadın Sesi",
+    Male: "Erkek Sesi",
+    Dialect: "Lehçe",
+    MatureMale: "Olgun Erkek Sesi",
+    GentleFemale: "Nazik Kadın Sesi",
+    YoungMale: "Erkek | Genç",
+    YoungFemale: "Kadın | Genç",
+    Confirm: "Tamamla",
+    Selected: "Seçildi",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Oluştur",
+    Edit: "Düzenle",
+    Name: "İsim",
+    VoicePreference: "Ses Tercihi",
+    InputName: "İsim Girin",
+    CreateCustomVoice: "Özel Ses Oluştur",
+    AbilitySettings: "Yetenek Ayarları",
+    Polish: "İyileştir",
+    Introduction: "Tanıtım",
+    IntroduceYourAiKid: "AI Kid'inizi Tanıtın",
+    OpeningLine: "Açılış Mesajı",
+    OpeningLineDescription:
+      "Sohbet başlatıldığında ilk mesaj olarak kullanılacak",
+    CreateMyAiKid: "AI Kid'imi Oluştur",
+    Save: "Kaydet",
+  },
 };
 
 export default tr;

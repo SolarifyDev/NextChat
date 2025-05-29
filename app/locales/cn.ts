@@ -623,7 +623,7 @@ const cn = {
     Prompt: {
       History: "这是历史聊天总结作为前情提要：{{content}}",
       Topic:
-        "使用四到五个字直接返回历史对话信息的简要主题，不要解释、不要标点、不要语气词、不要多余文本，不要加粗，如果没有主题，请直接返回“闲聊”",
+        "使用四到五个字直接返回历史对话信息的简要主题，不要解释、不要标点、不要语气词、不要多余文本，不要加粗，如果没有主题，请直接返回'闲聊'",
       Summarize:
         "简要总结一下对话内容，用作后续的上下文提示 prompt，控制在 200 字以内",
     },
@@ -846,6 +846,40 @@ const cn = {
     },
     GenerateParams: "生成参数",
     Detail: "详情",
+  },
+  Kid: {
+    NoKidText: "你还没有 AI Kid~",
+    InstructionText: "点击下方「+」召唤你的 AI Kid~",
+    Create: "创建",
+  },
+  SelectVoice: {
+    Title: "选择声音",
+    Recommended: "推荐",
+    Female: "女声",
+    Male: "男声",
+    Dialect: "方言",
+    MatureMale: "成熟男声",
+    GentleFemale: "温柔女声",
+    YoungMale: "男 | 青年",
+    YoungFemale: "女 | 青年",
+    Confirm: "完成",
+    Selected: "已选择",
+  },
+  AddOrUpdateAiKid: {
+    Create: "创建",
+    Edit: "编辑",
+    Name: "名称",
+    VoicePreference: "音色偏好",
+    InputName: "输入名称",
+    CreateCustomVoice: "创建专属声音",
+    AbilitySettings: "能力设定",
+    Polish: "润色",
+    Introduction: "介绍",
+    IntroduceYourAiKid: "介绍你的AI KID",
+    OpeningLine: "开场白",
+    OpeningLineDescription: "将作为开启聊天的第一句话",
+    CreateMyAiKid: "创建 My AI Kid",
+    Save: "保存",
   },
 };
 

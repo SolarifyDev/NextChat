@@ -581,6 +581,41 @@ const bn: PartialLocaleType = {
     Topic: "থিম",
     Time: "সময়",
   },
+  Kid: {
+    NoKidText: "আপনার এখনও AI Kid নেই~",
+    InstructionText: "নীচে「+」ক্লিক করে আপনার নিজের AI Kid ডাকুন~",
+    Create: "তৈরি করুন",
+  },
+  SelectVoice: {
+    Title: "কণ্ঠস্বর নির্বাচন করুন",
+    Recommended: "সুপারিশকৃত",
+    Female: "মহিলা কণ্ঠস্বর",
+    Male: "পুরুষ কণ্ঠস্বর",
+    Dialect: "উপভাষা",
+    MatureMale: "পরিপক্ক পুরুষ কণ্ঠস্বর",
+    GentleFemale: "মৃদু মহিলা কণ্ঠস্বর",
+    YoungMale: "পুরুষ | যুবক",
+    YoungFemale: "মহিলা | যুবতী",
+    Confirm: "সম্পূর্ণ",
+    Selected: "নির্বাচিত",
+  },
+  AddOrUpdateAiKid: {
+    Create: "তৈরি করুন",
+    Edit: "সম্পাদনা করুন",
+    Name: "নাম",
+    VoicePreference: "কণ্ঠস্বর পছন্দ",
+    InputName: "নাম লিখুন",
+    CreateCustomVoice: "কাস্টম কণ্ঠস্বর তৈরি করুন",
+    AbilitySettings: "ক্ষমতা সেটিংস",
+    Polish: "পরিমার্জন",
+    Introduction: "ভূমিকা",
+    IntroduceYourAiKid: "আপনার AI Kid পরিচয় করিয়ে দিন",
+    OpeningLine: "শুরুর লাইন",
+    OpeningLineDescription:
+      "চ্যাট শুরু করার সময় প্রথম বার্তা হিসেবে ব্যবহৃত হবে",
+    CreateMyAiKid: "আমার AI Kid তৈরি করুন",
+    Save: "সংরক্ষণ করুন",
+  },
 };
 
 export default bn;

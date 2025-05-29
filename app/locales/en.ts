@@ -857,6 +857,41 @@ const en: LocaleType = {
     GenerateParams: "Generate Params",
     Detail: "Detail",
   },
+  Kid: {
+    NoKidText: "You don't have an AI Kid yet~",
+    InstructionText: "Click the「+」below to summon your own AI Kid~",
+    Create: "Create",
+  },
+  SelectVoice: {
+    Title: "Select Voice",
+    Recommended: "Recommended",
+    Female: "Female Voice",
+    Male: "Male Voice",
+    Dialect: "Dialect",
+    MatureMale: "Mature Male Voice",
+    GentleFemale: "Gentle Female Voice",
+    YoungMale: "Male | Young",
+    YoungFemale: "Female | Young",
+    Confirm: "Complete",
+    Selected: "Selected",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Create",
+    Edit: "Edit",
+    Name: "Name",
+    VoicePreference: "Voice Preference",
+    InputName: "Enter Name",
+    CreateCustomVoice: "Create Custom Voice",
+    AbilitySettings: "Ability Settings",
+    Polish: "Polish",
+    Introduction: "Introduction",
+    IntroduceYourAiKid: "Introduce Your AI Kid",
+    OpeningLine: "Opening Line",
+    OpeningLineDescription:
+      "Will be used as the first message when starting a chat",
+    CreateMyAiKid: "Create My AI Kid",
+    Save: "Save",
+  },
 };
 
 export default en;

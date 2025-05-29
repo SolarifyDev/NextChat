@@ -590,6 +590,41 @@ const no: PartialLocaleType = {
     Topic: "Emne",
     Time: "Tid",
   },
+  Kid: {
+    NoKidText: "Du har ikke en AI Kid ennå~",
+    InstructionText: "Klikk på「+」under for å tilkalle din egen AI Kid~",
+    Create: "Opprett",
+  },
+  SelectVoice: {
+    Title: "Velg Stemme",
+    Recommended: "Anbefalt",
+    Female: "Kvinnestemme",
+    Male: "Mannestemme",
+    Dialect: "Dialekt",
+    MatureMale: "Moden Mannestemme",
+    GentleFemale: "Myk Kvinnestemme",
+    YoungMale: "Mann | Ung",
+    YoungFemale: "Kvinne | Ung",
+    Confirm: "Fullfør",
+    Selected: "Valgt",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Opprett",
+    Edit: "Rediger",
+    Name: "Navn",
+    VoicePreference: "Stemmeinnstilling",
+    InputName: "Skriv inn navn",
+    CreateCustomVoice: "Opprett tilpasset stemme",
+    AbilitySettings: "Evneinnstillinger",
+    Polish: "Forbedring",
+    Introduction: "Introduksjon",
+    IntroduceYourAiKid: "Introduser din AI Kid",
+    OpeningLine: "Åpningslinje",
+    OpeningLineDescription:
+      "Vil bli brukt som den første meldingen ved start av chat",
+    CreateMyAiKid: "Opprett Min AI Kid",
+    Save: "Lagre",
+  },
 };
 
 export default no;

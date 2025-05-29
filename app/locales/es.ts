@@ -598,6 +598,42 @@ const es: PartialLocaleType = {
     Topic: "Tema",
     Time: "Hora",
   },
+  Kid: {
+    NoKidText: "Aún no tienes un AI Kid~",
+    InstructionText:
+      "Haz clic en el botón「+」de abajo para invocar tu propio AI Kid~",
+    Create: "Crear",
+  },
+  SelectVoice: {
+    Title: "Seleccionar Voz",
+    Recommended: "Recomendado",
+    Female: "Voz Femenina",
+    Male: "Voz Masculina",
+    Dialect: "Dialecto",
+    MatureMale: "Voz Masculina Madura",
+    GentleFemale: "Voz Femenina Suave",
+    YoungMale: "Hombre | Joven",
+    YoungFemale: "Mujer | Joven",
+    Confirm: "Completar",
+    Selected: "Seleccionado",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Crear",
+    Edit: "Editar",
+    Name: "Nombre",
+    VoicePreference: "Preferencia de Voz",
+    InputName: "Ingrese Nombre",
+    CreateCustomVoice: "Crear Voz Personalizada",
+    AbilitySettings: "Configuración de Habilidades",
+    Polish: "Refinar",
+    Introduction: "Introducción",
+    IntroduceYourAiKid: "Presenta tu AI Kid",
+    OpeningLine: "Línea de Apertura",
+    OpeningLineDescription:
+      "Se usará como el primer mensaje al iniciar el chat",
+    CreateMyAiKid: "Crear Mi AI Kid",
+    Save: "Guardar",
+  },
 };
 
 export default es;

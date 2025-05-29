@@ -589,6 +589,41 @@ const ru: PartialLocaleType = {
     Topic: "Тема",
     Time: "Время",
   },
+  Kid: {
+    NoKidText: "У вас еще нет AI Kid~",
+    InstructionText: "Нажмите「+」ниже, чтобы вызвать своего AI Kid~",
+    Create: "Создать",
+  },
+  SelectVoice: {
+    Title: "Выбрать Голос",
+    Recommended: "Рекомендуется",
+    Female: "Женский Голос",
+    Male: "Мужской Голос",
+    Dialect: "Диалект",
+    MatureMale: "Зрелый Мужской Голос",
+    GentleFemale: "Нежный Женский Голос",
+    YoungMale: "Мужчина | Молодой",
+    YoungFemale: "Женщина | Молодая",
+    Confirm: "Завершить",
+    Selected: "Выбрано",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Создать",
+    Edit: "Редактировать",
+    Name: "Имя",
+    VoicePreference: "Настройки голоса",
+    InputName: "Введите имя",
+    CreateCustomVoice: "Создать пользовательский голос",
+    AbilitySettings: "Настройки способностей",
+    Polish: "Улучшить",
+    Introduction: "Введение",
+    IntroduceYourAiKid: "Представьте вашего AI Kid",
+    OpeningLine: "Начальная фраза",
+    OpeningLineDescription:
+      "Будет использоваться как первое сообщение при начале чата",
+    CreateMyAiKid: "Создать моего AI Kid",
+    Save: "Сохранить",
+  },
 };
 
 export default ru;

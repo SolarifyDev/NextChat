@@ -8,6 +8,7 @@ import styles from "./select-voice.module.scss";
 import gril from "../../../icons/3d girl Avatar.png";
 
 import NextImage, { StaticImageData } from "next/image";
+import { useTranslation } from "react-i18next";
 
 interface VoiceData {
   title: string;
@@ -21,16 +22,18 @@ interface VoiceListProps {
 }
 
 export function SelectVoice() {
+  const { t } = useTranslation();
+
   const data: VoiceData[] = [
     {
-      title: "成熟男聲",
-      description: "男 | 青年",
+      title: t("SelectVoice.MatureMale"),
+      description: t("SelectVoice.YoungMale"),
       avatar: gril,
       type: 0,
     },
     {
-      title: "成熟女聲",
-      description: "女 | 青年",
+      title: t("SelectVoice.GentleFemale"),
+      description: t("SelectVoice.YoungFemale"),
       avatar: gril,
       type: 1,
     },
@@ -56,7 +59,9 @@ export function SelectVoice() {
           <div className={styles["audio-icon"]}>
             <AudioSvg />
           </div>
-          <div className={styles["selected-text"]}>已選擇</div>
+          <div className={styles["selected-text"]}>
+            {t("SelectVoice.Selected")}
+          </div>
         </div>
       </div>
     </div>
@@ -80,19 +85,19 @@ export function SelectVoice() {
   // 优化后的 tabsData
   const tabsData: TabItem[] = [
     {
-      title: "推薦",
+      title: t("SelectVoice.Recommended"),
       component: <VoiceList items={data} />,
     },
     {
-      title: "男聲",
+      title: t("SelectVoice.Male"),
       component: <VoiceList items={data.filter((item) => item.type === 0)} />,
     },
     {
-      title: "女聲",
+      title: t("SelectVoice.Female"),
       component: <VoiceList items={data.filter((item) => item.type === 1)} />,
     },
     {
-      title: "方言",
+      title: t("SelectVoice.Dialect"),
       component: <></>,
     },
   ];
@@ -111,12 +116,12 @@ export function SelectVoice() {
             >
               <ArrowLeftIcon />
             </div>
-            <div className={styles["title"]}>選擇聲音</div>
+            <div className={styles["title"]}>{t("SelectVoice.Title")}</div>
             <div
               className={styles["complete-button"]}
               onClick={() => navigate(Path.AddOrUpdateKid)}
             >
-              完成
+              {t("SelectVoice.Confirm")}
             </div>
           </div>
         }

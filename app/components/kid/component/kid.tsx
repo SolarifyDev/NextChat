@@ -4,17 +4,20 @@ import CreateKidIcon from "../../../icons/create-kid.svg";
 import { Path } from "@/app/constant";
 
 import styles from "./kid.module.scss";
+import { useTranslation } from "react-i18next";
 
 export function Kid() {
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   return (
     <div className={styles["container"]}>
       <div className={styles["centerContent"]}>
         <AidHelpIcon />
-        <div className={styles["noKidText"]}>你還沒有 AI Kid 哦~</div>
+        <div className={styles["noKidText"]}>{t("Kid.NoKidText")}</div>
         <div className={styles["instructionText"]}>
-          點擊下方「+」召喚屬於自己的 AI Kid 吧~
+          {t("Kid.InstructionText")}
         </div>
         <div
           className={styles["createButton"]}
@@ -23,7 +26,7 @@ export function Kid() {
           }}
         >
           <CreateKidIcon />
-          创建
+          {t("Kid.Create")}
         </div>
       </div>
 
