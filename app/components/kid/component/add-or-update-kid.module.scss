@@ -75,7 +75,6 @@
   margin: 14px auto;
   position: relative;
   flex-shrink: 0;
-  background-color: red;
   cursor: pointer;
 }
 
@@ -160,10 +159,10 @@
 }
 
 .saveButton {
-  background-color: #28b446; // bg-green-600 (#28B446 类似)
+  background-color: #28b446 !important;
   padding: 12px 0;
   text-align: center;
-  color: white;
+  color: white !important;
   border-radius: 24px;
   font-weight: 600;
   font-size: 16px;

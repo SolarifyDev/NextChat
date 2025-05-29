@@ -2,16 +2,35 @@ import { Path } from "@/app/constant";
 import ArrowLeftIcon from "../../../icons/arrow-left.svg";
 import EditPhoto from "../../../icons/edit-photo.svg";
 import ArrowRightIcon from "../../../icons/arrow-right.svg";
-import MagicPenIcon from "../../../icons/magic-pen.svg";
+import NoAvatar from "../../../icons/no-avatar.png";
 
 import { useNavigate } from "react-router-dom";
 
 import styles from "./add-or-update-kid.module.scss";
 import clsx from "clsx";
-import { Input } from "antd";
+import { Button, Input } from "antd";
+import { useTranslation } from "react-i18next";
+import { IType, useKidStore } from "@/app/store/kid";
+import { AiKidVoiceType } from "@/app/client/smarties";
+import { clone } from "lodash-es";
+import { useDebounceFn } from "ahooks";
+import { showToast } from "../../ui-lib";
 
 export function AddOrUpdateKid() {
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
+
+  const kidStore = useKidStore();
+
+  const { run: handleUpdateKidFun } = useDebounceFn(
+    () => {
+      kidStore.handleUpdateKid(() => navigate(Path.AIKid));
+    },
+    {
+      wait: 300,
+    },
+  );
 
   return (
     <>
@@ -29,7 +48,12 @@ export function AddOrUpdateKid() {
           >
             <ArrowLeftIcon />
           </div>
-          <div className={styles.title}>编辑My AI Kid</div>
+          <div className={styles.title}>
+            {kidStore.type === IType.Add
+              ? t("AddOrUpdateAiKid.Create")
+              : t("AddOrUpdateAiKid.Edit")}
+            My AI Kid
+          </div>
         </div>
 
         {/* 中间内容区域 - 可滚动 */}
@@ -43,10 +67,70 @@ export function AddOrUpdateKid() {
               fileInput.onchange = (event: any) => {
                 const files = event.target.files;
                 const validImageTypes = ["image/png", "image/jpeg"];
+
+                if (files && files.length > 0) {
+                  const file = files[0];
+
+                  if (validImageTypes.includes(file.type)) {
+                    const newNotSaveKid = clone(kidStore.notSavekid);
+
+                    if (newNotSaveKid) {
+                      newNotSaveKid.avatarUrl = file;
+                      kidStore.handleChangeKid(newNotSaveKid, false);
+                    }
+                  } else {
+                    showToast("你选择的不是图片类型!");
+                  }
+                }
               };
               fileInput.click();
             }}
           >
+            {typeof kidStore.notSavekid?.avatarUrl === "string" ? (
+              <>
+                <img
+                  src={kidStore.notSavekid?.avatarUrl}
+                  alt="Logo"
+                  style={{
+                    width: 114,
+                    height: 114,
+                    objectFit: "cover",
+                    userSelect: "none",
+                    pointerEvents: "none",
+                    borderRadius: "50%",
+                  }}
+                />
+              </>
+            ) : kidStore.notSavekid?.avatarUrl instanceof File ? (
+              <>
+                <img
+                  src={URL.createObjectURL(kidStore.notSavekid.avatarUrl)}
+                  alt="Logo"
+                  style={{
+                    width: 114,
+                    height: 114,
+                    objectFit: "cover",
+                    userSelect: "none",
+                    pointerEvents: "none",
+                    borderRadius: "50%",
+                  }}
+                />
+              </>
+            ) : (
+              <img
+                src={NoAvatar.src}
+                alt="Logo"
+                style={{
+                  width: 114,
+                  height: 114,
+                  objectFit: "cover",
+                  userSelect: "none",
+                  pointerEvents: "none",
+                  borderRadius: "50%",
+                }}
+              />
+            )}
+
             <div className={styles.avatarBadge}>
               <EditPhoto />
             </div>
@@ -54,7 +138,9 @@ export function AddOrUpdateKid() {
 
           <div className={styles.card}>
             <div className={styles.cardRow}>
-              <div className={styles.cardTitle}>名称</div>
+              <div className={styles.cardTitle}>
+                {t("AddOrUpdateAiKid.Name")}
+              </div>
               <div style={{ width: "100%" }}>
                 <Input
                   className={clsx(styles.Input, styles.textRight)}
@@ -68,12 +154,27 @@ export function AddOrUpdateKid() {
                       e.target.blur();
                     }
                   }}
-                  placeholder="输入名称"
+                  value={kidStore.notSavekid?.name || ""}
+                  onChange={(e) => {
+                    const newData = clone(kidStore.notSavekid);
+                    if (newData) {
+                      kidStore.handleChangeKid(
+                        {
+                          ...newData,
+                          name: e.target.value,
+                        },
+                        false,
+                      );
+                    }
+                  }}
+                  placeholder={t("AddOrUpdateAiKid.InputName")}
                 />
               </div>
             </div>
             <div className={styles.cardRow}>
-              <div className={styles.cardTitle}>音色偏好</div>
+              <div className={styles.cardTitle}>
+                {t("AddOrUpdateAiKid.VoicePreference")}
+              </div>
               <div
                 className=""
                 style={{
@@ -95,7 +196,11 @@ export function AddOrUpdateKid() {
                   }}
                 >
                   <div className={styles.cardTitle}>
-                    创建专属音声 | 成熟優雅
+                    {kidStore.notSavekid
+                      ? kidStore.notSavekid.voice === AiKidVoiceType.Male
+                        ? t("SelectVoice.MatureMale")
+                        : t("SelectVoice.GentleFemale")
+                      : t("AddOrUpdateAiKid.CreateCustomVoice")}
                   </div>
 
                   <ArrowRightIcon />
@@ -104,9 +209,11 @@ export function AddOrUpdateKid() {
             </div>
           </div>
 
-          <div className={styles.card}>
+          {/* <div className={styles.card}>
             <div className={styles.cardRow}>
-              <div className={styles.cardTitle}>能力设定</div>
+              <div className={styles.cardTitle}>
+                {t("AddOrUpdateAiKid.AbilitySettings")}
+              </div>
               <div
                 className=""
                 style={{
@@ -129,7 +236,9 @@ export function AddOrUpdateKid() {
                 >
                   <MagicPenIcon />
 
-                  <div className={styles.cardTitle}>润色</div>
+                  <div className={styles.cardTitle}>
+                    {t("AddOrUpdateAiKid.Polish")}
+                  </div>
                 </div>
               </div>
             </div>
@@ -139,7 +248,9 @@ export function AddOrUpdateKid() {
           </div>
 
           <div className={styles.card}>
-            <div className={styles.cardRow}>介绍</div>
+            <div className={styles.cardRow}>
+              {t("AddOrUpdateAiKid.Introduction")}
+            </div>
             <div className={styles.textClamp}>
               <Input.TextArea
                 className={clsx(styles.Input, styles.textLeft)}
@@ -152,7 +263,7 @@ export function AddOrUpdateKid() {
                   maxRows: 2,
                 }}
                 variant="borderless"
-                placeholder="介紹你的AI KID"
+                placeholder={t("AddOrUpdateAiKid.IntroduceYourAiKid")}
                 onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&
@@ -163,40 +274,28 @@ export function AddOrUpdateKid() {
                 }}
               />
             </div>
-          </div>
+          </div> */}
 
           <div className={styles.card}>
-            <div className={styles.cardRow}>开场白</div>
+            <div className={styles.cardRow}>
+              {t("AddOrUpdateAiKid.OpeningLine")}
+            </div>
             <div className={styles.textClamp}>
               <Input.TextArea
                 className={clsx(styles.Input, styles.textLeft)}
-                style={{
-                  paddingLeft: "0px",
-                  paddingRight: "0px",
-                }}
-                autoSize={{
-                  minRows: 1,
-                  maxRows: 2,
-                }}
-                variant="borderless"
-                placeholder="将作为开启聊天的第一句话"
-                onKeyDown={(e) => {
-                  if (
-                    e.key === "Enter" &&
-                    e.target instanceof HTMLTextAreaElement
-                  ) {
-                    e.target.blur();
+                value={kidStore.notSavekid?.greeting || ""}
+                onChange={(e) => {
+                  const newData = clone(kidStore.notSavekid);
+                  if (newData) {
+                    kidStore.handleChangeKid(
+                      {
+                        ...newData,
+                        greeting: e.target.value,
+                      },
+                      false,
+                    );
                   }
                 }}
-              />
-            </div>
-          </div>
-
-          <div className={styles.card}>
-            <div className={styles.cardRow}>开场白</div>
-            <div className={styles.textClamp}>
-              <Input.TextArea
-                className={clsx(styles.Input, styles.textLeft)}
                 style={{
                   paddingLeft: "0px",
                   paddingRight: "0px",
@@ -206,7 +305,7 @@ export function AddOrUpdateKid() {
                   maxRows: 2,
                 }}
                 variant="borderless"
-                placeholder="将作为开启聊天的第一句话"
+                placeholder={t("AddOrUpdateAiKid.OpeningLineDescription")}
                 onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&
@@ -222,14 +321,19 @@ export function AddOrUpdateKid() {
 
         {/* 底部按钮 - 固定在底部 */}
         <div className={styles.footer}>
-          <div
+          <Button
+            type="link"
+            size="large"
+            loading={kidStore.isFetching}
             className={styles.saveButton}
             onClick={() => {
-              navigate(Path.AIKid);
+              handleUpdateKidFun();
             }}
           >
-            保存
-          </div>
+            {kidStore.type === IType.Add
+              ? t("AddOrUpdateAiKid.CreateMyAiKid")
+              : t("AddOrUpdateAiKid.Save")}
+          </Button>
         </div>
       </div>
     </>

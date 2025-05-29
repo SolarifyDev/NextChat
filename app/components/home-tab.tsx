@@ -7,7 +7,7 @@ import ArrowLeftIcon from "../icons/arrow-left.svg";
 import AddKidIcon from "../icons/add-kid.svg";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useOmeStore } from "@/app/store/ome";
-import { useUpdateEffect } from "ahooks";
+import { useNewChatStore } from "../store/new-chat";
 
 export function HomeTab() {
   const tabs = [
@@ -28,20 +28,18 @@ export function HomeTab() {
 
   const omeStore = useOmeStore();
 
-  useUpdateEffect(() => {
-    switch (activeTab) {
-      case 0:
-        navigate(Path.Chat);
-        break;
-      case 1:
-        navigate(Path.AIKid);
-        break;
-    }
-  }, [activeTab]);
+  const chatStore = useNewChatStore();
 
   useEffect(() => {
-    setActiveTab(location.pathname === "/chat" ? 0 : 1);
-  }, [location.pathname]);
+    setActiveTab(
+      location.pathname === Path.Chat ||
+        (location.pathname === Path.Home && chatStore.currentSessionIndex > -1)
+        ? 0
+        : location.pathname === Path.AIKid
+        ? 1
+        : -1,
+    );
+  }, [location.pathname, chatStore.currentSessionIndex]);
 
   return (
     <>
@@ -57,7 +55,9 @@ export function HomeTab() {
             style={{
               visibility: omeStore.isFromApp ? "visible" : "hidden",
             }}
-            onClick={() => navigate(Path.AIKid)}
+            onClick={() => {
+              navigate(Path.Home);
+            }}
           >
             <ArrowLeftIcon />
           </div>
@@ -65,7 +65,18 @@ export function HomeTab() {
             {tabs.map((tab, index) => (
               <button
                 key={index}
-                onClick={() => setActiveTab(index)}
+                onClick={() => {
+                  setActiveTab(index);
+
+                  switch (index) {
+                    case 0:
+                      navigate(Path.Chat);
+                      break;
+                    case 1:
+                      navigate(Path.AIKid);
+                      break;
+                  }
+                }}
                 className={clsx(styles["tab-button"], {
                   [styles["active"]]: activeTab === index,
                 })}
@@ -77,7 +88,7 @@ export function HomeTab() {
           <div
             className={styles["tab-right-button"]}
             style={{
-              visibility: activeTab !== 0 ? "visible" : "hidden",
+              visibility: activeTab !== 0 && false ? "visible" : "hidden",
             }}
             onClick={() => {
               navigate(Path.AddOrUpdateKid);
