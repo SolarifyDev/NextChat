@@ -110,6 +110,13 @@ const Kid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
   loading: () => null,
 });
 
+const Realtime = dynamic(
+  async () => (await import("./kid/component/realtime")).Realtime,
+  {
+    loading: () => null,
+  },
+);
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -225,6 +232,7 @@ function Screen() {
       </Routes>
     );
   }
+
   const renderContent = () => {
     if (isAuth) return <AuthPage />;
     if (isSd) return <Sd />;
@@ -238,7 +246,7 @@ function Screen() {
         />
         <WindowContent>
           <Routes>
-            <Route path={Path.Home} element={<Chat />} />
+            {/* <Route path={Path.Home} element={<Chat />} /> */}
             <Route path={Path.NewChat} element={<NewChat />} />
             <Route path={Path.Masks} element={<MaskPage />} />
             <Route path={Path.Plugins} element={<PluginPage />} />
@@ -248,8 +256,10 @@ function Screen() {
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
             <Route path={Path.SelectVoice} element={<SelectVoice />} />
             <Route path={Path.AddOrUpdateKid} element={<AddOrUpdateKid />} />
+            <Route path={Path.Realtime} element={<Realtime />} />
 
             <Route element={<HomeTab />}>
+              <Route path={Path.Home} element={<Chat />} />
               <Route path={Path.AIKid} element={<Kid />} />
               <Route path={Path.Chat} element={<Chat />} />
             </Route>
