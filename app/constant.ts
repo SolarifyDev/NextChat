@@ -55,7 +55,7 @@ export enum Path {
   AIKid = "/ai-kid",
   AddOrUpdateKid = "/add-or-update-kid",
   SelectVoice = "/select-voice",
-  Tab = "/tab", // 二合一页面 Chat + AIKid
+  Realtime = "/realtime",
 }
 
 export enum ApiPath {

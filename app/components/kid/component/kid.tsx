@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import AidHelpIcon from "../../../icons/kid-help.svg";
 import CreateKidIcon from "../../../icons/create-kid.svg";
 import CallIcon from "../../../icons/call.svg";
+import KidEditIcon from "../../../icons/kid-edit.svg";
 import { Path } from "@/app/constant";
 
 import styles from "./kid.module.scss";
@@ -76,9 +77,14 @@ export function Kid() {
                     );
                   }}
                 >
-                  <CallIcon />
+                  <KidEditIcon />
                 </div>
-                <div className={styles["actionButton"]}>
+                <div
+                  className={styles["actionButton"]}
+                  onClick={() => {
+                    navigate(Path.Realtime);
+                  }}
+                >
                   <CallIcon />
                 </div>
               </div>
