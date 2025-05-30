@@ -2,7 +2,7 @@
 import { useKidStore } from "@/app/store/kid";
 import { useNavigate } from "react-router-dom";
 
-// import RealTimeBgIcon from "../../../icons/realtime-bg.svg";
+import RealTimeBgPng from "../../../icons/realtime-bg.png";
 import AvatarBgIcon from "../../../icons/avatar-bg.svg";
 import NoAvatar from "../../../icons/gril.png";
 import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
@@ -23,11 +23,14 @@ export function Realtime() {
         height: "100%",
         boxSizing: "border-box",
         position: "relative",
-        backgroundColor: "skyblue",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        backgroundImage: `url(${RealTimeBgPng.src})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
       className={"no-dark"}
     >
@@ -76,6 +79,7 @@ export function Realtime() {
           background: "rgba(255,255,255,.5)",
           position: "absolute",
           bottom: "10%",
+          zIndex: 1,
         }}
       >
         <div
