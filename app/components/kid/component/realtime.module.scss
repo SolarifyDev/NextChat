@@ -35,15 +35,18 @@
 
 .waveContainer {
   position: absolute;
-  // width: 100%; /* 容纳两张图 */
   height: 100%;
   display: flex;
   animation: scrollWave 10s linear infinite;
   z-index: 0;
+
+  width: 200%;
 }
 
 .waveImage {
+  flex: 0 0 50%; /* 每张图宽度为 waveContainer 的一半 */
   height: 100%;
+  object-fit: cover;
 }
 
 @keyframes scrollWave {
