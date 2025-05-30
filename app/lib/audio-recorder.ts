@@ -95,12 +95,9 @@ export class AudioRecorder extends EventEmitter {
   stop() {
     // its plausible that stop would be called before start completes
     // such as if the websocket immediately hangs up
-    const handleStop = async () => {
+    const handleStop = () => {
       this.source?.disconnect();
       this.stream?.getTracks().forEach((track) => track.stop());
-      if (this.audioContext?.state !== "closed") {
-        await this.audioContext?.close();
-      }
       this.stream = undefined;
       this.recordingWorklet = undefined;
       this.vuWorklet = undefined;

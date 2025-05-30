@@ -47,7 +47,6 @@ interface MultimodalLiveClientEventTypes {
   audio: (data: ArrayBuffer) => void;
   content: (data: ServerContent) => void;
   interrupted: () => void;
-  aiTurnCompleted: () => void;
   setupcomplete: () => void;
   turncomplete: () => void;
   toolcall: (toolCall: ToolCall) => void;
@@ -56,7 +55,7 @@ interface MultimodalLiveClientEventTypes {
 
 export type MultimodalLiveAPIClientConnection = {
   url?: string;
-  apiKey?: string;
+  setConnected?: any;
 };
 
 /**
@@ -162,14 +161,6 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     const response = JSON.parse(responseJson);
 
     console.log(response);
-
-    if (response.type === "AiTurnCompleted") {
-      this.emit("aiTurnCompleted");
-    }
-
-    if (response.type === "SessionInitialized") {
-      console.log(`会话已建立 ｜ Session ID：${response.session_id}`);
-    }
 
     if (response.type === "SpeechDetected") {
       this.emit("interrupted");

@@ -12,13 +12,14 @@ import { useLiveAPIContext } from "@/app/contexts/LiveAPIContext";
 import { useEffect, useState } from "react";
 import { CallStatus } from "@/app/hook/use-live-api";
 import { AudioRecorder } from "@/app/lib/audio-recorder";
+import { Path } from "@/app/constant";
 
 export function Realtime() {
   const kidStore = useKidStore();
 
   const navigate = useNavigate();
 
-  const { client, connected, setConnected, connect, disconnect } =
+  const { client, connected, connect, disconnect, connectStatus } =
     useLiveAPIContext();
 
   const [audioRecorder] = useState(() => new AudioRecorder());
@@ -26,10 +27,9 @@ export function Realtime() {
   const [muted, setMuted] = useState(false);
 
   useEffect(() => {
-    // console.log(kidStore?.currentKid?.assistantId);
-    // if (kidStore.currentKid?.assistantId) {
-    //   connect(kidStore.currentKid.assistantId);
-    // }
+    if (kidStore.currentKid?.assistantId) {
+      connect(kidStore.currentKid.assistantId);
+    }
   }, []);
 
   useEffect(() => {
@@ -41,16 +41,16 @@ export function Realtime() {
         },
       ]);
     };
-
-    if (connected !== CallStatus.Disconnected && !muted && audioRecorder) {
+    if (connectStatus && !muted && audioRecorder) {
       audioRecorder.on("data", onData).start();
     } else {
       audioRecorder.stop();
     }
+
     return () => {
       audioRecorder.off("data", onData);
     };
-  }, [connected, client, muted, audioRecorder]);
+  }, [connectStatus, muted, audioRecorder]);
 
   const sessionStatusText = () => {
     switch (connected) {
@@ -101,22 +101,8 @@ export function Realtime() {
           {kidStore.currentKid?.name}
         </div>
       )}
-      <div>
-        <div
-          style={{ cursor: "pointer", color: "red" }}
-          onClick={() => {
-            connect(76);
-            // console.log(kidStore?.currentKid?.assistantId);
 
-            // if (kidStore.currentKid?.assistantId) {
-            //   connect(kidStore.currentKid.assistantId);
-            // }
-          }}
-        >
-          点击连接
-        </div>
-        {sessionStatusText()}
-      </div>
+      {sessionStatusText()}
 
       <div
         style={{
@@ -183,46 +169,13 @@ export function Realtime() {
             margin: "0 24px",
             cursor: "pointer",
           }}
-          onClick={() => {
-            disconnect();
+          onClick={async () => {
+            await disconnect();
+            navigate(Path.AIKid);
           }}
         >
           <RealtimeCloseIcon />
         </div>
-        {/* <div>
-          <div
-            onClick={() => {
-              connect(1);
-              // console.log(kidStore?.currentKid?.assistantId);
-
-              // if (kidStore.currentKid?.assistantId) {
-              //   connect(kidStore.currentKid.assistantId);
-              // }
-            }}
-          >
-            连接
-          </div>
-          -----
-          <div
-            onClick={() => {
-              setMuted(!muted);
-            }}
-          >
-            {muted ? "开启麦克风" : "关闭麦克风"}
-          </div>
-          ------
-          <div
-            onClick={() => {
-              disconnect();
-
-              // stopAudioStreamer();
-
-              // navigate(Path.AIKid);
-            }}
-          >
-            回退
-          </div>
-        </div> */}
 
         {/* <svg
         className={styles["waves"]}

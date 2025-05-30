@@ -229,10 +229,6 @@ export class AudioStreamer {
       this.gainNode.disconnect();
       this.gainNode = this.context.createGain();
       this.gainNode.connect(this.context.destination);
-
-      if (isEnd) {
-        this.context.close();
-      }
     }, 200);
   }
 
