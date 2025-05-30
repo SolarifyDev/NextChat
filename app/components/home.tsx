@@ -35,6 +35,7 @@ import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
 import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
+import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -54,7 +55,7 @@ const Settings = dynamic(async () => (await import("./settings")).Settings, {
 });
 
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
-  loading: () => <Loading noLogo />,
+  loading: () => null,
 });
 
 const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
@@ -256,7 +257,14 @@ function Screen() {
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
             <Route path={Path.SelectVoice} element={<SelectVoice />} />
             <Route path={Path.AddOrUpdateKid} element={<AddOrUpdateKid />} />
-            <Route path={Path.Realtime} element={<Realtime />} />
+            <Route
+              path={Path.Realtime}
+              element={
+                <LiveAPIProvider>
+                  <Realtime />
+                </LiveAPIProvider>
+              }
+            />
 
             <Route element={<HomeTab />}>
               <Route path={Path.Home} element={<Chat />} />

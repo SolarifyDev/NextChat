@@ -8,11 +8,65 @@ import NoAvatar from "../../../icons/gril.png";
 import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
 import RealtimeStopIcon from "../../../icons/realtime-stop.svg";
 import RealtimeCloseIcon from "../../../icons/realtime-close.svg";
+import { useLiveAPIContext } from "@/app/contexts/LiveAPIContext";
+import { useEffect, useState } from "react";
+import { CallStatus } from "@/app/hook/use-live-api";
+import { AudioRecorder } from "@/app/lib/audio-recorder";
 
 export function Realtime() {
   const kidStore = useKidStore();
 
   const navigate = useNavigate();
+
+  const { client, connected, setConnected, connect, disconnect } =
+    useLiveAPIContext();
+
+  const [audioRecorder] = useState(() => new AudioRecorder());
+
+  const [muted, setMuted] = useState(false);
+
+  useEffect(() => {
+    // console.log(kidStore?.currentKid?.assistantId);
+    // if (kidStore.currentKid?.assistantId) {
+    //   connect(kidStore.currentKid.assistantId);
+    // }
+  }, []);
+
+  useEffect(() => {
+    const onData = (base64: string) => {
+      client.sendRealtimeInput([
+        {
+          mimeType: "audio/pcm",
+          data: base64,
+        },
+      ]);
+    };
+
+    if (connected !== CallStatus.Disconnected && !muted && audioRecorder) {
+      audioRecorder.on("data", onData).start();
+    } else {
+      audioRecorder.stop();
+    }
+    return () => {
+      audioRecorder.off("data", onData);
+    };
+  }, [connected, client, muted, audioRecorder]);
+
+  const sessionStatusText = () => {
+    switch (connected) {
+      case CallStatus.Disconnected:
+        return <div>正在連接中......</div>;
+
+      case CallStatus.Connected:
+        return <div>你可以開始說話</div>;
+
+      case CallStatus.AISpeaking:
+        return <div>說話或點擊打斷</div>;
+
+      case CallStatus.UserSpeaking:
+        return <div>正在聽...</div>;
+    }
+  };
 
   return (
     <div
@@ -47,6 +101,22 @@ export function Realtime() {
           {kidStore.currentKid?.name}
         </div>
       )}
+      <div>
+        <div
+          style={{ cursor: "pointer", color: "red" }}
+          onClick={() => {
+            connect(76);
+            // console.log(kidStore?.currentKid?.assistantId);
+
+            // if (kidStore.currentKid?.assistantId) {
+            //   connect(kidStore.currentKid.assistantId);
+            // }
+          }}
+        >
+          点击连接
+        </div>
+        {sessionStatusText()}
+      </div>
 
       <div
         style={{
@@ -85,7 +155,6 @@ export function Realtime() {
           }}
         />
       </div>
-
       <div
         style={{
           display: "flex",
@@ -102,8 +171,11 @@ export function Realtime() {
             margin: "0 24px",
             cursor: "pointer",
           }}
+          onClick={() => {
+            setMuted(!muted);
+          }}
         >
-          {true ? <RealtimeSpeakIcon /> : <RealtimeStopIcon />}
+          {!muted ? <RealtimeSpeakIcon /> : <RealtimeStopIcon />}
         </div>
         <div
           className={"no-dark"}
@@ -111,12 +183,48 @@ export function Realtime() {
             margin: "0 24px",
             cursor: "pointer",
           }}
+          onClick={() => {
+            disconnect();
+          }}
         >
           <RealtimeCloseIcon />
         </div>
-      </div>
+        {/* <div>
+          <div
+            onClick={() => {
+              connect(1);
+              // console.log(kidStore?.currentKid?.assistantId);
 
-      {/* <svg
+              // if (kidStore.currentKid?.assistantId) {
+              //   connect(kidStore.currentKid.assistantId);
+              // }
+            }}
+          >
+            连接
+          </div>
+          -----
+          <div
+            onClick={() => {
+              setMuted(!muted);
+            }}
+          >
+            {muted ? "开启麦克风" : "关闭麦克风"}
+          </div>
+          ------
+          <div
+            onClick={() => {
+              disconnect();
+
+              // stopAudioStreamer();
+
+              // navigate(Path.AIKid);
+            }}
+          >
+            回退
+          </div>
+        </div> */}
+
+        {/* <svg
         className={styles["waves"]}
         xmlns="http://www.w3.org/2000/svg"
         xlinkHref="http://www.w3.org/1999/xlink"
@@ -158,6 +266,7 @@ export function Realtime() {
           />
         </g>
       </svg> */}
+      </div>
     </div>
   );
 }
