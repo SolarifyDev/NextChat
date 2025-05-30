@@ -598,13 +598,19 @@ const ko: PartialLocaleType = {
     InputName: "이름 입력",
     CreateCustomVoice: "맞춤 음성 만들기",
     AbilitySettings: "능력 설정",
-    Polish: "다듬기",
+    Polish: "개선",
     Introduction: "소개",
     IntroduceYourAiKid: "AI KID 소개하기",
     OpeningLine: "시작 메시지",
     OpeningLineDescription: "채팅 시작 시 첫 메시지로 사용됩니다",
     CreateMyAiKid: "My AI Kid 만들기",
     Save: "저장",
+  },
+  Realtime: {
+    StartSpeaking: "지금 말씀하실 수 있습니다",
+    Listening: "듣고 있습니다...",
+    Interrupt: "언제든지 말씀을 끊으실 수 있습니다",
+    ConnectionFailed: "연결에 실패했습니다. 다시 시도해 주세요!",
   },
 };
 

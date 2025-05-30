@@ -13,9 +13,19 @@ import { useEffect, useState } from "react";
 import { CallStatus } from "@/app/hook/use-live-api";
 import { AudioRecorder } from "@/app/lib/audio-recorder";
 import { Path } from "@/app/constant";
+import P1 from "../../../icons/1.svg";
+import P2 from "../../../icons/2.svg";
+import P3 from "../../../icons/3.svg";
+import P4 from "../../../icons/4.svg";
+import Wave from "../../../icons/wave.png";
+import styles from "./realtime.module.scss";
+import clsx from "clsx";
+import { useOmeStore } from "@/app/store/ome";
 
 export function Realtime() {
   const kidStore = useKidStore();
+
+  const omeStore = useOmeStore();
 
   const navigate = useNavigate();
 
@@ -80,7 +90,6 @@ export function Realtime() {
         alignItems: "center",
         justifyContent: "center",
         backgroundImage: `url(${RealTimeBgPng.src})`,
-        backgroundColor: "skyblue",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -92,7 +101,7 @@ export function Realtime() {
           style={{
             position: "absolute",
             top: "13px",
-            zIndex: 1,
+            zIndex: 2,
             fontSize: "18px",
             color: "#3A3A47",
             fontWeight: 600,
@@ -101,8 +110,6 @@ export function Realtime() {
           {kidStore.currentKid?.name}
         </div>
       )}
-
-      {sessionStatusText()}
 
       <div
         style={{
@@ -114,6 +121,7 @@ export function Realtime() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          zIndex: 2,
         }}
         className={"no-dark"}
       >
@@ -141,6 +149,16 @@ export function Realtime() {
           }}
         />
       </div>
+
+      <div className={styles.container}>
+        <div className={`${styles.dots} ${true ? styles.active : ""}`}>
+          <div className={`${styles.dot} ${styles.dot1}`}></div>
+          <div className={`${styles.dot} ${styles.dot2}`}></div>
+          <div className={`${styles.dot} ${styles.dot3}`}></div>
+        </div>
+        <div className={styles.text}>{sessionStatusText()}</div>
+      </div>
+
       <div
         style={{
           display: "flex",
@@ -148,7 +166,7 @@ export function Realtime() {
           background: "rgba(255,255,255,.5)",
           position: "absolute",
           bottom: "10%",
-          zIndex: 1,
+          zIndex: 2,
         }}
       >
         <div
@@ -176,50 +194,68 @@ export function Realtime() {
         >
           <RealtimeCloseIcon />
         </div>
-
-        {/* <svg
-        className={styles["waves"]}
-        xmlns="http://www.w3.org/2000/svg"
-        xlinkHref="http://www.w3.org/1999/xlink"
-        viewBox="0 24 150 28"
-        preserveAspectRatio="none"
-        shapeRendering="auto"
-      >
-        <defs>
-          <path
-            id="gentle-wave"
-            d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
-          />
-        </defs>
-        <g className={styles["parallax"]}>
-          <use
-            xlinkHref="#gentle-wave"
-            x="24"
-            y="4"
-            fill="rgba(255,255,255,0.1)"
-          />
-          <use
-            xlinkHref="#gentle-wave"
-            x="24"
-            y="4"
-            fill="rgba(255,255,255,0.19)"
-          />
-          <use
-            xlinkHref="#gentle-wave"
-            x="24"
-            y="4"
-            fill="rgba(255,255,255,0.15)"
-          />
-
-          <use
-            xlinkHref="#gentle-wave"
-            x="12"
-            y="16"
-            fill="rgba(255,255,255,0.1)"
-          />
-        </g>
-      </svg> */}
       </div>
+
+      {omeStore.isFromApp ? (
+        <div className={styles.waveContainer}>
+          <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
+          <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
+        </div>
+      ) : (
+        <div className={clsx("no-dark", styles.svgContainer)}>
+          <div
+            className={clsx("no-dark", styles.waveItem)}
+            style={{
+              zIndex: 1,
+              // backgroundColor: "red",
+            }}
+          >
+            <P1 className={styles["wave-animation"]} />
+            <P1
+              className={clsx(styles["wave-animation"], styles.flippedWave)}
+            />
+          </div>
+
+          <div
+            className={clsx("no-dark", styles.waveItem)}
+            style={{
+              zIndex: 1,
+              // backgroundColor: "green",
+            }}
+          >
+            <P2 className={styles["wave-animation"]} />
+            <P2
+              className={clsx(styles["wave-animation"], styles.flippedWave)}
+            />
+          </div>
+
+          <div
+            className={clsx("no-dark", styles.waveItem)}
+            style={{
+              zIndex: 1,
+              // backgroundColor: "skyblue",
+            }}
+          >
+            <P3 className={styles["wave-animation"]} />
+            <P3
+              className={clsx(styles["wave-animation"], styles.flippedWave)}
+            />
+          </div>
+
+          <div
+            className={clsx("no-dark", styles.waveItem)}
+            style={{
+              zIndex: 1,
+              // backgroundColor: "pink",
+            }}
+          >
+            <P4 className={styles["wave-animation"]} />
+            <P4
+              className={clsx(styles["wave-animation"], styles.flippedWave)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

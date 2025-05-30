@@ -569,6 +569,12 @@ const sk: PartialLocaleType = {
     CreateMyAiKid: "Vytvoriť Moje AI Kid",
     Save: "Uložiť",
   },
+  Realtime: {
+    StartSpeaking: "Môžete začať hovoriť",
+    Listening: "Počúvam...",
+    Interrupt: "Môžete ma kedykoľvek prerušiť",
+    ConnectionFailed: "Pripojenie zlyhalo, skúste to prosím znova!",
+  },
 };
 
 export default sk;

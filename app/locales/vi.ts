@@ -620,6 +620,12 @@ const vi: PartialLocaleType = {
     CreateMyAiKid: "Tạo AI Kid của tôi",
     Save: "Lưu",
   },
+  Realtime: {
+    StartSpeaking: "Bạn có thể bắt đầu nói",
+    Listening: "Đang lắng nghe...",
+    Interrupt: "Bạn có thể ngắt lời tôi bất cứ lúc nào",
+    ConnectionFailed: "Kết nối thất bại, vui lòng thử lại!",
+  },
 };
 
 export default vi;

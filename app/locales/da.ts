@@ -860,6 +860,12 @@ const da: PartialLocaleType = {
     CreateMyAiKid: "Opret Min AI Kid",
     Save: "Gem",
   },
+  Realtime: {
+    StartSpeaking: "Du kan begynde at tale",
+    Listening: "Lytter...",
+    Interrupt: "Du kan afbryde mig når som helst",
+    ConnectionFailed: "Forbindelse mislykkedes, prøv venligst igen!",
+  },
 };
 
 export default da;

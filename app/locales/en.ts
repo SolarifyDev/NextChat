@@ -892,6 +892,12 @@ const en: LocaleType = {
     CreateMyAiKid: "Create My AI Kid",
     Save: "Save",
   },
+  Realtime: {
+    StartSpeaking: "You can start speaking now",
+    Listening: "Listening...",
+    Interrupt: "You can interrupt me anytime",
+    ConnectionFailed: "Connection failed, please try again!",
+  },
 };
 
 export default en;

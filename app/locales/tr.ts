@@ -623,6 +623,12 @@ const tr: PartialLocaleType = {
     CreateMyAiKid: "AI Kid'imi Oluştur",
     Save: "Kaydet",
   },
+  Realtime: {
+    StartSpeaking: "Konuşmaya başlayabilirsiniz",
+    Listening: "Dinliyorum...",
+    Interrupt: "Beni istediğiniz zaman kesebilirsiniz",
+    ConnectionFailed: "Bağlantı başarısız, lütfen tekrar deneyin!",
+  },
 };
 
 export default tr;

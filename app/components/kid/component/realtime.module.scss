@@ -1,38 +1,117 @@
-.waves {
+.svgContainer {
   position: absolute;
   width: 100%;
-  height: 200px;
-  min-height: 100px;
-  max-height: 200px;
-  left: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+// web
+
+.waveItem {
+  position: absolute;
   bottom: 0;
+  display: flex;
+}
+
+.wave-animation {
+  animation: waveMove 10s linear infinite;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+@keyframes waveMove {
+  0% {
+    transform: translateX(0) scaleX(var(--scale-factor, 1));
+  }
+  100% {
+    transform: translateX(-100%) scaleX(var(--scale-factor, 1));
+  }
+}
+
+.waveItem.flippedWave {
+  --scale-factor: -1; /* 通过CSS变量控制翻转 */
+}
+
+.waveContainer {
+  position: absolute;
+  // width: 100%; /* 容纳两张图 */
+  height: 100%;
+  display: flex;
+  animation: scrollWave 10s linear infinite;
   z-index: 0;
 }
 
-.parallax > use {
-  animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+.waveImage {
+  height: 100%;
 }
-.parallax > use:nth-child(1) {
-  animation-delay: -2s;
-  animation-duration: 7s;
-}
-.parallax > use:nth-child(2) {
-  animation-delay: -3s;
-  animation-duration: 10s;
-}
-.parallax > use:nth-child(3) {
-  animation-delay: -4s;
-  animation-duration: 13s;
-}
-.parallax > use:nth-child(4) {
-  animation-delay: -5s;
-  animation-duration: 20s;
-}
-@keyframes move-forever {
+
+@keyframes scrollWave {
   0% {
-    transform: translate3d(-90px, 0, 0);
+    transform: translateX(0%);
   }
   100% {
-    transform: translate3d(85px, 0, 0);
+    transform: translateX(-50%);
   }
+}
+
+// ----
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+}
+
+.dots {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  height: 20px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: #6d6c88;
+  border-radius: 50%;
+  transform-origin: center;
+  animation-name: scaleUpDown;
+  animation-duration: 1.2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-play-state: paused;
+}
+
+.dot1 {
+  animation-delay: 0s;
+}
+
+.dot2 {
+  animation-delay: 0.4s;
+}
+
+.dot3 {
+  animation-delay: 0.8s;
+}
+
+@keyframes scaleUpDown {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+.active .dot {
+  animation-play-state: running;
+}
+
+.text {
+  font-size: 14px;
+  color: #6d6c88;
 }

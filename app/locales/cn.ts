@@ -881,6 +881,12 @@ const cn = {
     CreateMyAiKid: "创建 My AI Kid",
     Save: "保存",
   },
+  Realtime: {
+    StartSpeaking: "你可以開始說話",
+    Listening: "正在聽…",
+    Interrupt: "可以隨時說話打斷我",
+    ConnectionFailed: "连接失败，请重试！",
+  },
 };
 
 type DeepPartial<T> = T extends object

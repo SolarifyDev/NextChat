@@ -618,6 +618,12 @@ const cs: PartialLocaleType = {
     CreateMyAiKid: "Vytvořit mého AI Kid",
     Save: "Uložit",
   },
+  Realtime: {
+    StartSpeaking: "Můžete začít mluvit",
+    Listening: "Poslouchám...",
+    Interrupt: "Můžete mě kdykoli přerušit",
+    ConnectionFailed: "Připojení selhalo, zkuste to prosím znovu!",
+  },
 };
 
 export default cs;
