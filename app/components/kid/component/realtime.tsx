@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 import RealTimeBgPng from "../../../icons/realtime-bg.png";
 import AvatarBgIcon from "../../../icons/avatar-bg.svg";
-import NoAvatar from "../../../icons/gril.png";
 import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
 import RealtimeStopIcon from "../../../icons/realtime-stop.svg";
 import RealtimeCloseIcon from "../../../icons/realtime-close.svg";
@@ -112,6 +111,7 @@ export function Realtime() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        gap: "15px",
       }}
       className={"no-dark"}
     >
@@ -153,20 +153,22 @@ export function Realtime() {
             pointerEvents: "none",
           }}
         />
-        <img
-          src={NoAvatar.src}
-          alt="Logo"
-          style={{
-            width: 250,
-            height: 250,
-            objectFit: "cover",
-            userSelect: "none",
-            pointerEvents: "none",
-            borderRadius: "50%",
-            zIndex: 1,
-            position: "relative",
-          }}
-        />
+        {typeof kidStore.currentKid?.avatarUrl === "string" && (
+          <img
+            src={kidStore.currentKid?.avatarUrl as string}
+            alt="Logo"
+            style={{
+              width: 250,
+              height: 250,
+              objectFit: "cover",
+              userSelect: "none",
+              pointerEvents: "none",
+              borderRadius: "50%",
+              zIndex: 1,
+              position: "relative",
+            }}
+          />
+        )}
       </div>
 
       <div

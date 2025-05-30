@@ -1,6 +1,5 @@
 import { clone } from "lodash-es";
 import { GetKids, IAIKid, PostUpdateKid, getHeaders } from "../client/smarties";
-import { showToast } from "../components/ui-lib";
 import { createPersistStore } from "../utils/store";
 import { useOmeStore } from "./ome";
 
@@ -55,10 +54,6 @@ export const useKidStore = createPersistStore(
               useOmeStore.getState().token,
             ),
           );
-
-          console.log(data);
-
-          showToast("获取成功");
 
           set({
             kids: data ?? [],
