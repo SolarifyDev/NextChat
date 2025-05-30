@@ -9,8 +9,6 @@ import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
 import RealtimeStopIcon from "../../../icons/realtime-stop.svg";
 import RealtimeCloseIcon from "../../../icons/realtime-close.svg";
 
-import styles from "./realtime.module.scss";
-
 export function Realtime() {
   const kidStore = useKidStore();
 
@@ -28,12 +26,28 @@ export function Realtime() {
         alignItems: "center",
         justifyContent: "center",
         backgroundImage: `url(${RealTimeBgPng.src})`,
+        backgroundColor: "skyblue",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
       className={"no-dark"}
     >
+      {kidStore.currentKid?.name && (
+        <div
+          style={{
+            position: "absolute",
+            top: "13px",
+            zIndex: 1,
+            fontSize: "18px",
+            color: "#3A3A47",
+            fontWeight: 600,
+          }}
+        >
+          {kidStore.currentKid?.name}
+        </div>
+      )}
+
       <div
         style={{
           width: "275px",
@@ -101,7 +115,8 @@ export function Realtime() {
           <RealtimeCloseIcon />
         </div>
       </div>
-      <svg
+
+      {/* <svg
         className={styles["waves"]}
         xmlns="http://www.w3.org/2000/svg"
         xlinkHref="http://www.w3.org/1999/xlink"
@@ -118,36 +133,31 @@ export function Realtime() {
         <g className={styles["parallax"]}>
           <use
             xlinkHref="#gentle-wave"
-            x="48"
-            y="0"
-            fill="rgba(255,255,255,0.1)"
-          />
-          <use
-            xlinkHref="#gentle-wave"
-            x="0"
-            y="8"
-            fill="rgba(255,255,255,0.09)"
-          />
-          <use
-            xlinkHref="#gentle-wave"
             x="24"
             y="4"
             fill="rgba(255,255,255,0.1)"
           />
           <use
             xlinkHref="#gentle-wave"
-            x="72"
-            y="12"
-            fill="rgba(255,255,255,0.09)"
+            x="24"
+            y="4"
+            fill="rgba(255,255,255,0.19)"
           />
+          <use
+            xlinkHref="#gentle-wave"
+            x="24"
+            y="4"
+            fill="rgba(255,255,255,0.15)"
+          />
+
           <use
             xlinkHref="#gentle-wave"
             x="12"
             y="16"
-            fill="rgba(255,255,255,0.09)"
+            fill="rgba(255,255,255,0.1)"
           />
         </g>
-      </svg>
+      </svg> */}
     </div>
   );
 }
