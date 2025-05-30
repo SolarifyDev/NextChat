@@ -615,6 +615,7 @@ const bn: PartialLocaleType = {
       "চ্যাট শুরু করার সময় প্রথম বার্তা হিসেবে ব্যবহৃত হবে",
     CreateMyAiKid: "আমার AI Kid তৈরি করুন",
     Save: "সংরক্ষণ করুন",
+    NotImageTypeError: "আপনি যেটি নির্বাচন করেছেন তা ছবির ধরন নয়！",
   },
   Realtime: {
     StartSpeaking: "আপনি কথা বলা শুরু করতে পারেন",

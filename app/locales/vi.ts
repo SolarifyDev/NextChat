@@ -619,6 +619,7 @@ const vi: PartialLocaleType = {
       "Sẽ được sử dụng làm tin nhắn đầu tiên khi bắt đầu trò chuyện",
     CreateMyAiKid: "Tạo AI Kid của tôi",
     Save: "Lưu",
+    NotImageTypeError: "Bạn đã chọn không phải là loại hình ảnh！",
   },
   Realtime: {
     StartSpeaking: "Bạn có thể bắt đầu nói",

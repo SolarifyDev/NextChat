@@ -562,6 +562,7 @@ const tw = {
     OpeningLineDescription: "將作為開啟聊天的第一句話",
     CreateMyAiKid: "創建 My AI Kid",
     Save: "保存",
+    NotImageTypeError: "你選擇的不是圖片類型！",
   },
   Realtime: {
     StartSpeaking: "你可以開始說話",

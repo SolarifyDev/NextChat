@@ -623,6 +623,7 @@ const ru: PartialLocaleType = {
       "Будет использоваться как первое сообщение при начале чата",
     CreateMyAiKid: "Создать моего AI Kid",
     Save: "Сохранить",
+    NotImageTypeError: "Вы выбрали не тип изображения！",
   },
   Realtime: {
     StartSpeaking: "Вы можете начать говорить",

@@ -617,6 +617,7 @@ const cs: PartialLocaleType = {
     OpeningLineDescription: "Bude použit jako první zpráva při zahájení chatu",
     CreateMyAiKid: "Vytvořit mého AI Kid",
     Save: "Uložit",
+    NotImageTypeError: "Vybraný soubor není typu obrázek!",
   },
   Realtime: {
     StartSpeaking: "Můžete začít mluvit",

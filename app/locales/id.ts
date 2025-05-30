@@ -620,6 +620,7 @@ const id: PartialLocaleType = {
       "Akan digunakan sebagai pesan pertama saat memulai obrolan",
     CreateMyAiKid: "Buat AI Kid Saya",
     Save: "Simpan",
+    NotImageTypeError: "Anda tidak memilih jenis gambar!",
   },
   Realtime: {
     StartSpeaking: "Anda dapat mulai berbicara",

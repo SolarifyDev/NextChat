@@ -891,6 +891,7 @@ const en: LocaleType = {
       "Will be used as the first message when starting a chat",
     CreateMyAiKid: "Create My AI Kid",
     Save: "Save",
+    NotImageTypeError: "The file you selected is not an image!",
   },
   Realtime: {
     StartSpeaking: "You can start speaking now",

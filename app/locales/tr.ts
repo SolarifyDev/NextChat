@@ -622,6 +622,7 @@ const tr: PartialLocaleType = {
       "Sohbet başlatıldığında ilk mesaj olarak kullanılacak",
     CreateMyAiKid: "AI Kid'imi Oluştur",
     Save: "Kaydet",
+    NotImageTypeError: "Seçtiğiniz şey bir resim türü değil！",
   },
   Realtime: {
     StartSpeaking: "Konuşmaya başlayabilirsiniz",

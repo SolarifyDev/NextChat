@@ -633,6 +633,7 @@ const es: PartialLocaleType = {
       "Se usará como el primer mensaje al iniciar el chat",
     CreateMyAiKid: "Crear Mi AI Kid",
     Save: "Guardar",
+    NotImageTypeError: "¡No has seleccionado un tipo de imagen!",
   },
   Realtime: {
     StartSpeaking: "Puedes empezar a hablar",

@@ -568,6 +568,7 @@ const sk: PartialLocaleType = {
     OpeningLineDescription: "Bude použitá ako prvá správa pri spustení chatu",
     CreateMyAiKid: "Vytvoriť Moje AI Kid",
     Save: "Uložiť",
+    NotImageTypeError: "Vybrali ste nie obrazový typ！",
   },
   Realtime: {
     StartSpeaking: "Môžete začať hovoriť",

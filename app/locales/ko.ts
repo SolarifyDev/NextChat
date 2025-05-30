@@ -605,6 +605,7 @@ const ko: PartialLocaleType = {
     OpeningLineDescription: "채팅 시작 시 첫 메시지로 사용됩니다",
     CreateMyAiKid: "My AI Kid 만들기",
     Save: "저장",
+    NotImageTypeError: "이미지 유형을 선택하지 않았습니다！",
   },
   Realtime: {
     StartSpeaking: "지금 말씀하실 수 있습니다",

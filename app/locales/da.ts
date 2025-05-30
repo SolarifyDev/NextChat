@@ -859,6 +859,7 @@ const da: PartialLocaleType = {
       "Vil blive brugt som den første besked ved start af chat",
     CreateMyAiKid: "Opret Min AI Kid",
     Save: "Gem",
+    NotImageTypeError: "Du har ikke valgt en billedtype！",
   },
   Realtime: {
     StartSpeaking: "Du kan begynde at tale",

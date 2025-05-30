@@ -624,6 +624,7 @@ const no: PartialLocaleType = {
       "Vil bli brukt som den første meldingen ved start av chat",
     CreateMyAiKid: "Opprett Min AI Kid",
     Save: "Lagre",
+    NotImageTypeError: "Du har ikke valgt et bilde!",
   },
   Realtime: {
     StartSpeaking: "Du kan begynne å snakke",

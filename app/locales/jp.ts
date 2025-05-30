@@ -615,6 +615,7 @@ const jp: PartialLocaleType = {
       "チャット開始時の最初のメッセージとして使用されます",
     CreateMyAiKid: "My AI Kidを作成",
     Save: "保存",
+    NotImageTypeError: "画像タイプを選択していません！",
   },
   Realtime: {
     StartSpeaking: "話し始めることができます",

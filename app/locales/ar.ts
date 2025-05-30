@@ -604,6 +604,7 @@ const ar: PartialLocaleType = {
     OpeningLineDescription: "ستستخدم كأول رسالة عند بدء المحادثة",
     CreateMyAiKid: "إنشاء طفلي الذكي",
     Save: "حفظ",
+    NotImageTypeError: "لم تختار نوع الصورة！",
   },
   Realtime: {
     StartSpeaking: "يمكنك البدء في التحدث",
