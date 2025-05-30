@@ -53,6 +53,7 @@ export type UseLiveAPIResults = {
   connectLoading: boolean;
   setConnectLoading: Dispatch<SetStateAction<boolean>>;
   connectStatus: boolean;
+  stopAudioStreamer: () => void;
 };
 
 export function useLiveAPI({
@@ -90,6 +91,12 @@ export function useLiveAPI({
     }
   }, [audioStreamerRef]);
 
+  const stopAudioStreamer = () => {
+    setConnected(CallStatus.UserSpeaking);
+
+    audioStreamerRef.current?.stop(false);
+  };
+
   useEffect(() => {
     const onConnectSuccess = () => {
       setConnected(CallStatus.Connected);
@@ -101,12 +108,6 @@ export function useLiveAPI({
 
     const onClose = () => {
       setConnected(CallStatus.Disconnected);
-    };
-
-    const stopAudioStreamer = () => {
-      setConnected(CallStatus.UserSpeaking);
-
-      audioStreamerRef.current?.stop(false);
     };
 
     const onAudio = (data: ArrayBuffer) => {
@@ -149,8 +150,6 @@ export function useLiveAPI({
     audioStreamerRef.current?.stop(true);
 
     client.disconnect();
-
-    console.log("121212");
   }, [client]);
 
   return {
@@ -165,6 +164,7 @@ export function useLiveAPI({
     connectLoading,
     setConnectLoading,
     connectStatus,
+    stopAudioStreamer,
   };
 }
 

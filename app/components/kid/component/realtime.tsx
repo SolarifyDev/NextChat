@@ -21,16 +21,25 @@ import Wave from "../../../icons/wave.png";
 import styles from "./realtime.module.scss";
 import clsx from "clsx";
 import { useOmeStore } from "@/app/store/ome";
+import { useTranslation } from "react-i18next";
 
 export function Realtime() {
+  const { t } = useTranslation();
+
   const kidStore = useKidStore();
 
   const omeStore = useOmeStore();
 
   const navigate = useNavigate();
 
-  const { client, connected, connect, disconnect, connectStatus } =
-    useLiveAPIContext();
+  const {
+    client,
+    connected,
+    connect,
+    disconnect,
+    connectStatus,
+    stopAudioStreamer,
+  } = useLiveAPIContext();
 
   const [audioRecorder] = useState(() => new AudioRecorder());
 
@@ -40,6 +49,12 @@ export function Realtime() {
     if (kidStore.currentKid?.assistantId) {
       connect(kidStore.currentKid.assistantId);
     }
+
+    return () => {
+      disconnect();
+
+      audioRecorder.stop();
+    };
   }, []);
 
   useEffect(() => {
@@ -68,13 +83,17 @@ export function Realtime() {
         return <div>正在連接中......</div>;
 
       case CallStatus.Connected:
-        return <div>你可以開始說話</div>;
+        return <div>{t("Realtime.StartSpeaking")}</div>;
 
       case CallStatus.AISpeaking:
-        return <div>說話或點擊打斷</div>;
+        return (
+          <div onClick={() => stopAudioStreamer()}>
+            {t("Realtime.Interrupt")}
+          </div>
+        );
 
       case CallStatus.UserSpeaking:
-        return <div>正在聽...</div>;
+        return <div>{t("Realtime.Listening")}</div>;
     }
   };
 
@@ -150,7 +169,12 @@ export function Realtime() {
         />
       </div>
 
-      <div className={styles.container}>
+      <div
+        className={styles.container}
+        style={{
+          zIndex: 2,
+        }}
+      >
         <div className={`${styles.dots} ${true ? styles.active : ""}`}>
           <div className={`${styles.dot} ${styles.dot1}`}></div>
           <div className={`${styles.dot} ${styles.dot2}`}></div>
