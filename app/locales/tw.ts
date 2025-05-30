@@ -563,6 +563,12 @@ const tw = {
     CreateMyAiKid: "創建 My AI Kid",
     Save: "保存",
   },
+  Realtime: {
+    StartSpeaking: "你可以開始說話",
+    Listening: "正在聽…",
+    Interrupt: "可以隨時說話打斷我",
+    ConnectionFailed: "連接失敗，請重試！",
+  },
 };
 
 type DeepPartial<T> = T extends object

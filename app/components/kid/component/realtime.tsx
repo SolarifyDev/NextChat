@@ -96,6 +96,15 @@ export function Realtime() {
         />
       </div>
 
+      <div className={styles.container}>
+        <div className={`${styles.dots} ${true ? styles.active : ""}`}>
+          <div className={`${styles.dot} ${styles.dot1}`}></div>
+          <div className={`${styles.dot} ${styles.dot2}`}></div>
+          <div className={`${styles.dot} ${styles.dot3}`}></div>
+        </div>
+        <div className={styles.text}>你可以開始說話</div>
+      </div>
+
       <div
         style={{
           display: "flex",

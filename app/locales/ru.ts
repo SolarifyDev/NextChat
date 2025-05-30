@@ -624,6 +624,12 @@ const ru: PartialLocaleType = {
     CreateMyAiKid: "Создать моего AI Kid",
     Save: "Сохранить",
   },
+  Realtime: {
+    StartSpeaking: "Вы можете начать говорить",
+    Listening: "Слушаю...",
+    Interrupt: "Вы можете прервать меня в любой момент",
+    ConnectionFailed: "Ошибка соединения, пожалуйста, попробуйте снова!",
+  },
 };
 
 export default ru;

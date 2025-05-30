@@ -616,6 +616,12 @@ const jp: PartialLocaleType = {
     CreateMyAiKid: "My AI Kidを作成",
     Save: "保存",
   },
+  Realtime: {
+    StartSpeaking: "話し始めることができます",
+    Listening: "聞いています...",
+    Interrupt: "いつでも話を中断できます",
+    ConnectionFailed: "接続に失敗しました。もう一度お試しください！",
+  },
 };
 
 export default jp;

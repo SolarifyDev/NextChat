@@ -616,6 +616,12 @@ const bn: PartialLocaleType = {
     CreateMyAiKid: "আমার AI Kid তৈরি করুন",
     Save: "সংরক্ষণ করুন",
   },
+  Realtime: {
+    StartSpeaking: "আপনি কথা বলা শুরু করতে পারেন",
+    Listening: "শুনছি...",
+    Interrupt: "আপনি যেকোনো সময় আমাকে বাধা দিতে পারেন",
+    ConnectionFailed: "সংযোগ ব্যর্থ হয়েছে, অনুগ্রহ করে আবার চেষ্টা করুন!",
+  },
 };
 
 export default bn;

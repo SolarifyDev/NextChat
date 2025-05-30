@@ -621,6 +621,12 @@ const id: PartialLocaleType = {
     CreateMyAiKid: "Buat AI Kid Saya",
     Save: "Simpan",
   },
+  Realtime: {
+    StartSpeaking: "Anda dapat mulai berbicara",
+    Listening: "Mendengarkan...",
+    Interrupt: "Anda dapat menyela saya kapan saja",
+    ConnectionFailed: "Koneksi gagal, silakan coba lagi!",
+  },
 };
 
 export default id;

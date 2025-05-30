@@ -605,6 +605,12 @@ const ar: PartialLocaleType = {
     CreateMyAiKid: "إنشاء طفلي الذكي",
     Save: "حفظ",
   },
+  Realtime: {
+    StartSpeaking: "يمكنك البدء في التحدث",
+    Listening: "أستمع...",
+    Interrupt: "يمكنك مقاطعتي في أي وقت",
+    ConnectionFailed: "فشل الاتصال، يرجى المحاولة مرة أخرى!",
+  },
 };
 
 export default ar;

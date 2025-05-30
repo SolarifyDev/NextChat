@@ -637,6 +637,12 @@ const fr: PartialLocaleType = {
     CreateMyAiKid: "Créer Mon AI Kid",
     Save: "Enregistrer",
   },
+  Realtime: {
+    StartSpeaking: "Vous pouvez commencer à parler",
+    Listening: "J'écoute...",
+    Interrupt: "Vous pouvez m'interrompre à tout moment",
+    ConnectionFailed: "Échec de la connexion, veuillez réessayer !",
+  },
 };
 
 export default fr;

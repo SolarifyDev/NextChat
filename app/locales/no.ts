@@ -625,6 +625,12 @@ const no: PartialLocaleType = {
     CreateMyAiKid: "Opprett Min AI Kid",
     Save: "Lagre",
   },
+  Realtime: {
+    StartSpeaking: "Du kan begynne å snakke",
+    Listening: "Lytter...",
+    Interrupt: "Du kan avbryte meg når som helst",
+    ConnectionFailed: "Tilkobling mislyktes, vennligst prøv igjen!",
+  },
 };
 
 export default no;
