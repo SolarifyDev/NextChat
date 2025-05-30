@@ -42,6 +42,7 @@ import { base64ToArrayBuffer, blobToJSON } from "../utils/audio-utils";
  */
 interface MultimodalLiveClientEventTypes {
   open: () => void;
+  error: () => void;
   log: (log: StreamingLog) => void;
   close: (event: CloseEvent) => void;
   audio: (data: ArrayBuffer) => void;
@@ -97,6 +98,8 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     return new Promise((resolve, reject) => {
       const onError = (ev: Event) => {
         this.disconnect(ws);
+        this.emit("error");
+
         const message = `Could not connect to "${this.url}/${assistantId}"`;
         this.log(`server.${ev.type}`, message);
         reject(new Error(message));

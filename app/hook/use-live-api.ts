@@ -39,6 +39,7 @@ export enum CallStatus {
   AIDone, // AI说话结束
   UserSpeaking, // 人开始说话
   UserDone, // 人结束说话
+  ConnectError, // 连接失败
 }
 
 export type UseLiveAPIResults = {
@@ -116,11 +117,14 @@ export function useLiveAPI({
       audioStreamerRef.current?.addPCM16(new Uint8Array(data));
     };
 
+    const onError = () => setConnected(CallStatus.ConnectError);
+
     client
       .on("open", onConnectSuccess)
       .on("close", onClose)
       .on("interrupted", stopAudioStreamer)
-      .on("audio", onAudio);
+      .on("audio", onAudio)
+      .on("error", onError);
 
     return () => {
       client

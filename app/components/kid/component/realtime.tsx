@@ -21,6 +21,7 @@ import styles from "./realtime.module.scss";
 import clsx from "clsx";
 import { useOmeStore } from "@/app/store/ome";
 import { useTranslation } from "react-i18next";
+import { showToast } from "../../ui-lib";
 
 export function Realtime() {
   const { t } = useTranslation();
@@ -55,6 +56,14 @@ export function Realtime() {
       audioRecorder.stop();
     };
   }, []);
+
+  useEffect(() => {
+    if (connected === CallStatus.ConnectError) {
+      showToast(t("Realtime.ConnectionFailed"));
+
+      navigate(Path.AIKid);
+    }
+  }, [connected]);
 
   useEffect(() => {
     const onData = (base64: string) => {
