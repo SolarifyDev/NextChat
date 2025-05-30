@@ -197,9 +197,16 @@ export function Realtime() {
       </div>
 
       {omeStore.isFromApp ? (
-        <div className={styles.waveContainer}>
-          <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
-          <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
+        // <div className={styles.waveContainer}>
+        //   <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
+        //   <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
+        // </div>
+
+        <div className={styles.waveWrapper}>
+          <div className={styles.waveContainer}>
+            <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
+            <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
+          </div>
         </div>
       ) : (
         <div className={clsx("no-dark", styles.svgContainer)}>

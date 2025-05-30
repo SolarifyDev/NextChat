@@ -33,28 +33,59 @@
   --scale-factor: -1; /* 通过CSS变量控制翻转 */
 }
 
+// .waveContainer {
+//   position: absolute;
+//   height: 100%;
+//   display: flex;
+//   animation: scrollWave 10s linear infinite;
+//   z-index: 0;
+
+//   width: 200%;
+// }
+
+// .waveImage {
+//   flex: 0 0 50%; /* 每张图宽度为 waveContainer 的一半 */
+//   height: 100%;
+//   object-fit: cover;
+// }
+
+// @keyframes scrollWave {
+//   0% {
+//     transform: translateX(0%);
+//   }
+//   100% {
+//     transform: translateX(-50%);
+//   }
+// }
+
+.waveWrapper {
+  position: absolute;
+  width: 100%; /* 可视区域宽度 */
+  height: 100%; /* 比例缩放后的高度，例如你想压缩到 1/10 原图 */
+  overflow: hidden;
+}
+
 .waveContainer {
   position: absolute;
-  height: 100%;
   display: flex;
-  animation: scrollWave 10s linear infinite;
-  z-index: 0;
-
-  width: 200%;
+  width: 7672px; /* 3836 * 2，拼接两张图 */
+  height: 100%;
+  animation: scrollWave 20s linear infinite;
+  will-change: transform;
 }
 
 .waveImage {
-  flex: 0 0 50%; /* 每张图宽度为 waveContainer 的一半 */
-  height: 100%;
-  object-fit: cover;
+  width: 3836px;
+  height: auto;
+  flex-shrink: 0;
 }
 
 @keyframes scrollWave {
   0% {
-    transform: translateX(0%);
+    transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-3836px); /* 向左滑动一张图宽 */
   }
 }
 
