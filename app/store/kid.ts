@@ -1,7 +1,9 @@
-import { clone } from "lodash-es";
+import { clone, isEmpty, isNil } from "lodash-es";
 import { GetKids, IAIKid, PostUpdateKid, getHeaders } from "../client/smarties";
 import { createPersistStore } from "../utils/store";
 import { useOmeStore } from "./ome";
+import { showToast } from "../components/ui-lib";
+import { t } from "i18next";
 
 export enum IType {
   Add,
@@ -104,6 +106,12 @@ export const useKidStore = createPersistStore(
           const { notSavekid, isFetching, handleChangeKid } = get();
 
           if (isFetching) return;
+
+          if (isEmpty(notSavekid?.name) || isNil(notSavekid?.name)) {
+            showToast(t("AddOrUpdateAiKid.NoNameTips"));
+
+            return;
+          }
 
           if (notSavekid) {
             set({

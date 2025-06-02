@@ -623,6 +623,7 @@ const tr: PartialLocaleType = {
     CreateMyAiKid: "AI Kid'imi Oluştur",
     Save: "Kaydet",
     NotImageTypeError: "Seçtiğiniz şey bir resim türü değil！",
+    NoNameTips: "Lütfen isim girin",
   },
   Realtime: {
     StartSpeaking: "Konuşmaya başlayabilirsiniz",

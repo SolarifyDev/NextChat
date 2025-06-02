@@ -620,6 +620,7 @@ const vi: PartialLocaleType = {
     CreateMyAiKid: "Tạo AI Kid của tôi",
     Save: "Lưu",
     NotImageTypeError: "Bạn đã chọn không phải là loại hình ảnh！",
+    NoNameTips: "Vui lòng nhập tên",
   },
   Realtime: {
     StartSpeaking: "Bạn có thể bắt đầu nói",

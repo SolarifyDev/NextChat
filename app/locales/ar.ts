@@ -605,6 +605,7 @@ const ar: PartialLocaleType = {
     CreateMyAiKid: "إنشاء طفلي الذكي",
     Save: "حفظ",
     NotImageTypeError: "لم تختار نوع الصورة！",
+    NoNameTips: "يرجى إدخال الاسم",
   },
   Realtime: {
     StartSpeaking: "يمكنك البدء في التحدث",

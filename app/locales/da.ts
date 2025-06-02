@@ -860,6 +860,7 @@ const da: PartialLocaleType = {
     CreateMyAiKid: "Opret Min AI Kid",
     Save: "Gem",
     NotImageTypeError: "Du har ikke valgt en billedtype！",
+    NoNameTips: "Indtast venligst navn",
   },
   Realtime: {
     StartSpeaking: "Du kan begynde at tale",

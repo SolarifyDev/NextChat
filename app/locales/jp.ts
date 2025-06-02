@@ -616,6 +616,7 @@ const jp: PartialLocaleType = {
     CreateMyAiKid: "My AI Kidを作成",
     Save: "保存",
     NotImageTypeError: "画像タイプを選択していません！",
+    NoNameTips: "名前を入力してください",
   },
   Realtime: {
     StartSpeaking: "話し始めることができます",

@@ -881,6 +881,7 @@ const cn = {
     CreateMyAiKid: "创建 My AI Kid",
     Save: "保存",
     NotImageTypeError: "你选择的不是图片类型！",
+    NoNameTips: "请输入名称",
   },
   Realtime: {
     StartSpeaking: "你可以開始說話",

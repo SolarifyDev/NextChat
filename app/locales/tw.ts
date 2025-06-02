@@ -563,6 +563,7 @@ const tw = {
     CreateMyAiKid: "創建 My AI Kid",
     Save: "保存",
     NotImageTypeError: "你選擇的不是圖片類型！",
+    NoNameTips: "請輸入名稱",
   },
   Realtime: {
     StartSpeaking: "你可以開始說話",

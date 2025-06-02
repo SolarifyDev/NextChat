@@ -618,6 +618,7 @@ const cs: PartialLocaleType = {
     CreateMyAiKid: "Vytvořit mého AI Kid",
     Save: "Uložit",
     NotImageTypeError: "Vybraný soubor není typu obrázek!",
+    NoNameTips: "Prosím, zadejte jméno",
   },
   Realtime: {
     StartSpeaking: "Můžete začít mluvit",

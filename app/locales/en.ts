@@ -892,6 +892,7 @@ const en: LocaleType = {
     CreateMyAiKid: "Create My AI Kid",
     Save: "Save",
     NotImageTypeError: "The file you selected is not an image!",
+    NoNameTips: "Please enter name",
   },
   Realtime: {
     StartSpeaking: "You can start speaking now",

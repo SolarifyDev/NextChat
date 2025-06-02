@@ -554,6 +554,7 @@ const pt: PartialLocaleType = {
     CreateMyAiKid: "Criar Meu AI Kid",
     Save: "Salvar",
     NotImageTypeError: "Você não selecionou um tipo de imagem!",
+    NoNameTips: "Por favor, insira o nome",
   },
   Realtime: {
     StartSpeaking: "Você pode começar a falar",

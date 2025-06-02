@@ -624,6 +624,7 @@ const ru: PartialLocaleType = {
     CreateMyAiKid: "Создать моего AI Kid",
     Save: "Сохранить",
     NotImageTypeError: "Вы выбрали не тип изображения！",
+    NoNameTips: "Пожалуйста, введите имя",
   },
   Realtime: {
     StartSpeaking: "Вы можете начать говорить",

@@ -569,6 +569,7 @@ const sk: PartialLocaleType = {
     CreateMyAiKid: "Vytvoriť Moje AI Kid",
     Save: "Uložiť",
     NotImageTypeError: "Vybrali ste nie obrazový typ！",
+    NoNameTips: "Prosím, zadajte meno",
   },
   Realtime: {
     StartSpeaking: "Môžete začať hovoriť",
