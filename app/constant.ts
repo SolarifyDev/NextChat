@@ -478,7 +478,6 @@ export const VISION_MODEL_REGEXES = [
   /^dall-e-3$/, // Matches exactly "dall-e-3"
   /glm-4v/,
   /vl/i,
-  /gpt-4.1/,
   /gpt-4.1-mini/,
   /o3/,
   /o4-mini/,
