@@ -28,9 +28,10 @@ RUN yarn build
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add --no-cache proxychains-ng python3 py3-pip
+RUN apk add --no-cache proxychains-ng python3 py3-pip build-base python3-dev curl
+RUN pip3 install --upgrade --break-system-packages pip setuptools wheel
 
-RUN pip3 install uv
+RUN pip3 install --break-system-packages uv
 
 RUN uv tool install arxiv-mcp-server
 
