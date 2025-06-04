@@ -28,7 +28,11 @@ RUN yarn build
 FROM base AS runner
 WORKDIR /app
 
-RUN apk add proxychains-ng
+RUN apk add --no-cache proxychains-ng python3 py3-pip
+
+RUN pip3 install uv
+
+RUN uv tool install arxiv-mcp-server
 
 ENV PROXY_URL=""
 ENV OPENAI_API_KEY=""
@@ -66,15 +70,3 @@ CMD if [ -n "$PROXY_URL" ]; then \
     else \
     node server.js; \
     fi
-
-FROM python:3.11-slim
-
-# Install uv
-RUN pip install uv
-
-# Use uv to install arxiv-mcp-server
-RUN uv tool install arxiv-mcp-server
-
-# Your other Dockerfile commands would go here
-# For example, setting up a working directory, copying files, etc.
-WORKDIR /app
