@@ -35,6 +35,7 @@ import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
 import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
+import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -54,7 +55,7 @@ const Settings = dynamic(async () => (await import("./settings")).Settings, {
 });
 
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
-  loading: () => <Loading noLogo />,
+  loading: () => null,
 });
 
 const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
@@ -84,6 +85,36 @@ const McpMarketPage = dynamic(
   async () => (await import("./mcp-market")).McpMarketPage,
   {
     loading: () => <Loading noLogo />,
+  },
+);
+
+const HomeTab = dynamic(async () => (await import("./home-tab")).HomeTab, {
+  loading: () => null,
+});
+
+const SelectVoice = dynamic(
+  async () => (await import("./kid/component/select-voice")).SelectVoice,
+  {
+    loading: () => null,
+  },
+);
+
+const AddOrUpdateKid = dynamic(
+  async () =>
+    (await import("./kid/component/add-or-update-kid")).AddOrUpdateKid,
+  {
+    loading: () => null,
+  },
+);
+
+const Kid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
+  loading: () => null,
+});
+
+const Realtime = dynamic(
+  async () => (await import("./kid/component/realtime")).Realtime,
+  {
+    loading: () => null,
   },
 );
 
@@ -202,6 +233,7 @@ function Screen() {
       </Routes>
     );
   }
+
   const renderContent = () => {
     if (isAuth) return <AuthPage />;
     if (isSd) return <Sd />;
@@ -215,14 +247,30 @@ function Screen() {
         />
         <WindowContent>
           <Routes>
-            <Route path={Path.Home} element={<Chat />} />
+            {/* <Route path={Path.Home} element={<Chat />} /> */}
             <Route path={Path.NewChat} element={<NewChat />} />
             <Route path={Path.Masks} element={<MaskPage />} />
             <Route path={Path.Plugins} element={<PluginPage />} />
             <Route path={Path.SearchChat} element={<SearchChat />} />
-            <Route path={Path.Chat} element={<Chat />} />
+            {/* <Route path={Path.Chat} element={<Chat />} /> */}
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
+            <Route path={Path.SelectVoice} element={<SelectVoice />} />
+            <Route path={Path.AddOrUpdateKid} element={<AddOrUpdateKid />} />
+            <Route
+              path={Path.Realtime}
+              element={
+                <LiveAPIProvider>
+                  <Realtime />
+                </LiveAPIProvider>
+              }
+            />
+
+            <Route element={<HomeTab />}>
+              <Route path={Path.Home} element={<Chat />} />
+              <Route path={Path.AIKid} element={<Kid />} />
+              <Route path={Path.Chat} element={<Chat />} />
+            </Route>
           </Routes>
         </WindowContent>
       </>

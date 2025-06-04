@@ -520,6 +520,48 @@ const pt: PartialLocaleType = {
     Settings:
       "Configurações detectadas a partir da url, confirmar para aplicar?",
   },
+  Kid: {
+    NoKidText: "Você ainda não tem um AI Kid~",
+    InstructionText: "Clique no「+」abaixo para invocar seu próprio AI Kid~",
+    Create: "Criar",
+  },
+  SelectVoice: {
+    Title: "Selecionar Voz",
+    Recommended: "Recomendado",
+    Female: "Voz Feminina",
+    Male: "Voz Masculina",
+    Dialect: "Dialeto",
+    MatureMale: "Voz Masculina Madura",
+    GentleFemale: "Voz Feminina Suave",
+    YoungMale: "Homem | Jovem",
+    YoungFemale: "Mulher | Jovem",
+    Confirm: "Concluir",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Criar",
+    Edit: "Editar",
+    Name: "Nome",
+    VoicePreference: "Preferência de Voz",
+    InputName: "Digite o Nome",
+    CreateCustomVoice: "Criar Voz Personalizada",
+    AbilitySettings: "Configurações de Habilidades",
+    Polish: "Refinar",
+    Introduction: "Introdução",
+    IntroduceYourAiKid: "Apresente seu AI Kid",
+    OpeningLine: "Linha de Abertura",
+    OpeningLineDescription:
+      "Será usada como a primeira mensagem ao iniciar um chat",
+    CreateMyAiKid: "Criar Meu AI Kid",
+    Save: "Salvar",
+    NotImageTypeError: "Você não selecionou um tipo de imagem!",
+    NoNameTips: "Por favor, insira o nome",
+  },
+  Realtime: {
+    StartSpeaking: "Você pode começar a falar",
+    Listening: "Ouvindo...",
+    Interrupt: "Você pode me interromper a qualquer momento",
+    ConnectionFailed: "Falha na conexão, por favor tente novamente!",
+  },
 };
 
 export default pt;

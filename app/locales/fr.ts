@@ -601,6 +601,50 @@ const fr: PartialLocaleType = {
     Topic: "Sujet",
     Time: "Temps",
   },
+  Kid: {
+    NoKidText: "Vous n'avez pas encore d'AI Kid~",
+    InstructionText:
+      "Cliquez sur le「+」ci-dessous pour invoquer votre propre AI Kid~",
+    Create: "Créer",
+  },
+  SelectVoice: {
+    Title: "Sélectionner la voix",
+    Recommended: "Recommandé",
+    Female: "Voix féminine",
+    Male: "Voix masculine",
+    Dialect: "Dialecte",
+    MatureMale: "Voix masculine mûre",
+    GentleFemale: "Voix féminine douce",
+    YoungMale: "Homme | Jeune",
+    YoungFemale: "Femme | Jeune",
+    Confirm: "Terminer",
+    Selected: "Sélectionné",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Créer",
+    Edit: "Modifier",
+    Name: "Nom",
+    VoicePreference: "Préférence de Voix",
+    InputName: "Entrez le Nom",
+    CreateCustomVoice: "Créer une Voix Personnalisée",
+    AbilitySettings: "Paramètres des Capacités",
+    Polish: "Améliorer",
+    Introduction: "Introduction",
+    IntroduceYourAiKid: "Présentez votre AI Kid",
+    OpeningLine: "Message d'Ouverture",
+    OpeningLineDescription:
+      "Sera utilisé comme premier message lors du démarrage d'une conversation",
+    CreateMyAiKid: "Créer Mon AI Kid",
+    Save: "Enregistrer",
+    NotImageTypeError: "Vous n'avez pas sélectionné un type d'image !",
+    NoNameTips: "Veuillez entrer un nom",
+  },
+  Realtime: {
+    StartSpeaking: "Vous pouvez commencer à parler",
+    Listening: "J'écoute...",
+    Interrupt: "Vous pouvez m'interrompre à tout moment",
+    ConnectionFailed: "Échec de la connexion, veuillez réessayer !",
+  },
 };
 
 export default fr;

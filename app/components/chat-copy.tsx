@@ -1973,6 +1973,7 @@ export function _Chat_NEW() {
                 justifyContent: "center",
                 top: "50%",
                 transform: "translateY(-50%)",
+                visibility: "hidden",
               }}
               onClick={() => navigate(Path.Home)}
             >

@@ -580,6 +580,50 @@ const jp: PartialLocaleType = {
     Topic: "テーマ",
     Time: "時間",
   },
+  Kid: {
+    NoKidText: "まだAI Kidがいません~",
+    InstructionText:
+      "下の「+」をクリックして、あなただけのAI Kidを呼び出しましょう~",
+    Create: "作成",
+  },
+  SelectVoice: {
+    Title: "音声を選択",
+    Recommended: "おすすめ",
+    Female: "女性の声",
+    Male: "男性の声",
+    Dialect: "方言",
+    MatureMale: "成熟した男性の声",
+    GentleFemale: "優しい女性の声",
+    YoungMale: "男性 | 若者",
+    YoungFemale: "女性 | 若者",
+    Confirm: "完了",
+    Selected: "選択済み",
+  },
+  AddOrUpdateAiKid: {
+    Create: "作成",
+    Edit: "編集",
+    Name: "名前",
+    VoicePreference: "音声設定",
+    InputName: "名前を入力",
+    CreateCustomVoice: "カスタム音声を作成",
+    AbilitySettings: "能力設定",
+    Polish: "調整",
+    Introduction: "紹介",
+    IntroduceYourAiKid: "AI KIDの紹介",
+    OpeningLine: "オープニングメッセージ",
+    OpeningLineDescription:
+      "チャット開始時の最初のメッセージとして使用されます",
+    CreateMyAiKid: "My AI Kidを作成",
+    Save: "保存",
+    NotImageTypeError: "画像タイプを選択していません！",
+    NoNameTips: "名前を入力してください",
+  },
+  Realtime: {
+    StartSpeaking: "話し始めることができます",
+    Listening: "聞いています...",
+    Interrupt: "いつでも話を中断できます",
+    ConnectionFailed: "接続に失敗しました。もう一度お試しください！",
+  },
 };
 
 export default jp;
