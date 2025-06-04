@@ -66,3 +66,15 @@ CMD if [ -n "$PROXY_URL" ]; then \
     else \
     node server.js; \
     fi
+
+FROM python:3.11-slim
+
+# Install uv
+RUN pip install uv
+
+# Use uv to install arxiv-mcp-server
+RUN uv tool install arxiv-mcp-server
+
+# Your other Dockerfile commands would go here
+# For example, setting up a working directory, copying files, etc.
+WORKDIR /app
