@@ -613,6 +613,9 @@ const ko: PartialLocaleType = {
     Listening: "듣고 있습니다...",
     Interrupt: "언제든지 말씀을 끊으실 수 있습니다",
     ConnectionFailed: "연결에 실패했습니다. 다시 시도해 주세요!",
+    Connecting: "연결 중...",
+    PermissionPrompt:
+      "마이크 접근에 실패했습니다. 마이크 권한을 수동으로 활성화해 주세요",
   },
 };
 

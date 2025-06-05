@@ -867,6 +867,9 @@ const da: PartialLocaleType = {
     Listening: "Lytter...",
     Interrupt: "Du kan afbryde mig når som helst",
     ConnectionFailed: "Forbindelse mislykkedes, prøv venligst igen!",
+    Connecting: "Forbinder...",
+    PermissionPrompt:
+      "Mikrofonadgang mislykkedes, aktiver venligst mikrofonadgang manuelt",
   },
 };
 

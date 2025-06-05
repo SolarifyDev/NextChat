@@ -561,6 +561,9 @@ const pt: PartialLocaleType = {
     Listening: "Ouvindo...",
     Interrupt: "Você pode me interromper a qualquer momento",
     ConnectionFailed: "Falha na conexão, por favor tente novamente!",
+    Connecting: "Conectando...",
+    PermissionPrompt:
+      "Falha no acesso ao microfone, por favor ative a permissão do microfone manualmente",
   },
 };
 

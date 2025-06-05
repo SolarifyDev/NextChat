@@ -612,6 +612,9 @@ const ar: PartialLocaleType = {
     Listening: "أستمع...",
     Interrupt: "يمكنك مقاطعتي في أي وقت",
     ConnectionFailed: "فشل الاتصال، يرجى المحاولة مرة أخرى!",
+    Connecting: " đang kết nối...",
+    PermissionPrompt:
+      "فشل الحصول على الميكروفون الحالي، يرجى تمكين أذونات الميكروفون يدويًا",
   },
 };
 

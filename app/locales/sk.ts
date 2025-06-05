@@ -576,6 +576,9 @@ const sk: PartialLocaleType = {
     Listening: "Počúvam...",
     Interrupt: "Môžete ma kedykoľvek prerušiť",
     ConnectionFailed: "Pripojenie zlyhalo, skúste to prosím znova!",
+    Connecting: "Pripájanie...",
+    PermissionPrompt:
+      "Prístup k mikrofónu zlyhal, prosím, povolte povolenie mikrofónu manuálne",
   },
 };
 

@@ -106,14 +106,13 @@ export function Realtime() {
   }, [connectStatus, muted, audioRecorder]);
 
   const sessionStatusText = useMemo(() => {
-    if (!isNil(audioIsReady)) {
-      if (!audioIsReady)
-        return <div>当前麦克风获取失败，请手动允许麦克风权限</div>;
+    if (!isNil(audioIsReady) && !audioIsReady) {
+      return <div>{t("Realtime.PermissionPrompt")}</div>;
     }
 
     switch (connected) {
       case CallStatus.Disconnected:
-        return <div>正在連接中......</div>;
+        return <div>{t("Realtime.Connecting")}</div>;
 
       case CallStatus.Connected:
         return <div>{t("Realtime.StartSpeaking")}</div>;
