@@ -641,6 +641,9 @@ const it: PartialLocaleType = {
     Listening: "Sto ascoltando...",
     Interrupt: "Puoi interrompermi in qualsiasi momento",
     ConnectionFailed: "Connessione fallita, riprova!",
+    Connecting: "Connessione in corso...",
+    PermissionPrompt:
+      "Accesso al microfono fallito, attivare manualmente i permessi del microfono",
   },
 };
 

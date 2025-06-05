@@ -623,6 +623,9 @@ const jp: PartialLocaleType = {
     Listening: "聞いています...",
     Interrupt: "いつでも話を中断できます",
     ConnectionFailed: "接続に失敗しました。もう一度お試しください！",
+    Connecting: "接続中...",
+    PermissionPrompt:
+      "マイクへのアクセスに失敗しました。マイクの権限を手動で有効にしてください",
   },
 };
 

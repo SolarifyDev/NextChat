@@ -632,6 +632,9 @@ const no: PartialLocaleType = {
     Listening: "Lytter...",
     Interrupt: "Du kan avbryte meg når som helst",
     ConnectionFailed: "Tilkobling mislyktes, vennligst prøv igjen!",
+    Connecting: "Kobler til...",
+    PermissionPrompt:
+      "Mikrofontilgang mislyktes, vennligst aktiver mikrofontillatelse manuelt",
   },
 };
 

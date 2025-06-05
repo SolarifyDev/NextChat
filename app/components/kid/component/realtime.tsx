@@ -8,7 +8,7 @@ import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
 import RealtimeStopIcon from "../../../icons/realtime-stop.svg";
 import RealtimeCloseIcon from "../../../icons/realtime-close.svg";
 import { useLiveAPIContext } from "@/app/contexts/LiveAPIContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CallStatus } from "@/app/hook/use-live-api";
 import { AudioRecorder } from "@/app/lib/audio-recorder";
 import { Path } from "@/app/constant";
@@ -22,6 +22,7 @@ import clsx from "clsx";
 import { useOmeStore } from "@/app/store/ome";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../../ui-lib";
+import { isNil } from "lodash";
 
 export function Realtime() {
   const { t } = useTranslation();
@@ -44,6 +45,8 @@ export function Realtime() {
   const [audioRecorder] = useState(() => new AudioRecorder());
 
   const [muted, setMuted] = useState(false);
+
+  const [audioIsReady, setAudioIsReady] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
@@ -74,21 +77,42 @@ export function Realtime() {
         },
       ]);
     };
-    if (connectStatus && !muted && audioRecorder) {
-      audioRecorder.on("data", onData).start();
-    } else {
-      audioRecorder.stop();
-    }
+
+    if (!audioRecorder) return;
+
+    let active = true;
+
+    const startRecording = async () => {
+      if (connectStatus && !muted) {
+        audioRecorder.on("data", onData);
+
+        const success = await audioRecorder.start();
+
+        if (active) {
+          setAudioIsReady(success);
+        }
+      } else {
+        audioRecorder.stop();
+      }
+    };
+
+    startRecording();
 
     return () => {
+      active = false;
       audioRecorder.off("data", onData);
+      audioRecorder.stop();
     };
   }, [connectStatus, muted, audioRecorder]);
 
-  const sessionStatusText = () => {
+  const sessionStatusText = useMemo(() => {
+    if (!isNil(audioIsReady) && !audioIsReady) {
+      return <div>{t("Realtime.PermissionPrompt")}</div>;
+    }
+
     switch (connected) {
       case CallStatus.Disconnected:
-        return <div>正在連接中......</div>;
+        return <div>{t("Realtime.Connecting")}</div>;
 
       case CallStatus.Connected:
         return <div>{t("Realtime.StartSpeaking")}</div>;
@@ -103,7 +127,7 @@ export function Realtime() {
       case CallStatus.UserSpeaking:
         return <div>{t("Realtime.Listening")}</div>;
     }
-  };
+  }, [connected, audioIsReady]);
 
   return (
     <div
@@ -191,7 +215,7 @@ export function Realtime() {
           <div className={`${styles.dot} ${styles.dot2}`}></div>
           <div className={`${styles.dot} ${styles.dot3}`}></div>
         </div>
-        <div className={styles.text}>{sessionStatusText()}</div>
+        <div className={styles.text}>{sessionStatusText}</div>
       </div>
 
       <div

@@ -888,6 +888,8 @@ const cn = {
     Listening: "正在聽…",
     Interrupt: "可以隨時說話打斷我",
     ConnectionFailed: "连接失败，请重试！",
+    Connecting: "正在连接...",
+    PermissionPrompt: "当前麦克风获取失败，请手动打开麦克风权限",
   },
 };
 

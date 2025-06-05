@@ -899,6 +899,9 @@ const en: LocaleType = {
     Listening: "Listening...",
     Interrupt: "You can interrupt me anytime",
     ConnectionFailed: "Connection failed, please try again!",
+    Connecting: "Connecting...",
+    PermissionPrompt:
+      "Microphone access failed, please enable microphone permission manually",
   },
 };
 

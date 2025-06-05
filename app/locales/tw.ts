@@ -570,6 +570,8 @@ const tw = {
     Listening: "正在聽…",
     Interrupt: "可以隨時說話打斷我",
     ConnectionFailed: "連接失敗，請重試！",
+    Connecting: "正在連接...",
+    PermissionPrompt: "當前麥克風獲取失敗，請手動開啟麥克風權限",
   },
 };
 

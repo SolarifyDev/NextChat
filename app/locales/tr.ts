@@ -630,6 +630,9 @@ const tr: PartialLocaleType = {
     Listening: "Dinliyorum...",
     Interrupt: "Beni istediğiniz zaman kesebilirsiniz",
     ConnectionFailed: "Bağlantı başarısız, lütfen tekrar deneyin!",
+    Connecting: "Bağlanıyor...",
+    PermissionPrompt:
+      "Mikrofon erişimi başarısız oldu, lütfen mikrofon iznini manuel olarak etkinleştirin",
   },
 };
 

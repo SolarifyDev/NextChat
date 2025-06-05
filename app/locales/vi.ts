@@ -627,6 +627,9 @@ const vi: PartialLocaleType = {
     Listening: "Đang lắng nghe...",
     Interrupt: "Bạn có thể ngắt lời tôi bất cứ lúc nào",
     ConnectionFailed: "Kết nối thất bại, vui lòng thử lại!",
+    Connecting: "Đang kết nối...",
+    PermissionPrompt:
+      "Không thể truy cập microphone, vui lòng bật quyền microphone thủ công",
   },
 };
 

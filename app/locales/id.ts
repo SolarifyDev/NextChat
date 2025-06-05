@@ -628,6 +628,9 @@ const id: PartialLocaleType = {
     Listening: "Mendengarkan...",
     Interrupt: "Anda dapat menyela saya kapan saja",
     ConnectionFailed: "Koneksi gagal, silakan coba lagi!",
+    Connecting: "Menghubungkan...",
+    PermissionPrompt:
+      "Akses mikrofon gagal, silakan aktifkan izin mikrofon secara manual",
   },
 };
 
