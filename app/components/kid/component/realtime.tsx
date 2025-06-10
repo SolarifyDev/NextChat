@@ -48,15 +48,6 @@ export function Realtime() {
 
   const [audioIsReady, setAudioIsReady] = useState<boolean | null>(null);
 
-  const onData = (base64: string) => {
-    client.sendRealtimeInput([
-      {
-        mimeType: "audio/pcm",
-        data: base64,
-      },
-    ]);
-  };
-
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
       connect(kidStore.currentKid.assistantId);
@@ -65,7 +56,7 @@ export function Realtime() {
     return () => {
       disconnect();
 
-      audioRecorder.stop(true);
+      audioRecorder.stop();
     };
   }, []);
 
@@ -78,25 +69,30 @@ export function Realtime() {
   }, [connected]);
 
   useEffect(() => {
+    const onData = (base64: string) => {
+      client.sendRealtimeInput([
+        {
+          mimeType: "audio/pcm",
+          data: base64,
+        },
+      ]);
+    };
+
     if (!audioRecorder) return;
 
     let active = true;
 
     const startRecording = async () => {
-      if (connectStatus) {
-        if (muted) {
-          audioRecorder.stop(false);
-        } else {
-          audioRecorder.on("data", onData);
+      if (connectStatus && !muted) {
+        audioRecorder.on("data", onData);
 
-          const success = await audioRecorder.start();
+        const success = await audioRecorder.start();
 
-          if (active) {
-            setAudioIsReady(success);
-          }
+        if (active) {
+          setAudioIsReady(success);
         }
       } else {
-        audioRecorder.stop(true);
+        audioRecorder.stop();
       }
     };
 
