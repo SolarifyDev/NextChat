@@ -65,9 +65,7 @@ export function Realtime() {
     return () => {
       disconnect();
 
-      audioRecorder.off("data", onData);
-
-      audioRecorder.stop();
+      audioRecorder.stop(true);
     };
   }, []);
 
@@ -87,7 +85,7 @@ export function Realtime() {
     const startRecording = async () => {
       if (connectStatus) {
         if (muted) {
-          audioRecorder.stop();
+          audioRecorder.stop(false);
         } else {
           audioRecorder.on("data", onData);
 
@@ -98,7 +96,7 @@ export function Realtime() {
           }
         }
       } else {
-        audioRecorder.stop();
+        audioRecorder.stop(true);
       }
     };
 
@@ -106,8 +104,7 @@ export function Realtime() {
 
     return () => {
       active = false;
-      // audioRecorder.off("data", onData);
-      // audioRecorder.stop();
+      audioRecorder.off("data", onData);
     };
   }, [connectStatus, muted, audioRecorder]);
 

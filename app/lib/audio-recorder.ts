@@ -147,9 +147,13 @@ export class AudioRecorder extends EventEmitter {
       }
 
       try {
-        this.stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
+        if (this.stream) {
+          this.stream?.getTracks().forEach((track) => (track.enabled = true));
+        } else {
+          this.stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+        }
 
         const audioTracks = this.stream.getAudioTracks();
         if (audioTracks.length === 0) {
@@ -203,11 +207,17 @@ export class AudioRecorder extends EventEmitter {
     return this.starting;
   }
 
-  stop() {
+  stop(isLeave: boolean) {
     const handleStop = () => {
       this.source?.disconnect();
-      this.stream?.getTracks().forEach((track) => track.stop());
-      this.stream = undefined;
+
+      if (!isLeave) {
+        this.stream?.getTracks().forEach((track) => (track.enabled = false));
+      } else {
+        this.stream?.getTracks().forEach((track) => track.stop());
+        this.stream = undefined;
+      }
+
       this.recordingWorklet = undefined;
       this.vuWorklet = undefined;
       this.recording = false;
