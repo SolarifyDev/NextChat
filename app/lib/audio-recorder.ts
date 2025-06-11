@@ -148,7 +148,11 @@ export class AudioRecorder extends EventEmitter {
 
       try {
         this.stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
         });
 
         const audioTracks = this.stream.getAudioTracks();
@@ -221,4 +225,3 @@ export class AudioRecorder extends EventEmitter {
     handleStop();
   }
 }
-
