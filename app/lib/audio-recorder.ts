@@ -19,7 +19,6 @@ import VolMeterWorket from "./worklets/vol-meter";
 
 import { createWorketFromSrc } from "./audioworklet-registry";
 import EventEmitter from "eventemitter3";
-import { audioContext } from "../utils/audio-utils";
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   var binary = "";
@@ -133,72 +132,197 @@ export class AudioRecorder extends EventEmitter {
     super();
   }
 
+  // async start(): Promise<boolean> {
+  //   if (this.starting) {
+  //     // 如果正在启动中，直接返回已有Promise
+  //     return this.starting;
+  //   }
+
+  //   this.starting = (async () => {
+  //     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  //       console.error("当前环境不支持媒体设备访问");
+  //       this.starting = null;
+  //       return false;
+  //     }
+
+  //     try {
+  //       this.stream = await navigator.mediaDevices.getUserMedia({
+  //         audio: {
+  //           echoCancellation: true,
+  //           noiseSuppression: true,
+  //           autoGainControl: true,
+  //         },
+  //       });
+
+  //       const audioTracks = this.stream.getAudioTracks();
+  //       if (audioTracks.length === 0) {
+  //         console.warn("未检测到任何音频输入设备");
+  //         this.starting = null;
+  //         return false;
+  //       }
+
+  //       this.audioContext = await audioContext({ sampleRate: this.sampleRate });
+  //       this.source = this.audioContext.createMediaStreamSource(this.stream);
+
+  //       const workletName = "audio-recorder-worklet";
+  //       const src = createWorketFromSrc(workletName, AudioRecordingWorklet);
+
+  //       await this.audioContext.audioWorklet.addModule(src);
+  //       this.recordingWorklet = new AudioWorkletNode(
+  //         this.audioContext,
+  //         workletName,
+  //       );
+
+  //       this.recordingWorklet.port.onmessage = (ev: MessageEvent) => {
+  //         const arrayBuffer = ev.data.data.int16arrayBuffer;
+  //         if (arrayBuffer) {
+  //           const arrayBufferString = arrayBufferToBase64(arrayBuffer);
+  //           this.emit("data", arrayBufferString);
+  //         }
+  //       };
+  //       this.source.connect(this.recordingWorklet);
+
+  //       const vuWorkletName = "vu-meter";
+  //       await this.audioContext.audioWorklet.addModule(
+  //         createWorketFromSrc(vuWorkletName, VolMeterWorket),
+  //       );
+  //       this.vuWorklet = new AudioWorkletNode(this.audioContext, vuWorkletName);
+  //       this.vuWorklet.port.onmessage = (ev: MessageEvent) => {
+  //         this.emit("volume", ev.data.volume);
+  //       };
+
+  //       this.source.connect(this.vuWorklet);
+
+  //       this.recording = true;
+  //       this.starting = null;
+  //       return true;
+  //     } catch (err) {
+  //       console.error("启动麦克风失败：", err);
+  //       this.starting = null;
+  //       return false;
+  //     }
+  //   })();
+
+  //   return this.starting;
+  // }
+
   async start(): Promise<boolean> {
-    if (this.starting) {
-      // 如果正在启动中，直接返回已有Promise
-      return this.starting;
-    }
+    if (this.starting) return this.starting;
 
     this.starting = (async () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.error("当前环境不支持媒体设备访问");
+      if (!navigator.mediaDevices?.getUserMedia) {
+        console.error("环境不支持媒体设备访问");
         this.starting = null;
         return false;
       }
 
-      try {
-        this.stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          },
-        });
+      // 设备检测
+      const isHuawei = /huawei|honor/i.test(navigator.userAgent);
+      const isAndroid = /android/i.test(navigator.userAgent);
 
+      try {
+        // 动态约束配置
+        const constraints: MediaStreamConstraints = {
+          audio: {
+            // 基础约束
+            channelCount: 1,
+            sampleRate: isHuawei ? 16000 : this.sampleRate,
+            echoCancellation: { ideal: true },
+            noiseSuppression: { ideal: true },
+            autoGainControl: { ideal: true },
+
+            // 平台增强约束
+            ...(isAndroid
+              ? {
+                  // Android通用增强
+                  googEchoCancellation: true,
+                  googNoiseSuppression: "aggressive",
+                  googHighpassFilter: true,
+                }
+              : {}),
+
+            ...(isHuawei
+              ? {
+                  // 华为专用配置
+                  mimeType: "audio/G729",
+                  processing: {
+                    voiceIsolation: false, // 关闭EMUI语音增强
+                    noiseSuppressionLevel: "high",
+                  },
+                }
+              : {}),
+          },
+        };
+
+        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
         const audioTracks = this.stream.getAudioTracks();
         if (audioTracks.length === 0) {
-          console.warn("未检测到任何音频输入设备");
+          console.warn("未检测到音频输入设备");
           this.starting = null;
           return false;
         }
 
-        this.audioContext = await audioContext({ sampleRate: this.sampleRate });
+        // 打印实际生效的约束（调试用）
+        console.log("生效的音频约束:", audioTracks[0].getSettings());
+
+        // 音频上下文配置
+        this.audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)({
+          sampleRate: isHuawei ? 16000 : this.sampleRate,
+          latencyHint: isHuawei ? "interactive" : "balanced",
+        });
+
         this.source = this.audioContext.createMediaStreamSource(this.stream);
 
+        // Worklet初始化
         const workletName = "audio-recorder-worklet";
-        const src = createWorketFromSrc(workletName, AudioRecordingWorklet);
+        await this.audioContext.audioWorklet.addModule(
+          createWorketFromSrc(workletName, AudioRecordingWorklet),
+        );
 
-        await this.audioContext.audioWorklet.addModule(src);
         this.recordingWorklet = new AudioWorkletNode(
           this.audioContext,
           workletName,
+          { numberOfOutputs: 1 },
         );
 
         this.recordingWorklet.port.onmessage = (ev: MessageEvent) => {
-          const arrayBuffer = ev.data.data.int16arrayBuffer;
-          if (arrayBuffer) {
-            const arrayBufferString = arrayBufferToBase64(arrayBuffer);
-            this.emit("data", arrayBufferString);
+          if (ev.data.data?.int16arrayBuffer) {
+            this.emit(
+              "data",
+              arrayBufferToBase64(ev.data.data.int16arrayBuffer),
+            );
           }
         };
-        this.source.connect(this.recordingWorklet);
 
+        // VU Meter
         const vuWorkletName = "vu-meter";
         await this.audioContext.audioWorklet.addModule(
           createWorketFromSrc(vuWorkletName, VolMeterWorket),
         );
-        this.vuWorklet = new AudioWorkletNode(this.audioContext, vuWorkletName);
+        this.vuWorklet = new AudioWorkletNode(
+          this.audioContext,
+          vuWorkletName,
+          { numberOfOutputs: 0 }, // 仅测量不输出
+        );
         this.vuWorklet.port.onmessage = (ev: MessageEvent) => {
-          this.emit("volume", ev.data.volume);
+          this.emit("volume", Math.min(ev.data.volume * 1.2, 1)); // 华为设备音量补偿
         };
 
+        // 连接音频管线
+        this.source.connect(this.recordingWorklet);
         this.source.connect(this.vuWorklet);
+
+        // 华为设备断开直接输出
+        if (!isHuawei) {
+          this.recordingWorklet.connect(this.audioContext.destination);
+        }
 
         this.recording = true;
         this.starting = null;
         return true;
       } catch (err) {
-        console.error("启动麦克风失败：", err);
+        console.error("启动失败:", err);
         this.starting = null;
         return false;
       }
