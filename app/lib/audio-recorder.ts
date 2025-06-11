@@ -19,6 +19,7 @@ import VolMeterWorket from "./worklets/vol-meter";
 
 import { createWorketFromSrc } from "./audioworklet-registry";
 import EventEmitter from "eventemitter3";
+import { showToast } from "../components/ui-lib";
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   var binary = "";
@@ -132,80 +133,6 @@ export class AudioRecorder extends EventEmitter {
     super();
   }
 
-  // async start(): Promise<boolean> {
-  //   if (this.starting) {
-  //     // 如果正在启动中，直接返回已有Promise
-  //     return this.starting;
-  //   }
-
-  //   this.starting = (async () => {
-  //     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-  //       console.error("当前环境不支持媒体设备访问");
-  //       this.starting = null;
-  //       return false;
-  //     }
-
-  //     try {
-  //       this.stream = await navigator.mediaDevices.getUserMedia({
-  //         audio: {
-  //           echoCancellation: true,
-  //           noiseSuppression: true,
-  //           autoGainControl: true,
-  //         },
-  //       });
-
-  //       const audioTracks = this.stream.getAudioTracks();
-  //       if (audioTracks.length === 0) {
-  //         console.warn("未检测到任何音频输入设备");
-  //         this.starting = null;
-  //         return false;
-  //       }
-
-  //       this.audioContext = await audioContext({ sampleRate: this.sampleRate });
-  //       this.source = this.audioContext.createMediaStreamSource(this.stream);
-
-  //       const workletName = "audio-recorder-worklet";
-  //       const src = createWorketFromSrc(workletName, AudioRecordingWorklet);
-
-  //       await this.audioContext.audioWorklet.addModule(src);
-  //       this.recordingWorklet = new AudioWorkletNode(
-  //         this.audioContext,
-  //         workletName,
-  //       );
-
-  //       this.recordingWorklet.port.onmessage = (ev: MessageEvent) => {
-  //         const arrayBuffer = ev.data.data.int16arrayBuffer;
-  //         if (arrayBuffer) {
-  //           const arrayBufferString = arrayBufferToBase64(arrayBuffer);
-  //           this.emit("data", arrayBufferString);
-  //         }
-  //       };
-  //       this.source.connect(this.recordingWorklet);
-
-  //       const vuWorkletName = "vu-meter";
-  //       await this.audioContext.audioWorklet.addModule(
-  //         createWorketFromSrc(vuWorkletName, VolMeterWorket),
-  //       );
-  //       this.vuWorklet = new AudioWorkletNode(this.audioContext, vuWorkletName);
-  //       this.vuWorklet.port.onmessage = (ev: MessageEvent) => {
-  //         this.emit("volume", ev.data.volume);
-  //       };
-
-  //       this.source.connect(this.vuWorklet);
-
-  //       this.recording = true;
-  //       this.starting = null;
-  //       return true;
-  //     } catch (err) {
-  //       console.error("启动麦克风失败：", err);
-  //       this.starting = null;
-  //       return false;
-  //     }
-  //   })();
-
-  //   return this.starting;
-  // }
-
   async start(): Promise<boolean> {
     if (this.starting) return this.starting;
 
@@ -226,7 +153,7 @@ export class AudioRecorder extends EventEmitter {
           audio: {
             // 基础约束
             channelCount: 1,
-            sampleRate: isHuawei ? 16000 : this.sampleRate,
+            sampleRate: this.sampleRate,
             echoCancellation: { ideal: true },
             noiseSuppression: { ideal: true },
             autoGainControl: { ideal: true },
@@ -255,6 +182,11 @@ export class AudioRecorder extends EventEmitter {
         };
 
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        const track = this.stream.getAudioTracks()[0];
+        console.log(track.getSettings());
+
+        showToast(track.getSettings().echoCancellation ? "1 回声" : "0 回声");
         const audioTracks = this.stream.getAudioTracks();
         if (audioTracks.length === 0) {
           console.warn("未检测到音频输入设备");
@@ -313,11 +245,6 @@ export class AudioRecorder extends EventEmitter {
         this.source.connect(this.recordingWorklet);
         this.source.connect(this.vuWorklet);
 
-        // 华为设备断开直接输出
-        if (!isHuawei) {
-          this.recordingWorklet.connect(this.audioContext.destination);
-        }
-
         this.recording = true;
         this.starting = null;
         return true;
@@ -349,3 +276,77 @@ export class AudioRecorder extends EventEmitter {
     handleStop();
   }
 }
+
+// async start(): Promise<boolean> {
+//   if (this.starting) {
+//     // 如果正在启动中，直接返回已有Promise
+//     return this.starting;
+//   }
+
+//   this.starting = (async () => {
+//     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+//       console.error("当前环境不支持媒体设备访问");
+//       this.starting = null;
+//       return false;
+//     }
+
+//     try {
+//       this.stream = await navigator.mediaDevices.getUserMedia({
+//         audio: {
+//           echoCancellation: true,
+//           noiseSuppression: true,
+//           autoGainControl: true,
+//         },
+//       });
+
+//       const audioTracks = this.stream.getAudioTracks();
+//       if (audioTracks.length === 0) {
+//         console.warn("未检测到任何音频输入设备");
+//         this.starting = null;
+//         return false;
+//       }
+
+//       this.audioContext = await audioContext({ sampleRate: this.sampleRate });
+//       this.source = this.audioContext.createMediaStreamSource(this.stream);
+
+//       const workletName = "audio-recorder-worklet";
+//       const src = createWorketFromSrc(workletName, AudioRecordingWorklet);
+
+//       await this.audioContext.audioWorklet.addModule(src);
+//       this.recordingWorklet = new AudioWorkletNode(
+//         this.audioContext,
+//         workletName,
+//       );
+
+//       this.recordingWorklet.port.onmessage = (ev: MessageEvent) => {
+//         const arrayBuffer = ev.data.data.int16arrayBuffer;
+//         if (arrayBuffer) {
+//           const arrayBufferString = arrayBufferToBase64(arrayBuffer);
+//           this.emit("data", arrayBufferString);
+//         }
+//       };
+//       this.source.connect(this.recordingWorklet);
+
+//       const vuWorkletName = "vu-meter";
+//       await this.audioContext.audioWorklet.addModule(
+//         createWorketFromSrc(vuWorkletName, VolMeterWorket),
+//       );
+//       this.vuWorklet = new AudioWorkletNode(this.audioContext, vuWorkletName);
+//       this.vuWorklet.port.onmessage = (ev: MessageEvent) => {
+//         this.emit("volume", ev.data.volume);
+//       };
+
+//       this.source.connect(this.vuWorklet);
+
+//       this.recording = true;
+//       this.starting = null;
+//       return true;
+//     } catch (err) {
+//       console.error("启动麦克风失败：", err);
+//       this.starting = null;
+//       return false;
+//     }
+//   })();
+
+//   return this.starting;
+// }
