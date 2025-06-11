@@ -200,7 +200,7 @@ export class AudioRecorder extends EventEmitter {
         // 音频上下文配置
         this.audioContext = new (window.AudioContext ||
           window.webkitAudioContext)({
-          sampleRate: isHuawei ? 16000 : this.sampleRate,
+          sampleRate: isHuawei ? 48000 : this.sampleRate,
           latencyHint: isHuawei ? "interactive" : "balanced",
         });
 
