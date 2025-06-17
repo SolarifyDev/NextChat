@@ -6,10 +6,7 @@ import {
   ChatMessageTool,
   usePluginStore,
 } from "@/app/store";
-import {
-  preProcessImageContentForAlibabaDashScope,
-  streamWithThink,
-} from "@/app/utils/chat";
+import { streamWithThink } from "@/app/utils/chat";
 import {
   ChatOptions,
   getHeaders,
@@ -17,14 +14,12 @@ import {
   LLMModel,
   SpeechOptions,
   MultimodalContent,
-  MultimodalContentForAlibaba,
 } from "../api";
 import { getClientConfig } from "@/app/config/client";
 import {
   getMessageTextContent,
   getMessageTextContentWithoutThinking,
   getTimeoutMSByModel,
-  isVisionModel,
 } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
 import { useNewChatStore } from "@/app/store/new-chat";
@@ -94,6 +89,14 @@ export class QwenApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
+    const messages = options.messages.map((v) => ({
+      role: v.role,
+      content:
+        v.role === "assistant"
+          ? getMessageTextContentWithoutThinking(v)
+          : getMessageTextContent(v),
+    }));
+
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
@@ -102,21 +105,6 @@ export class QwenApi implements LLMApi {
         model: options.config.model,
       },
     };
-
-    const visionModel = isVisionModel(options.config.model);
-
-    const messages: ChatOptions["messages"] = [];
-    for (const v of options.messages) {
-      const content = (
-        visionModel
-          ? await preProcessImageContentForAlibabaDashScope(v.content)
-          : v.role === "assistant"
-          ? getMessageTextContentWithoutThinking(v)
-          : getMessageTextContent(v)
-      ) as any;
-
-      messages.push({ role: v.role, content });
-    }
 
     const shouldStream = !!options.config.stream;
     const requestPayload: RequestPayload = {
@@ -142,7 +130,7 @@ export class QwenApi implements LLMApi {
         "X-DashScope-SSE": shouldStream ? "enable" : "disable",
       };
 
-      const chatPath = this.path(Alibaba.ChatPath(modelConfig.model));
+      const chatPath = this.path(Alibaba.ChatPath);
       const chatPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
@@ -174,7 +162,7 @@ export class QwenApi implements LLMApi {
             const json = JSON.parse(text);
             const choices = json.output.choices as Array<{
               message: {
-                content: string | null | MultimodalContentForAlibaba[];
+                content: string | null;
                 tool_calls: ChatMessageTool[];
                 reasoning_content: string | null;
               };
@@ -224,9 +212,7 @@ export class QwenApi implements LLMApi {
             } else if (content && content.length > 0) {
               return {
                 isThinking: false,
-                content: Array.isArray(content)
-                  ? content.map((item) => item.text).join(",")
-                  : content,
+                content: content,
               };
             }
 

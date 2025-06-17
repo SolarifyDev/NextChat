@@ -3,7 +3,7 @@ import {
   UPLOAD_URL,
   REQUEST_TIMEOUT_MS,
 } from "@/app/constant";
-import { MultimodalContent, RequestMessage } from "@/app/client/api";
+import { RequestMessage } from "@/app/client/api";
 import {
   EventStreamContentType,
   fetchEventSource,
@@ -70,9 +70,8 @@ export function compressImage(file: Blob, maxSize: number): Promise<string> {
   });
 }
 
-export async function preProcessImageContentBase(
+export async function preProcessImageContent(
   content: RequestMessage["content"],
-  transformImageUrl: (url: string) => Promise<{ [key: string]: any }>,
 ) {
   if (typeof content === "string") {
     return content;
@@ -82,7 +81,7 @@ export async function preProcessImageContentBase(
     if (part?.type == "image_url" && part?.image_url?.url) {
       try {
         const url = await cacheImageToBase64Image(part?.image_url?.url);
-        result.push(await transformImageUrl(url));
+        result.push({ type: part.type, image_url: { url } });
       } catch (error) {
         console.error("Error processing image URL:", error);
       }
@@ -91,23 +90,6 @@ export async function preProcessImageContentBase(
     }
   }
   return result;
-}
-
-export async function preProcessImageContent(
-  content: RequestMessage["content"],
-) {
-  return preProcessImageContentBase(content, async (url) => ({
-    type: "image_url",
-    image_url: { url },
-  })) as Promise<MultimodalContent[] | string>;
-}
-
-export async function preProcessImageContentForAlibabaDashScope(
-  content: RequestMessage["content"],
-) {
-  return preProcessImageContentBase(content, async (url) => ({
-    image: url,
-  }));
 }
 
 const imageCaches: Record<string, string> = {};

@@ -42,11 +42,6 @@ export interface MultimodalContent {
   };
 }
 
-export interface MultimodalContentForAlibaba {
-  text?: string;
-  image?: string;
-}
-
 export interface RequestMessage {
   role: MessageRole;
   content: string | MultimodalContent[];

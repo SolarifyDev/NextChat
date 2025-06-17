@@ -73,12 +73,9 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
       LlmIcon = BotIconGemma;
     } else if (modelName.startsWith("claude")) {
       LlmIcon = BotIconClaude;
-    } else if (modelName.includes("llama")) {
+    } else if (modelName.toLowerCase().includes("llama")) {
       LlmIcon = BotIconMeta;
-    } else if (
-      modelName.startsWith("mixtral") ||
-      modelName.startsWith("codestral")
-    ) {
+    } else if (modelName.startsWith("mixtral")) {
       LlmIcon = BotIconMistral;
     } else if (modelName.toLowerCase().includes("deepseek")) {
       if (isFromApp) LlmIcon = BotIconDeepseek1;
@@ -96,7 +93,7 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
     } else if (modelName.startsWith("doubao") || modelName.startsWith("ep-")) {
       LlmIcon = BotIconDoubao;
     } else if (
-      modelName.includes("glm") ||
+      modelName.toLowerCase().includes("glm") ||
       modelName.startsWith("cogview-") ||
       modelName.startsWith("cogvideox-")
     ) {
