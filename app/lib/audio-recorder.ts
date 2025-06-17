@@ -19,7 +19,6 @@ import VolMeterWorket from "./worklets/vol-meter";
 
 import { createWorketFromSrc } from "./audioworklet-registry";
 import EventEmitter from "eventemitter3";
-import { showToast } from "../components/ui-lib";
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   var binary = "";
@@ -184,18 +183,13 @@ export class AudioRecorder extends EventEmitter {
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
 
         const track = this.stream.getAudioTracks()[0];
-        console.log(track.getSettings());
 
-        showToast(track.getSettings().echoCancellation ? "1 回声" : "0 回声");
         const audioTracks = this.stream.getAudioTracks();
         if (audioTracks.length === 0) {
           console.warn("未检测到音频输入设备");
           this.starting = null;
           return false;
         }
-
-        // 打印实际生效的约束（调试用）
-        console.log("生效的音频约束:", audioTracks[0].getSettings());
 
         // 音频上下文配置
         this.audioContext = new (window.AudioContext ||
