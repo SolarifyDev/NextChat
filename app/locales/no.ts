@@ -78,11 +78,13 @@ const no: PartialLocaleType = {
       Clear: "Rydd samtale",
       Settings: "Samtaleinnstillinger",
       UploadImage: "Last opp bilde",
+      OnlineSearch: "Nett søk",
     },
     Rename: "Gi nytt navn til samtale",
     Typing: "Skriver…",
     Input:
       "{{submitKey}} send，/ for å utløse autoutfylling, : for å utløse kommando",
+    AppInput: "La oss starte å prate~",
     Send: "Send",
     Config: {
       Reset: "Fjern minne",
@@ -94,6 +96,7 @@ const no: PartialLocaleType = {
       Content:
         "Jeg kan hjelpe deg med å søke og svare på spørsmål. Spør meg om hva som helst!",
     },
+    UploadImageTips: "Bare maksimalt tre bilete kan lastast opp!",
   },
   Export: {
     Title: "Del samtalehistorikk",

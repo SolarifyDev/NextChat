@@ -81,10 +81,12 @@ const en: LocaleType = {
       Clear: "Clear Context",
       Settings: "Settings",
       UploadImage: "Upload Images",
+      OnlineSearch: "Online search",
     },
     Rename: "Rename Chat",
     Typing: "Typing…",
     Input: "{{submitKey}} to send, / to search prompts, : to use commands",
+    AppInput: "Let's start chatting~",
     Send: "Send",
     StartSpeak: "Start Speak",
     StopSpeak: "Stop Speak",
@@ -107,6 +109,8 @@ const en: LocaleType = {
       Content:
         "I can help you search and answer questions. Just ask me anything!",
     },
+    UploadImageTips:
+      "A maximum of only three images are allowed to be uploaded!",
   },
   Export: {
     Title: "Export Messages",

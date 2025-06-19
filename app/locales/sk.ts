@@ -76,11 +76,13 @@ const sk: PartialLocaleType = {
       Masks: "Masky",
       Clear: "Vymazať kontext",
       Settings: "Nastavenia",
+      OnlineSearch: "Online vyhľadávanie",
     },
     Rename: "Premenovať Chat",
     Typing: "Písanie…",
     Input:
       "{{submitKey}} na odoslanie, / na vyhľadávanie výziev, : na použitie príkazov",
+    AppInput: "Poďme si pokecať~",
     Send: "Odoslať",
     Config: {
       Reset: "Resetovať na predvolené",
@@ -92,6 +94,7 @@ const sk: PartialLocaleType = {
       Content:
         "Môžem vám pomôcť s vyhľadávaním a odpovedaním na otázky. Spýtajte sa ma na čokoľvek!",
     },
+    UploadImageTips: "Povolené je nahrať maximálne tri obrázky!",
   },
   Export: {
     Title: "Export správ",

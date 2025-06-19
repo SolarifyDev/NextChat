@@ -25,6 +25,7 @@ import { XAIApi } from "./platforms/xai";
 import { ChatGLMApi } from "./platforms/glm";
 import { SiliconflowApi } from "./platforms/siliconflow";
 import { useNewChatStore } from "../store/new-chat";
+import { useOmeStore } from "../store/ome";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -39,6 +40,11 @@ export interface MultimodalContent {
   image_url?: {
     url: string;
   };
+}
+
+export interface MultimodalContentForAlibaba {
+  text?: string;
+  image?: string;
 }
 
 export interface RequestMessage {
@@ -78,6 +84,8 @@ export interface ChatOptions {
   onController?: (controller: AbortController) => void;
   onBeforeTool?: (tool: ChatMessageTool) => void;
   onAfterTool?: (tool: ChatMessageTool) => void;
+
+  isSummary?: boolean; // 给接口控制当前是否是总结
 }
 
 export interface LLMUsage {
@@ -235,6 +243,7 @@ export function validString(x: string): boolean {
 
 export function getHeaders(ignoreHeaders: boolean = false) {
   const appConfig = useAppConfig.getState();
+  const omeStore = useOmeStore.getState();
   const accessStore = useAccessStore.getState();
   // const chatStore = useChatStore.getState();
   const chatStore = useNewChatStore.getState();
@@ -352,26 +361,28 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   }
   // console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
 
-  if (appConfig.isFromApp) {
-    switch (appConfig.from.toLowerCase()) {
+  if (omeStore.isFromApp) {
+    switch (omeStore.from.toLowerCase()) {
       case "omeofficeapp":
-        headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
+        headers["OME-METIS-Authorization"] = omeStore.token || "";
 
-        headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
+        headers["OME-METIS-UserId"] = omeStore.userId || "";
 
-        headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+        headers["Ome-Metis-Username"] = omeStore.userName || "";
         break;
-      case "omelink":
-        headers["Omelink-Metis-Userid"] = appConfig.omeUserId || "";
+      case "omelinkapp":
+        headers["Omelink-Metis-Userid"] = omeStore.userId || "";
         break;
     }
   } else {
-    headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
+    headers["OME-METIS-Authorization"] = omeStore.token || "";
 
-    headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
+    headers["OME-METIS-UserId"] = omeStore.userId || "";
 
-    headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+    headers["Ome-Metis-Username"] = omeStore.userName || "";
   }
+
+  headers["OnlineSearch"] = (omeStore.onlineSearch ? 1 : 0).toString();
 
   return headers;
 }

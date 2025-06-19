@@ -8,12 +8,14 @@ import { ModelType } from "../store";
 
 import BotIconDefault from "../icons/llm-icons/default.svg";
 import BotIconOpenAI from "../icons/llm-icons/openai.svg";
+import BotIconOpenAI1 from "../icons/llm-icons/chatGPT.svg";
 import BotIconGemini from "../icons/llm-icons/gemini.svg";
 import BotIconGemma from "../icons/llm-icons/gemma.svg";
 import BotIconClaude from "../icons/llm-icons/claude.svg";
 import BotIconMeta from "../icons/llm-icons/meta.svg";
 import BotIconMistral from "../icons/llm-icons/mistral.svg";
 import BotIconDeepseek from "../icons/llm-icons/deepseek.svg";
+import BotIconDeepseek1 from "../icons/llm-icons/DS.svg";
 import BotIconMoonshot from "../icons/llm-icons/moonshot.svg";
 import BotIconQwen from "../icons/llm-icons/qwen.svg";
 import BotIconWenxin from "../icons/llm-icons/wenxin.svg";
@@ -22,6 +24,7 @@ import BotIconHunyuan from "../icons/llm-icons/hunyuan.svg";
 import BotIconDoubao from "../icons/llm-icons/doubao.svg";
 import BotIconChatglm from "../icons/llm-icons/chatglm.svg";
 import BotIconMetis from "../icons/llm-icons/metis.svg";
+import { useOmeStore } from "../store/ome";
 
 export function getEmojiUrl(unified: string, style: EmojiStyle) {
   // Whoever owns this Content Delivery Network (CDN), I am using your CDN to serve emojis
@@ -49,6 +52,8 @@ export function AvatarPicker(props: {
 export function Avatar(props: { model?: ModelType; avatar?: string }) {
   let LlmIcon = BotIconDefault;
 
+  const { isFromApp } = useOmeStore();
+
   if (props.model) {
     const modelName = props.model.toLowerCase();
 
@@ -60,19 +65,24 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
       modelName.startsWith("o1") ||
       modelName.startsWith("o3")
     ) {
-      LlmIcon = BotIconOpenAI;
+      if (isFromApp) LlmIcon = BotIconOpenAI1;
+      else LlmIcon = BotIconOpenAI;
     } else if (modelName.startsWith("gemini")) {
       LlmIcon = BotIconGemini;
     } else if (modelName.startsWith("gemma")) {
       LlmIcon = BotIconGemma;
     } else if (modelName.startsWith("claude")) {
       LlmIcon = BotIconClaude;
-    } else if (modelName.toLowerCase().includes("llama")) {
+    } else if (modelName.includes("llama")) {
       LlmIcon = BotIconMeta;
-    } else if (modelName.startsWith("mixtral")) {
+    } else if (
+      modelName.startsWith("mixtral") ||
+      modelName.startsWith("codestral")
+    ) {
       LlmIcon = BotIconMistral;
     } else if (modelName.toLowerCase().includes("deepseek")) {
-      LlmIcon = BotIconDeepseek;
+      if (isFromApp) LlmIcon = BotIconDeepseek1;
+      else LlmIcon = BotIconDeepseek;
     } else if (modelName.startsWith("moonshot")) {
       LlmIcon = BotIconMoonshot;
     } else if (modelName.startsWith("qwen")) {
@@ -86,7 +96,7 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
     } else if (modelName.startsWith("doubao") || modelName.startsWith("ep-")) {
       LlmIcon = BotIconDoubao;
     } else if (
-      modelName.toLowerCase().includes("glm") ||
+      modelName.includes("glm") ||
       modelName.startsWith("cogview-") ||
       modelName.startsWith("cogvideox-")
     ) {

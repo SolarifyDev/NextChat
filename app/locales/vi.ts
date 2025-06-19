@@ -76,10 +76,12 @@ const vi: PartialLocaleType = {
       Clear: "Xóa cuộc trò chuyện",
       Settings: "Cài đặt trò chuyện",
       UploadImage: "Tải lên hình ảnh",
+      OnlineSearch: "Tìm kiếm trực tuyến",
     },
     Rename: "Đổi tên cuộc trò chuyện",
     Typing: "Đang nhập…",
     Input: "{{submitKey}} gửi，/ kích hoạt hoàn chỉnh, : kích hoạt lệnh",
+    AppInput: "Hãy bắt đầu trò chuyện nào~",
     Send: "Gửi",
     Config: {
       Reset: "Xóa trí nhớ",
@@ -91,6 +93,7 @@ const vi: PartialLocaleType = {
       Content:
         "Tôi có thể giúp bạn tìm kiếm và trả lời câu hỏi. Hãy hỏi tôi bất cứ điều gì!",
     },
+    UploadImageTips: "Chỉ được phép tải lên tối đa ba hình ảnh!",
   },
   Export: {
     Title: "Chia sẻ ghi chép trò chuyện",

@@ -81,9 +81,15 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) and (pointer: fine) {
   :root {
     @include dark;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (pointer: coarse) {
+  :root {
+    @include light;
   }
 }
 
@@ -350,6 +356,46 @@ pre {
   &:focus {
     filter: brightness(0.95);
   }
+
+  .is-clicked-show {
+    svg {
+      fill: rgba(86, 146, 169, 1) !important;
+    }
+  }
+
+  .is-hover-show {
+    svg {
+      fill: #333 !important;
+    }
+  }
+}
+
+.clickable-is-app {
+  cursor: pointer;
+
+  .is-hover-show-fill {
+    svg {
+      fill: #6e6c8a !important;
+    }
+  }
+
+  .is-hover-show-stroke {
+    svg {
+      stroke: #6e6c8a !important;
+    }
+  }
+
+  .is-clicked-show-fill {
+    svg {
+      fill: rgba(40, 180, 70, 1) !important;
+    }
+  }
+
+  .is-clicked-show-stroke {
+    svg {
+      stroke: rgba(40, 180, 70, 1) !important;
+    }
+  }
 }
 
 .error {
@@ -389,8 +435,8 @@ pre {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: var(--border-in-light);
-  box-shadow: var(--card-shadow);
+  // border: var(--border-in-light);
+  // box-shadow: var(--card-shadow);
   border-radius: 11px;
 }
 

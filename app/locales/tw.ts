@@ -76,10 +76,12 @@ const tw = {
       Clear: "清除聊天",
       Settings: "對話設定",
       UploadImage: "上傳圖片",
+      OnlineSearch: "聯網搜索",
     },
     Rename: "重新命名對話",
     Typing: "正在輸入…",
     Input: "輸入訊息後，按下 {{submitKey}} 鍵即可傳送",
+    AppInput: "開始聊天吧～",
     Send: "傳送",
     Config: {
       Reset: "重設",
@@ -99,6 +101,7 @@ const tw = {
       Title: "Hi~我是METIS",
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
+    UploadImageTips: "最多只允許上傳三張圖片",
   },
   Export: {
     Title: "將聊天記錄匯出為 Markdown",

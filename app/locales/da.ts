@@ -78,11 +78,13 @@ const da: PartialLocaleType = {
       Clear: "Ryd kontekst",
       Settings: "Indstillinger",
       UploadImage: "Upload billeder",
+      OnlineSearch: "Online søgning",
     },
     Rename: "Omdøb chat",
     Typing: "Skriver…",
     Input:
       "{{submitKey}} for at sende, / for at søge i prompts, : for at bruge kommandoer",
+    AppInput: "Lad os begynde at chatte~",
     Send: "Send",
     StartSpeak: "Start oplæsning",
     StopSpeak: "Stop oplæsning",
@@ -105,6 +107,7 @@ const da: PartialLocaleType = {
       Content:
         "Jeg kan hjælpe dig med at søge og besvare spørgsmål. Spørg mig hvad som helst!",
     },
+    UploadImageTips: "Der må kun uploades maksimalt tre billeder!",
   },
   Export: {
     Title: "Eksportér beskeder",

@@ -37,7 +37,9 @@ import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
+import AppBottomIcon from "../icons/app-bottom.svg";
 import StopIcon from "../icons/pause.svg";
+import AppStopIcon from "../icons/app-pause.svg";
 import RobotIcon from "../icons/robot.svg";
 import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
@@ -47,10 +49,14 @@ import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import ArrowLeftIcon from "../icons/arrow-left.svg";
-import SendIcon from "../icons/send.svg";
 import AppImage from "../icons/app-gallery.svg";
 import AppRobot from "../icons/app-robot.svg";
-import MetisIcon from "../icons/Footer.png";
+import SearchOnlineIcon from "../icons/search-online.svg";
+import AppSearchOnlineIcon from "../icons/search-online-app.svg";
+import SendWhiteIcon from "../icons/send-white.svg";
+import MetisIcon from "../icons/metis.png";
+import SendIcon from "../icons/green-send.png";
+import GraySendIcon from "../icons/gray-send.png";
 
 import NextImage from "next/image";
 
@@ -123,7 +129,7 @@ import { ClientApi, MultimodalContent } from "../client/api";
 import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
-import { isEmpty } from "lodash-es";
+import { isEmpty, isNil } from "lodash-es";
 import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
@@ -137,6 +143,8 @@ import { nanoid } from "nanoid";
 import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
+import { useOmeStore } from "../store/ome";
+import { useDebounceFn } from "ahooks";
 
 const localStorage = safeLocalStorage();
 
@@ -440,9 +448,15 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
+  isHaveHover?: boolean; // 是否有hover效果
+  isClick?: boolean; // 是否需要点击效果
+  isWebClick?: boolean; // web端是否有选中样式
+  isChangeSvgStroke?: boolean; // svg样式是调整stroke 还是 fill
 }) {
+  const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const [isActive, setIsActive] = useState(false);
   const [width, setWidth] = useState({
     full: 16,
     icon: 16,
@@ -459,15 +473,52 @@ export function ChatAction(props: {
     });
   }
 
+  const { run: onClick } = useDebounceFn(
+    () => {
+      props.onClick();
+      setTimeout(updateWidth, 1);
+    },
+    {
+      wait: 300,
+    },
+  );
+
   return (
     <div
-      className={clsx(styles["chat-input-action"], "clickable")}
-      onClick={() => {
-        props.onClick();
-        setTimeout(updateWidth, 1);
-      }}
+      className={clsx(
+        {
+          // app端样式
+          [styles["chat-input-action-is-app"]]: isFromApp && !isActive, // 默认
+          [styles["chat-input-action-is-app-hover"]]: isFromApp && isActive, // hover
+          [styles["chat-input-action-is-app-clicked"]]:
+            isFromApp && !isActive && props.isClick, // 选中
+          "clickable-is-app": isFromApp, // 设置svg样式
+        },
+        {
+          // web端样式
+          [styles["chat-input-action"]]: !isFromApp, // 默认
+          [styles["chat-input-action-clicked"]]:
+            !isFromApp && props.isClick && props.isWebClick, // 选中
+          clickable: !isFromApp, // 设置svg样式
+        },
+      )}
+      onClick={onClick}
       onMouseEnter={updateWidth}
-      onTouchStart={updateWidth}
+      onTouchStart={() => {
+        if (isFromApp) {
+          setIsActive(!isActive);
+        }
+        updateWidth();
+      }}
+      onTouchEnd={() => {
+        setTimeout(() => {
+          if (isFromApp) {
+            if (isActive) {
+              setIsActive(false);
+            }
+          }
+        }, 1000);
+      }}
       style={
         {
           "--icon-width": `${width.icon}px`,
@@ -475,7 +526,27 @@ export function ChatAction(props: {
         } as React.CSSProperties
       }
     >
-      <div ref={iconRef} className={styles["icon"]}>
+      <div
+        ref={iconRef}
+        // className={clsx(styles["icon"], props.isHaveHover && "is-hover-show")}
+        className={clsx(
+          styles["icon"],
+
+          props.isClick || isActive
+            ? isFromApp
+              ? props.isChangeSvgStroke
+                ? "is-clicked-show-stroke"
+                : "is-clicked-show-fill"
+              : "is-clicked-show"
+            : (!isNil(props.isClick) || (isFromApp && props.isHaveHover)) &&
+                (isFromApp
+                  ? props.isChangeSvgStroke
+                    ? "is-hover-show-stroke"
+                    : "is-hover-show-fill"
+                  : "is-hover-show"),
+          props.isWebClick && props.isClick && "no-dark",
+        )}
+      >
         {props.icon}
       </div>
       <div className={styles["text"]} ref={textRef}>
@@ -542,6 +613,7 @@ export function ChatActions(props: {
   const { t } = useTranslation();
 
   const config = useAppConfig();
+  const omeStore = useOmeStore();
   const navigate = useNavigate();
   const chatStore = useNewChatStore();
   const pluginStore = usePluginStore();
@@ -574,19 +646,39 @@ export function ChatActions(props: {
     const deepseekModels = filteredModels.filter((m) =>
       m.displayName.toLowerCase().includes("deepseek"),
     );
+    const metisModels = filteredModels.filter((m) =>
+      m.displayName.toLowerCase().includes("metis"),
+    );
     const otherModels = filteredModels.filter(
-      (m) => !m.displayName.toLowerCase().includes("deepseek"),
+      (m) =>
+        !m.displayName.toLowerCase().includes("deepseek") &&
+        !m.displayName.toLowerCase().includes("metis"),
     );
 
     if (defaultModel) {
       const arr = [
         defaultModel,
         ...deepseekModels.filter((m) => m !== defaultModel),
+        ...metisModels.filter((m) => m !== defaultModel),
         ...otherModels.filter((m) => m !== defaultModel),
       ];
+      if (omeStore.isFromApp) {
+        return arr.filter((i) =>
+          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
+            (item) => item === i.displayName.toLowerCase(),
+          ),
+        );
+      }
       return arr;
     } else {
-      return [...deepseekModels, ...otherModels];
+      if (omeStore.isFromApp) {
+        return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
+          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
+            (item) => item === i.displayName.toLowerCase(),
+          ),
+        );
+      }
+      return [...deepseekModels, ...metisModels, ...otherModels];
     }
   }, [allModels]);
   const currentModelName = useMemo(() => {
@@ -653,7 +745,9 @@ export function ChatActions(props: {
             onClick={stopAll}
             // text={Locale.Chat.InputActions.Stop}
             text={t("Chat.InputActions.Stop")}
-            icon={<StopIcon />}
+            icon={omeStore.isFromApp ? <AppStopIcon /> : <StopIcon />}
+            isChangeSvgStroke={true}
+            isHaveHover={true}
           />
         )}
         {!props.hitBottom && (
@@ -661,10 +755,12 @@ export function ChatActions(props: {
             onClick={props.scrollToBottom}
             // text={Locale.Chat.InputActions.ToBottom}
             text={t("Chat.InputActions.ToBottom")}
-            icon={<BottomIcon />}
+            icon={omeStore.isFromApp ? <AppBottomIcon /> : <BottomIcon />}
+            isChangeSvgStroke={true}
+            isHaveHover={true}
           />
         )}
-        {props.hitBottom && !config.isFromApp && (
+        {props.hitBottom && !omeStore.isFromApp && (
           <ChatAction
             onClick={props.showPromptModal}
             // text={Locale.Chat.InputActions.Settings}
@@ -681,32 +777,35 @@ export function ChatActions(props: {
             icon={
               props.uploading ? (
                 <LoadingButtonIcon />
-              ) : config.isFromApp ? (
+              ) : omeStore.isFromApp ? (
                 <AppImage />
               ) : (
                 <ImageIcon />
               )
             }
+            isHaveHover={true}
           />
         )}
-        <ChatAction
-          onClick={nextTheme}
-          // text={Locale.Chat.InputActions.Theme[theme]}
-          text={t(`Chat.InputActions.Theme.${theme}`)}
-          icon={
-            <>
-              {theme === Theme.Auto ? (
-                <AutoIcon />
-              ) : theme === Theme.Light ? (
-                <LightIcon />
-              ) : theme === Theme.Dark ? (
-                <DarkIcon />
-              ) : null}
-            </>
-          }
-        />
+        {!omeStore.isFromApp && (
+          <ChatAction
+            onClick={nextTheme}
+            // text={Locale.Chat.InputActions.Theme[theme]}
+            text={t(`Chat.InputActions.Theme.${theme}`)}
+            icon={
+              <>
+                {theme === Theme.Auto ? (
+                  <AutoIcon />
+                ) : theme === Theme.Light ? (
+                  <LightIcon />
+                ) : theme === Theme.Dark ? (
+                  <DarkIcon />
+                ) : null}
+              </>
+            }
+          />
+        )}
 
-        {!config.isFromApp && (
+        {!omeStore.isFromApp && (
           <ChatAction
             onClick={props.showPromptHints}
             // text={Locale.Chat.InputActions.Prompt}
@@ -715,7 +814,7 @@ export function ChatActions(props: {
           />
         )}
 
-        {!config.isFromApp && (
+        {!omeStore.isFromApp && (
           <ChatAction
             onClick={() => {
               navigate(Path.Masks);
@@ -726,7 +825,7 @@ export function ChatActions(props: {
           />
         )}
 
-        {!config.isFromApp && (
+        {!omeStore.isFromApp && (
           <ChatAction
             // text={Locale.Chat.InputActions.Clear}
             text={t("Chat.InputActions.Clear")}
@@ -751,7 +850,24 @@ export function ChatActions(props: {
         <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
-          icon={config.isFromApp ? <AppRobot /> : <RobotIcon />}
+          icon={omeStore.isFromApp ? <AppRobot /> : <RobotIcon />}
+          isHaveHover={true}
+          isClick={showModelSelector}
+        />
+
+        <ChatAction
+          onClick={() =>
+            useOmeStore
+              .getState()
+              .setOnlineSearch(!useOmeStore.getState().onlineSearch)
+          }
+          text={t("Chat.InputActions.OnlineSearch")}
+          icon={
+            omeStore.isFromApp ? <AppSearchOnlineIcon /> : <SearchOnlineIcon />
+          }
+          isHaveHover={true}
+          isClick={useOmeStore.getState().onlineSearch}
+          isWebClick={true}
         />
 
         {showModelSelector && (
@@ -871,7 +987,7 @@ export function ChatActions(props: {
         )}
 
         {showPlugins(currentProviderName, currentModel) &&
-          !config.isFromApp && (
+          !omeStore.isFromApp && (
             <ChatAction
               onClick={() => {
                 if (pluginStore.getAll().length == 0) {
@@ -1393,7 +1509,7 @@ export function _Chat_NEW() {
     });
   };
 
-  const appstore = useAppConfig();
+  const omeStore = useOmeStore();
   const accessStore = useAccessStore();
   const [speechStatus, setSpeechStatus] = useState(false);
   const [speechLoading, setSpeechLoading] = useState(false);
@@ -1456,13 +1572,13 @@ export function _Chat_NEW() {
     const copiedHello = Object.assign({}, data);
 
     if (!accessStore.isAuthorized()) {
-      if (!isEmpty(appstore.omeToken)) {
+      if (!isEmpty(omeStore.token)) {
       } else {
         // copiedHello.content = Locale.Error.Unauthorized;
         copiedHello.content = t("Error.Unauthorized");
       }
     }
-    if (!config.isFromApp) context.push(copiedHello);
+    if (!omeStore.isFromApp) context.push(copiedHello);
   }
 
   // preview messages
@@ -1674,6 +1790,9 @@ export function _Chat_NEW() {
   );
 
   async function uploadImage() {
+    if (attachImages.length >= 3) {
+      return showToast(t("Chat.UploadImageTips"));
+    }
     const images: string[] = [];
     images.push(...attachImages);
 
@@ -1688,9 +1807,26 @@ export function _Chat_NEW() {
           setUploading(true);
           const files = event.target.files;
           const imagesData: string[] = [];
+          const validImageTypes = [
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/heic",
+            "image/heif",
+          ];
+
           for (let i = 0; i < files.length; i++) {
             const file = event.target.files[i];
-            console.log("file", file);
+
+            if (!validImageTypes.includes(file.type)) {
+              if (i === files.length - 1) {
+                setUploading(false);
+                rej(new Error("No valid images were selected."));
+              } else {
+                continue;
+              }
+            }
+
             uploadImageRemote(file)
               .then((dataUrl) => {
                 imagesData.push(dataUrl);
@@ -1801,6 +1937,12 @@ export function _Chat_NEW() {
     };
   }, [messages, chatStore, navigate, session]);
 
+  useEffect(() => {
+    if (omeStore.isFromApp) {
+      config.update((config) => (config.theme = Theme.Light));
+    }
+  }, [omeStore.isFromApp]);
+
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
   if (!session) {
@@ -1810,10 +1952,10 @@ export function _Chat_NEW() {
   return (
     <>
       <div
-        className={config.isFromApp ? styles["chat-is-app"] : styles.chat}
+        className={omeStore.isFromApp ? styles["chat-is-app"] : styles.chat}
         key={session.id}
       >
-        {config.isFromApp ? (
+        {omeStore.isFromApp ? (
           <div
             style={{
               textAlign: "center",
@@ -1992,7 +2134,7 @@ export function _Chat_NEW() {
                         <div className={styles["chat-message-container"]}>
                           <div className={styles["chat-message-header"]}>
                             <div className={styles["chat-message-avatar"]}>
-                              {!config.isFromApp && (
+                              {!omeStore.isFromApp && (
                                 <div className={styles["chat-message-edit"]}>
                                   <IconButton
                                     icon={<EditIcon />}
@@ -2067,7 +2209,7 @@ export function _Chat_NEW() {
                               </div>
                             )}
 
-                            {showActions && !config.isFromApp && (
+                            {showActions && !omeStore.isFromApp && (
                               <div className={styles["chat-message-actions"]}>
                                 <div className={styles["chat-input-actions"]}>
                                   {message.streaming ? (
@@ -2168,7 +2310,13 @@ export function _Chat_NEW() {
                               ))}
                             </div>
                           )}
-                          <div className={styles["chat-message-item"]}>
+                          <div
+                            className={
+                              omeStore.isFromApp
+                                ? styles["chat-message-item-is-app"]
+                                : styles["chat-message-item"]
+                            }
+                          >
                             <Markdown
                               key={message.streaming ? "loading" : "done"}
                               content={getMessageTextContent(message)}
@@ -2229,19 +2377,21 @@ export function _Chat_NEW() {
                             </div>
                           )}
 
-                          <div className={styles["chat-message-action-date"]}>
-                            {isContext
-                              ? // ? Locale.Chat.IsContext
-                                t("Chat.IsContext")
-                              : message.date.toLocaleString()}
-                          </div>
+                          {!omeStore.isFromApp && (
+                            <div className={styles["chat-message-action-date"]}>
+                              {isContext
+                                ? // ? Locale.Chat.IsContext
+                                  t("Chat.IsContext")
+                                : message.date.toLocaleString()}
+                            </div>
+                          )}
                         </div>
                       </div>
                       {shouldShowClearContextDivider && <ClearContextDivider />}
                     </Fragment>
                   );
                 })}
-              {messages.length === 0 && config.isFromApp && (
+              {messages.length === 0 && omeStore.isFromApp && (
                 <div
                   style={{
                     position: "absolute",
@@ -2280,7 +2430,13 @@ export function _Chat_NEW() {
                 </div>
               )}
             </div>
-            <div className={styles["chat-input-panel"]}>
+            <div
+              className={
+                omeStore.isFromApp
+                  ? styles["chat-input-panel-is-app"]
+                  : styles["chat-input-panel"]
+              }
+            >
               <PromptHints
                 prompts={promptHints}
                 onPromptSelect={onPromptSelect}
@@ -2311,14 +2467,24 @@ export function _Chat_NEW() {
                 setShowChatSidePanel={setShowChatSidePanel}
               />
               <div
-                className={styles["chat-input-panel-inner-is-app"]}
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: "32px",
-                  backgroundColor: "#FFFFFF",
-                  display: "flex",
-                  flexDirection: "row",
-                }}
+                className={
+                  omeStore.isFromApp
+                    ? styles["chat-input-panel-inner-is-app"]
+                    : styles["chat-input-panel-inner"]
+                }
+                style={
+                  omeStore.isFromApp
+                    ? {
+                        padding: "12px 16px",
+                        borderRadius: "32px",
+                        display: "flex",
+                        flexDirection: "row",
+                      }
+                    : {
+                        padding: "10px 10px",
+                        position: "relative",
+                      }
+                }
               >
                 <div
                   style={{
@@ -2328,11 +2494,19 @@ export function _Chat_NEW() {
                   <Input.TextArea
                     id="chat-input"
                     ref={textareaRef}
-                    className={styles["chat-input-is-app"]}
+                    className={
+                      omeStore.isFromApp
+                        ? styles["chat-input-is-app"]
+                        : styles["chat-input"]
+                    }
                     // placeholder={Locale.Chat.Input(submitKey, config.isFromApp)}
-                    placeholder={t("Chat.Input", {
-                      submitKey,
-                    })}
+                    placeholder={
+                      omeStore.isFromApp
+                        ? t("Chat.AppInput")
+                        : t("Chat.Input", {
+                            submitKey,
+                          })
+                    }
                     onInput={(e) => onInput(e.currentTarget.value)}
                     value={userInput}
                     onKeyDown={onInputKeyDown}
@@ -2341,13 +2515,15 @@ export function _Chat_NEW() {
                     onPaste={handlePaste}
                     autoFocus={autoFocus}
                     autoSize={{
-                      minRows: 1,
+                      minRows: omeStore.isFromApp ? 1 : 2,
                       maxRows: 6,
                     }}
                     style={{
                       fontSize: config.fontSize,
                       fontFamily: config.fontFamily,
-                      backgroundColor: "white",
+                      backgroundColor: omeStore.isFromApp
+                        ? "#fafaff"
+                        : undefined,
                       marginRight: 2,
                       border: "none",
                       marginBottom: attachImages.length != 0 ? "8px" : 0,
@@ -2381,15 +2557,65 @@ export function _Chat_NEW() {
 
                 <div
                   style={{
-                    maxHeight: 30,
-                    backgroundColor: "white",
+                    maxHeight: omeStore.isFromApp ? 30 : undefined,
+                    marginLeft: 4,
                     display: "flex",
                     justifyContent: "center",
-                    alignItems: "center",
+                    alignItems: omeStore.isFromApp ? "center" : "end",
+                    position: !omeStore.isFromApp ? "absolute" : undefined,
+                    right: !omeStore.isFromApp ? "20px" : undefined,
+                    bottom: !omeStore.isFromApp ? "10px" : undefined,
                   }}
-                  onClick={() => doSubmit(userInput)}
                 >
-                  <SendIcon />
+                  {omeStore.isFromApp ? (
+                    isEmpty(userInput) && attachImages.length === 0 ? (
+                      <NextImage
+                        src={GraySendIcon.src}
+                        alt=""
+                        width={32}
+                        height={32}
+                        onClick={() => doSubmit(userInput)}
+                      />
+                    ) : (
+                      <NextImage
+                        src={SendIcon.src}
+                        alt=""
+                        width={32}
+                        height={32}
+                        onClick={() => doSubmit(userInput)}
+                      />
+                    )
+                  ) : (
+                    <button
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 10,
+                        border: "none",
+                        outline: "none",
+                        cursor: "pointer",
+                        color: "var(--black)",
+                        backgroundColor: "var(--primary)",
+                        padding: "10px",
+                      }}
+                      onClick={() => doSubmit(userInput)}
+                    >
+                      <SendWhiteIcon />
+                      <div
+                        style={{
+                          fontSize: 12,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          marginLeft: 5,
+                          color: "white",
+                        }}
+                      >
+                        {t("Chat.Send")}
+                      </div>
+                    </button>
+                  )}
                 </div>
               </div>
               {/* <label

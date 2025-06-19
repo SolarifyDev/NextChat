@@ -77,10 +77,12 @@ const de: PartialLocaleType = {
       Clear: "Chat löschen",
       Settings: "Gesprächseinstellungen",
       UploadImage: "Bild hochladen",
+      OnlineSearch: "Online-Suche",
     },
     Rename: "Gespräch umbenennen",
     Typing: "Tippt…",
     Input: "{{submitKey}} senden，/ für Autovervollständigung, : für Befehle",
+    AppInput: "Lass uns plaudern~",
     Send: "Senden",
     Config: {
       Reset: "Erinnerung löschen",
@@ -92,6 +94,7 @@ const de: PartialLocaleType = {
       Content:
         "Ich kann dir bei der Suche helfen und Fragen beantworten. Frag mich einfach alles!",
     },
+    UploadImageTips: "Es dürfen maximal drei Bilder hochgeladen werden!",
   },
   Export: {
     Title: "Chatverlauf teilen",

@@ -33,6 +33,8 @@ import { isMcpEnabled } from "../mcp/actions";
 import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
+import { useOmeStore } from "../store/ome";
+import { MessageEnum } from "../enum";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -232,7 +234,7 @@ export function SideBarTail(props: {
 }
 
 export function SideBar(props: { className?: string }) {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   const DISCOVERY = [
     // { name: Locale.Plugin.Name, path: Path.Plugins },
@@ -248,6 +250,7 @@ export function SideBar(props: { className?: string }) {
   const navigate = useNavigate();
   const config = useAppConfig();
   const chatStore = useNewChatStore();
+  const omeStore = useOmeStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
   const { getSession } = useNewChatStore();
@@ -255,6 +258,22 @@ export function SideBar(props: { className?: string }) {
   const { run: addConversation } = useDebounceFn(
     () => {
       chatStore.newSession(undefined, () => navigate(Path.Chat));
+    },
+    { wait: 300 },
+  );
+
+  const { run: quitMetis } = useDebounceFn(
+    () => {
+      if (window.ReactNativeWebView) {
+        try {
+          const message = {
+            data: {},
+            msg: "quit",
+            type: MessageEnum.Quit,
+          };
+          window.ReactNativeWebView.postMessage(JSON.stringify(message));
+        } catch {}
+      }
     },
     { wait: 300 },
   );
@@ -270,19 +289,19 @@ export function SideBar(props: { className?: string }) {
   }, []);
 
   useEffect(() => {
-    if (config._hasHydrated && chatStore.isDown) {
+    if (chatStore.isDown) {
       getSession();
     }
-  }, [config._hasHydrated, chatStore.isDown]);
+  }, [chatStore.isDown]);
 
   return (
     <SideBarContainer
-      onDragStart={!config.isFromApp ? onDragStart : () => {}}
+      onDragStart={!omeStore.isFromApp ? onDragStart : () => {}}
       shouldNarrow={shouldNarrow}
-      isFromApp={config.isFromApp}
+      isFromApp={omeStore.isFromApp!}
       {...props}
     >
-      {!config.isFromApp ? (
+      {!omeStore.isFromApp ? (
         <SideBarHeader
           title="NextChat"
           subTitle="Build your own AI assistant."
@@ -360,9 +379,7 @@ export function SideBar(props: { className?: string }) {
               top: "50%",
               transform: "translateY(-50%)",
             }}
-            onClick={() => {
-              console.log("click");
-            }}
+            onClick={() => quitMetis()}
           >
             <ArrowLeftIcon />
           </div>
@@ -377,14 +394,15 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
-        <ChatList narrow={shouldNarrow} isFromApp={config.isFromApp} />
+        <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp!} />
       </SideBarBody>
-      {config.isFromApp ? (
+      {omeStore.isFromApp ? (
         <div
           style={{
             width: "100%",
             display: "flex",
             justifyContent: "center",
+            paddingBottom: "8px",
           }}
         >
           <div

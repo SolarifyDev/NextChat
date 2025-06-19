@@ -76,10 +76,12 @@ const ko: PartialLocaleType = {
       Clear: "채팅 지우기",
       Settings: "채팅 설정",
       UploadImage: "이미지 업로드",
+      OnlineSearch: "온라인 검색",
     },
     Rename: "채팅 이름 변경",
     Typing: "입력 중…",
     Input: "{{submitKey}} 전송，/ 자동 완성，: 명령어 입력",
+    AppInput: "채팅을 시작해 보세요～",
     Send: "전송",
     Config: {
       Reset: "기억 지우기",
@@ -90,6 +92,7 @@ const ko: PartialLocaleType = {
       Title: "안녕하세요~ 저는 METIS입니다",
       Content: "검색과 질문에 답해드릴 수 있어요. 무엇이든 물어보세요!",
     },
+    UploadImageTips: "최대 세 장의 이미지만 업로드할 수 있습니다!",
   },
   Export: {
     Title: "채팅 기록 공유",

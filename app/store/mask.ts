@@ -1,11 +1,12 @@
 import { BUILTIN_MASKS } from "../masks";
-import { getLang, Lang } from "../locales";
+import { Lang } from "../locales";
 import { ChatMessage } from "./chat";
 import { ModelConfig, useAppConfig } from "./config";
 import { StoreKey } from "../constant";
 import { nanoid } from "nanoid";
 import { createPersistStore } from "../utils/store";
 import { getDefaultTopic } from "./new-chat";
+import { useOmeStore } from "./ome";
 
 export type Mask = {
   id: string;
@@ -42,7 +43,7 @@ export const createEmptyMask = () =>
     context: [],
     syncGlobalConfig: true, // use global config as default
     modelConfig: { ...useAppConfig.getState().modelConfig },
-    lang: getLang(),
+    lang: useOmeStore.getState().language,
     builtin: false,
     createdAt: Date.now(),
     plugin: [],

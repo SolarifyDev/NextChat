@@ -1,5 +1,3 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { RequestMessage } from "../typing";
 import { ModelType } from "./config";
 import {
@@ -24,7 +22,6 @@ import {
   SUMMARIZE_MODEL,
   ServiceProvider,
 } from "../constant";
-import { getLang } from "../locales";
 import { nanoid } from "nanoid";
 import { prettyObject } from "../utils/format";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
@@ -41,6 +38,9 @@ import { ConvertSession, JSONParse } from "../utils/convert";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
 import { isEmpty } from "lodash-es";
 import { t } from "i18next";
+import { useOmeStore } from "./ome";
+import { createPersistStore } from "../utils/store";
+import { indexedDBStorage } from "../utils/indexedDB-storage";
 
 export type ChatMessageTool = {
   id: string;
@@ -150,7 +150,7 @@ function fillTemplateWith(input: string, modelConfig: ModelConfig) {
     cutoff,
     model: modelConfig.model,
     time: new Date().toString(),
-    lang: getLang(),
+    lang: useOmeStore.getState().language,
     input: input,
   };
 
@@ -265,14 +265,25 @@ function getSummarizeModel(
   return [currentModel, providerName];
 }
 
-export const useNewChatStore = create<ChatStoreType>()(
-  persist(
-    (set, get) => ({
-      currentSessionIndex: -1,
-      sessions: [],
-      lastInput: "",
-      isDown: false,
-      isReady: false,
+const detaultSessions: ChatSession[] = [];
+
+export const useNewChatStore = createPersistStore(
+  {
+    currentSessionIndex: -1,
+    sessions: detaultSessions,
+    lastInput: "",
+    isDown: false,
+    isLoading: false,
+  },
+  (set, _get) => {
+    function get() {
+      return {
+        ..._get(),
+        ...methods,
+      };
+    }
+
+    const methods = {
       setIsDown: (isDown: boolean) => {
         set({ isDown });
       },
@@ -289,11 +300,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
           const data = await GetHistory(
             getHeaders(
-              useAppConfig.getState().from,
-              useAppConfig.getState().isFromApp,
-              useAppConfig.getState().omeUserId,
-              useAppConfig.getState().omeUserName,
-              useAppConfig.getState().omeToken,
+              useOmeStore.getState().from,
+              useOmeStore.getState().isFromApp!,
+              useOmeStore.getState().userId,
+              useOmeStore.getState().userName,
+              useOmeStore.getState().token,
             ),
           );
           const newData: ChatSession[] = data.map((item) => ({
@@ -326,7 +337,7 @@ export const useNewChatStore = create<ChatStoreType>()(
       clearCurrent: () => {
         set({
           currentSessionIndex: -1,
-          sessions: [],
+          sessions: detaultSessions,
           isDown: false,
           isLoading: false,
         });
@@ -650,11 +661,11 @@ export const useNewChatStore = create<ChatStoreType>()(
             const config = useAppConfig.getState();
             await PostAddOrUpdateSession(
               getHeaders(
-                useAppConfig.getState().from,
-                useAppConfig.getState().isFromApp,
-                useAppConfig.getState().omeUserId,
-                useAppConfig.getState().omeUserName,
-                useAppConfig.getState().omeToken,
+                useOmeStore.getState().from,
+                useOmeStore.getState().isFromApp!,
+                useOmeStore.getState().userId,
+                useOmeStore.getState().userName,
+                useOmeStore.getState().token,
               ),
               ConvertSession("update", sessions[index]),
             )
@@ -699,7 +710,7 @@ export const useNewChatStore = create<ChatStoreType>()(
         if (
           (config.enableAutoGenerateTitle &&
             // session.topic === DEFAULT_TOPIC &&
-            session.topic === getDefaultTopic() &&
+            // session.topic === getDefaultTopic() &&
             countMessages(messages) >= SUMMARIZE_MIN_LEN) ||
           refreshTitle
         ) {
@@ -740,6 +751,7 @@ export const useNewChatStore = create<ChatStoreType>()(
                 );
               }
             },
+            isSummary: true,
           });
         }
         const summarizeIndex = Math.max(
@@ -865,11 +877,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
             await PostAddOrUpdateSession(
               getHeaders(
-                useAppConfig.getState().from,
-                useAppConfig.getState().isFromApp,
-                useAppConfig.getState().omeUserId,
-                useAppConfig.getState().omeUserName,
-                useAppConfig.getState().omeToken,
+                useOmeStore.getState().from,
+                useOmeStore.getState().isFromApp!,
+                useOmeStore.getState().userId,
+                useOmeStore.getState().userName,
+                useOmeStore.getState().token,
               ),
               data,
             )
@@ -910,11 +922,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         await PostAddOrUpdateSession(
           getHeaders(
-            useAppConfig.getState().from,
-            useAppConfig.getState().isFromApp,
-            useAppConfig.getState().omeUserId,
-            useAppConfig.getState().omeUserName,
-            useAppConfig.getState().omeToken,
+            useOmeStore.getState().from,
+            useOmeStore.getState().isFromApp!,
+            useOmeStore.getState().userId,
+            useOmeStore.getState().userName,
+            useOmeStore.getState().token,
           ),
           data,
         )
@@ -960,11 +972,11 @@ export const useNewChatStore = create<ChatStoreType>()(
 
         await PostAddOrUpdateSession(
           getHeaders(
-            useAppConfig.getState().from,
-            useAppConfig.getState().isFromApp,
-            useAppConfig.getState().omeUserId,
-            useAppConfig.getState().omeUserName,
-            useAppConfig.getState().omeToken,
+            useOmeStore.getState().from,
+            useOmeStore.getState().isFromApp!,
+            useOmeStore.getState().userId,
+            useOmeStore.getState().userName,
+            useOmeStore.getState().token,
           ),
           data,
         )
@@ -987,17 +999,20 @@ export const useNewChatStore = create<ChatStoreType>()(
             showToast("创建新聊天失败");
           });
       },
-      clearAllData() {
+      async clearAllData() {
+        await indexedDBStorage.clear();
         localStorage.clear();
         location.reload();
       },
-    }),
-    {
-      name: "CHAT_STORE",
-      // storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        state?.clearCurrent();
-      },
+    };
+
+    return methods;
+  },
+
+  {
+    name: "CHAT_STORE",
+    onRehydrateStorage: (state) => {
+      state?.clearCurrent();
     },
-  ),
+  },
 );

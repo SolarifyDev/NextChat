@@ -76,10 +76,12 @@ const tr: PartialLocaleType = {
       Clear: "Sohbeti temizle",
       Settings: "Sohbet ayarları",
       UploadImage: "Resim yükle",
+      OnlineSearch: "Çevrimiçi arama",
     },
     Rename: "Sohbeti yeniden adlandır",
     Typing: "Yazıyor…",
     Input: "{{submitKey}} gönder, / tamamlama için, : komutlar için",
+    AppInput: "Hadi sohbet edelim~",
     Send: "Gönder",
     Config: {
       Reset: "Hafızayı temizle",
@@ -91,6 +93,7 @@ const tr: PartialLocaleType = {
       Content:
         "Arama yapabilir ve sorularınızı yanıtlayabilirim. Bana istediğinizi sorabilirsiniz!",
     },
+    UploadImageTips: "En fazla üç resim yüklenebilir!",
   },
   Export: {
     Title: "Sohbet kayıtlarını paylaş",

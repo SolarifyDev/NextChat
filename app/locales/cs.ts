@@ -76,10 +76,12 @@ const cs: PartialLocaleType = {
       Clear: "Vymazat konverzaci",
       Settings: "Nastavení konverzace",
       UploadImage: "Nahrát obrázek",
+      OnlineSearch: "Online vyhledávání",
     },
     Rename: "Přejmenovat konverzaci",
     Typing: "Píše se…",
     Input: "{submitKey} odeslat，/ pro doplnění, : pro příkaz",
+    AppInput: "Začněme si povídat~",
     Send: "Odeslat",
     Config: {
       Reset: "Vymazat paměť",
@@ -91,6 +93,7 @@ const cs: PartialLocaleType = {
       Content:
         "Mohu vám pomoci s hledáním a odpověďmi na otázky. Ptejte se na cokoliv!",
     },
+    UploadImageTips: "Je povoleno nahrát maximálně tři obrázky!",
   },
   Export: {
     Title: "Sdílet konverzace",
