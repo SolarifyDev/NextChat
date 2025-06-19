@@ -585,6 +585,52 @@ const vi: PartialLocaleType = {
     Topic: "Chủ đề",
     Time: "Thời gian",
   },
+  Kid: {
+    NoKidText: "Bạn chưa có AI Kid~",
+    InstructionText: "Nhấp vào「+」bên dưới để triệu hồi AI Kid của riêng bạn~",
+    Create: "Tạo",
+  },
+  SelectVoice: {
+    Title: "Chọn Giọng Nói",
+    Recommended: "Đề xuất",
+    Female: "Giọng Nữ",
+    Male: "Giọng Nam",
+    Dialect: "Phương ngữ",
+    MatureMale: "Giọng Nam Trưởng Thành",
+    GentleFemale: "Giọng Nữ Dịu Dàng",
+    YoungMale: "Nam | Trẻ",
+    YoungFemale: "Nữ | Trẻ",
+    Confirm: "Hoàn thành",
+    Selected: "Đã chọn",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Tạo",
+    Edit: "Chỉnh sửa",
+    Name: "Tên",
+    VoicePreference: "Tùy chọn giọng nói",
+    InputName: "Nhập tên",
+    CreateCustomVoice: "Tạo giọng nói tùy chỉnh",
+    AbilitySettings: "Cài đặt khả năng",
+    Polish: "Hoàn thiện",
+    Introduction: "Giới thiệu",
+    IntroduceYourAiKid: "Giới thiệu AI Kid của bạn",
+    OpeningLine: "Câu mở đầu",
+    OpeningLineDescription:
+      "Sẽ được sử dụng làm tin nhắn đầu tiên khi bắt đầu trò chuyện",
+    CreateMyAiKid: "Tạo AI Kid của tôi",
+    Save: "Lưu",
+    NotImageTypeError: "Bạn đã chọn không phải là loại hình ảnh！",
+    NoNameTips: "Vui lòng nhập tên",
+  },
+  Realtime: {
+    StartSpeaking: "Bạn có thể bắt đầu nói",
+    Listening: "Đang lắng nghe...",
+    Interrupt: "Bạn có thể ngắt lời tôi bất cứ lúc nào",
+    ConnectionFailed: "Kết nối thất bại, vui lòng thử lại!",
+    Connecting: "Đang kết nối...",
+    PermissionPrompt:
+      "Không thể truy cập microphone, vui lòng bật quyền microphone thủ công",
+  },
 };
 
 export default vi;

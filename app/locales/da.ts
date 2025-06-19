@@ -825,6 +825,52 @@ const da: PartialLocaleType = {
     GenerateParams: "Genereringsvalg",
     Detail: "Detaljer",
   },
+  Kid: {
+    NoKidText: "Du har ikke en AI Kid endnu~",
+    InstructionText: "Klik på「+」nedenfor for at tilkalde din egen AI Kid~",
+    Create: "Opret",
+  },
+  SelectVoice: {
+    Title: "Vælg Stemme",
+    Recommended: "Anbefalet",
+    Female: "Kvindelig Stemme",
+    Male: "Mandlig Stemme",
+    Dialect: "Dialekt",
+    MatureMale: "Moden Mandlig Stemme",
+    GentleFemale: "Blid Kvindelig Stemme",
+    YoungMale: "Mand | Ung",
+    YoungFemale: "Kvinde | Ung",
+    Confirm: "Færdig",
+    Selected: "Valgt",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Opret",
+    Edit: "Rediger",
+    Name: "Navn",
+    VoicePreference: "Stemmeindstilling",
+    InputName: "Indtast navn",
+    CreateCustomVoice: "Opret tilpasset stemme",
+    AbilitySettings: "Evneindstillinger",
+    Polish: "Forbedring",
+    Introduction: "Introduktion",
+    IntroduceYourAiKid: "Introducer din AI Kid",
+    OpeningLine: "Åbningslinje",
+    OpeningLineDescription:
+      "Vil blive brugt som den første besked ved start af chat",
+    CreateMyAiKid: "Opret Min AI Kid",
+    Save: "Gem",
+    NotImageTypeError: "Du har ikke valgt en billedtype！",
+    NoNameTips: "Indtast venligst navn",
+  },
+  Realtime: {
+    StartSpeaking: "Du kan begynde at tale",
+    Listening: "Lytter...",
+    Interrupt: "Du kan afbryde mig når som helst",
+    ConnectionFailed: "Forbindelse mislykkedes, prøv venligst igen!",
+    Connecting: "Forbinder...",
+    PermissionPrompt:
+      "Mikrofonadgang mislykkedes, aktiver venligst mikrofonadgang manuelt",
+  },
 };
 
 export default da;

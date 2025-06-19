@@ -1,5 +1,10 @@
 import { api } from "./api";
 
+export enum AiKidVoiceType {
+  Male,
+  Female,
+}
+
 export interface ISession {
   sessionId: number;
   id: string;
@@ -12,6 +17,20 @@ export interface ISession {
   mask: string;
   isDeleted: boolean;
   clearContextIndex: number | null;
+}
+
+export interface IAIKid {
+  id: number;
+  agentId: number;
+  assistantId: number;
+  uuid: string;
+  name: string;
+  avatarUrl: string | File;
+  greeting: string;
+  voice: AiKidVoiceType;
+  userId: number;
+  createdBy: number;
+  createdDate: string;
 }
 
 export function getHeaders(
@@ -62,9 +81,7 @@ export const GetHistory = async (headers: {
 };
 
 export const PostAddOrUpdateSession = async (
-  headers: {
-    [key: string]: string;
-  },
+  headers: { [key: string]: string },
   data: Partial<ISession>,
 ): Promise<ISession> => {
   return (
@@ -72,4 +89,25 @@ export const PostAddOrUpdateSession = async (
       headers,
     })
   ).data;
+};
+
+export const GetKids = async (headers: {
+  [key: string]: string;
+}): Promise<IAIKid[]> => {
+  return (
+    await api.get("/api/Ome/ai/kids", {
+      headers,
+    })
+  ).data;
+};
+
+// export const
+
+export const PostUpdateKid = async (
+  headers: { [key: string]: string },
+  data: FormData,
+) => {
+  return await api.post("/api/Ome/ai/kid/update", data, {
+    headers,
+  });
 };

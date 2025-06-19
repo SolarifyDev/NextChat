@@ -29,6 +29,10 @@ const nextConfig = {
   output: mode,
   images: {
     unoptimized: mode === "export",
+    domains: [
+      "smartiesprd.oss-cn-hongkong.aliyuncs.com",
+      "smartiestest.oss-cn-hongkong.aliyuncs.com",
+    ],
   },
   experimental: {
     forceSwcTransforms: true,

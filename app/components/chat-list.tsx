@@ -46,11 +46,21 @@ export function ChatItem(props: {
       className={clsx(styles["chat-item"], {
         [styles["chat-item-selected"]]:
           props.selected &&
-          (currentPath === Path.Chat || currentPath === Path.Home) &&
+          (currentPath === Path.Chat ||
+            currentPath === Path.Home ||
+            currentPath === Path.AIKid ||
+            currentPath === Path.SelectVoice ||
+            currentPath === Path.AddOrUpdateKid ||
+            currentPath === Path.Realtime) &&
           !props.isFromApp,
         [styles["chat-item-selected-is-app"]]:
           props.selected &&
-          (currentPath === Path.Chat || currentPath === Path.Home) &&
+          (currentPath === Path.Chat ||
+            currentPath === Path.Home ||
+            currentPath === Path.AIKid ||
+            currentPath === Path.SelectVoice ||
+            currentPath === Path.AddOrUpdateKid ||
+            currentPath === Path.Realtime) &&
           props.isFromApp,
       })}
       onClick={props.onClick}
