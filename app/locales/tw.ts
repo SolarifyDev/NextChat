@@ -562,12 +562,16 @@ const tw = {
     OpeningLineDescription: "將作為開啟聊天的第一句話",
     CreateMyAiKid: "創建 My AI Kid",
     Save: "保存",
+    NotImageTypeError: "你選擇的不是圖片類型！",
+    NoNameTips: "請輸入名稱",
   },
   Realtime: {
     StartSpeaking: "你可以開始說話",
     Listening: "正在聽…",
     Interrupt: "可以隨時說話打斷我",
     ConnectionFailed: "連接失敗，請重試！",
+    Connecting: "正在連接...",
+    PermissionPrompt: "當前麥克風獲取失敗，請手動開啟麥克風權限",
   },
 };
 

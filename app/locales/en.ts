@@ -891,12 +891,17 @@ const en: LocaleType = {
       "Will be used as the first message when starting a chat",
     CreateMyAiKid: "Create My AI Kid",
     Save: "Save",
+    NotImageTypeError: "The file you selected is not an image!",
+    NoNameTips: "Please enter name",
   },
   Realtime: {
     StartSpeaking: "You can start speaking now",
     Listening: "Listening...",
     Interrupt: "You can interrupt me anytime",
     ConnectionFailed: "Connection failed, please try again!",
+    Connecting: "Connecting...",
+    PermissionPrompt:
+      "Microphone access failed, please enable microphone permission manually",
   },
 };
 

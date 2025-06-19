@@ -619,12 +619,17 @@ const vi: PartialLocaleType = {
       "Sẽ được sử dụng làm tin nhắn đầu tiên khi bắt đầu trò chuyện",
     CreateMyAiKid: "Tạo AI Kid của tôi",
     Save: "Lưu",
+    NotImageTypeError: "Bạn đã chọn không phải là loại hình ảnh！",
+    NoNameTips: "Vui lòng nhập tên",
   },
   Realtime: {
     StartSpeaking: "Bạn có thể bắt đầu nói",
     Listening: "Đang lắng nghe...",
     Interrupt: "Bạn có thể ngắt lời tôi bất cứ lúc nào",
     ConnectionFailed: "Kết nối thất bại, vui lòng thử lại!",
+    Connecting: "Đang kết nối...",
+    PermissionPrompt:
+      "Không thể truy cập microphone, vui lòng bật quyền microphone thủ công",
   },
 };
 

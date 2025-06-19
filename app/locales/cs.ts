@@ -617,12 +617,17 @@ const cs: PartialLocaleType = {
     OpeningLineDescription: "Bude použit jako první zpráva při zahájení chatu",
     CreateMyAiKid: "Vytvořit mého AI Kid",
     Save: "Uložit",
+    NotImageTypeError: "Vybraný soubor není typu obrázek!",
+    NoNameTips: "Prosím, zadejte jméno",
   },
   Realtime: {
     StartSpeaking: "Můžete začít mluvit",
     Listening: "Poslouchám...",
     Interrupt: "Můžete mě kdykoli přerušit",
     ConnectionFailed: "Připojení selhalo, zkuste to prosím znovu!",
+    Connecting: "Připojování...",
+    PermissionPrompt:
+      "Přístup k mikrofonu selhal, povolte prosím přístup k mikrofonu ručně",
   },
 };
 

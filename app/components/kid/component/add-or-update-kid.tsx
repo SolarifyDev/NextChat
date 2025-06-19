@@ -79,7 +79,7 @@ export function AddOrUpdateKid() {
                       kidStore.handleChangeKid(newNotSaveKid, false);
                     }
                   } else {
-                    showToast("你选择的不是图片类型!");
+                    showToast(t("AddOrUpdateAiKid.NotImageTypeError"));
                   }
                 }
               };

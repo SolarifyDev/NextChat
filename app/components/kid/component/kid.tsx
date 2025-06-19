@@ -83,7 +83,7 @@ export function Kid() {
                 <div
                   className={clsx("no-dark", styles["actionButton"])}
                   onClick={() => {
-                    navigate(Path.Realtime);
+                    handleChangeKid(item, true, () => navigate(Path.Realtime));
                   }}
                 >
                   <CallIcon />

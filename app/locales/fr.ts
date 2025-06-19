@@ -636,12 +636,17 @@ const fr: PartialLocaleType = {
       "Sera utilisé comme premier message lors du démarrage d'une conversation",
     CreateMyAiKid: "Créer Mon AI Kid",
     Save: "Enregistrer",
+    NotImageTypeError: "Vous n'avez pas sélectionné un type d'image !",
+    NoNameTips: "Veuillez entrer un nom",
   },
   Realtime: {
     StartSpeaking: "Vous pouvez commencer à parler",
     Listening: "J'écoute...",
     Interrupt: "Vous pouvez m'interrompre à tout moment",
     ConnectionFailed: "Échec de la connexion, veuillez réessayer !",
+    Connecting: "Connexion en cours...",
+    PermissionPrompt:
+      "Échec de l'accès au microphone, veuillez activer manuellement les permissions du microphone",
   },
 };
 

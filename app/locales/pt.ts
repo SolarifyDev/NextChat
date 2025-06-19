@@ -553,12 +553,17 @@ const pt: PartialLocaleType = {
       "Será usada como a primeira mensagem ao iniciar um chat",
     CreateMyAiKid: "Criar Meu AI Kid",
     Save: "Salvar",
+    NotImageTypeError: "Você não selecionou um tipo de imagem!",
+    NoNameTips: "Por favor, insira o nome",
   },
   Realtime: {
     StartSpeaking: "Você pode começar a falar",
     Listening: "Ouvindo...",
     Interrupt: "Você pode me interromper a qualquer momento",
     ConnectionFailed: "Falha na conexão, por favor tente novamente!",
+    Connecting: "Conectando...",
+    PermissionPrompt:
+      "Falha no acesso ao microfone, por favor ative a permissão do microfone manualmente",
   },
 };
 

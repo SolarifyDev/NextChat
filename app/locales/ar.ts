@@ -604,12 +604,17 @@ const ar: PartialLocaleType = {
     OpeningLineDescription: "ستستخدم كأول رسالة عند بدء المحادثة",
     CreateMyAiKid: "إنشاء طفلي الذكي",
     Save: "حفظ",
+    NotImageTypeError: "لم تختار نوع الصورة！",
+    NoNameTips: "يرجى إدخال الاسم",
   },
   Realtime: {
     StartSpeaking: "يمكنك البدء في التحدث",
     Listening: "أستمع...",
     Interrupt: "يمكنك مقاطعتي في أي وقت",
     ConnectionFailed: "فشل الاتصال، يرجى المحاولة مرة أخرى!",
+    Connecting: " đang kết nối...",
+    PermissionPrompt:
+      "فشل الحصول على الميكروفون الحالي، يرجى تمكين أذونات الميكروفون يدويًا",
   },
 };
 

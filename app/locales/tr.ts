@@ -622,12 +622,17 @@ const tr: PartialLocaleType = {
       "Sohbet başlatıldığında ilk mesaj olarak kullanılacak",
     CreateMyAiKid: "AI Kid'imi Oluştur",
     Save: "Kaydet",
+    NotImageTypeError: "Seçtiğiniz şey bir resim türü değil！",
+    NoNameTips: "Lütfen isim girin",
   },
   Realtime: {
     StartSpeaking: "Konuşmaya başlayabilirsiniz",
     Listening: "Dinliyorum...",
     Interrupt: "Beni istediğiniz zaman kesebilirsiniz",
     ConnectionFailed: "Bağlantı başarısız, lütfen tekrar deneyin!",
+    Connecting: "Bağlanıyor...",
+    PermissionPrompt:
+      "Mikrofon erişimi başarısız oldu, lütfen mikrofon iznini manuel olarak etkinleştirin",
   },
 };
 

@@ -620,12 +620,17 @@ const id: PartialLocaleType = {
       "Akan digunakan sebagai pesan pertama saat memulai obrolan",
     CreateMyAiKid: "Buat AI Kid Saya",
     Save: "Simpan",
+    NotImageTypeError: "Anda tidak memilih jenis gambar!",
+    NoNameTips: "Silakan masukkan nama",
   },
   Realtime: {
     StartSpeaking: "Anda dapat mulai berbicara",
     Listening: "Mendengarkan...",
     Interrupt: "Anda dapat menyela saya kapan saja",
     ConnectionFailed: "Koneksi gagal, silakan coba lagi!",
+    Connecting: "Menghubungkan...",
+    PermissionPrompt:
+      "Akses mikrofon gagal, silakan aktifkan izin mikrofon secara manual",
   },
 };
 

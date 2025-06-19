@@ -880,12 +880,16 @@ const cn = {
     OpeningLineDescription: "将作为开启聊天的第一句话",
     CreateMyAiKid: "创建 My AI Kid",
     Save: "保存",
+    NotImageTypeError: "你选择的不是图片类型！",
+    NoNameTips: "请输入名称",
   },
   Realtime: {
     StartSpeaking: "你可以開始說話",
     Listening: "正在聽…",
     Interrupt: "可以隨時說話打斷我",
     ConnectionFailed: "连接失败，请重试！",
+    Connecting: "正在连接...",
+    PermissionPrompt: "当前麦克风获取失败，请手动打开麦克风权限",
   },
 };
 

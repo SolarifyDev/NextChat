@@ -624,12 +624,17 @@ const no: PartialLocaleType = {
       "Vil bli brukt som den første meldingen ved start av chat",
     CreateMyAiKid: "Opprett Min AI Kid",
     Save: "Lagre",
+    NotImageTypeError: "Du har ikke valgt et bilde!",
+    NoNameTips: "Vennligst skriv inn navn",
   },
   Realtime: {
     StartSpeaking: "Du kan begynne å snakke",
     Listening: "Lytter...",
     Interrupt: "Du kan avbryte meg når som helst",
     ConnectionFailed: "Tilkobling mislyktes, vennligst prøv igjen!",
+    Connecting: "Kobler til...",
+    PermissionPrompt:
+      "Mikrofontilgang mislyktes, vennligst aktiver mikrofontillatelse manuelt",
   },
 };
 

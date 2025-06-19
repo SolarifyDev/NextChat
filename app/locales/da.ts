@@ -859,12 +859,17 @@ const da: PartialLocaleType = {
       "Vil blive brugt som den første besked ved start af chat",
     CreateMyAiKid: "Opret Min AI Kid",
     Save: "Gem",
+    NotImageTypeError: "Du har ikke valgt en billedtype！",
+    NoNameTips: "Indtast venligst navn",
   },
   Realtime: {
     StartSpeaking: "Du kan begynde at tale",
     Listening: "Lytter...",
     Interrupt: "Du kan afbryde mig når som helst",
     ConnectionFailed: "Forbindelse mislykkedes, prøv venligst igen!",
+    Connecting: "Forbinder...",
+    PermissionPrompt:
+      "Mikrofonadgang mislykkedes, aktiver venligst mikrofonadgang manuelt",
   },
 };
 

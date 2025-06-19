@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 
 import RealTimeBgPng from "../../../icons/realtime-bg.png";
 import AvatarBgIcon from "../../../icons/avatar-bg.svg";
-import NoAvatar from "../../../icons/gril.png";
 import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
 import RealtimeStopIcon from "../../../icons/realtime-stop.svg";
 import RealtimeCloseIcon from "../../../icons/realtime-close.svg";
+import { useLiveAPIContext } from "@/app/contexts/LiveAPIContext";
+import { useEffect, useMemo, useState } from "react";
+import { CallStatus } from "@/app/hook/use-live-api";
+import { AudioRecorder } from "@/app/lib/audio-recorder";
+import { Path } from "@/app/constant";
 import P1 from "../../../icons/1.svg";
 import P2 from "../../../icons/2.svg";
 import P3 from "../../../icons/3.svg";
@@ -16,13 +20,113 @@ import Wave from "../../../icons/wave.png";
 import styles from "./realtime.module.scss";
 import clsx from "clsx";
 import { useOmeStore } from "@/app/store/ome";
+import { useTranslation } from "react-i18next";
+import { showToast } from "../../ui-lib";
+import { isNil } from "lodash";
 
 export function Realtime() {
+  const { t } = useTranslation();
+
   const kidStore = useKidStore();
 
   const omeStore = useOmeStore();
 
   const navigate = useNavigate();
+
+  const {
+    client,
+    connected,
+    connect,
+    disconnect,
+    connectStatus,
+    stopAudioStreamer,
+  } = useLiveAPIContext();
+
+  const [audioRecorder] = useState(() => new AudioRecorder());
+
+  const [muted, setMuted] = useState<boolean>(false);
+
+  const [audioIsReady, setAudioIsReady] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (kidStore.currentKid?.assistantId) {
+      connect(kidStore.currentKid.assistantId);
+    }
+
+    return () => {
+      disconnect();
+
+      audioRecorder.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (connected === CallStatus.ConnectError) {
+      showToast(t("Realtime.ConnectionFailed"));
+
+      navigate(Path.AIKid);
+    }
+  }, [connected]);
+
+  useEffect(() => {
+    const onData = (base64: string) => {
+      client.sendRealtimeInput([
+        {
+          mimeType: "audio/pcm",
+          data: base64,
+        },
+      ]);
+    };
+
+    if (!audioRecorder) return;
+
+    let active = true;
+
+    const startRecording = async () => {
+      if (connectStatus && !muted) {
+        audioRecorder.on("data", onData);
+
+        const success = await audioRecorder.start();
+
+        if (active) {
+          setAudioIsReady(success);
+        }
+      } else {
+        audioRecorder.stop();
+      }
+    };
+
+    startRecording();
+
+    return () => {
+      active = false;
+      audioRecorder.off("data", onData);
+    };
+  }, [connectStatus, muted, audioRecorder]);
+
+  const sessionStatusText = useMemo(() => {
+    if (!isNil(audioIsReady) && !audioIsReady) {
+      return <div>{t("Realtime.PermissionPrompt")}</div>;
+    }
+
+    switch (connected) {
+      case CallStatus.Disconnected:
+        return <div>{t("Realtime.Connecting")}</div>;
+
+      case CallStatus.Connected:
+        return <div>{t("Realtime.StartSpeaking")}</div>;
+
+      case CallStatus.AISpeaking:
+        return (
+          <div onClick={() => stopAudioStreamer()}>
+            {t("Realtime.Interrupt")}
+          </div>
+        );
+
+      case CallStatus.UserSpeaking:
+        return <div>{t("Realtime.Listening")}</div>;
+    }
+  }, [connected, audioIsReady]);
 
   return (
     <div
@@ -39,6 +143,7 @@ export function Realtime() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        gap: "15px",
       }}
       className={"no-dark"}
     >
@@ -80,29 +185,36 @@ export function Realtime() {
             pointerEvents: "none",
           }}
         />
-        <img
-          src={NoAvatar.src}
-          alt="Logo"
-          style={{
-            width: 250,
-            height: 250,
-            objectFit: "cover",
-            userSelect: "none",
-            pointerEvents: "none",
-            borderRadius: "50%",
-            zIndex: 1,
-            position: "relative",
-          }}
-        />
+        {typeof kidStore.currentKid?.avatarUrl === "string" && (
+          <img
+            src={kidStore.currentKid?.avatarUrl as string}
+            alt="Logo"
+            style={{
+              width: 250,
+              height: 250,
+              objectFit: "cover",
+              userSelect: "none",
+              pointerEvents: "none",
+              borderRadius: "50%",
+              zIndex: 1,
+              position: "relative",
+            }}
+          />
+        )}
       </div>
 
-      <div className={styles.container}>
+      <div
+        className={styles.container}
+        style={{
+          zIndex: 2,
+        }}
+      >
         <div className={`${styles.dots} ${true ? styles.active : ""}`}>
           <div className={`${styles.dot} ${styles.dot1}`}></div>
           <div className={`${styles.dot} ${styles.dot2}`}></div>
           <div className={`${styles.dot} ${styles.dot3}`}></div>
         </div>
-        <div className={styles.text}>你可以開始說話</div>
+        <div className={styles.text}>{sessionStatusText}</div>
       </div>
 
       <div
@@ -121,8 +233,11 @@ export function Realtime() {
             margin: "0 24px",
             cursor: "pointer",
           }}
+          onClick={() => {
+            setMuted(!muted);
+          }}
         >
-          {true ? <RealtimeSpeakIcon /> : <RealtimeStopIcon />}
+          {!muted ? <RealtimeSpeakIcon /> : <RealtimeStopIcon />}
         </div>
         <div
           className={"no-dark"}
@@ -130,15 +245,21 @@ export function Realtime() {
             margin: "0 24px",
             cursor: "pointer",
           }}
+          onClick={async () => {
+            await disconnect();
+            navigate(Path.AIKid);
+          }}
         >
           <RealtimeCloseIcon />
         </div>
       </div>
 
       {omeStore.isFromApp ? (
-        <div className={styles.waveContainer}>
-          <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
-          <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
+        <div className={styles.waveWrapper}>
+          <div className={styles.waveContainer}>
+            <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
+            <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
+          </div>
         </div>
       ) : (
         <div className={clsx("no-dark", styles.svgContainer)}>
