@@ -44,7 +44,7 @@ export function Realtime() {
 
   const [audioRecorder] = useState(() => new AudioRecorder());
 
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState<boolean>(false);
 
   const [audioIsReady, setAudioIsReady] = useState<boolean | null>(null);
 
@@ -255,11 +255,6 @@ export function Realtime() {
       </div>
 
       {omeStore.isFromApp ? (
-        // <div className={styles.waveContainer}>
-        //   <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
-        //   <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
-        // </div>
-
         <div className={styles.waveWrapper}>
           <div className={styles.waveContainer}>
             <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
@@ -324,4 +319,3 @@ export function Realtime() {
     </div>
   );
 }
-
