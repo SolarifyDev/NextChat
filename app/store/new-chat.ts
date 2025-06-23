@@ -710,7 +710,7 @@ export const useNewChatStore = createPersistStore(
         if (
           (config.enableAutoGenerateTitle &&
             // session.topic === DEFAULT_TOPIC &&
-            // session.topic === getDefaultTopic() &&
+            session.topic === getDefaultTopic() &&
             countMessages(messages) >= SUMMARIZE_MIN_LEN) ||
           refreshTitle
         ) {
