@@ -8,7 +8,7 @@ import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
 import RealtimeStopIcon from "../../../icons/realtime-stop.svg";
 import RealtimeCloseIcon from "../../../icons/realtime-close.svg";
 import { useLiveAPIContext } from "@/app/contexts/LiveAPIContext";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CallStatus } from "@/app/hook/use-live-api";
 import { AudioRecorder } from "@/app/lib/audio-recorder";
 import { Path } from "@/app/constant";
@@ -23,6 +23,8 @@ import { useOmeStore } from "@/app/store/ome";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../../ui-lib";
 import { isNil } from "lodash";
+import { useWebcam } from "@/app/hook/use-webcam";
+import { UseMediaStreamResult } from "@/app/hook/use-media-stream-mux";
 
 export function Realtime() {
   const { t } = useTranslation();
@@ -33,6 +35,25 @@ export function Realtime() {
 
   const navigate = useNavigate();
 
+  const [audioRecorder] = useState(() => new AudioRecorder());
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const renderCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+
+  const [muted, setMuted] = useState<boolean>(false);
+
+  const [audioIsReady, setAudioIsReady] = useState<boolean | null>(null);
+
+  const videoStreams = [useWebcam()];
+
+  const [webcam] = videoStreams;
+
+  const [activeVideoStream, setActiveVideoStream] =
+    useState<MediaStream | null>(null);
+
   const {
     client,
     connected,
@@ -42,15 +63,9 @@ export function Realtime() {
     stopAudioStreamer,
   } = useLiveAPIContext();
 
-  const [audioRecorder] = useState(() => new AudioRecorder());
-
-  const [muted, setMuted] = useState<boolean>(false);
-
-  const [audioIsReady, setAudioIsReady] = useState<boolean | null>(null);
-
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      connect(kidStore.currentKid.assistantId);
+      // connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
@@ -104,6 +119,43 @@ export function Realtime() {
     };
   }, [connectStatus, muted, audioRecorder]);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.srcObject = activeVideoStream;
+    }
+
+    let timeoutId = -1;
+
+    function sendVideoFrame() {
+      const video = videoRef.current;
+      const canvas = renderCanvasRef.current;
+
+      if (!video || !canvas) {
+        return;
+      }
+
+      const ctx = canvas.getContext("2d")!;
+      canvas.width = video.videoWidth * 0.25;
+      canvas.height = video.videoHeight * 0.25;
+      if (canvas.width + canvas.height > 0) {
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        const base64 = canvas.toDataURL("image/jpeg", 1.0);
+        const data = base64.slice(base64.indexOf(",") + 1, Infinity);
+        client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
+      }
+      if (connected) {
+        timeoutId = window.setTimeout(sendVideoFrame, 1000 / 0.5);
+      }
+    }
+
+    if (connected && activeVideoStream !== null) {
+      requestAnimationFrame(sendVideoFrame);
+    }
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [connected, activeVideoStream, client, videoRef]);
+
   const sessionStatusText = useMemo(() => {
     if (!isNil(audioIsReady) && !audioIsReady) {
       return <div>{t("Realtime.PermissionPrompt")}</div>;
@@ -128,6 +180,22 @@ export function Realtime() {
     }
   }, [connected, audioIsReady]);
 
+  const changeStreams = (next?: UseMediaStreamResult) => async () => {
+    console.log("changeStreams");
+    console.log("changeStreams", next);
+    if (next) {
+      const mediaStream = await next.start();
+      console.log("changeStreams", mediaStream);
+      setActiveVideoStream(mediaStream);
+      setVideoStream(mediaStream);
+    } else {
+      setActiveVideoStream(null);
+      setVideoStream(null);
+    }
+
+    videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
+  };
+
   return (
     <div
       style={{
@@ -147,6 +215,8 @@ export function Realtime() {
       }}
       className={"no-dark"}
     >
+      <canvas style={{ display: "none" }} ref={renderCanvasRef} />
+
       {kidStore.currentKid?.name && (
         <div
           style={{
@@ -203,6 +273,17 @@ export function Realtime() {
         )}
       </div>
 
+      {/* <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        style={{
+          display: !videoRef.current || !videoStream ? "none" : "flex",
+          flexGrow: 1,
+          width: "100%",
+          height: "20%",
+        }}
+      /> */}
       <div
         className={styles.container}
         style={{
@@ -251,6 +332,20 @@ export function Realtime() {
           }}
         >
           <RealtimeCloseIcon />
+        </div>
+
+        <div
+          className={"no-dark"}
+          style={{
+            margin: "0 24px",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            console.log("changeStreams", webcam);
+            changeStreams(webcam);
+          }}
+        >
+          切屏幕
         </div>
       </div>
 
