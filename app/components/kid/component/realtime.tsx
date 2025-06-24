@@ -93,6 +93,7 @@ export function Realtime() {
       disconnect();
 
       audioRecorder.stop();
+      webcam.stop();
     };
   }, []);
 
