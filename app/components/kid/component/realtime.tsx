@@ -26,6 +26,27 @@ import { isNil } from "lodash";
 import { useWebcam } from "@/app/hook/use-webcam";
 import { UseMediaStreamResult } from "@/app/hook/use-media-stream-mux";
 
+type MediaStreamButtonProps = {
+  isStreaming: boolean;
+  start: () => Promise<any>;
+  stop: () => any;
+};
+
+const MediaStreamButton = ({
+  isStreaming,
+  start,
+  stop,
+}: MediaStreamButtonProps) =>
+  isStreaming ? (
+    <button className="action-button" onClick={stop}>
+      <span className="material-symbols-outlined">stop</span>
+    </button>
+  ) : (
+    <button className="action-button" onClick={start}>
+      <span className="material-symbols-outlined">start</span>
+    </button>
+  );
+
 export function Realtime() {
   const { t } = useTranslation();
 
@@ -65,7 +86,7 @@ export function Realtime() {
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      // connect(kidStore.currentKid.assistantId);
+      connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
@@ -141,6 +162,7 @@ export function Realtime() {
         ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
         const base64 = canvas.toDataURL("image/jpeg", 1.0);
         const data = base64.slice(base64.indexOf(",") + 1, Infinity);
+        console.log("sending video frame", data);
         client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
       }
       if (connected) {
@@ -181,11 +203,8 @@ export function Realtime() {
   }, [connected, audioIsReady]);
 
   const changeStreams = (next?: UseMediaStreamResult) => async () => {
-    console.log("changeStreams");
-    console.log("changeStreams", next);
     if (next) {
       const mediaStream = await next.start();
-      console.log("changeStreams", mediaStream);
       setActiveVideoStream(mediaStream);
       setVideoStream(mediaStream);
     } else {
@@ -273,7 +292,7 @@ export function Realtime() {
         )}
       </div>
 
-      {/* <video
+      <video
         ref={videoRef}
         autoPlay
         playsInline
@@ -283,7 +302,7 @@ export function Realtime() {
           width: "100%",
           height: "20%",
         }}
-      /> */}
+      />
       <div
         className={styles.container}
         style={{
@@ -334,19 +353,11 @@ export function Realtime() {
           <RealtimeCloseIcon />
         </div>
 
-        <div
-          className={"no-dark"}
-          style={{
-            margin: "0 24px",
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            console.log("changeStreams", webcam);
-            changeStreams(webcam);
-          }}
-        >
-          切屏幕
-        </div>
+        <MediaStreamButton
+          isStreaming={webcam.isStreaming}
+          start={changeStreams(webcam)}
+          stop={changeStreams()}
+        />
       </div>
 
       {omeStore.isFromApp ? (
