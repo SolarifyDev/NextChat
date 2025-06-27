@@ -160,7 +160,7 @@ export function useLiveAPI({
   }, [client]);
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && connected) {
+    if (document.visibilityState === "visible" && connectStatus) {
       showToast("亮屏----初始化播放器");
 
       audioStreamerRef.current?.resume();

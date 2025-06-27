@@ -99,8 +99,10 @@ export function Realtime() {
     startRecording();
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && active) {
+      if (document.visibilityState === "visible" && connectStatus) {
         // 重新启动麦克风采集
+        showToast("亮屏----初始化麦克风");
+
         audioRecorder.stop();
         startRecording();
       }
