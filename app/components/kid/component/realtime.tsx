@@ -39,6 +39,7 @@ export function Realtime() {
     connect,
     disconnect,
     connectStatus,
+    connectStatusRef,
     stopAudioStreamer,
   } = useLiveAPIContext();
 
@@ -98,12 +99,12 @@ export function Realtime() {
 
     startRecording();
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && connectStatus) {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === "visible" && connectStatusRef.current) {
         // 重新启动麦克风采集
         showToast("亮屏----初始化麦克风");
 
-        audioRecorder.stop();
+        await audioRecorder.stop();
         startRecording();
       }
     };

@@ -16,6 +16,7 @@
 
 import {
   Dispatch,
+  MutableRefObject,
   SetStateAction,
   useCallback,
   useEffect,
@@ -55,6 +56,7 @@ export type UseLiveAPIResults = {
   connectLoading: boolean;
   setConnectLoading: Dispatch<SetStateAction<boolean>>;
   connectStatus: boolean;
+  connectStatusRef: MutableRefObject<boolean>;
   stopAudioStreamer: () => void;
 };
 
@@ -72,13 +74,14 @@ export function useLiveAPI({
 
   const [connectStatus, setConnectStatus] = useState<boolean>(false);
 
+  const connectStatusRef = useRef(connectStatus);
+
   const [config, setConfig] = useState<LiveConfig>({
     model: "models/gemini-2.0-flash-exp",
   });
   const [volume, setVolume] = useState(0);
 
-  // register audio for streaming server -> speakers
-  useEffect(() => {
+  const initAudioStream = () => {
     if (!audioStreamerRef.current) {
       audioContext({ id: "audio-out", latencyHint: "playback" }).then(
         (audioCtx: AudioContext) => {
@@ -93,12 +96,17 @@ export function useLiveAPI({
         },
       );
     }
+  };
+
+  // register audio for streaming server -> speakers
+  useEffect(() => {
+    initAudioStream();
   }, [audioStreamerRef]);
 
   const stopAudioStreamer = () => {
     setConnected(CallStatus.UserSpeaking);
 
-    audioStreamerRef.current?.stop(false);
+    audioStreamerRef.current?.stop();
   };
 
   useEffect(() => {
@@ -154,18 +162,24 @@ export function useLiveAPI({
 
     setConnected(CallStatus.Disconnected);
 
-    audioStreamerRef.current?.stop(true);
+    audioStreamerRef.current?.stop();
 
     client.disconnect();
   }, [client]);
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && connectStatus) {
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible" && connectStatusRef.current) {
       showToast("亮屏----初始化播放器");
 
-      audioStreamerRef.current?.resume();
+      await audioStreamerRef.current?.stop();
+
+      initAudioStream();
     }
   });
+
+  useEffect(() => {
+    connectStatusRef.current = connectStatus;
+  }, [connectStatus]);
 
   return {
     client,
@@ -179,6 +193,7 @@ export function useLiveAPI({
     connectLoading,
     setConnectLoading,
     connectStatus,
+    connectStatusRef,
     stopAudioStreamer,
   };
 }
