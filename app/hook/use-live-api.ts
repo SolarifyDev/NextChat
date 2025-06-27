@@ -168,7 +168,14 @@ export function useLiveAPI({
   }, [client]);
 
   document.addEventListener("visibilitychange", async () => {
-    if (document.visibilityState === "visible" && connectStatusRef.current) {
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (
+      document.visibilityState === "visible" &&
+      connectStatusRef.current &&
+      isIOS
+    ) {
       showToast("亮屏----初始化播放器");
 
       await audioStreamerRef.current?.stop();

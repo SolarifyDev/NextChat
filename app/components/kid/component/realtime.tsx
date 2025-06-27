@@ -100,7 +100,14 @@ export function Realtime() {
     startRecording();
 
     const handleVisibilityChange = async () => {
-      if (document.visibilityState === "visible" && connectStatusRef.current) {
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (
+        document.visibilityState === "visible" &&
+        connectStatusRef.current &&
+        isIOS
+      ) {
         // 重新启动麦克风采集
         showToast("亮屏----初始化麦克风");
 
