@@ -160,9 +160,9 @@ export function useLiveAPI({
   }, [client]);
 
   document.addEventListener("visibilitychange", () => {
-    showToast("亮屏----初始化播放器");
+    if (document.visibilityState === "visible" && connected) {
+      showToast("亮屏----初始化播放器");
 
-    if (document.visibilityState === "visible") {
       audioStreamerRef.current?.resume();
     }
   });

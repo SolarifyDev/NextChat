@@ -98,6 +98,16 @@ export function Realtime() {
 
     startRecording();
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && active) {
+        // 重新启动麦克风采集
+        audioRecorder.stop();
+        startRecording();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       active = false;
       audioRecorder.off("data", onData);
