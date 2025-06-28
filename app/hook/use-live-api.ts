@@ -32,7 +32,6 @@ import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
 import { audioContext } from "../utils/audio-utils";
 import VolMeterWorket from "../lib/worklets/vol-meter";
-import { showToast } from "../components/ui-lib";
 
 export enum CallStatus {
   Disconnected, // 未连接
@@ -176,8 +175,6 @@ export function useLiveAPI({
       connectStatusRef.current &&
       isIOS
     ) {
-      showToast("亮屏----初始化播放器");
-
       await audioStreamerRef.current?.stop();
 
       initAudioStream();

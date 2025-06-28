@@ -109,8 +109,6 @@ export function Realtime() {
         isIOS
       ) {
         // 重新启动麦克风采集
-        showToast("亮屏----初始化麦克风");
-
         await audioRecorder.stop();
         startRecording();
       }
