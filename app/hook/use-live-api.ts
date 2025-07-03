@@ -177,6 +177,8 @@ export function useLiveAPI({
     ) {
       await audioStreamerRef.current?.stop();
 
+      audioStreamerRef.current = null;
+
       initAudioStream();
     }
   });
