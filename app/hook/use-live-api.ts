@@ -172,11 +172,7 @@ export function useLiveAPI({
     const isIOS =
       /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    if (
-      document.visibilityState === "visible" &&
-      connectStatusRef.current &&
-      isIOS
-    ) {
+    if (document.visibilityState === "visible" && isIOS) {
       await audioStreamerRef.current?.stop();
 
       audioStreamerRef.current = null;
