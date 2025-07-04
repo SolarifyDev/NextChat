@@ -23,7 +23,6 @@ import { useOmeStore } from "@/app/store/ome";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../../ui-lib";
 import { isNil } from "lodash";
-import { Button } from "antd";
 
 export function Realtime() {
   const { t } = useTranslation();
@@ -42,7 +41,6 @@ export function Realtime() {
     connectStatus,
     connectStatusRef,
     stopAudioStreamer,
-    resume,
   } = useLiveAPIContext();
 
   const [audioRecorder] = useState(() => new AudioRecorder());
@@ -179,8 +177,6 @@ export function Realtime() {
           }}
         >
           {kidStore.currentKid?.name}
-
-          <Button onClick={() => resume()}>恢复</Button>
         </div>
       )}
 
