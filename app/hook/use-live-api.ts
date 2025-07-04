@@ -161,7 +161,9 @@ export function useLiveAPI({
 
     setConnected(CallStatus.Disconnected);
 
-    audioStreamerRef.current?.stop();
+    await audioStreamerRef.current?.stop();
+
+    audioStreamerRef.current = null;
 
     client.disconnect();
   }, [client]);
