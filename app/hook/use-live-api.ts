@@ -32,6 +32,7 @@ import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
 import { audioContext } from "../utils/audio-utils";
 import VolMeterWorket from "../lib/worklets/vol-meter";
+import { showToast } from "../components/ui-lib";
 
 export enum CallStatus {
   Disconnected, // 未连接
@@ -57,6 +58,8 @@ export type UseLiveAPIResults = {
   connectStatus: boolean;
   connectStatusRef: MutableRefObject<boolean>;
   stopAudioStreamer: () => void;
+  showResumeButton: boolean;
+  resume: () => void;
 };
 
 export function useLiveAPI({
@@ -75,15 +78,29 @@ export function useLiveAPI({
 
   const connectStatusRef = useRef(connectStatus);
 
+  const [showResumeButton, setShowResumeButton] = useState(false);
+
   const [config, setConfig] = useState<LiveConfig>({
     model: "models/gemini-2.0-flash-exp",
   });
   const [volume, setVolume] = useState(0);
 
+  const resume = async () => {
+    await audioStreamerRef?.current?.resume();
+  };
+
   const initAudioStream = () => {
+    showToast("初始化");
+
     if (!audioStreamerRef.current) {
       audioContext({ id: "audio-out", latencyHint: "playback" }).then(
         (audioCtx: AudioContext) => {
+          showToast(audioCtx.state ?? "");
+
+          if (audioCtx.state === "suspended") {
+            setShowResumeButton(true);
+          }
+
           audioStreamerRef.current = new AudioStreamer(audioCtx);
           audioStreamerRef.current
             .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
@@ -172,7 +189,11 @@ export function useLiveAPI({
     const isIOS =
       /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    if (document.visibilityState === "visible" && isIOS) {
+    if (
+      document.visibilityState === "visible" &&
+      connectStatusRef.current &&
+      isIOS
+    ) {
       await audioStreamerRef.current?.stop();
 
       audioStreamerRef.current = null;
@@ -199,5 +220,7 @@ export function useLiveAPI({
     connectStatus,
     connectStatusRef,
     stopAudioStreamer,
+    showResumeButton,
+    resume,
   };
 }
