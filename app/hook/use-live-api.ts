@@ -30,7 +30,7 @@ import {
 } from "../lib/multimodal-live-client";
 import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
-import { audioContext } from "../utils/audio-utils";
+import { audioContext, closeAudioContext } from "../utils/audio-utils";
 import VolMeterWorket from "../lib/worklets/vol-meter";
 import { showToast } from "../components/ui-lib";
 
@@ -101,16 +101,6 @@ export function useLiveAPI({
     }
   };
 
-  // register audio for streaming server -> speakers
-  // useEffect(() => {
-  //   initAudioStream();
-
-  //   return () => {
-  //     // 卸载时清理（但不要设为null！）
-  //     audioStreamerRef.current?.stop();
-  //   };
-  // }, []);
-
   const stopAudioStreamer = () => {
     setConnected(CallStatus.UserSpeaking);
 
@@ -177,6 +167,8 @@ export function useLiveAPI({
 
     audioStreamerRef.current = null;
 
+    await closeAudioContext("audio-out");
+
     client.disconnect();
   }, [client]);
 
@@ -189,10 +181,16 @@ export function useLiveAPI({
       const isIOS =
         /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-      if (document.visibilityState === "visible" && isIOS) {
+      if (
+        document.visibilityState === "visible" &&
+        connectStatusRef.current &&
+        isIOS
+      ) {
         await audioStreamerRef.current?.stop();
 
         audioStreamerRef.current = null;
+
+        initAudioStream();
       }
     });
   }, []);
