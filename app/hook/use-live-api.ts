@@ -81,29 +81,35 @@ export function useLiveAPI({
   });
   const [volume, setVolume] = useState(0);
 
-  const initAudioStream = () => {
+  const initAudioStream = async () => {
     showToast("初始化");
 
     if (!audioStreamerRef.current) {
-      audioContext({ id: "audio-out", latencyHint: "playback" }).then(
-        (audioCtx: AudioContext) => {
-          audioStreamerRef.current = new AudioStreamer(audioCtx);
-          audioStreamerRef.current
-            .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
-              setVolume(ev.data.volume);
-            })
-            .then(() => {
-              // Successfully added worklet
-            });
+      const audioCtx = await audioContext({
+        id: "audio-out",
+        latencyHint: "playback",
+      });
+
+      audioStreamerRef.current = new AudioStreamer(audioCtx);
+      await audioStreamerRef.current.addWorklet<any>(
+        "vumeter-out",
+        VolMeterWorket,
+        (ev: any) => {
+          setVolume(ev.data.volume);
         },
       );
     }
   };
 
   // register audio for streaming server -> speakers
-  useEffect(() => {
-    initAudioStream();
-  }, [audioStreamerRef]);
+  // useEffect(() => {
+  //   initAudioStream();
+
+  //   return () => {
+  //     // 卸载时清理（但不要设为null！）
+  //     audioStreamerRef.current?.stop();
+  //   };
+  // }, []);
 
   const stopAudioStreamer = () => {
     setConnected(CallStatus.UserSpeaking);
@@ -153,6 +159,9 @@ export function useLiveAPI({
       if (!config) {
         throw new Error("config has not been set");
       }
+
+      await initAudioStream();
+
       client.disconnect();
       await client.connect(config, assistantId);
     },
@@ -171,22 +180,22 @@ export function useLiveAPI({
     client.disconnect();
   }, [client]);
 
-  document.addEventListener("visibilitychange", async () => {
-    const isIOS =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-    if (document.visibilityState === "visible" && isIOS) {
-      await audioStreamerRef.current?.stop();
-
-      audioStreamerRef.current = null;
-
-      initAudioStream();
-    }
-  });
-
   useEffect(() => {
     connectStatusRef.current = connectStatus;
   }, [connectStatus]);
+
+  useEffect(() => {
+    document.addEventListener("visibilitychange", async () => {
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (document.visibilityState === "visible" && isIOS) {
+        await audioStreamerRef.current?.stop();
+
+        audioStreamerRef.current = null;
+      }
+    });
+  }, []);
 
   return {
     client,
