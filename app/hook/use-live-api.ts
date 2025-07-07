@@ -101,6 +101,10 @@ export function useLiveAPI({
     }
   };
 
+  useEffect(() => {
+    initAudioStream();
+  }, []);
+
   const stopAudioStreamer = () => {
     setConnected(CallStatus.UserSpeaking);
 
@@ -149,8 +153,6 @@ export function useLiveAPI({
       if (!config) {
         throw new Error("config has not been set");
       }
-
-      await initAudioStream();
 
       client.disconnect();
       await client.connect(config, assistantId);
