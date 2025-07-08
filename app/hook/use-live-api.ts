@@ -90,6 +90,8 @@ export function useLiveAPI({
         latencyHint: "playback",
       });
 
+      showToast(audioCtx.state);
+
       audioStreamerRef.current = new AudioStreamer(audioCtx);
       await audioStreamerRef.current.addWorklet<any>(
         "vumeter-out",
@@ -179,7 +181,7 @@ export function useLiveAPI({
   }, [connectStatus]);
 
   useEffect(() => {
-    document.addEventListener("visibilitychange", async () => {
+    const handleVisibilityChange = async () => {
       const isIOS =
         /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
@@ -188,13 +190,19 @@ export function useLiveAPI({
         connectStatusRef.current &&
         isIOS
       ) {
-        await audioStreamerRef.current?.stop();
-
-        audioStreamerRef.current = null;
-
-        initAudioStream();
+        try {
+          await audioStreamerRef.current?.stop();
+          audioStreamerRef.current = null;
+          initAudioStream();
+        } catch (e) {
+          console.warn("Stop failed", e);
+        }
       }
-    });
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   return {
