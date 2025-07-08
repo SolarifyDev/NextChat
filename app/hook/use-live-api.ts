@@ -85,18 +85,20 @@ export function useLiveAPI({
     showToast("初始化");
 
     if (!audioStreamerRef.current) {
-      audioContext({ id: "audio-out" }).then((audioCtx: AudioContext) => {
-        showToast(audioCtx.state);
+      audioContext({ id: "audio-out", latencyHint: "playback" }).then(
+        (audioCtx: AudioContext) => {
+          showToast(audioCtx.state);
 
-        audioStreamerRef.current = new AudioStreamer(audioCtx);
-        audioStreamerRef.current
-          .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
-            setVolume(ev.data.volume);
-          })
-          .then(() => {
-            // Successfully added worklet
-          });
-      });
+          audioStreamerRef.current = new AudioStreamer(audioCtx);
+          audioStreamerRef.current
+            .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
+              setVolume(ev.data.volume);
+            })
+            .then(() => {
+              // Successfully added worklet
+            });
+        },
+      );
     }
   };
 
@@ -152,7 +154,6 @@ export function useLiveAPI({
       if (!config) {
         throw new Error("config has not been set");
       }
-
       client.disconnect();
       await client.connect(config, assistantId);
     },
