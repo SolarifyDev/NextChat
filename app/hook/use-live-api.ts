@@ -30,7 +30,7 @@ import {
 } from "../lib/multimodal-live-client";
 import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
-import { audioContext, closeAudioContext } from "../utils/audio-utils";
+import { audioContext } from "../utils/audio-utils";
 import VolMeterWorket from "../lib/worklets/vol-meter";
 import { showToast } from "../components/ui-lib";
 
@@ -85,21 +85,18 @@ export function useLiveAPI({
     showToast("初始化");
 
     if (!audioStreamerRef.current) {
-      const audioCtx = await audioContext({
-        id: "audio-out",
-        latencyHint: "playback",
+      audioContext({ id: "audio-out" }).then((audioCtx: AudioContext) => {
+        showToast(audioCtx.state);
+
+        audioStreamerRef.current = new AudioStreamer(audioCtx);
+        audioStreamerRef.current
+          .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
+            setVolume(ev.data.volume);
+          })
+          .then(() => {
+            // Successfully added worklet
+          });
       });
-
-      showToast(audioCtx.state);
-
-      audioStreamerRef.current = new AudioStreamer(audioCtx);
-      await audioStreamerRef.current.addWorklet<any>(
-        "vumeter-out",
-        VolMeterWorket,
-        (ev: any) => {
-          setVolume(ev.data.volume);
-        },
-      );
     }
   };
 
@@ -170,8 +167,6 @@ export function useLiveAPI({
     await audioStreamerRef.current?.stop();
 
     audioStreamerRef.current = null;
-
-    await closeAudioContext("audio-out");
 
     client.disconnect();
   }, [client]);
