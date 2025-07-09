@@ -30,8 +30,6 @@ import {
 } from "../lib/multimodal-live-client";
 import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
-import { audioContext } from "../utils/audio-utils";
-import VolMeterWorket from "../lib/worklets/vol-meter";
 import { showToast } from "../components/ui-lib";
 
 export enum CallStatus {
@@ -84,27 +82,44 @@ export function useLiveAPI({
   const initAudioStream = async () => {
     showToast("初始化");
 
-    if (!audioStreamerRef.current) {
-      audioContext({ id: "audio-out", latencyHint: "playback" }).then(
-        (audioCtx: AudioContext) => {
-          showToast(audioCtx.state);
+    //   if (!audioStreamerRef.current) {
+    //     audioContext({ id: "audio-out", latencyHint: "playback" }).then(
+    //       (audioCtx: AudioContext) => {
+    //         showToast(audioCtx.state);
 
-          audioStreamerRef.current = new AudioStreamer(audioCtx);
-          audioStreamerRef.current
-            .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
-              setVolume(ev.data.volume);
-            })
-            .then(() => {
-              // Successfully added worklet
-            });
-        },
-      );
+    //         audioStreamerRef.current = new AudioStreamer(audioCtx);
+    //         audioStreamerRef.current
+    //           .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
+    //             setVolume(ev.data.volume);
+    //           })
+    //           .then(() => {
+    //             // Successfully added worklet
+    //           });
+    //       },
+    //     );
+    //   }
+    audioStreamerRef.current = null;
+
+    const newContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)({
+      sampleRate: 24000,
+    });
+
+    audioStreamerRef.current = new AudioStreamer(newContext);
+
+    try {
+      await newContext.resume();
+      console.log("AudioContext 创建并恢复成功");
+      showToast("音频上下文已创建 ✅");
+    } catch (error) {
+      console.error("AudioContext 恢复失败:", error);
+      showToast("音频上下文恢复失败 ❌");
     }
   };
 
-  useEffect(() => {
-    initAudioStream();
-  }, []);
+  // useEffect(() => {
+  //   initAudioStream();
+  // }, []);
 
   const stopAudioStreamer = () => {
     setConnected(CallStatus.UserSpeaking);
@@ -154,6 +169,7 @@ export function useLiveAPI({
       if (!config) {
         throw new Error("config has not been set");
       }
+      await initAudioStream();
       client.disconnect();
       await client.connect(config, assistantId);
     },
@@ -178,27 +194,16 @@ export function useLiveAPI({
 
   useEffect(() => {
     const handleVisibilityChange = async () => {
-      const isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-      if (
-        document.visibilityState === "visible" &&
-        connectStatusRef.current &&
-        isIOS
-      ) {
-        try {
-          await audioStreamerRef.current?.stop();
-          audioStreamerRef.current = null;
-          initAudioStream();
-        } catch (e) {
-          console.warn("Stop failed", e);
-        }
+      if (document.visibilityState === "visible") {
+        console.warn("页面恢复可见，强制重建 AudioContext");
+        await initAudioStream();
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () =>
+    return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   return {
