@@ -30,7 +30,6 @@ import {
 } from "../lib/multimodal-live-client";
 import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
-import { showToast } from "../components/ui-lib";
 
 export enum CallStatus {
   Disconnected, // 未连接
@@ -80,8 +79,6 @@ export function useLiveAPI({
   const [volume, setVolume] = useState(0);
 
   const initAudioStream = async () => {
-    showToast("初始化");
-
     //   if (!audioStreamerRef.current) {
     //     audioContext({ id: "audio-out", latencyHint: "playback" }).then(
     //       (audioCtx: AudioContext) => {
@@ -110,10 +107,8 @@ export function useLiveAPI({
     try {
       await newContext.resume();
       console.log("AudioContext 创建并恢复成功");
-      showToast("音频上下文已创建 ✅");
     } catch (error) {
       console.error("AudioContext 恢复失败:", error);
-      showToast("音频上下文恢复失败 ❌");
     }
   };
 
