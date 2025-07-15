@@ -229,6 +229,7 @@ export function Kid() {
                   style={{
                     padding: "10px 20px",
                     cursor: "pointer",
+                    justifyContent: "center",
                   }}
                   key={index}
                   onClick={() => {
@@ -250,7 +251,28 @@ export function Kid() {
                     />
                   </div>
                   <div className={styles["content"]}>
-                    <div className={styles["name"]}>{item.name}</div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <div className={styles["name-A"]}>{item.name} </div>
+                      <span
+                        style={{
+                          color: "white",
+                          backgroundColor: "oklch(75% 0.183 55.934)",
+                          padding: "2px 6px",
+                          borderRadius: "10px",
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        OFFICIAL
+                      </span>
+                    </div>
+
                     <div className={styles["message"]}>{item.description}</div>
                   </div>
                 </div>
