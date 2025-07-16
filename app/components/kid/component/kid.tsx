@@ -3,7 +3,6 @@ import AidHelpIcon from "../../../icons/kid-help.svg";
 import CreateKidIcon from "../../../icons/create-kid.svg";
 import CallIcon from "../../../icons/call.svg";
 import KidEditIcon from "../../../icons/kid-edit.svg";
-import DeepIcon from "../../../icons/deep.png";
 import { Path } from "@/app/constant";
 
 import styles from "./kid.module.scss";
@@ -14,14 +13,15 @@ import { Spin } from "antd";
 import clsx from "clsx";
 import { useOmeStore } from "@/app/store/ome";
 import { StaticImageData } from "next/image";
-import OneP from "../../../icons/1P.jpeg";
-import TwoM from "../../../icons/2M.jpeg";
-import ThreeM from "../../../icons/3M.jpeg";
-import FourM from "../../../icons/4M.jpeg";
-import FiveM from "../../../icons/5M.jpeg";
-import SixM from "../../../icons/6M.jpeg";
-import FourPC from "../../../icons/4PC.jpeg";
-import FourPB from "../../../icons/4PB.jpeg";
+import OneP from "../../../icons/1P.png";
+import TwoM from "../../../icons/2M.png";
+import ThreeM from "../../../icons/3M.png";
+import FourM from "../../../icons/4M.png";
+import FiveM from "../../../icons/5M.png";
+import SixM from "../../../icons/6M.png";
+import FourPC from "../../../icons/4PC.png";
+import FourPB from "../../../icons/4PB.png";
+import DeepReSearch from "../../../icons/deepresearch.png";
 
 interface TeamLever {
   name: string;
@@ -179,7 +179,7 @@ export function Kid() {
             >
               <div className={styles["avatar"]}>
                 <img
-                  src={DeepIcon.src as string}
+                  src={DeepReSearch.src as string}
                   alt="Logo"
                   style={{
                     width: 48,
@@ -199,86 +199,59 @@ export function Kid() {
               </div>
             </div>
           )}
-          {!isFromApp && (
-            <div
-              className={styles["listItem-A"]}
-              style={{
-                borderTop: "2px",
-                borderStyle: "solid",
-                borderColor: "#EAEAEA",
-                borderBottom: "0",
-                borderLeft: "0",
-                borderRight: "0",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+
+          {!isFromApp &&
+            data.map((item, index) => (
               <div
-                className={styles["name"]}
+                className={styles["listItem"]}
                 style={{
-                  fontSize: "24px",
-                  padding: "10px 20px",
+                  cursor: "pointer",
+                }}
+                key={index}
+                onClick={() => {
+                  window.open(item.url, "_blank");
                 }}
               >
-                層級數字員工團隊
-              </div>
-
-              {data.map((item, index) => (
-                <div
-                  className={styles["listItem"]}
-                  style={{
-                    padding: "10px 20px",
-                    cursor: "pointer",
-                    justifyContent: "center",
-                  }}
-                  key={index}
-                  onClick={() => {
-                    window.open(item.url, "_blank");
-                  }}
-                >
-                  <div className={styles["avatar"]}>
-                    <img
-                      src={item.icon.src as string}
-                      alt="Logo"
+                <div className={styles["avatar"]}>
+                  <img
+                    src={item.icon.src as string}
+                    alt="Logo"
+                    style={{
+                      width: 48,
+                      height: 48,
+                      objectFit: "cover",
+                      userSelect: "none",
+                      pointerEvents: "none",
+                      borderRadius: "50%",
+                    }}
+                  />
+                </div>
+                <div className={styles["content"]}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div className={styles["name-A"]}>{item.name} </div>
+                    <span
                       style={{
-                        width: 48,
-                        height: 48,
-                        objectFit: "cover",
-                        userSelect: "none",
-                        pointerEvents: "none",
-                        borderRadius: "50%",
-                      }}
-                    />
-                  </div>
-                  <div className={styles["content"]}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "10px",
+                        color: "white",
+                        backgroundColor: "oklch(75% 0.183 55.934)",
+                        padding: "2px 6px",
+                        borderRadius: "10px",
+                        fontSize: "12px",
+                        fontWeight: "bold",
                       }}
                     >
-                      <div className={styles["name-A"]}>{item.name} </div>
-                      <span
-                        style={{
-                          color: "white",
-                          backgroundColor: "oklch(75% 0.183 55.934)",
-                          padding: "2px 6px",
-                          borderRadius: "10px",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        OFFICIAL
-                      </span>
-                    </div>
-
-                    <div className={styles["message"]}>{item.description}</div>
+                      OFFICIAL
+                    </span>
                   </div>
+
+                  <div className={styles["message"]}>{item.description}</div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
         </div>
       ) : (
         <div className={styles["centerContent"]}>
