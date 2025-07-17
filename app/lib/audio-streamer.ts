@@ -208,7 +208,7 @@ export class AudioStreamer {
     }
   }
 
-  async stop(isEnd: boolean) {
+  async stop() {
     this.isPlaying = false;
     this.isStreamComplete = true;
     this.audioQueue = [];
