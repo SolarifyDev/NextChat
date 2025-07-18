@@ -24,7 +24,7 @@ export const ArmsProvider = (props: { children: React.ReactNode }) => {
           imgUrl: "https://arms-retcode.aliyuncs.com/r.png?",
         });
 
-        console.log("ARMS 初始化成功");
+        console.log("ARMS 初始化成功", config);
         (window as any).__bl = logger;
         setLoaded(true);
       } catch (err) {
