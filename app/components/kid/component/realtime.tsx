@@ -348,6 +348,10 @@ export function Realtime() {
         ref={videoRef}
         autoPlay
         playsInline
+        webkit-playsinline="true"
+        controls={false}
+        disablePictureInPicture={true} // 禁用画中画
+        x-webkit-airplay="deny"
         style={{
           position: "absolute",
           display: !videoRef.current || !videoStream ? "none" : "flex",
