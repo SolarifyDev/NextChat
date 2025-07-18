@@ -16,6 +16,7 @@
 
 import {
   Dispatch,
+  MutableRefObject,
   SetStateAction,
   useCallback,
   useEffect,
@@ -29,8 +30,6 @@ import {
 } from "../lib/multimodal-live-client";
 import { LiveConfig } from "../multimodal-live-types";
 import { AudioStreamer } from "../lib/audio-streamer";
-import { audioContext } from "../utils/audio-utils";
-import VolMeterWorket from "../lib/worklets/vol-meter";
 
 export enum CallStatus {
   Disconnected, // 未连接
@@ -54,6 +53,7 @@ export type UseLiveAPIResults = {
   connectLoading: boolean;
   setConnectLoading: Dispatch<SetStateAction<boolean>>;
   connectStatus: boolean;
+  connectStatusRef: MutableRefObject<boolean>;
   stopAudioStreamer: () => void;
 };
 
@@ -71,33 +71,55 @@ export function useLiveAPI({
 
   const [connectStatus, setConnectStatus] = useState<boolean>(false);
 
+  const connectStatusRef = useRef(connectStatus);
+
   const [config, setConfig] = useState<LiveConfig>({
     model: "models/gemini-2.0-flash-exp",
   });
   const [volume, setVolume] = useState(0);
 
-  // register audio for streaming server -> speakers
-  useEffect(() => {
-    if (!audioStreamerRef.current) {
-      audioContext({ id: "audio-out", latencyHint: "playback" }).then(
-        (audioCtx: AudioContext) => {
-          audioStreamerRef.current = new AudioStreamer(audioCtx);
-          audioStreamerRef.current
-            .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
-              setVolume(ev.data.volume);
-            })
-            .then(() => {
-              // Successfully added worklet
-            });
-        },
-      );
+  const initAudioStream = async () => {
+    //   if (!audioStreamerRef.current) {
+    //     audioContext({ id: "audio-out", latencyHint: "playback" }).then(
+    //       (audioCtx: AudioContext) => {
+    //         showToast(audioCtx.state);
+
+    //         audioStreamerRef.current = new AudioStreamer(audioCtx);
+    //         audioStreamerRef.current
+    //           .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
+    //             setVolume(ev.data.volume);
+    //           })
+    //           .then(() => {
+    //             // Successfully added worklet
+    //           });
+    //       },
+    //     );
+    //   }
+    audioStreamerRef.current = null;
+
+    const newContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)({
+      sampleRate: 24000,
+    });
+
+    audioStreamerRef.current = new AudioStreamer(newContext);
+
+    try {
+      await newContext.resume();
+      console.log("AudioContext 创建并恢复成功");
+    } catch (error) {
+      console.error("AudioContext 恢复失败:", error);
     }
-  }, [audioStreamerRef]);
+  };
+
+  // useEffect(() => {
+  //   initAudioStream();
+  // }, []);
 
   const stopAudioStreamer = () => {
     setConnected(CallStatus.UserSpeaking);
 
-    audioStreamerRef.current?.stop(false);
+    audioStreamerRef.current?.stop();
   };
 
   useEffect(() => {
@@ -142,6 +164,7 @@ export function useLiveAPI({
       if (!config) {
         throw new Error("config has not been set");
       }
+      await initAudioStream();
       client.disconnect();
       await client.connect(config, assistantId);
     },
@@ -153,10 +176,30 @@ export function useLiveAPI({
 
     setConnected(CallStatus.Disconnected);
 
-    audioStreamerRef.current?.stop(true);
+    await audioStreamerRef.current?.stop();
+
+    audioStreamerRef.current = null;
 
     client.disconnect();
   }, [client]);
+
+  useEffect(() => {
+    connectStatusRef.current = connectStatus;
+  }, [connectStatus]);
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === "visible") {
+        console.warn("页面恢复可见，强制重建 AudioContext");
+        await initAudioStream();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   return {
     client,
@@ -170,6 +213,7 @@ export function useLiveAPI({
     connectLoading,
     setConnectLoading,
     connectStatus,
+    connectStatusRef,
     stopAudioStreamer,
   };
 }

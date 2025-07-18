@@ -81,6 +81,7 @@ export function Realtime() {
     connect,
     disconnect,
     connectStatus,
+    connectStatusRef,
     stopAudioStreamer,
   } = useLiveAPIContext();
 
@@ -134,6 +135,23 @@ export function Realtime() {
     };
 
     startRecording();
+
+    const handleVisibilityChange = async () => {
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (
+        document.visibilityState === "visible" &&
+        connectStatusRef.current &&
+        isIOS
+      ) {
+        // 重新启动麦克风采集
+        await audioRecorder.stop();
+        startRecording();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       active = false;
