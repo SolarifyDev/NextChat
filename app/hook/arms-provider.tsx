@@ -30,6 +30,7 @@ export const ArmsProvider = (props: { children: React.ReactNode }) => {
         window.__bl.setConfig({
           debug: true,
         });
+
         setLoaded(true);
       } catch (err) {
         console.error("ARMS 初始化失败");

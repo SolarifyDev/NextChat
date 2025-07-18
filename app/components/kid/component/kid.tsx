@@ -212,11 +212,12 @@ export function Kid() {
                 }}
                 key={index}
                 onClick={() => {
-                  (window as any).__bl.custom(item.name, {
-                    id: userId,
+                  (window as any).__bl.custom({
+                    key: "biz",
+                    msg: "msg info",
                   });
                   console.log((window as any).__bl, "--");
-                  window.open(item.url, "_blank");
+                  // window.open(item.url, "_blank");
                 }}
               >
                 <div className={styles["avatar"]}>
