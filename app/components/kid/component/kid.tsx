@@ -174,10 +174,10 @@ export function Kid() {
                 cursor: "pointer",
               }}
               onClick={() => {
-                window.open("http://47.238.241.114:3000/chat", "_blank");
                 (window as any).__bl.custom("111", {
                   id: 111,
                 });
+                window.open("http://47.238.241.114:3000/chat", "_blank");
               }}
             >
               <div className={styles["avatar"]}>
@@ -212,10 +212,11 @@ export function Kid() {
                 }}
                 key={index}
                 onClick={() => {
-                  window.open(item.url, "_blank");
                   (window as any).__bl.custom(item.name, {
                     id: userId,
                   });
+                  console.log((window as any).__bl, "--");
+                  window.open(item.url, "_blank");
                 }}
               >
                 <div className={styles["avatar"]}>
