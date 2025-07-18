@@ -37,6 +37,13 @@ import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 
+const ArmsProvider = dynamic(
+  async () => (await import("../hook/arms-provider")).ArmsProvider,
+  {
+    ssr: false,
+  },
+);
+
 export function Loading(props: { noLogo?: boolean }) {
   return (
     <div className={clsx("no-dark", styles["loading-content"])}>
@@ -445,9 +452,11 @@ export function Home() {
 
   return (
     <ErrorBoundary>
-      <Router>
-        <Screen />
-      </Router>
+      <ArmsProvider>
+        <Router>
+          <Screen />
+        </Router>
+      </ArmsProvider>
     </ErrorBoundary>
   );
 }

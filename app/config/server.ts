@@ -93,6 +93,9 @@ declare global {
       DEFAULT_INPUT_TEMPLATE?: string;
 
       ENABLE_MCP?: string; // enable mcp functionality
+
+      ARMS?: string;
+      ENVIRONMENT?: string;
     }
   }
 }
@@ -266,5 +269,7 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+    arms: process.env.ARMS,
+    environment: process.env.ENVIRONMENT,
   };
 };
