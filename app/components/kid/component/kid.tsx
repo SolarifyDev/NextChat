@@ -95,7 +95,7 @@ export function Kid() {
     handleChangeCurrentKidIndex,
   } = useKidStore();
 
-  const { isFromApp } = useOmeStore();
+  const { isFromApp, userId } = useOmeStore();
 
   useEffect(() => {
     getKids();
@@ -175,6 +175,9 @@ export function Kid() {
               }}
               onClick={() => {
                 window.open("http://47.238.241.114:3000/chat", "_blank");
+                (window as any).custom("111", {
+                  id: 111,
+                });
               }}
             >
               <div className={styles["avatar"]}>
@@ -210,6 +213,9 @@ export function Kid() {
                 key={index}
                 onClick={() => {
                   window.open(item.url, "_blank");
+                  (window as any).custom(item.name, {
+                    id: userId,
+                  });
                 }}
               >
                 <div className={styles["avatar"]}>
