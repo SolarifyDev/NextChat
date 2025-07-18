@@ -17,7 +17,7 @@
 import { useState, useEffect } from "react";
 import { UseMediaStreamResult } from "./use-media-stream-mux";
 
-export function useWebcam(): UseMediaStreamResult {
+export function useWebcam(isFromApp: boolean): UseMediaStreamResult {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
 

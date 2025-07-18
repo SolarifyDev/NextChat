@@ -7,6 +7,9 @@ import AvatarBgIcon from "../../../icons/avatar-bg.svg";
 import RealtimeSpeakIcon from "../../../icons/realtime-speak.svg";
 import RealtimeStopIcon from "../../../icons/realtime-stop.svg";
 import RealtimeCloseIcon from "../../../icons/realtime-close.svg";
+import OpenCameraIcon from "../../../icons/open-camera.svg";
+import StopCameraIcon from "../../../icons/stop-camera.svg";
+import SwitchIcon from "../../../icons/switch.svg";
 import { useLiveAPIContext } from "@/app/contexts/LiveAPIContext";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CallStatus } from "@/app/hook/use-live-api";
@@ -38,13 +41,25 @@ const MediaStreamButton = ({
   stop,
 }: MediaStreamButtonProps) =>
   isStreaming ? (
-    <button className="action-button" onClick={stop}>
-      <span className="material-symbols-outlined">stop</span>
-    </button>
+    <div
+      onClick={stop}
+      style={{
+        margin: "0 24px",
+        cursor: "pointer",
+      }}
+    >
+      <StopCameraIcon />
+    </div>
   ) : (
-    <button className="action-button" onClick={start}>
-      <span className="material-symbols-outlined">start</span>
-    </button>
+    <div
+      onClick={start}
+      style={{
+        margin: "0 24px",
+        cursor: "pointer",
+      }}
+    >
+      <OpenCameraIcon />
+    </div>
   );
 
 export function Realtime() {
@@ -68,7 +83,7 @@ export function Realtime() {
 
   const [audioIsReady, setAudioIsReady] = useState<boolean | null>(null);
 
-  const videoStreams = [useWebcam()];
+  const videoStreams = [useWebcam(omeStore.isFromApp as boolean)];
 
   const [webcam] = videoStreams;
 
@@ -94,7 +109,7 @@ export function Realtime() {
       disconnect();
 
       audioRecorder.stop();
-      webcam.stop();
+      webcam?.stop();
     };
   }, []);
 
@@ -223,7 +238,7 @@ export function Realtime() {
 
   const changeStreams = (next?: UseMediaStreamResult) => async () => {
     if (next) {
-      const mediaStream = await next.start();
+      const mediaStream = await next?.start();
       setActiveVideoStream(mediaStream);
       setVideoStream(mediaStream);
     } else {
@@ -260,13 +275,31 @@ export function Realtime() {
           style={{
             position: "absolute",
             top: "13px",
-            zIndex: 2,
+            zIndex: 3,
             fontSize: "18px",
             color: "#3A3A47",
             fontWeight: 600,
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            justifyContent: "center",
           }}
         >
           {kidStore.currentKid?.name}
+          {webcam?.isStreaming && omeStore.isFromApp && (
+            <div
+              // onClick={() => webcam?.switchCamera()}
+              className="no-dark"
+              style={{
+                position: "absolute",
+                right: "16px",
+                cursor: "pointer",
+                zIndex: 2,
+              }}
+            >
+              <SwitchIcon />
+            </div>
+          )}
         </div>
       )}
 
@@ -316,16 +349,18 @@ export function Realtime() {
         autoPlay
         playsInline
         style={{
+          position: "absolute",
           display: !videoRef.current || !videoStream ? "none" : "flex",
-          flexGrow: 1,
+          objectFit: "cover",
           width: "100%",
-          height: "20%",
+          height: "100%",
+          zIndex: 2,
         }}
       />
       <div
         className={styles.container}
         style={{
-          zIndex: 2,
+          zIndex: 3,
         }}
       >
         <div className={`${styles.dots} ${true ? styles.active : ""}`}>
@@ -373,17 +408,25 @@ export function Realtime() {
         </div>
 
         <MediaStreamButton
-          isStreaming={webcam.isStreaming}
+          isStreaming={webcam?.isStreaming}
           start={changeStreams(webcam)}
           stop={changeStreams()}
         />
       </div>
 
       {omeStore.isFromApp ? (
-        <div className={styles.waveWrapper}>
+        <div className={clsx("no-dark", styles.waveWrapper)}>
           <div className={styles.waveContainer}>
-            <img src={Wave.src} alt="Wave 1" className={styles.waveImage} />
-            <img src={Wave.src} alt="Wave 2" className={styles.waveImage} />
+            <img
+              src={Wave.src}
+              alt="Wave 1"
+              className={clsx("no-dark", styles.waveImage)}
+            />
+            <img
+              src={Wave.src}
+              alt="Wave 2"
+              className={clsx("no-dark", styles.waveImage)}
+            />
           </div>
         </div>
       ) : (
