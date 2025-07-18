@@ -175,7 +175,7 @@ export function Kid() {
               }}
               onClick={() => {
                 window.open("http://47.238.241.114:3000/chat", "_blank");
-                (window as any).custom("111", {
+                (window as any).__bl.custom("111", {
                   id: 111,
                 });
               }}
@@ -213,7 +213,7 @@ export function Kid() {
                 key={index}
                 onClick={() => {
                   window.open(item.url, "_blank");
-                  (window as any).custom(item.name, {
+                  (window as any).__bl.custom(item.name, {
                     id: userId,
                   });
                 }}
