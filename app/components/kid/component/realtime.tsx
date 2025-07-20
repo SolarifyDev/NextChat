@@ -11,7 +11,7 @@ import OpenCameraIcon from "../../../icons/open-camera.svg";
 import StopCameraIcon from "../../../icons/stop-camera.svg";
 import SwitchIcon from "../../../icons/switch.svg";
 import { useLiveAPIContext } from "@/app/contexts/LiveAPIContext";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CallStatus } from "@/app/hook/use-live-api";
 import { AudioRecorder } from "@/app/lib/audio-recorder";
 import { Path } from "@/app/constant";
@@ -28,6 +28,7 @@ import { showToast } from "../../ui-lib";
 import { isNil } from "lodash";
 import { useWebcam } from "@/app/hook/use-webcam";
 import { UseMediaStreamResult } from "@/app/hook/use-media-stream-mux";
+import { useUpdateEffect } from "ahooks";
 
 type MediaStreamButtonProps = {
   isStreaming: boolean;
@@ -110,8 +111,33 @@ export function Realtime() {
 
       audioRecorder.stop();
       webcam?.stop();
+
+      changeStreams()();
     };
   }, []);
+
+  const cleanupVideoStream = useCallback((stream: MediaStream | null) => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      console.log("清理视频流");
+    }
+  }, []);
+
+  useUpdateEffect(() => {
+    const currentStream = videoStream;
+
+    return () => {
+      currentStream && cleanupVideoStream(currentStream);
+    };
+  }, [videoStream, cleanupVideoStream]);
+
+  useUpdateEffect(() => {
+    const currentStream = activeVideoStream;
+
+    return () => {
+      currentStream && cleanupVideoStream(currentStream);
+    };
+  }, [activeVideoStream, cleanupVideoStream]);
 
   useEffect(() => {
     if (connected === CallStatus.ConnectError) {
