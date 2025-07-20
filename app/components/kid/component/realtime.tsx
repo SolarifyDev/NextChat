@@ -404,6 +404,7 @@ export function Realtime() {
             cursor: "pointer",
           }}
           onClick={async () => {
+            await changeStreams()();
             await disconnect();
             navigate(Path.AIKid);
           }}
@@ -439,7 +440,6 @@ export function Realtime() {
             className={clsx("no-dark", styles.waveItem)}
             style={{
               zIndex: 1,
-              // backgroundColor: "red",
             }}
           >
             <P1 className={styles["wave-animation"]} />
@@ -452,7 +452,6 @@ export function Realtime() {
             className={clsx("no-dark", styles.waveItem)}
             style={{
               zIndex: 1,
-              // backgroundColor: "green",
             }}
           >
             <P2 className={styles["wave-animation"]} />
@@ -465,7 +464,6 @@ export function Realtime() {
             className={clsx("no-dark", styles.waveItem)}
             style={{
               zIndex: 1,
-              // backgroundColor: "skyblue",
             }}
           >
             <P3 className={styles["wave-animation"]} />
@@ -478,7 +476,6 @@ export function Realtime() {
             className={clsx("no-dark", styles.waveItem)}
             style={{
               zIndex: 1,
-              // backgroundColor: "pink",
             }}
           >
             <P4 className={styles["wave-animation"]} />
