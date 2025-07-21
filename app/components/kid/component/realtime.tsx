@@ -392,7 +392,7 @@ export function Realtime() {
         x-webkit-airplay="deny"
         style={{
           position: "absolute",
-          display: !videoRef.current || !videoStream ? "none" : "flex",
+          visibility: !videoRef.current || !videoStream ? "hidden" : "visible",
           objectFit: "cover",
           width: "100%",
           height: "100%",
