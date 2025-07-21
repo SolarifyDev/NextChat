@@ -223,7 +223,7 @@ export function Realtime() {
         const base64 = canvas.toDataURL("image/jpeg", 1.0);
         const data = base64.slice(base64.indexOf(",") + 1, Infinity);
         console.log("sending video frame", data);
-        // client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
+        client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
       }
       if (connected) {
         timeoutId = window.setTimeout(sendVideoFrame, 1000 / 0.5);
