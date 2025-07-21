@@ -318,8 +318,9 @@ export function Realtime() {
 
   // 监听视频加载完成事件
   const handleVideoReady = useCallback(() => {
-    setIsVideoReady(true);
-    // 添加一个小延迟确保视频完全开始播放
+    setTimeout(() => {
+      setIsVideoReady(true);
+    }, 300);
   }, []);
 
   // 监听视频开始播放事件
