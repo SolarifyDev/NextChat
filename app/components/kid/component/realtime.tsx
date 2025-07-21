@@ -47,7 +47,7 @@ const MediaStreamButton = ({
         cursor: "pointer",
       }}
     >
-      <StopCameraIcon />
+      <OpenCameraIcon />
     </div>
   ) : (
     <div
@@ -57,7 +57,7 @@ const MediaStreamButton = ({
         cursor: "pointer",
       }}
     >
-      <OpenCameraIcon />
+      <StopCameraIcon />
     </div>
   );
 
