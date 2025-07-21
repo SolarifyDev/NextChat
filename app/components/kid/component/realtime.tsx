@@ -472,7 +472,7 @@ export function Realtime() {
           left: 0,
           zIndex: 8,
           display: "flex",
-          background: "red",
+          background: "rgba(255, 255, 255, 0.3)",
           alignItems: "center",
           justifyContent: "center",
           // transition: "opacity 200ms",
