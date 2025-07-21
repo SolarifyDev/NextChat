@@ -1,4 +1,3 @@
-// import { Path } from "@/app/constant";
 import { useKidStore } from "@/app/store/kid";
 import { useNavigate } from "react-router-dom";
 
@@ -105,11 +104,11 @@ export function Realtime() {
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      // connect(kidStore.currentKid.assistantId);
+      connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
-      // disconnect();
+      disconnect();
 
       audioRecorder.stop();
       webcam?.stop();
@@ -214,10 +213,12 @@ export function Realtime() {
   }, [connectStatus, muted, audioRecorder]);
 
   useEffect(() => {
-    if (videoRef.current) {
+    if (videoRef.current && videoRef.current.srcObject !== activeVideoStream) {
       videoRef.current.srcObject = activeVideoStream;
     }
+  }, [activeVideoStream]);
 
+  useEffect(() => {
     let timeoutId = -1;
 
     function sendVideoFrame() {
@@ -249,7 +250,7 @@ export function Realtime() {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [connected, activeVideoStream, client, videoRef]);
+  }, [connected, activeVideoStream, client]);
 
   const sessionStatusText = useMemo(() => {
     if (!isNil(audioIsReady) && !audioIsReady) {
