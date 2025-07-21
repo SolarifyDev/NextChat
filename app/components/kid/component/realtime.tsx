@@ -376,7 +376,10 @@ export function Realtime() {
         playsInline
         webkit-playsinline="true"
         controls={false}
+        muted={true}
         disablePictureInPicture={true} // 禁用画中画
+        disableRemotePlayback={true}
+        preload="auto"
         x-webkit-airplay="deny"
         style={{
           position: "absolute",
