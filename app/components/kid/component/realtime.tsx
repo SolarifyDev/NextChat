@@ -92,6 +92,10 @@ export function Realtime() {
   const videoStreamRef = useRef<MediaStream | null>(null);
   const activeVideoStreamRef = useRef<MediaStream | null>(null);
 
+  // 添加切换状态管理
+  const [isSwitching, setIsSwitching] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+
   const {
     client,
     connected,
@@ -277,26 +281,55 @@ export function Realtime() {
   }, [connected, audioIsReady]);
 
   const changeStreams = (next?: UseMediaStreamResult) => async () => {
+    setIsSwitching(true);
+    setIsVideoReady(false);
+
     if (next) {
       const mediaStream = await next?.start();
-      setActiveVideoStream(mediaStream);
-      setVideoStream(mediaStream);
+      if (mediaStream) {
+        setActiveVideoStream(mediaStream);
+        setVideoStream(mediaStream);
+      } else {
+        setIsSwitching(false);
+      }
     } else {
       setActiveVideoStream(null);
       setVideoStream(null);
+      setIsSwitching(false);
     }
 
     videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
   };
 
   const switchStreams = (next: UseMediaStreamResult) => async () => {
+    setIsSwitching(true);
+    setIsVideoReady(false);
+
     const mediaStream = await next?.switchCamera();
     if (mediaStream) {
       setActiveVideoStream(mediaStream);
       setVideoStream(mediaStream);
       videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
+    } else {
+      setIsSwitching(false);
     }
   };
+
+  const shouldShowOverlay = isSwitching || (activeVideoStream && !isVideoReady);
+
+  // 监听视频加载完成事件
+  const handleVideoReady = useCallback(() => {
+    setIsVideoReady(true);
+    // 添加一个小延迟确保视频完全开始播放
+    setTimeout(() => {
+      setIsSwitching(false);
+    }, 100);
+  }, []);
+
+  // 监听视频开始播放事件
+  const handleVideoPlay = useCallback(() => {
+    setIsVideoReady(true);
+  }, []);
 
   return (
     <div
@@ -403,6 +436,9 @@ export function Realtime() {
         disablePictureInPicture={true} // 禁用画中画
         disableRemotePlayback={true}
         preload="auto"
+        onLoadedData={handleVideoReady}
+        onPlaying={handleVideoPlay}
+        onCanPlay={handleVideoReady}
         x-webkit-airplay="deny"
         style={{
           position: "absolute",
@@ -411,6 +447,19 @@ export function Realtime() {
           width: "100%",
           height: "100%",
           zIndex: 2,
+          transition: "opacity 0.3s ease-in-out",
+          opacity: shouldShowOverlay ? 0 : 1,
+        }}
+      />
+
+      <div
+        className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-300 ${
+          shouldShowOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        style={{
+          background: "rgba(0, 0, 0, 0.5)",
+          backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)",
         }}
       />
 
