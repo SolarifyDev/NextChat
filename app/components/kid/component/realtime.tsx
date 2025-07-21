@@ -28,7 +28,6 @@ import { showToast } from "../../ui-lib";
 import { isNil } from "lodash";
 import { useWebcam } from "@/app/hook/use-webcam";
 import { UseMediaStreamResult } from "@/app/hook/use-media-stream-mux";
-import { useUpdateEffect } from "ahooks";
 
 type MediaStreamButtonProps = {
   isStreaming: boolean;
@@ -91,6 +90,9 @@ export function Realtime() {
   const [activeVideoStream, setActiveVideoStream] =
     useState<MediaStream | null>(null);
 
+  const videoStreamRef = useRef<MediaStream | null>(null);
+  const activeVideoStreamRef = useRef<MediaStream | null>(null);
+
   const {
     client,
     connected,
@@ -113,6 +115,9 @@ export function Realtime() {
       webcam?.stop();
 
       changeStreams()();
+
+      cleanupVideoStream(videoStreamRef.current);
+      cleanupVideoStream(activeVideoStreamRef.current);
     };
   }, []);
 
@@ -123,21 +128,29 @@ export function Realtime() {
     }
   }, []);
 
-  useUpdateEffect(() => {
-    const currentStream = videoStream;
+  // useUpdateEffect(() => {
+  //   const currentStream = videoStream;
 
-    return () => {
-      currentStream && cleanupVideoStream(currentStream);
-    };
-  }, [videoStream, cleanupVideoStream]);
+  //   return () => {
+  //     currentStream && cleanupVideoStream(currentStream);
+  //   };
+  // }, [videoStream, cleanupVideoStream]);
 
-  useUpdateEffect(() => {
-    const currentStream = activeVideoStream;
+  // useUpdateEffect(() => {
+  //   const currentStream = activeVideoStream;
 
-    return () => {
-      currentStream && cleanupVideoStream(currentStream);
-    };
-  }, [activeVideoStream, cleanupVideoStream]);
+  //   return () => {
+  //     currentStream && cleanupVideoStream(currentStream);
+  //   };
+  // }, [activeVideoStream, cleanupVideoStream]);
+
+  useEffect(() => {
+    videoStreamRef.current = videoStream;
+  }, [videoStream]);
+
+  useEffect(() => {
+    activeVideoStreamRef.current = activeVideoStream;
+  }, [activeVideoStream]);
 
   useEffect(() => {
     if (connected === CallStatus.ConnectError) {
@@ -399,6 +412,7 @@ export function Realtime() {
           zIndex: 2,
         }}
       />
+
       <div
         className={styles.container}
         style={{
