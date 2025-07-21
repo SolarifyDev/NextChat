@@ -105,11 +105,11 @@ export function Realtime() {
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      connect(kidStore.currentKid.assistantId);
+      // connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
-      disconnect();
+      // disconnect();
 
       audioRecorder.stop();
       webcam?.stop();
