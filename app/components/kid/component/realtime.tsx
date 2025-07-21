@@ -93,7 +93,6 @@ export function Realtime() {
   const activeVideoStreamRef = useRef<MediaStream | null>(null);
 
   // 添加切换状态管理
-  const [isSwitching, setIsSwitching] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   const {
@@ -108,7 +107,7 @@ export function Realtime() {
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      connect(kidStore.currentKid.assistantId);
+      // connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
@@ -281,8 +280,8 @@ export function Realtime() {
   }, [connected, audioIsReady]);
 
   const changeStreams = (next?: UseMediaStreamResult) => async () => {
-    setIsSwitching(true);
-    setIsVideoReady(false);
+    // setIsSwitching(true);
+    // setIsVideoReady(false);
 
     if (next) {
       const mediaStream = await next?.start();
@@ -290,19 +289,19 @@ export function Realtime() {
         setActiveVideoStream(mediaStream);
         setVideoStream(mediaStream);
       } else {
-        setIsSwitching(false);
+        // setIsSwitching(false);
       }
     } else {
       setActiveVideoStream(null);
       setVideoStream(null);
-      setIsSwitching(false);
+      // setIsSwitching(false);
     }
 
     videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
   };
 
   const switchStreams = (next: UseMediaStreamResult) => async () => {
-    setIsSwitching(true);
+    // setIsSwitching(true);
     setIsVideoReady(false);
 
     const mediaStream = await next?.switchCamera();
@@ -311,19 +310,16 @@ export function Realtime() {
       setVideoStream(mediaStream);
       videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
     } else {
-      setIsSwitching(false);
+      // setIsSwitching(false);
     }
   };
 
-  const shouldShowOverlay = isSwitching || (activeVideoStream && !isVideoReady);
+  const shouldShowOverlay = activeVideoStream && !isVideoReady;
 
   // 监听视频加载完成事件
   const handleVideoReady = useCallback(() => {
     setIsVideoReady(true);
     // 添加一个小延迟确保视频完全开始播放
-    setTimeout(() => {
-      setIsSwitching(false);
-    }, 100);
   }, []);
 
   // 监听视频开始播放事件
@@ -357,7 +353,7 @@ export function Realtime() {
           style={{
             position: "absolute",
             top: "13px",
-            zIndex: 3,
+            zIndex: 10,
             fontSize: "18px",
             color: "#3A3A47",
             fontWeight: 600,
@@ -376,12 +372,24 @@ export function Realtime() {
                 position: "absolute",
                 right: "16px",
                 cursor: "pointer",
-                zIndex: 2,
+                zIndex: 11,
               }}
             >
               <SwitchIcon />
             </div>
           )}
+          <div
+            onClick={switchStreams(webcam)}
+            className="no-dark"
+            style={{
+              position: "absolute",
+              right: "16px",
+              cursor: "pointer",
+              zIndex: 11,
+            }}
+          >
+            <SwitchIcon />
+          </div>
         </div>
       )}
 
@@ -396,6 +404,7 @@ export function Realtime() {
           justifyContent: "center",
           alignItems: "center",
           zIndex: 2,
+          opacity: shouldShowOverlay ? 0 : 1,
         }}
         className={"no-dark"}
       >
@@ -446,27 +455,36 @@ export function Realtime() {
           objectFit: "cover",
           width: "100%",
           height: "100%",
-          zIndex: 2,
-          transition: "opacity 0.3s ease-in-out",
+          zIndex: 9,
           opacity: shouldShowOverlay ? 0 : 1,
         }}
       />
 
       <div
-        className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-300 ${
-          shouldShowOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        // className={`absolute inset-0 z-10 flex bg-black items-center justify-center transition-opacity duration-300 ${
+        //   shouldShowOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
+        // }`}
         style={{
-          background: "rgba(0, 0, 0, 0.5)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          zIndex: 8,
+          display: "flex",
+          background: "red",
+          alignItems: "center",
+          justifyContent: "center",
+          // transition: "opacity 200ms",
+          opacity: shouldShowOverlay ? 1 : 0,
+          // pointerEvents: shouldShowOverlay ? "auto" : "none",
         }}
-      />
+      ></div>
 
       <div
         className={styles.container}
         style={{
-          zIndex: 3,
+          zIndex: 10,
         }}
       >
         <div className={`${styles.dots} ${true ? styles.active : ""}`}>
@@ -484,7 +502,7 @@ export function Realtime() {
           background: "rgba(255,255,255,.5)",
           position: "absolute",
           bottom: "10%",
-          zIndex: 2,
+          zIndex: 10,
         }}
       >
         <div
