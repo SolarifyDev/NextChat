@@ -107,7 +107,7 @@ export function Realtime() {
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      // connect(kidStore.currentKid.assistantId);
+      connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
@@ -281,7 +281,7 @@ export function Realtime() {
 
   const changeStreams = (next?: UseMediaStreamResult) => async () => {
     // setIsSwitching(true);
-    // setIsVideoReady(false);
+    setIsVideoReady(false);
 
     if (next) {
       const mediaStream = await next?.start();
@@ -365,7 +365,7 @@ export function Realtime() {
           }}
         >
           {kidStore.currentKid?.name}
-          {webcam?.isStreaming && omeStore.isFromApp && (
+          {/* {webcam?.isStreaming && omeStore.isFromApp && (
             <div
               onClick={switchStreams(webcam)}
               className="no-dark"
@@ -378,7 +378,7 @@ export function Realtime() {
             >
               <SwitchIcon />
             </div>
-          )}
+          )} */}
           <div
             onClick={switchStreams(webcam)}
             className="no-dark"
@@ -462,9 +462,6 @@ export function Realtime() {
       />
 
       <div
-        // className={`absolute inset-0 z-10 flex bg-black items-center justify-center transition-opacity duration-300 ${
-        //   shouldShowOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
-        // }`}
         style={{
           position: "absolute",
           top: 0,
@@ -478,7 +475,7 @@ export function Realtime() {
           justifyContent: "center",
           // transition: "opacity 200ms",
           opacity: shouldShowOverlay ? 1 : 0,
-          // pointerEvents: shouldShowOverlay ? "auto" : "none",
+          pointerEvents: shouldShowOverlay ? "auto" : "none",
         }}
       ></div>
 
