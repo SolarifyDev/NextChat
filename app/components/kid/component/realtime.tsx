@@ -281,9 +281,10 @@ export function Realtime() {
 
   const changeStreams = (next?: UseMediaStreamResult) => async () => {
     // setIsSwitching(true);
-    setIsVideoReady(false);
 
     if (next) {
+      setIsVideoReady(false);
+
       const mediaStream = await next?.start();
       if (mediaStream) {
         setActiveVideoStream(mediaStream);
@@ -302,26 +303,25 @@ export function Realtime() {
 
   const switchStreams = (next: UseMediaStreamResult) => async () => {
     // setIsSwitching(true);
-    setIsVideoReady(false);
 
     const mediaStream = await next?.switchCamera();
     if (mediaStream) {
+      setIsVideoReady(false);
+
       setActiveVideoStream(mediaStream);
       setVideoStream(mediaStream);
       videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
-    } else {
-      // setIsSwitching(false);
     }
   };
 
   const shouldShowOverlay = activeVideoStream && !isVideoReady;
 
   // 监听视频加载完成事件
-  const handleVideoReady = useCallback(() => {
-    setTimeout(() => {
-      setIsVideoReady(true);
-    }, 300);
-  }, []);
+  // const handleVideoReady = useCallback(() => {
+  //   setTimeout(() => {
+  //     setIsVideoReady(true);
+  //   }, 300);
+  // }, []);
 
   // 监听视频开始播放事件
   const handleVideoPlay = useCallback(() => {
@@ -446,9 +446,9 @@ export function Realtime() {
         disablePictureInPicture={true} // 禁用画中画
         disableRemotePlayback={true}
         preload="auto"
-        onLoadedData={handleVideoReady}
+        // onLoadedData={handleVideoReady}
         onPlaying={handleVideoPlay}
-        onCanPlay={handleVideoReady}
+        // onCanPlay={handleVideoReady}
         x-webkit-airplay="deny"
         style={{
           position: "absolute",
@@ -463,17 +463,18 @@ export function Realtime() {
 
       <div
         style={{
+          width: "100%",
+          height: "100%",
           position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
+          // top: 0,
+          // right: 0,
+          // bottom: 0,
+          // left: 0,
           zIndex: 8,
           display: "flex",
-          background: "rgba(255, 255, 255, 0.3)",
+          background: "rgba(0, 0, 0, 1)",
           alignItems: "center",
           justifyContent: "center",
-          // transition: "opacity 200ms",
           opacity: shouldShowOverlay ? 1 : 0,
           pointerEvents: shouldShowOverlay ? "auto" : "none",
         }}
