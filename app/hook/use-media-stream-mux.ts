@@ -20,4 +20,6 @@ export type UseMediaStreamResult = {
   stop: () => void;
   isStreaming: boolean;
   stream: MediaStream | null;
+  switchCamera: () => Promise<false | MediaStream>;
+  currentFacingMode?: "user" | "environment";
 };

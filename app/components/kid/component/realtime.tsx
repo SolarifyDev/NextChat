@@ -275,6 +275,15 @@ export function Realtime() {
     videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
   };
 
+  const switchStreams = (next: UseMediaStreamResult) => async () => {
+    const mediaStream = await next?.switchCamera();
+    if (mediaStream) {
+      setActiveVideoStream(mediaStream);
+      setVideoStream(mediaStream);
+      videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
+    }
+  };
+
   return (
     <div
       style={{
@@ -314,7 +323,7 @@ export function Realtime() {
           {kidStore.currentKid?.name}
           {webcam?.isStreaming && omeStore.isFromApp && (
             <div
-              // onClick={() => webcam?.switchCamera()}
+              onClick={switchStreams(webcam)}
               className="no-dark"
               style={{
                 position: "absolute",
