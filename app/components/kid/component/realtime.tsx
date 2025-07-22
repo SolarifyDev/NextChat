@@ -109,7 +109,7 @@ export function Realtime() {
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      connect(kidStore.currentKid.assistantId);
+      // connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
@@ -287,8 +287,6 @@ export function Realtime() {
 
       const mediaStream = await next?.start();
       if (mediaStream) {
-        // setIsSwitchingCamera(false);
-
         setActiveVideoStream(mediaStream);
         setVideoStream(mediaStream);
       }
@@ -305,8 +303,6 @@ export function Realtime() {
 
     const mediaStream = await next?.switchCamera();
     if (mediaStream) {
-      // setIsSwitchingCamera(false);
-
       setActiveVideoStream(mediaStream);
       setVideoStream(mediaStream);
       videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
@@ -314,13 +310,6 @@ export function Realtime() {
   };
 
   const shouldShowOverlay = isSwitchingCamera;
-
-  // 监听视频加载完成事件
-  // const handleVideoReady = useCallback(() => {
-  //   setTimeout(() => {
-  //     setIsVideoReady(true);
-  //   }, 300);
-  // }, []);
 
   // 监听视频开始播放事件
   const handleVideoPlay = useCallback(() => {
@@ -467,13 +456,46 @@ export function Realtime() {
           position: "absolute",
           zIndex: 8,
           display: "flex",
-          background: "red",
+          background: "black",
           alignItems: "center",
           justifyContent: "center",
           opacity: shouldShowOverlay ? 1 : 0,
           pointerEvents: shouldShowOverlay ? "auto" : "none",
         }}
-      ></div>
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "16px" /* space-y-4 ≈ 16px */,
+          }}
+        >
+          {/* 旋转加载动画 */}
+          <div
+            style={{
+              width: "48px",
+              height: "48px",
+              border: "4px solid white",
+              borderTop: "4px solid transparent",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+            }}
+          ></div>
+
+          {/* 文字提示 */}
+          <div
+            style={{
+              color: "white",
+              fontSize: "18px",
+              fontWeight: 500,
+              lineHeight: "28px",
+            }}
+          >
+            {isSwitchingCamera ? "切换摄像头中..." : "准备中..."}
+          </div>
+        </div>
+      </div>
 
       <div
         className={styles.container}
