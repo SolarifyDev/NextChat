@@ -109,7 +109,7 @@ export function Realtime() {
 
   useEffect(() => {
     if (kidStore.currentKid?.assistantId) {
-      // connect(kidStore.currentKid.assistantId);
+      connect(kidStore.currentKid.assistantId);
     }
 
     return () => {
