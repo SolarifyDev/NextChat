@@ -632,116 +632,75 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export function Realtime() {
   const navigate = useNavigate();
-
-  const videoStreams = [useWebcam(true)];
-  const [webcam] = videoStreams;
+  const webcam = useWebcam(true);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-  const [activeVideoStream, setActiveVideoStream] =
-    useState<MediaStream | null>(null);
-
-  // 添加切换状态管理
   const [isSwitching, setIsSwitching] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const videoStreamRef = useRef<MediaStream | null>(null);
-  const activeVideoStreamRef = useRef<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  const cleanupVideoStream = useCallback((stream: MediaStream | null) => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      console.log("清理视频流");
-    }
+  const cleanupStream = useCallback((s: MediaStream | null) => {
+    s?.getTracks().forEach((track) => track.stop());
+    console.log("清理视频流");
   }, []);
 
   useEffect(() => {
     return () => {
-      cleanupVideoStream(videoStreamRef.current);
-      cleanupVideoStream(activeVideoStreamRef.current);
+      cleanupStream(streamRef.current);
     };
   }, []);
 
   useEffect(() => {
-    videoStreamRef.current = videoStream;
-  }, [videoStream]);
-
-  useEffect(() => {
-    if (videoRef.current && activeVideoStream) {
-      videoRef.current.srcObject = activeVideoStream;
-      setIsVideoReady(false); // 重置视频准备状态
+    streamRef.current = stream;
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+      setIsVideoReady(false); // 等待视频加载完成
     }
-    activeVideoStreamRef.current = activeVideoStream;
-  }, [activeVideoStream]);
+  }, [stream]);
 
-  // 监听视频加载完成事件
   const handleVideoReady = useCallback(() => {
     setIsVideoReady(true);
-    // 添加一个小延迟确保视频完全开始播放
-    setTimeout(() => {
-      setIsSwitching(false);
-    }, 100);
+    setTimeout(() => setIsSwitching(false), 100); // 避免闪烁
   }, []);
 
-  // 监听视频开始播放事件
-  const handleVideoPlay = useCallback(() => {
-    setIsVideoReady(true);
-  }, []);
-
-  const changeStreams = (next?: typeof webcam) => async () => {
+  const changeStream = (next?: typeof webcam) => async () => {
     setIsSwitching(true);
     setIsVideoReady(false);
+    cleanupStream(streamRef.current);
 
     if (next) {
-      // 先清理当前流
-      cleanupVideoStream(activeVideoStreamRef.current);
-
-      const mediaStream = await next?.start();
-      if (mediaStream) {
-        setActiveVideoStream(mediaStream);
-        setVideoStream(mediaStream);
+      const newStream = await next.start();
+      if (newStream) {
+        setStream(newStream);
       } else {
         setIsSwitching(false);
       }
     } else {
-      cleanupVideoStream(activeVideoStreamRef.current);
-      setActiveVideoStream(null);
-      setVideoStream(null);
+      setStream(null);
       setIsSwitching(false);
     }
-
-    videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
   };
 
-  const switchStreams = (next: typeof webcam) => async () => {
+  const switchCamera = (next: typeof webcam) => async () => {
     setIsSwitching(true);
     setIsVideoReady(false);
+    cleanupStream(streamRef.current);
 
-    // 先清理当前流
-    cleanupVideoStream(activeVideoStreamRef.current);
-
-    const mediaStream = await next?.switchCamera();
-    if (mediaStream) {
-      setActiveVideoStream(mediaStream);
-      setVideoStream(mediaStream);
-      videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
+    const newStream = await next.switchCamera();
+    if (newStream) {
+      setStream(newStream);
     } else {
       setIsSwitching(false);
     }
   };
 
-  const shouldShowOverlay = isSwitching || (activeVideoStream && !isVideoReady);
+  const shouldShowOverlay = isSwitching || (stream && !isVideoReady);
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <div
-        onClick={async () => {
-          navigate(Path.AIKid);
-        }}
-      >
-        关闭
-      </div>
+      <div onClick={() => navigate(Path.AIKid)}>关闭</div>
       <div
         style={{
           width: "100%",
@@ -772,21 +731,21 @@ export function Realtime() {
           }}
         >
           <button
-            onClick={changeStreams(webcam)}
+            onClick={changeStream(webcam)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             disabled={isSwitching}
           >
             开启
           </button>
           <button
-            onClick={changeStreams()}
+            onClick={changeStream()}
             className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             disabled={isSwitching}
           >
             关闭
           </button>
           <button
-            onClick={switchStreams(webcam)}
+            onClick={switchCamera(webcam)}
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             disabled={isSwitching}
           >
@@ -804,17 +763,18 @@ export function Realtime() {
           disableRemotePlayback={true}
           preload="auto"
           onLoadedData={handleVideoReady}
-          onPlaying={handleVideoPlay}
+          onPlaying={handleVideoReady}
           onCanPlay={handleVideoReady}
           style={{
             position: "absolute",
-            visibility: !activeVideoStream ? "hidden" : "visible",
+            // ✅ 避免用 visibility，改用 opacity 控制可见性
             objectFit: "cover",
             width: "100%",
             height: "100%",
             zIndex: 2,
             transition: "opacity 0.3s ease-in-out",
             opacity: shouldShowOverlay ? 0 : 1,
+            pointerEvents: "none",
           }}
         />
 
