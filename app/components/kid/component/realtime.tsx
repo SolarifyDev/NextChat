@@ -454,7 +454,7 @@ export function Realtime() {
             fontSize: "18px",
             color: "#3A3A47",
             fontWeight: 600,
-            display: activeVideoStream ? "none" : "flex",
+            display: "flex",
             alignItems: "center",
             width: "100%",
             justifyContent: "center",
@@ -469,24 +469,12 @@ export function Realtime() {
                 position: "absolute",
                 right: "16px",
                 cursor: "pointer",
-                zIndex: 11,
+                zIndex: 2,
               }}
             >
               <SwitchIcon />
             </div>
           )}
-          {/* <div
-            onClick={switchStreams(webcam)}
-            className="no-dark"
-            style={{
-              position: "absolute",
-              right: "16px",
-              cursor: "pointer",
-              zIndex: 11,
-            }}
-          >
-            <SwitchIcon />
-          </div> */}
         </div>
       )}
 
@@ -501,7 +489,7 @@ export function Realtime() {
           alignItems: "center",
           zIndex: 2,
           opacity: shouldShowOverlay ? 0 : 1,
-          display: activeVideoStream ? "none" : "flex",
+          visibility: activeVideoStream ? "hidden" : "visible",
         }}
         className={"no-dark"}
       >
