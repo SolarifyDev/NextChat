@@ -289,13 +289,13 @@ export function Realtime() {
       if (mediaStream) {
         setActiveVideoStream(mediaStream);
         setVideoStream(mediaStream);
+        videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
       }
     } else {
       setActiveVideoStream(null);
       setVideoStream(null);
+      videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
     }
-
-    videoStreams.filter((msr) => msr !== next).forEach((msr) => msr.stop());
   };
 
   const switchStreams = (next: UseMediaStreamResult) => async () => {
