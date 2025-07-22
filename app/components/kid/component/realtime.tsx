@@ -817,6 +817,59 @@ export function Realtime() {
             opacity: shouldShowOverlay ? 0 : 1,
           }}
         />
+
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            zIndex: 10,
+            backgroundColor: "black",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transitionProperty: "opacity",
+            transitionDuration: "300ms",
+            opacity: shouldShowOverlay ? 1 : 0,
+            pointerEvents: shouldShowOverlay ? "auto" : "none",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
+            <div
+              style={{
+                width: "3rem",
+                height: "3rem",
+                borderWidth: "4px",
+                borderStyle: "solid",
+                borderColor: "white white transparent white",
+                borderRadius: "9999px",
+                animationName: "spin",
+                animationDuration: "1s",
+                animationIterationCount: "infinite",
+                animationTimingFunction: "linear",
+              }}
+            ></div>
+
+            <div
+              style={{
+                color: "white",
+                fontSize: "1.125rem",
+                fontWeight: "500",
+              }}
+            >
+              {isSwitching ? "切换摄像头中..." : "准备中..."}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
