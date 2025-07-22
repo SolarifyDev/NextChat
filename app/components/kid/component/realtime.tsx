@@ -46,6 +46,7 @@ const MediaStreamButton = ({
         margin: "0 24px",
         cursor: "pointer",
       }}
+      className="no-dark"
     >
       <OpenCameraIcon />
     </div>
@@ -56,6 +57,7 @@ const MediaStreamButton = ({
         margin: "0 24px",
         cursor: "pointer",
       }}
+      className="no-dark"
     >
       <StopCameraIcon />
     </div>
@@ -495,11 +497,11 @@ export function Realtime() {
           borderRadius: "50%",
           flexShrink: 0,
           position: "relative",
-          display: "flex",
           justifyContent: "center",
           alignItems: "center",
           zIndex: 2,
           opacity: shouldShowOverlay ? 0 : 1,
+          display: activeVideoStream ? "none" : "flex",
         }}
         className={"no-dark"}
       >
