@@ -392,6 +392,42 @@ export function Realtime() {
     setIsSwitching(false);
   }, []);
 
+  function drawVideoToCanvas(
+    video: HTMLVideoElement,
+    ctx: CanvasRenderingContext2D,
+  ) {
+    const canvas = ctx.canvas;
+    const canvasAspect = canvas.width / canvas.height;
+    const videoAspect = video.videoWidth / video.videoHeight;
+
+    let sx = 0,
+      sy = 0,
+      sWidth = video.videoWidth,
+      sHeight = video.videoHeight;
+
+    if (canvasAspect > videoAspect) {
+      // canvas 更宽，裁剪上下
+      sHeight = video.videoWidth / canvasAspect;
+      sy = (video.videoHeight - sHeight) / 2;
+    } else {
+      // canvas 更高，裁剪左右
+      sWidth = video.videoHeight * canvasAspect;
+      sx = (video.videoWidth - sWidth) / 2;
+    }
+
+    ctx.drawImage(
+      video,
+      sx,
+      sy,
+      sWidth,
+      sHeight,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+  }
+
   useEffect(() => {
     const render = () => {
       const canvas = canvasRef.current;
@@ -399,9 +435,16 @@ export function Realtime() {
       if (!canvas || !video) return;
 
       const ctx = canvas.getContext("2d");
-      if (ctx && video.readyState >= 2) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      }
+      if (!ctx || video.readyState < 2) return;
+
+      // 设置 canvas 内部分辨率
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      drawVideoToCanvas(video, ctx);
 
       animationFrameIdRef.current = requestAnimationFrame(render);
     };
@@ -485,6 +528,7 @@ export function Realtime() {
           borderRadius: "50%",
           flexShrink: 0,
           position: "relative",
+          display: "flex",
           justifyContent: "center",
           alignItems: "center",
           zIndex: 2,
@@ -522,14 +566,12 @@ export function Realtime() {
 
       <canvas
         ref={canvasRef}
-        width={800}
-        height={720}
         style={{
           position: "absolute",
           objectFit: "cover",
           width: "100%",
           height: "100%",
-          zIndex: 1,
+          zIndex: 2,
           transition: "opacity 0.3s ease-in-out",
           display: activeVideoStream ? "flex" : "none",
           opacity: shouldShowOverlay ? 0 : 1,
@@ -555,9 +597,9 @@ export function Realtime() {
           display: "none",
           // position: "absolute",
           // visibility: !videoRef.current || !videoStream ? "hidden" : "visible",
-          // objectFit: "cover",
-          // width: "100%",
-          // height: "100%",
+          objectFit: "cover",
+          width: "100%",
+          height: "100%",
           // zIndex: 9,
           // opacity: shouldShowOverlay ? 0 : 1,
         }}
