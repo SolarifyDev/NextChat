@@ -309,7 +309,7 @@ export function Realtime() {
     }
   };
 
-  const shouldShowOverlay = isSwitchingCamera;
+  const shouldShowOverlay = activeVideoStream && isSwitchingCamera;
 
   // 监听视频开始播放事件
   const handleVideoPlay = useCallback(() => {
