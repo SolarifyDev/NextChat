@@ -634,12 +634,15 @@ export function Realtime() {
   const navigate = useNavigate();
   const webcam = useWebcam(true);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const hiddenVideoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const [isSwitching, setIsSwitching] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
-
   const streamRef = useRef<MediaStream | null>(null);
+
+  const animationFrameIdRef = useRef<number>();
 
   const cleanupStream = useCallback((s: MediaStream | null) => {
     s?.getTracks().forEach((track) => track.stop());
@@ -654,21 +657,89 @@ export function Realtime() {
 
   useEffect(() => {
     streamRef.current = stream;
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
-      setIsVideoReady(false); // 等待视频加载完成
+
+    const video = hiddenVideoRef.current;
+    if (video && stream) {
+      video.srcObject = stream;
+      video.play().catch(console.error);
+      setIsVideoReady(false);
     }
   }, [stream]);
 
+  const stopStreamAndClear = useCallback(() => {
+    // 停止canvas绘制
+    if (animationFrameIdRef.current) {
+      cancelAnimationFrame(animationFrameIdRef.current);
+      animationFrameIdRef.current = undefined;
+    }
+
+    // 停止摄像头轨道并清空 video
+    if (hiddenVideoRef.current?.srcObject) {
+      const mediaStream = hiddenVideoRef.current.srcObject as MediaStream;
+      mediaStream.getTracks().forEach((t) => t.stop());
+      hiddenVideoRef.current.srcObject = null;
+    }
+
+    // 清空canvas内容（填黑）
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    setStream(null);
+    setIsVideoReady(false);
+    setIsSwitching(false);
+  }, []);
+
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const render = () => {
+      const canvas = canvasRef.current;
+      const video = hiddenVideoRef.current;
+      if (!canvas || !video) return;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx && video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
+
+      animationFrameIdRef.current = requestAnimationFrame(render);
+    };
+
+    if (isVideoReady && stream) {
+      animationFrameIdRef.current = requestAnimationFrame(render);
+    } else {
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
+        animationFrameIdRef.current = undefined;
+      }
+    }
+
+    return () => {
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
+        animationFrameIdRef.current = undefined;
+      }
+    };
+  }, [isVideoReady, stream]);
+
   const handleVideoReady = useCallback(() => {
     setIsVideoReady(true);
-    setTimeout(() => setIsSwitching(false), 100); // 避免闪烁
+    setTimeout(() => setIsSwitching(false), 100);
   }, []);
 
   const changeStream = (next?: typeof webcam) => async () => {
     setIsSwitching(true);
     setIsVideoReady(false);
     cleanupStream(streamRef.current);
+
+    stopStreamAndClear();
 
     if (next) {
       const newStream = await next.start();
@@ -699,7 +770,7 @@ export function Realtime() {
   const shouldShowOverlay = isSwitching || (stream && !isVideoReady);
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div style={{ width: "100%", height: "100%", backgroundColor: "black" }}>
       <div onClick={() => navigate(Path.AIKid)}>关闭</div>
       <div
         style={{
@@ -717,6 +788,7 @@ export function Realtime() {
           gap: "15px",
         }}
       >
+        {/* 控制按钮 */}
         <div
           style={{
             position: "absolute",
@@ -753,21 +825,14 @@ export function Realtime() {
           </button>
         </div>
 
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          controls={false}
-          muted={true}
-          disablePictureInPicture={true}
-          disableRemotePlayback={true}
-          preload="auto"
-          onLoadedData={handleVideoReady}
-          onPlaying={handleVideoReady}
-          onCanPlay={handleVideoReady}
+        {/* 渲染视频画面 */}
+        <canvas
+          ref={canvasRef}
+          width={1280}
+          height={720}
           style={{
+            backgroundColor: "black",
             position: "absolute",
-            // ✅ 避免用 visibility，改用 opacity 控制可见性
             objectFit: "cover",
             width: "100%",
             height: "100%",
@@ -778,6 +843,18 @@ export function Realtime() {
           }}
         />
 
+        {/* 隐藏 video 供 canvas 使用 */}
+        <video
+          ref={hiddenVideoRef}
+          style={{ display: "none" }}
+          muted
+          playsInline
+          autoPlay
+          preload="auto"
+          onCanPlay={handleVideoReady}
+        />
+
+        {/* 黑色遮罩层 */}
         <div
           style={{
             position: "absolute",
