@@ -244,18 +244,18 @@ export function Realtime() {
         console.log("sending video frame", data);
         client.sendRealtimeInput([{ mimeType: "image/jpeg", data }]);
       }
-      if (connected) {
+      if (connectStatus) {
         timeoutId = window.setTimeout(sendVideoFrame, 1000 / 0.5);
       }
     }
 
-    if (connected && activeVideoStream !== null) {
+    if (connectStatus && activeVideoStream !== null) {
       requestAnimationFrame(sendVideoFrame);
     }
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [connected, activeVideoStream, client]);
+  }, [connectStatus, activeVideoStream, client, videoRef]);
 
   const sessionStatusText = useMemo(() => {
     if (!isNil(audioIsReady) && !audioIsReady) {
