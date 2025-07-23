@@ -56,6 +56,11 @@ export function getHeaders(
           "Omelink-Metis-Userid": userId,
         };
         break;
+      case "omeoffice 1.0":
+        headers = {
+          "Ome-Office-Oa-User-Id": userId,
+        };
+        break;
       default:
         return {};
     }
