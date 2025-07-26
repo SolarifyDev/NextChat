@@ -412,8 +412,8 @@ export function Home() {
           omeStore.setLanguage(data?.lanauge);
         }
       } catch (error) {
-        if (window?.webkit?.messageHandlers?.nativelistener) {
-          window?.webkit?.messageHandlers?.nativelistener.postMessage("quit");
+        if (window?.webkit?.messageHandlers?.nativeListener) {
+          window?.webkit?.messageHandlers?.nativeListener.postMessage("quit");
         }
       }
     };
