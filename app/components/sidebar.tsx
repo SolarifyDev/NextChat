@@ -273,6 +273,10 @@ export function SideBar(props: { className?: string }) {
           };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } catch {}
+      } else if ((window as any)?.webkit?.messageHandlers?.nativelistener) {
+        (window as any)?.webkit?.messageHandlers?.nativelistener.postMessage(
+          "quit",
+        );
       }
     },
     { wait: 300 },
