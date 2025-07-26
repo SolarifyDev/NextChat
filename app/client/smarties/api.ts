@@ -41,8 +41,8 @@ api.interceptors.response.use(
             type: MessageEnum.Quit,
           };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        } else if ((window as any)?.webkit?.messageHandlers?.nativelistener) {
-          (window as any)?.webkit?.messageHandlers?.nativelistener.postMessage(
+        } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
+          (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
             "quit",
           );
         }

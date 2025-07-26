@@ -449,8 +449,8 @@ export function Home() {
           };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } catch {}
-      } else if (window?.webkit?.messageHandlers?.nativelistener) {
-        window?.webkit?.messageHandlers?.nativelistener.postMessage(
+      } else if (window?.webkit?.messageHandlers?.nativeListener) {
+        window?.webkit?.messageHandlers?.nativeListener.postMessage(
           "omemetis is ready",
         );
       } else {
