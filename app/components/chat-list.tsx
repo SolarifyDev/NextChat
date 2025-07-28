@@ -1,3 +1,5 @@
+"use client";
+
 import DeleteIcon from "../icons/delete.svg";
 
 import styles from "./home.module.scss";
@@ -14,6 +16,7 @@ import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { useOmeStore } from "../store/ome";
+import { trackEvent } from "../utils/ga";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -130,7 +133,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
-  const { onlineSearch, setOnlineSearch } = useOmeStore();
+  const { onlineSearch, setOnlineSearch, userId } = useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
@@ -178,6 +181,17 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             index={i}
             selected={i === currentSessionIndex}
             onClick={() => {
+              if (props.isFromApp) {
+                trackEvent(
+                  "click_chat_timestamp",
+                  {
+                    userId: userId,
+                    time: new Date(),
+                  },
+                  true,
+                );
+              }
+
               navigate(Path.Chat);
               selectSession(i);
               if (onlineSearch) {

@@ -36,6 +36,9 @@ import i18next from "i18next";
 import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
+import UserActivityMonitor from "../hook/use-activity";
+import { useInteractionMonitor } from "../hook/useInteractionMonitor";
+import { trackEvent } from "../utils/ga";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -213,6 +216,53 @@ function Screen() {
   const shouldTightBorder =
     getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
 
+  useEffect(() => {
+    let monitor: UserActivityMonitor;
+
+    if (omeStore.isFromApp) {
+      monitor = new UserActivityMonitor({
+        timeout: 30 * 60 * 1000,
+        gaEventName: "exit_app_timestamp",
+        userId: omeStore.userId,
+      });
+    }
+
+    return () => {
+      if (monitor) monitor.destroy();
+    };
+  }, []);
+
+  const { getCurrentInteractedMs } = useInteractionMonitor((interacted) => {
+    console.log("📤 上传行为埋点 => ", interacted ? "活跃" : "无操作");
+
+    if (omeStore.isFromApp) {
+      trackEvent(
+        "app_is_active",
+        {
+          isActive: interacted,
+          userId: omeStore.userId,
+        },
+        true,
+      );
+    }
+  });
+
+  // 传递切换事件给父
+  useEffect(() => {
+    try {
+      if (window.ReactNativeWebView) {
+        const message = {
+          data: {
+            path: location.pathname,
+          },
+          msg: "pathname",
+          type: MessageEnum.Path,
+        };
+        window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      }
+    } catch {}
+  }, [location.pathname]);
+
   // useEffect(() => {
   //   loadAsyncGoogleFont();
   // }, []);
@@ -244,6 +294,7 @@ function Screen() {
           className={clsx({
             [styles["sidebar-show"]]: isHome,
           })}
+          getCurrentInteractedMs={getCurrentInteractedMs}
         />
         <WindowContent>
           <Routes>

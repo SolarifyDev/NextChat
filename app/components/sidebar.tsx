@@ -1,3 +1,5 @@
+"use client";
+
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./home.module.scss";
@@ -35,6 +37,7 @@ import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
+import { trackEvent } from "../utils/ga";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -233,7 +236,10 @@ export function SideBarTail(props: {
   );
 }
 
-export function SideBar(props: { className?: string }) {
+export function SideBar(props: {
+  getCurrentInteractedMs: (isAll?: boolean) => number;
+  className?: string;
+}) {
   const { t } = useTranslation();
 
   const DISCOVERY = [
@@ -257,6 +263,16 @@ export function SideBar(props: { className?: string }) {
 
   const { run: addConversation } = useDebounceFn(
     () => {
+      if (omeStore.isFromApp) {
+        trackEvent(
+          "click_chat_timestamp",
+          {
+            userId: omeStore.userId,
+            time: new Date(),
+          },
+          true,
+        );
+      }
       chatStore.newSession(undefined, () => navigate(Path.Chat));
     },
     { wait: 300 },
@@ -264,6 +280,20 @@ export function SideBar(props: { className?: string }) {
 
   const { run: quitMetis } = useDebounceFn(
     () => {
+      const ms = props.getCurrentInteractedMs(true);
+      console.log("ms", ms); // 获取到的活跃时长
+
+      if (omeStore.isFromApp) {
+        trackEvent(
+          "app_active_duration",
+          {
+            userId: omeStore.userId,
+            time: ms,
+          },
+          true,
+        );
+      }
+
       if (window.ReactNativeWebView) {
         try {
           const message = {
