@@ -144,7 +144,7 @@ class UserActivityMonitor {
         trackEvent(
           this.gaEventName,
           {
-            time: new Date(),
+            time: Date.now(),
             userid: this.userId,
           },
           this.debug,

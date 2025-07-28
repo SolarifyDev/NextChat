@@ -186,7 +186,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
                   "click_chat_timestamp",
                   {
                     userId: userId,
-                    time: new Date(),
+                    time: Date.now(),
                   },
                   true,
                 );
