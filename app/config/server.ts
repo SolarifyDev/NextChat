@@ -41,6 +41,7 @@ declare global {
 
       // google tag manager
       GTM_ID?: string;
+      GA_ID?: string;
 
       // anthropic only
       ANTHROPIC_URL?: string;
