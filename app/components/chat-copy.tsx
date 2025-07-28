@@ -1329,7 +1329,7 @@ export function _Chat_NEW() {
         "click_send_timestamp",
         {
           userId: omeStore.userId,
-          time: new Date(),
+          time: Date.now(),
         },
         true,
       );

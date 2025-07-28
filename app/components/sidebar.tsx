@@ -268,7 +268,7 @@ export function SideBar(props: {
           "click_chat_timestamp",
           {
             userId: omeStore.userId,
-            time: new Date(),
+            time: Date.now(),
           },
           true,
         );
