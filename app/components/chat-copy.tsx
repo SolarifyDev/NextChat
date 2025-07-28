@@ -1,5 +1,3 @@
-"use client";
-
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   Fragment,
@@ -147,7 +145,6 @@ import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
 import { useDebounceFn } from "ahooks";
-import { trackEvent } from "../utils/ga";
 
 const localStorage = safeLocalStorage();
 
@@ -1323,18 +1320,6 @@ export function _Chat_NEW() {
 
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
-
-    if (omeStore.isFromApp) {
-      trackEvent(
-        "click_send_timestamp",
-        {
-          userId: omeStore.userId,
-          time: new Date(),
-        },
-        true,
-      );
-    }
-
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
