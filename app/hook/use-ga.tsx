@@ -1,6 +1,5 @@
 "use client";
 
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { useEffect, useState } from "react";
 
 export const GaProvider = () => {
@@ -24,56 +23,84 @@ export const GaProvider = () => {
   }, []);
 
   // 在 GA 初始化后配置 cookie 属性
+  // useEffect(() => {
+  //   if (gaId && typeof window !== "undefined") {
+  //     let intervalId: NodeJS.Timeout;
+  //     let timeoutId: NodeJS.Timeout;
+
+  //     const configureGA = () => {
+  //       if (window.gtag) {
+  //         window.gtag("config", gaId, { cookie_flags: "SameSite=None;Secure" });
+  //         console.log("GA configured with custom cookie settings");
+
+  //         // 成功后清除定时器
+  //         clearInterval(intervalId);
+  //         clearTimeout(timeoutId);
+  //         return true;
+  //       }
+  //       return false;
+  //     };
+
+  //     // 延迟开始检查
+  //     timeoutId = setTimeout(() => {
+  //       // 先尝试一次
+  //       if (!configureGA()) {
+  //         // 如果失败，每100ms检查一次
+  //         intervalId = setInterval(() => {
+  //           configureGA();
+  //         }, 100);
+
+  //         // 5秒后停止尝试
+  //         setTimeout(() => {
+  //           clearInterval(intervalId);
+  //           console.warn("GA gtag not available after 5 seconds");
+  //         }, 10000);
+  //       }
+  //     }, 200);
+
+  //     // 清理函数
+  //     return () => {
+  //       if (intervalId) clearInterval(intervalId);
+  //       if (timeoutId) clearTimeout(timeoutId);
+  //     };
+  //   }
+  // }, [gaId]);
+
+  // return (
+  //   <>
+  //     {gaId && (
+  //       <>
+  //         <GoogleAnalytics gaId={gaId} />
+  //       </>
+  //     )}
+  //   </>
+  // );
+
   useEffect(() => {
-    if (gaId && typeof window !== "undefined") {
-      let intervalId: NodeJS.Timeout;
-      let timeoutId: NodeJS.Timeout;
+    if (!gaId) return;
 
-      const configureGA = () => {
-        if (window.gtag) {
-          window.gtag("config", gaId, { cookie_flags: "SameSite=None;Secure" });
-          console.log("GA configured with custom cookie settings");
+    // 插入 GA 脚本
+    const script1 = document.createElement("script");
+    script1.async = true;
+    script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+    document.head.appendChild(script1);
 
-          // 成功后清除定时器
-          clearInterval(intervalId);
-          clearTimeout(timeoutId);
-          return true;
-        }
-        return false;
-      };
+    const script2 = document.createElement("script");
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', '${gaId}', {
+        cookie_flags: 'SameSite=None;Secure'
+      });
+    `;
+    document.head.appendChild(script2);
 
-      // 延迟开始检查
-      timeoutId = setTimeout(() => {
-        // 先尝试一次
-        if (!configureGA()) {
-          // 如果失败，每100ms检查一次
-          intervalId = setInterval(() => {
-            configureGA();
-          }, 100);
-
-          // 5秒后停止尝试
-          setTimeout(() => {
-            clearInterval(intervalId);
-            console.warn("GA gtag not available after 5 seconds");
-          }, 10000);
-        }
-      }, 200);
-
-      // 清理函数
-      return () => {
-        if (intervalId) clearInterval(intervalId);
-        if (timeoutId) clearTimeout(timeoutId);
-      };
-    }
+    return () => {
+      document.head.removeChild(script1);
+      document.head.removeChild(script2);
+    };
   }, [gaId]);
 
-  return (
-    <>
-      {gaId && (
-        <>
-          <GoogleAnalytics gaId={gaId} />
-        </>
-      )}
-    </>
-  );
+  return null;
 };
