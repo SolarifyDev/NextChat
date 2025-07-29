@@ -51,7 +51,6 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        {serverConfig?.arms}
         {serverConfig?.isVercel && (
           <>
             <SpeedInsights />
