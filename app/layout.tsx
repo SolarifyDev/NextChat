@@ -5,7 +5,7 @@ import "./styles/highlight.scss";
 import { getClientConfig } from "./config/client";
 import type { Metadata, Viewport } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { GoogleTagManager } from "@next/third-parties/google";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import { getServerSideConfig } from "./config/server";
 
 export const metadata: Metadata = {
@@ -33,6 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const serverConfig = getServerSideConfig();
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html lang="en">
@@ -61,11 +62,11 @@ export default function RootLayout({
             <GoogleTagManager gtmId={serverConfig.gtmId} />
           </>
         )}
-        {/* {serverConfig?.gaId && (
+        {gaId && (
           <>
             <GoogleAnalytics gaId={serverConfig.gaId} />
           </>
-        )} */}
+        )}
       </body>
     </html>
   );
