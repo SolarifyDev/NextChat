@@ -33,7 +33,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const serverConfig = getServerSideConfig();
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html lang="en">
@@ -62,11 +61,10 @@ export default function RootLayout({
             <GoogleTagManager gtmId={serverConfig.gtmId} />
           </>
         )}
-        {gaId && (
-          <>
-            <GoogleAnalytics gaId={serverConfig.gaId} />
-          </>
-        )}
+
+        <>
+          <GoogleAnalytics gaId={"G-47X0RQPPKG"} />
+        </>
       </body>
     </html>
   );
