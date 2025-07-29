@@ -51,7 +51,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        {serverConfig?.gaId}
+        {serverConfig?.arms}
         {serverConfig?.isVercel && (
           <>
             <SpeedInsights />
