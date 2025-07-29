@@ -8,6 +8,7 @@ export default async function App() {
   return (
     <>
       <Home />
+      {serverConfig.arms}
       {serverConfig?.isVercel && (
         <>
           <Analytics />
