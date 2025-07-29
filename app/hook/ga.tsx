@@ -1,7 +1,7 @@
 "use client";
 
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { useEffect, useState } from "react";
+import ReactGA from "react-ga4";
 
 export const GaProvider = () => {
   const [gaId, setGaId] = useState<string>("");
@@ -13,6 +13,8 @@ export const GaProvider = () => {
         const config = await res.json();
 
         console.log(config, "config");
+        ReactGA.initialize(config?.gaId);
+
         setGaId(config?.gaId || "");
       } catch (err) {
         console.error("ARMS 初始化失败");
@@ -24,11 +26,11 @@ export const GaProvider = () => {
 
   return (
     <>
-      {gaId && (
+      {/* {gaId && (
         <>
           <GoogleAnalytics gaId={gaId} />
         </>
-      )}
+      )} */}
     </>
   );
 };

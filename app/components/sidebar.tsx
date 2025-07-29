@@ -490,11 +490,19 @@ export function SideBar(props: {
               // text={shouldNarrow ? undefined : Locale.Home.NewChat}
               text={shouldNarrow ? undefined : t("Home.NewChat")}
               onClick={() => {
-                if (config.dontShowMaskSplashScreen) {
-                  chatStore.newSession(undefined, () => navigate(Path.Chat));
-                } else {
-                  navigate(Path.NewChat);
-                }
+                trackEvent(
+                  "test_click",
+                  {
+                    userId: omeStore.userId,
+                    time: Date.now(),
+                  },
+                  true,
+                );
+                // if (config.dontShowMaskSplashScreen) {
+                //   chatStore.newSession(undefined, () => navigate(Path.Chat));
+                // } else {
+                //   navigate(Path.NewChat);
+                // }
               }}
               shadow
             />
