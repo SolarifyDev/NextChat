@@ -263,16 +263,16 @@ export function SideBar(props: {
 
   const { run: addConversation } = useDebounceFn(
     () => {
-      // if (omeStore.from === "omelinkapp") {
-      trackEvent(
-        "click_chat_timestamp",
-        {
-          userId: omeStore.userId,
-          time: Date.now(),
-        },
-        true,
-      );
-      // }
+      if (omeStore.from === "omelinkapp") {
+        trackEvent(
+          "click_chat_timestamp",
+          {
+            userId: omeStore.userId,
+            time: Date.now(),
+          },
+          true,
+        );
+      }
 
       chatStore.newSession(undefined, () => navigate(Path.Chat));
     },
@@ -494,11 +494,21 @@ export function SideBar(props: {
               // text={shouldNarrow ? undefined : Locale.Home.NewChat}
               text={shouldNarrow ? undefined : t("Home.NewChat")}
               onClick={() => {
-                if (config.dontShowMaskSplashScreen) {
-                  chatStore.newSession(undefined, () => navigate(Path.Chat));
-                } else {
-                  navigate(Path.NewChat);
-                }
+                trackEvent(
+                  // "click_chat_timestamp",
+                  "111",
+                  {
+                    userId: omeStore.userId,
+                    time: Date.now(),
+                  },
+                  true,
+                );
+
+                // if (config.dontShowMaskSplashScreen) {
+                //   chatStore.newSession(undefined, () => navigate(Path.Chat));
+                // } else {
+                //   navigate(Path.NewChat);
+                // }
               }}
               shadow
             />
