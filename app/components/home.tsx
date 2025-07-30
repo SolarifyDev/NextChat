@@ -72,9 +72,7 @@ const PluginPage = dynamic(async () => (await import("./plugin")).PluginPage, {
 
 const SearchChat = dynamic(
   async () => (await import("./search-chat")).SearchChatPage,
-  {
-    loading: () => <Loading noLogo />,
-  },
+  { loading: () => <Loading noLogo /> },
 );
 
 const Sd = dynamic(async () => (await import("./sd")).Sd, {
@@ -83,9 +81,7 @@ const Sd = dynamic(async () => (await import("./sd")).Sd, {
 
 const McpMarketPage = dynamic(
   async () => (await import("./mcp-market")).McpMarketPage,
-  {
-    loading: () => <Loading noLogo />,
-  },
+  { loading: () => <Loading noLogo /> },
 );
 
 const HomeTab = dynamic(async () => (await import("./home-tab")).HomeTab, {
@@ -94,17 +90,13 @@ const HomeTab = dynamic(async () => (await import("./home-tab")).HomeTab, {
 
 const SelectVoice = dynamic(
   async () => (await import("./kid/component/select-voice")).SelectVoice,
-  {
-    loading: () => null,
-  },
+  { loading: () => null },
 );
 
 const AddOrUpdateKid = dynamic(
   async () =>
     (await import("./kid/component/add-or-update-kid")).AddOrUpdateKid,
-  {
-    loading: () => null,
-  },
+  { loading: () => null },
 );
 
 const Kid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
@@ -113,9 +105,7 @@ const Kid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
 
 const Realtime = dynamic(
   async () => (await import("./kid/component/realtime")).Realtime,
-  {
-    loading: () => null,
-  },
+  { loading: () => null },
 );
 
 export function useSwitchTheme() {
@@ -240,11 +230,7 @@ function Screen() {
     if (isSdNew) return <Sd />;
     return (
       <>
-        <SideBar
-          className={clsx({
-            [styles["sidebar-show"]]: isHome,
-          })}
-        />
+        <SideBar className={clsx({ [styles["sidebar-show"]]: isHome })} />
         <WindowContent>
           <Routes>
             {/* <Route path={Path.Home} element={<Chat />} /> */}
