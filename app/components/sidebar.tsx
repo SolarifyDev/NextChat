@@ -1,3 +1,5 @@
+"use client";
+
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./home.module.scss";
@@ -35,6 +37,7 @@ import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
+import { trackEvent } from "../utils/ga";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -127,10 +130,7 @@ export function useDragSideBar() {
     document.documentElement.style.setProperty("--sidebar-width", sideBarWidth);
   }, [config.sidebarWidth, isMobileScreen, shouldNarrow]);
 
-  return {
-    onDragStart,
-    shouldNarrow,
-  };
+  return { onDragStart, shouldNarrow };
 }
 
 export function SideBarContainer(props: {
@@ -233,7 +233,10 @@ export function SideBarTail(props: {
   );
 }
 
-export function SideBar(props: { className?: string }) {
+export function SideBar(props: {
+  getCurrentInteractedMs: (isAll?: boolean) => number;
+  className?: string;
+}) {
   const { t } = useTranslation();
 
   const DISCOVERY = [
@@ -257,6 +260,14 @@ export function SideBar(props: { className?: string }) {
 
   const { run: addConversation } = useDebounceFn(
     () => {
+      if (omeStore.from === "omelinkapp") {
+        trackEvent(
+          "click_chat_timestamp",
+          { userId: omeStore.userId, time: new Date() },
+          true,
+        );
+      }
+
       chatStore.newSession(undefined, () => navigate(Path.Chat));
     },
     { wait: 300 },
@@ -264,16 +275,18 @@ export function SideBar(props: { className?: string }) {
 
   const { run: quitMetis } = useDebounceFn(
     () => {
-      if (window.ReactNativeWebView) {
-        try {
-          const message = {
-            data: {},
-            msg: "quit",
-            type: MessageEnum.Quit,
-          };
+      try {
+        if (window?.ReactNativeWebView) {
+          const ms = props.getCurrentInteractedMs(true);
+
+          const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
+
+          if (omeStore.from === "omelinkapp") {
+            message.data = { time: ms };
+          }
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        } catch {}
-      }
+        }
+      } catch {}
     },
     { wait: 300 },
   );
@@ -348,10 +361,7 @@ export function SideBar(props: { className?: string }) {
             <Selector
               items={[
                 ...DISCOVERY.map((item) => {
-                  return {
-                    title: item.name,
-                    value: item.path,
-                  };
+                  return { title: item.name, value: item.path };
                 }),
               ]}
               onClose={() => setshowDiscoverySelector(false)}

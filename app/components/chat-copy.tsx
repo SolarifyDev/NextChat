@@ -1,3 +1,5 @@
+"use client";
+
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   Fragment,
@@ -145,6 +147,7 @@ import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
 import { useDebounceFn } from "ahooks";
+import { trackEvent } from "../utils/ga";
 
 const localStorage = safeLocalStorage();
 
@@ -338,10 +341,7 @@ function useSubmitHandler() {
     );
   };
 
-  return {
-    submitKey,
-    shouldSubmit,
-  };
+  return { submitKey, shouldSubmit };
 }
 
 export type RenderPrompt = Pick<Prompt, "title" | "content">;
@@ -372,9 +372,7 @@ export function PromptHints(props: {
           Math.min(props.prompts.length - 1, selectIndex + delta),
         );
         setSelectIndex(nextIndex);
-        selectedRef.current?.scrollIntoView({
-          block: "center",
-        });
+        selectedRef.current?.scrollIntoView({ block: "center" });
       };
 
       if (e.key === "ArrowUp") {
@@ -457,20 +455,14 @@ export function ChatAction(props: {
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = useState(false);
-  const [width, setWidth] = useState({
-    full: 16,
-    icon: 16,
-  });
+  const [width, setWidth] = useState({ full: 16, icon: 16 });
 
   function updateWidth() {
     if (!iconRef.current || !textRef.current) return;
     const getWidth = (dom: HTMLDivElement) => dom.getBoundingClientRect().width;
     const textWidth = getWidth(textRef.current);
     const iconWidth = getWidth(iconRef.current);
-    setWidth({
-      full: textWidth + iconWidth,
-      icon: iconWidth,
-    });
+    setWidth({ full: textWidth + iconWidth, icon: iconWidth });
   }
 
   const { run: onClick } = useDebounceFn(
@@ -478,9 +470,7 @@ export function ChatAction(props: {
       props.onClick();
       setTimeout(updateWidth, 1);
     },
-    {
-      wait: 300,
-    },
+    { wait: 300 },
   );
 
   return (
@@ -589,12 +579,7 @@ function useScrollToBottom(
     lastMessagesLength.current = messages.length;
   }, [messages.length, detach, scrollDomToBottom]);
 
-  return {
-    scrollRef,
-    autoScroll,
-    setAutoScroll,
-    scrollDomToBottom,
-  };
+  return { scrollRef, autoScroll, setAutoScroll, scrollDomToBottom };
 }
 
 export function ChatActions(props: {
@@ -916,10 +901,7 @@ export function ChatActions(props: {
         {showSizeSelector && (
           <Selector
             defaultSelectedValue={currentSize}
-            items={modelSizes.map((m) => ({
-              title: m,
-              value: m,
-            }))}
+            items={modelSizes.map((m) => ({ title: m, value: m }))}
             onClose={() => setShowSizeSelector(false)}
             onSelection={(s) => {
               if (s.length === 0) return;
@@ -943,10 +925,7 @@ export function ChatActions(props: {
         {showQualitySelector && (
           <Selector
             defaultSelectedValue={currentQuality}
-            items={dalle3Qualitys.map((m) => ({
-              title: m,
-              value: m,
-            }))}
+            items={dalle3Qualitys.map((m) => ({ title: m, value: m }))}
             onClose={() => setShowQualitySelector(false)}
             onSelection={(q) => {
               if (q.length === 0) return;
@@ -970,10 +949,7 @@ export function ChatActions(props: {
         {showStyleSelector && (
           <Selector
             defaultSelectedValue={currentStyle}
-            items={dalle3Styles.map((m) => ({
-              title: m,
-              value: m,
-            }))}
+            items={dalle3Styles.map((m) => ({ title: m, value: m }))}
             onClose={() => setShowStyleSelector(false)}
             onSelection={(s) => {
               if (s.length === 0) return;
@@ -1320,6 +1296,15 @@ export function _Chat_NEW() {
 
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
+
+    if (omeStore.from === "omelinkapp") {
+      trackEvent(
+        "click_send_timestamp",
+        { userId: omeStore.userId, time: new Date() },
+        true,
+      );
+    }
+
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
@@ -1491,11 +1476,7 @@ export function _Chat_NEW() {
   const onPinMessage = (message: ChatMessage) => {
     chatStore.updateTargetSession(
       session!,
-      (session) =>
-        session.mask.context.push({
-          ...message,
-          id: nanoid(),
-        }),
+      (session) => session.mask.context.push({ ...message, id: nanoid() }),
       true,
     );
 
@@ -1589,10 +1570,7 @@ export function _Chat_NEW() {
         isLoading
           ? [
               {
-                ...createMessage({
-                  role: "assistant",
-                  content: "……",
-                }),
+                ...createMessage({ role: "assistant", content: "……" }),
                 preview: true,
               },
             ]
@@ -1602,10 +1580,7 @@ export function _Chat_NEW() {
         userInput.length > 0 && config.sendPreviewBubble
           ? [
               {
-                ...createMessage({
-                  role: "user",
-                  content: userInput,
-                }),
+                ...createMessage({ role: "user", content: userInput }),
                 preview: true,
               },
             ]
@@ -1696,10 +1671,7 @@ export function _Chat_NEW() {
       if (accessStore.disableFastLink) return;
 
       try {
-        const payload = JSON.parse(text) as {
-          key?: string;
-          url?: string;
-        };
+        const payload = JSON.parse(text) as { key?: string; url?: string };
 
         console.log("[Command] got settings from url: ", payload);
 
@@ -2163,9 +2135,7 @@ export function _Chat_NEW() {
                                         ) {
                                           newContent.push({
                                             type: "image_url",
-                                            image_url: {
-                                              url: images[i],
-                                            },
+                                            image_url: { url: images[i] },
                                           });
                                         }
                                       }
@@ -2420,10 +2390,7 @@ export function _Chat_NEW() {
                     {t("Chat.Metis.Title")}
                   </div>
                   <div
-                    style={{
-                      color: "rgba(160, 158, 187, 1)",
-                      width: "279px",
-                    }}
+                    style={{ color: "rgba(160, 158, 187, 1)", width: "279px" }}
                   >
                     {/* {Locale.Chat.Metis.Content} */}
                     {t("Chat.Metis.Content")}
@@ -2481,17 +2448,10 @@ export function _Chat_NEW() {
                         display: "flex",
                         flexDirection: "row",
                       }
-                    : {
-                        padding: "10px 10px",
-                        position: "relative",
-                      }
+                    : { padding: "10px 10px", position: "relative" }
                 }
               >
-                <div
-                  style={{
-                    width: "100%",
-                  }}
-                >
+                <div style={{ width: "100%" }}>
                   <Input.TextArea
                     id="chat-input"
                     ref={textareaRef}
@@ -2504,9 +2464,7 @@ export function _Chat_NEW() {
                     placeholder={
                       omeStore.isFromApp
                         ? t("Chat.AppInput")
-                        : t("Chat.Input", {
-                            submitKey,
-                          })
+                        : t("Chat.Input", { submitKey })
                     }
                     onInput={(e) => onInput(e.currentTarget.value)}
                     value={userInput}
