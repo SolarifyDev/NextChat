@@ -1300,7 +1300,7 @@ export function _Chat_NEW() {
     if (omeStore.from === "omelinkapp") {
       trackEvent(
         "click_send_timestamp",
-        { userId: omeStore.userId, time: new Date() },
+        { userId: omeStore.userId, time: Date.now() },
         true,
       );
     }
