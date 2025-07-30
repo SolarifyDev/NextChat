@@ -277,13 +277,14 @@ export function SideBar(props: {
     () => {
       try {
         if (window?.ReactNativeWebView) {
-          const ms = props.getCurrentInteractedMs(true);
-
           const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
 
           if (omeStore.from === "omelinkapp") {
+            const ms = props.getCurrentInteractedMs(true);
+
             message.data = { time: ms };
           }
+
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         }
       } catch {}
