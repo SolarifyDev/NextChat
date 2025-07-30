@@ -263,7 +263,7 @@ export function SideBar(props: {
       if (omeStore.from === "omelinkapp") {
         trackEvent(
           "click_chat_timestamp",
-          { userId: omeStore.userId, time: new Date() },
+          { userId: omeStore.userId, time: Date.now() },
           true,
         );
       }

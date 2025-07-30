@@ -184,7 +184,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
               if (from === "omelinkapp") {
                 trackEvent(
                   "click_chat_timestamp",
-                  { userId: userId, time: new Date() },
+                  { userId: userId, time: Date.now() },
                   true,
                 );
               }
