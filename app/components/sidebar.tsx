@@ -261,16 +261,16 @@ export function SideBar(props: { className?: string }) {
 
   const { run: quitMetis } = useDebounceFn(
     () => {
-      if (window.ReactNativeWebView) {
-        try {
+      try {
+        if (window?.ReactNativeWebView) {
           const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        } catch {}
-      } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
-        (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
-          "quit",
-        );
-      }
+        } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
+          (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
+            "quit",
+          );
+        }
+      } catch {}
     },
     { wait: 300 },
   );
