@@ -127,10 +127,7 @@ export function useDragSideBar() {
     document.documentElement.style.setProperty("--sidebar-width", sideBarWidth);
   }, [config.sidebarWidth, isMobileScreen, shouldNarrow]);
 
-  return {
-    onDragStart,
-    shouldNarrow,
-  };
+  return { onDragStart, shouldNarrow };
 }
 
 export function SideBarContainer(props: {
@@ -266,11 +263,7 @@ export function SideBar(props: { className?: string }) {
     () => {
       if (window.ReactNativeWebView) {
         try {
-          const message = {
-            data: {},
-            msg: "quit",
-            type: MessageEnum.Quit,
-          };
+          const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } catch {}
       }
@@ -348,10 +341,7 @@ export function SideBar(props: { className?: string }) {
             <Selector
               items={[
                 ...DISCOVERY.map((item) => {
-                  return {
-                    title: item.name,
-                    value: item.path,
-                  };
+                  return { title: item.name, value: item.path };
                 }),
               ]}
               onClose={() => setshowDiscoverySelector(false)}
