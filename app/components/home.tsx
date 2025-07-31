@@ -373,10 +373,45 @@ export function Home() {
       }
     };
 
+    (window as any).receiveFromNative = (response: string) => {
+      try {
+        const data = JSON.parse(response);
+
+        if (isEmpty(data) || (typeof response === "string" && response === ""))
+          return;
+
+        if (!isEmpty(data?.from)) {
+          omeStore.setFrom(data.from ?? "");
+        }
+        if (!isEmpty(data?.ometoken)) {
+          omeStore.setToken(data?.ometoken ?? "");
+        }
+        if (!isEmpty(data?.omeUserId)) {
+          omeStore.setUserId(data?.omeUserId ?? "");
+        }
+        if (!isEmpty(data?.omeUserName)) {
+          omeStore.setUserName(data?.omeUserName ?? "");
+        }
+        omeStore.setIsFromApp(true);
+        useNewChatStore.getState().setIsDown(true);
+        if (!isEmpty(data?.lanauge)) {
+          omeStore.setLanguage(data?.lanauge);
+        }
+      } catch (error) {
+        if (window?.webkit?.messageHandlers?.nativeListener) {
+          window?.webkit?.messageHandlers?.nativeListener.postMessage("quit");
+        }
+      }
+    };
+
     window.addEventListener("message", handleMessage);
 
     return () => {
       window.removeEventListener("message", handleMessage);
+
+      if ((window as any).receiveFromNative) {
+        delete (window as any).receiveFromNative;
+      }
     };
   }, []);
 
@@ -400,6 +435,10 @@ export function Home() {
           };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } catch {}
+      } else if (window?.webkit?.messageHandlers?.nativeListener) {
+        window?.webkit?.messageHandlers?.nativeListener.postMessage(
+          "omemetis is ready",
+        );
       } else {
         window.parent.postMessage("omemetis is ready", "*");
       }
