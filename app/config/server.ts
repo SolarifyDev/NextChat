@@ -93,6 +93,8 @@ declare global {
       DEFAULT_INPUT_TEMPLATE?: string;
 
       ENABLE_MCP?: string; // enable mcp functionality
+
+      GROWING_ID?: string;
     }
   }
 }
@@ -266,5 +268,6 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+    growingId: process.env.GROWING_ID,
   };
 };
