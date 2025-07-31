@@ -36,7 +36,6 @@ import { ModelConfigList } from "./model-config";
 import { IconButton } from "./button";
 import {
   SubmitKey,
-  useChatStore,
   Theme,
   useUpdateStore,
   useAccessStore,
@@ -84,6 +83,7 @@ import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";
 import { ProviderType } from "../utils/cloud";
+import { useNewChatStore } from "../store/new-chat";
 
 function EditPromptModal(props: { id: string; onClose: () => void }) {
   const promptStore = usePromptStore();
@@ -240,7 +240,7 @@ function UserPromptModal(props: { onClose?: () => void }) {
 }
 
 function DangerItems() {
-  const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
   const appConfig = useAppConfig();
 
   return (
@@ -483,7 +483,8 @@ function SyncConfigModal(props: { onClose?: () => void }) {
 
 function SyncItems() {
   const syncStore = useSyncStore();
-  const chatStore = useChatStore();
+  // const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
   const promptStore = usePromptStore();
   const maskStore = useMaskStore();
   const couldSync = useMemo(() => {

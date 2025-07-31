@@ -233,12 +233,16 @@ export function showToast(
   content: string,
   action?: ToastProps["action"],
   delay = 3000,
+  callback?: () => void,
 ) {
   const div = document.createElement("div");
   div.className = styles.show;
   document.body.appendChild(div);
 
   const root = createRoot(div);
+
+  const isManuallyClosed = { value: true };
+
   const close = () => {
     div.classList.add(styles.hide);
 
@@ -250,9 +254,28 @@ export function showToast(
 
   setTimeout(() => {
     close();
+    if (isManuallyClosed.value && callback) {
+      callback();
+    }
   }, delay);
 
-  root.render(<Toast content={content} action={action} onClose={close} />);
+  root.render(
+    <Toast
+      content={content}
+      action={
+        action
+          ? {
+              text: action.text,
+              onClick: () => {
+                action.onClick?.();
+                isManuallyClosed.value = false;
+              },
+            }
+          : undefined
+      }
+      onClose={close}
+    />,
+  );
 }
 
 export type InputProps = React.HTMLProps<HTMLTextAreaElement> & {

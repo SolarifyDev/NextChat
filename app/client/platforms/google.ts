@@ -10,7 +10,6 @@ import {
 import {
   useAccessStore,
   useAppConfig,
-  useChatStore,
   usePluginStore,
   ChatMessageTool,
 } from "@/app/store";
@@ -28,6 +27,7 @@ import { preProcessImageContent } from "@/app/utils/chat";
 import { nanoid } from "nanoid";
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
+import { useNewChatStore } from "@/app/store/new-chat";
 
 export class GeminiProApi implements LLMApi {
   path(path: string, shouldStream = false): string {
@@ -145,7 +145,8 @@ export class GeminiProApi implements LLMApi {
 
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
+      // ...useChatStore.getState().currentSession().mask.modelConfig,
+      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
       ...{
         model: options.config.model,
       },
@@ -206,11 +207,10 @@ export class GeminiProApi implements LLMApi {
       );
 
       if (shouldStream) {
-        const [tools, funcs] = usePluginStore
-          .getState()
-          .getAsTools(
-            useChatStore.getState().currentSession().mask?.plugin || [],
-          );
+        const [tools, funcs] = usePluginStore.getState().getAsTools(
+          // useChatStore.getState().currentSession().mask?.plugin || [],
+          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+        );
         return stream(
           chatPath,
           requestPayload,

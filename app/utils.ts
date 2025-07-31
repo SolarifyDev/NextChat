@@ -354,6 +354,12 @@ export function showPlugins(provider: ServiceProvider, model: string) {
   ) {
     return true;
   }
+  if (model.toLowerCase().includes("deepseek-chat")) {
+    return true;
+  }
+  if (model.toLowerCase().includes("metis")) {
+    return true;
+  }
   return false;
 }
 

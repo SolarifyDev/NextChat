@@ -58,7 +58,7 @@ export function PluginPage() {
   const closePluginModal = () => setEditingPluginId(undefined);
 
   const onChangePlugin = useDebouncedCallback((editingPlugin, e) => {
-    const content = e.target.innerText;
+    const content = e.target.innerText.replace(/，/g, ",");
     try {
       const api = new OpenAPIClientAxios({
         definition: yaml.load(content) as any,
@@ -76,11 +76,11 @@ export function PluginPage() {
           }
         })
         .catch((e) => {
-          console.error(e);
+          console.error(e, "then");
           showToast(Locale.Plugin.EditModal.Error);
         });
     } catch (e) {
-      console.error(e);
+      console.error(e, "try");
       showToast(Locale.Plugin.EditModal.Error);
     }
   }, 100).bind(null, editingPlugin);

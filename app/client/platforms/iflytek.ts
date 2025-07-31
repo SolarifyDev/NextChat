@@ -5,7 +5,7 @@ import {
   Iflytek,
   REQUEST_TIMEOUT_MS,
 } from "@/app/constant";
-import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
+import { useAccessStore, useAppConfig } from "@/app/store";
 
 import {
   ChatOptions,
@@ -25,6 +25,7 @@ import { getMessageTextContent } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
 
 import { RequestPayload } from "./openai";
+import { useNewChatStore } from "@/app/store/new-chat";
 
 export class SparkApi implements LLMApi {
   private disableListModels = true;
@@ -73,7 +74,8 @@ export class SparkApi implements LLMApi {
 
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
+      // ...useChatStore.getState().currentSession().mask.modelConfig,
+      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,

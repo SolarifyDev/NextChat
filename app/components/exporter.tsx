@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { ChatMessage, useAppConfig, useChatStore } from "../store";
+import { ChatMessage, useAppConfig } from "../store";
 import Locale from "../locales";
 import styles from "./exporter.module.scss";
 import {
@@ -40,6 +40,7 @@ import { type ClientApi, getClientApi } from "../client/api";
 import { getMessageTextContent } from "../utils";
 import { MaskAvatar } from "./mask";
 import clsx from "clsx";
+import { useNewChatStore } from "../store/new-chat";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -164,8 +165,10 @@ export function MessageExporter() {
     setExportConfig(config);
   }
 
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  // const chatStore = useChatStore();
+  const chatStore = useNewChatStore();
+  // const session = chatStore.currentSession();
+  const session = chatStore.getCurrentSession();
   const { selection, updateSelection } = useMessageSelector();
   const selectedMessages = useMemo(() => {
     const ret: ChatMessage[] = [];
@@ -410,8 +413,10 @@ export function ImagePreviewer(props: {
   messages: ChatMessage[];
   topic: string;
 }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  // const chatStore = useChatStore();
+  // const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
   const mask = session.mask;
   const config = useAppConfig();
 

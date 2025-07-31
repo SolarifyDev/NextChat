@@ -19,11 +19,11 @@ import {
   HTMLPreview,
   HTMLPreviewHander,
 } from "./artifacts";
-import { useChatStore } from "../store";
 import { IconButton } from "./button";
 
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
+import { useNewChatStore } from "../store/new-chat";
 
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -77,8 +77,10 @@ export function PreCode(props: { children: any }) {
   const [mermaidCode, setMermaidCode] = useState("");
   const [htmlCode, setHtmlCode] = useState("");
   const { height } = useWindowSize();
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  // const chatStore = useChatStore();
+  // const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
 
   const renderArtifacts = useDebouncedCallback(() => {
     if (!ref.current) return;
@@ -174,8 +176,10 @@ export function PreCode(props: { children: any }) {
 }
 
 function CustomCode(props: { children: any; className?: string }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  // const chatStore = useChatStore();
+  // const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  const session = chatStore.getCurrentSession();
   const config = useAppConfig();
   const enableCodeFold =
     session.mask?.enableCodeFold !== false && config.enableCodeFold;

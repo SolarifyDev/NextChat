@@ -82,6 +82,9 @@ export interface ChatStat {
 }
 
 export interface ChatSession {
+  sessionId?: number;
+  isDeleted?: boolean;
+
   id: string;
   topic: string;
 

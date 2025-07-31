@@ -1,6 +1,6 @@
 "use client";
 import { ApiPath, Baidu, BAIDU_BASE_URL } from "@/app/constant";
-import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
+import { useAccessStore, useAppConfig } from "@/app/store";
 import { getAccessToken } from "@/app/utils/baidu";
 
 import {
@@ -20,6 +20,7 @@ import { prettyObject } from "@/app/utils/format";
 import { getClientConfig } from "@/app/config/client";
 import { getMessageTextContent, getTimeoutMSByModel } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
+import { useNewChatStore } from "@/app/store/new-chat";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -100,7 +101,8 @@ export class ErnieApi implements LLMApi {
 
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
+      // ...useChatStore.getState().currentSession().mask.modelConfig,
+      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
       ...{
         model: options.config.model,
       },

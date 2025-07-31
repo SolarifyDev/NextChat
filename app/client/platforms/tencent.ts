@@ -1,6 +1,6 @@
 "use client";
 import { ApiPath, TENCENT_BASE_URL } from "@/app/constant";
-import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
+import { useAccessStore, useAppConfig } from "@/app/store";
 
 import {
   ChatOptions,
@@ -27,6 +27,7 @@ import mapValues from "lodash-es/mapValues";
 import isArray from "lodash-es/isArray";
 import isObject from "lodash-es/isObject";
 import { fetch } from "@/app/utils/stream";
+import { useNewChatStore } from "@/app/store/new-chat";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -107,7 +108,8 @@ export class HunyuanApi implements LLMApi {
 
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
+      // ...useChatStore.getState().currentSession().mask.modelConfig,
+      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
       ...{
         model: options.config.model,
       },
