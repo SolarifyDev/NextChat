@@ -4,7 +4,12 @@ export const TrackGrowingIO = (
 ) => {
   try {
     if (window.gio) {
-      window.gio("track", eventName, data || {});
+      const params = {
+        currentTime: Date.now().toString(),
+        ...data,
+      };
+
+      window.gio("track", eventName, params || {});
     }
   } catch {}
 };
