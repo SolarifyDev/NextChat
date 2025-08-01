@@ -143,7 +143,7 @@ class UserActivityMonitor {
       if (typeof window.gtag === "function") {
         trackEvent(
           this.gaEventName,
-          { time: Date.now(), userid: this.userId },
+          { time: Date.now(), userId: this.userId },
           this.debug,
         );
         return;
