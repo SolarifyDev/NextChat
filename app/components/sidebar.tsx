@@ -261,11 +261,10 @@ export function SideBar(props: {
   const { run: addConversation } = useDebounceFn(
     () => {
       if (omeStore.from === "omelinkapp") {
-        trackEvent(
-          "click_chat_timestamp",
-          { userId: omeStore.userId, time: Date.now() },
-          true,
-        );
+        trackEvent("click_chat_timestamp", {
+          userId: omeStore.userId,
+          time: Date.now(),
+        });
       }
 
       chatStore.newSession(undefined, () => navigate(Path.Chat));
