@@ -214,6 +214,7 @@ function Screen() {
         timeout: 30 * 60 * 1000,
         gaEventName: "exit_app_timestamp",
         userId: omeStore.userId,
+        debug: false,
       });
     }
 
@@ -226,11 +227,10 @@ function Screen() {
     console.log("📤 上传行为埋点 => ", interacted ? "活跃" : "无操作");
 
     if (omeStore.from === "omelinkapp") {
-      trackEvent(
-        "app_is_active",
-        { isActive: interacted, userId: omeStore.userId },
-        true,
-      );
+      trackEvent("app_is_active", {
+        isActive: interacted,
+        userId: omeStore.userId,
+      });
     }
   });
 

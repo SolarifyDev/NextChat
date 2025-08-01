@@ -48,7 +48,7 @@ class UserActivityMonitor {
     // 配置选项
     this.timeout = options.timeout || 30 * 60 * 1000; // 默认30分钟
     this.gaEventName = options.gaEventName || "";
-    this.debug = options.debug ?? true;
+    this.debug = options.debug ?? false;
     this.userId = options.userId || "";
 
     // 绑定事件处理函数

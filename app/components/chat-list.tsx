@@ -182,11 +182,10 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             selected={i === currentSessionIndex}
             onClick={() => {
               if (from === "omelinkapp") {
-                trackEvent(
-                  "click_chat_timestamp",
-                  { userId: userId, time: Date.now() },
-                  true,
-                );
+                trackEvent("click_chat_timestamp", {
+                  userId: userId,
+                  time: Date.now(),
+                });
               }
 
               navigate(Path.Chat);

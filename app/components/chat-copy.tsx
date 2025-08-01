@@ -1298,11 +1298,10 @@ export function _Chat_NEW() {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
 
     if (omeStore.from === "omelinkapp") {
-      trackEvent(
-        "click_send_timestamp",
-        { userId: omeStore.userId, time: Date.now() },
-        true,
-      );
+      trackEvent("click_send_timestamp", {
+        userId: omeStore.userId,
+        time: Date.now(),
+      });
     }
 
     const matchCommand = chatCommands.match(userInput);
