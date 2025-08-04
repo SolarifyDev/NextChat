@@ -23,6 +23,7 @@ import FourPC from "../../../icons/4PC.png";
 import FourPB from "../../../icons/4PB.png";
 import DeepReSearch from "../../../icons/deepresearch.png";
 import { TrackGrowingIO } from "@/app/utils/analytics";
+import { MessageEnum } from "@/app/enum";
 
 interface TeamLever {
   name: string;
@@ -96,7 +97,7 @@ export function Kid() {
     handleChangeCurrentKidIndex,
   } = useKidStore();
 
-  const { isFromApp, userId } = useOmeStore();
+  const { isFromApp, userId, from } = useOmeStore();
 
   useEffect(() => {
     getKids();
@@ -168,7 +169,7 @@ export function Kid() {
             );
           })}
 
-          {!isFromApp && (
+          {(!isFromApp || from.includes("omeoffice")) && (
             <div
               className={styles["listItem"]}
               style={{
@@ -180,7 +181,27 @@ export function Kid() {
                   kid: "Deep Research",
                 });
 
-                window.open("http://47.238.241.114:3000/chat", "_blank");
+                try {
+                  const message = {
+                    data: {
+                      url: "http://47.238.241.114:3000/chat",
+                    },
+                    msg: "navigate",
+                    type: MessageEnum.Navigate,
+                  };
+
+                  if (window?.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(
+                      JSON.stringify(message),
+                    );
+                  } else if (window?.webkit?.messageHandlers?.nativeListener) {
+                    window?.webkit?.messageHandlers?.nativeListener.postMessage(
+                      JSON.stringify(message),
+                    );
+                  } else {
+                    window.open("http://47.238.241.114:3000/chat", "_blank");
+                  }
+                } catch {}
               }}
             >
               <div className={styles["avatar"]}>
@@ -206,7 +227,7 @@ export function Kid() {
             </div>
           )}
 
-          {!isFromApp &&
+          {(!isFromApp || from.includes("omeoffice")) &&
             data.map((item, index) => (
               <div
                 className={styles["listItem"]}
@@ -220,7 +241,29 @@ export function Kid() {
                     kid: item.name,
                   });
 
-                  window.open(item.url, "_blank");
+                  try {
+                    const message = {
+                      data: {
+                        url: item.url,
+                      },
+                      msg: "navigate",
+                      type: MessageEnum.Navigate,
+                    };
+
+                    if (window?.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else if (
+                      window?.webkit?.messageHandlers?.nativeListener
+                    ) {
+                      window?.webkit?.messageHandlers?.nativeListener.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else {
+                      window.open(item.url, "_blank");
+                    }
+                  } catch {}
                 }}
               >
                 <div className={styles["avatar"]}>
