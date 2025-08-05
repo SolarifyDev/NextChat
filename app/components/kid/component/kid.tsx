@@ -235,8 +235,8 @@ export function Kid() {
                       data: {
                         url: item.url,
                       },
-                      msg: "navigate",
                       type: MessageEnum.Navigate,
+                      msg: "navigate",
                     };
 
                     if (window?.ReactNativeWebView) {
