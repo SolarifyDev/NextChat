@@ -275,9 +275,8 @@ export function SideBar(props: {
   const { run: quitMetis } = useDebounceFn(
     () => {
       try {
+        const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
         if (window?.ReactNativeWebView) {
-          const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
-
           if (omeStore.from === "omelinkapp") {
             const ms = props.getCurrentInteractedMs(true);
 
@@ -287,7 +286,7 @@ export function SideBar(props: {
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
           (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
-            "quit",
+            JSON.stringify(message),
           );
         }
       } catch {}
