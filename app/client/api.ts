@@ -373,6 +373,9 @@ export function getHeaders(ignoreHeaders: boolean = false) {
       case "omelinkapp":
         headers["Omelink-Metis-Userid"] = omeStore.userId || "";
         break;
+      case "omeoffice 1.0":
+        headers["Ome-Office-Oa-User-Id"] = omeStore.userId || "";
+        break;
     }
   } else {
     headers["OME-METIS-Authorization"] = omeStore.token || "";
