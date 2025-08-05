@@ -180,8 +180,8 @@ export function Kid() {
                     data: {
                       url: "http://47.238.241.114:3000/chat",
                     },
-                    msg: "navigate",
                     type: MessageEnum.Navigate,
+                    msg: "navigate",
                   };
 
                   if (window?.ReactNativeWebView) {
