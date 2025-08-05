@@ -33,16 +33,20 @@ api.interceptors.response.use(
     const { status } = error.response;
 
     if (status === 401) {
-      if (window.ReactNativeWebView) {
-        try {
+      try {
+        if (window.ReactNativeWebView) {
           const message = {
             data: {},
             msg: "quit",
             type: MessageEnum.Quit,
           };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        } catch {}
-      }
+        } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
+          (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
+            "quit",
+          );
+        }
+      } catch {}
     }
   },
 );
