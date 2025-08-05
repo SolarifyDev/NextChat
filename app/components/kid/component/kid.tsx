@@ -96,7 +96,7 @@ export function Kid() {
     handleChangeCurrentKidIndex,
   } = useKidStore();
 
-  const { isFromApp, userId } = useOmeStore();
+  const { isFromApp, userId, userName } = useOmeStore();
 
   useEffect(() => {
     getKids();
@@ -176,6 +176,7 @@ export function Kid() {
               }}
               onClick={() => {
                 TrackGrowingIO("registerSuccess", {
+                  userName: userName,
                   userId: userId,
                   kid: "Deep Research",
                 });
@@ -216,6 +217,7 @@ export function Kid() {
                 key={index}
                 onClick={() => {
                   TrackGrowingIO("registerSuccess", {
+                    userName: userName,
                     userId: userId,
                     kid: item.name,
                   });
