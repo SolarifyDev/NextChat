@@ -22,6 +22,7 @@ import SixM from "../../../icons/6M.png";
 import FourPC from "../../../icons/4PC.png";
 import FourPB from "../../../icons/4PB.png";
 import DeepReSearch from "../../../icons/deepresearch.png";
+import { TrackGrowingIO } from "@/app/utils/analytics";
 
 interface TeamLever {
   name: string;
@@ -95,7 +96,7 @@ export function Kid() {
     handleChangeCurrentKidIndex,
   } = useKidStore();
 
-  const { isFromApp } = useOmeStore();
+  const { isFromApp, userId, userName } = useOmeStore();
 
   useEffect(() => {
     getKids();
@@ -174,6 +175,12 @@ export function Kid() {
                 cursor: "pointer",
               }}
               onClick={() => {
+                TrackGrowingIO("registerSuccess", {
+                  userName: userName,
+                  userId: userId,
+                  kid: "Deep Research",
+                });
+
                 window.open("http://47.238.241.114:3000/chat", "_blank");
               }}
             >
@@ -209,6 +216,12 @@ export function Kid() {
                 }}
                 key={index}
                 onClick={() => {
+                  TrackGrowingIO("registerSuccess", {
+                    userName: userName,
+                    userId: userId,
+                    kid: item.name,
+                  });
+
                   window.open(item.url, "_blank");
                 }}
               >
