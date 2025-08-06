@@ -11,6 +11,7 @@ export type OmeStoreType = {
   isFromApp: boolean | null;
   language: Lang;
   onlineSearch: boolean;
+  eventUuid: string; // ga
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -19,6 +20,7 @@ export type OmeStoreType = {
   setFrom: (from: string) => void;
   setIsFromApp: (isFromApp: boolean) => void;
   setLanguage: (language: Lang) => void;
+  setEventUuid: (eventUuid: string) => void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -31,6 +33,7 @@ export const useOmeStore = create<OmeStoreType>()(
       isFromApp: null,
       language: "cn",
       onlineSearch: false,
+      eventUuid: "",
       clearCurrent: () => {
         set({
           token: "",
@@ -39,6 +42,7 @@ export const useOmeStore = create<OmeStoreType>()(
           from: "",
           isFromApp: null,
           onlineSearch: false,
+          eventUuid: "",
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -61,6 +65,9 @@ export const useOmeStore = create<OmeStoreType>()(
       },
       setLanguage: (language: Lang) => {
         set({ language });
+      },
+      setEventUuid: (eventUuid: string) => {
+        set({ eventUuid });
       },
     }),
     {

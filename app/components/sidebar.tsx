@@ -264,6 +264,7 @@ export function SideBar(props: {
         trackEvent("click_chat_timestamp", {
           userId: omeStore.userId,
           time: Date.now(),
+          metis_event_id: omeStore.eventUuid,
         });
       }
 

@@ -1301,6 +1301,7 @@ export function _Chat_NEW() {
       trackEvent("click_send_timestamp", {
         userId: omeStore.userId,
         time: Date.now(),
+        metis_event_id: omeStore.eventUuid,
       });
     }
 
