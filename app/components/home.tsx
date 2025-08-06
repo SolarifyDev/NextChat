@@ -215,6 +215,7 @@ function Screen() {
         gaEventName: "exit_app_timestamp",
         userId: omeStore.userId,
         debug: false,
+        eventUuid: omeStore.eventUuid,
       });
     }
 
@@ -230,6 +231,7 @@ function Screen() {
       trackEvent("app_is_active", {
         isActive: interacted,
         userId: omeStore.userId,
+        metis_event_id: omeStore.eventUuid,
       });
     }
   });
@@ -391,6 +393,9 @@ export function Home() {
           useNewChatStore.getState().setIsDown(true);
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
+          }
+          if (!isEmpty(params?.eventUuid)) {
+            omeStore.setEventUuid(params.eventUuid);
           }
         } catch {}
       } else {

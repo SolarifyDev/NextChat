@@ -5,6 +5,7 @@ interface UserActivityMonitorOptions {
   gaEventName?: string;
   userId?: string;
   debug?: boolean;
+  eventUuid?: string;
 }
 
 interface UserActivityStatus {
@@ -28,6 +29,7 @@ class UserActivityMonitor {
   private gaEventName: string;
   private debug: boolean;
   private userId: string;
+  private eventUuid: string;
 
   // 状态管理
   private timer: NodeJS.Timeout | null = null;
@@ -50,6 +52,7 @@ class UserActivityMonitor {
     this.gaEventName = options.gaEventName || "";
     this.debug = options.debug ?? false;
     this.userId = options.userId || "";
+    this.eventUuid = options.eventUuid || "";
 
     // 绑定事件处理函数
     this.handleUserActivity = this.handleUserActivity.bind(this);
@@ -143,7 +146,11 @@ class UserActivityMonitor {
       if (typeof window.gtag === "function") {
         trackEvent(
           this.gaEventName,
-          { time: Date.now(), userId: this.userId },
+          {
+            time: Date.now(),
+            userId: this.userId,
+            metis_event_id: this.eventUuid,
+          },
           this.debug,
         );
         return;
