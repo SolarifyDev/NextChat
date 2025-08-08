@@ -207,7 +207,7 @@ export class ClaudeApi implements LLMApi {
         path,
         requestBody,
         {
-          ...getHeaders(),
+          ...(await getHeaders()),
           "anthropic-version": accessStore.anthropicApiVersion,
         },
         // @ts-ignore
@@ -309,7 +309,7 @@ export class ClaudeApi implements LLMApi {
         body: JSON.stringify(requestBody),
         signal: controller.signal,
         headers: {
-          ...getHeaders(), // get common headers
+          ...(await getHeaders()), // get common headers
           "anthropic-version": accessStore.anthropicApiVersion,
           // do not send `anthropicApiKey` in browser!!!
           // Authorization: getAuthKey(accessStore.anthropicApiKey),

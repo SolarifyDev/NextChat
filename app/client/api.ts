@@ -241,7 +241,7 @@ export function validString(x: string): boolean {
   return x?.length > 0;
 }
 
-export function getHeaders(ignoreHeaders: boolean = false) {
+export async function getHeaders(ignoreHeaders: boolean = false) {
   const appConfig = useAppConfig.getState();
   const omeStore = useOmeStore.getState();
   const accessStore = useAccessStore.getState();
@@ -360,6 +360,9 @@ export function getHeaders(ignoreHeaders: boolean = false) {
     );
   }
   // console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
+  if (omeStore.shouldRefreshToken()) {
+    await omeStore.refreshAccessToken();
+  }
 
   if (omeStore.isFromApp) {
     switch (omeStore.from.toLowerCase()) {

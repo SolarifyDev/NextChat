@@ -36,6 +36,7 @@ import i18next from "i18next";
 import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
+import { PostGetToken } from "../client/smarties";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -339,7 +340,23 @@ export function Home() {
           if (!isEmpty(params?.omeUserName)) {
             omeStore.setUserName(params?.omeUserName ?? "");
           }
-          omeStore.setIsFromApp(true);
+          if (!isEmpty(params?.ticket)) {
+            omeStore.setTicket(params?.ticket ?? "");
+
+            PostGetToken("get", {
+              grant_type: "ticket",
+              ticket: params?.ticket ?? "",
+            })
+              .then((res) => {
+                omeStore.setToken(res.access_token ?? "");
+                omeStore.setIsFromApp(true);
+              })
+              .catch(() => {
+                // 需要做quit
+              });
+          } else {
+            omeStore.setIsFromApp(true);
+          }
           useNewChatStore.getState().setIsDown(true);
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);

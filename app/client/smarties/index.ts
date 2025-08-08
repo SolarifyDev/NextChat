@@ -116,3 +116,48 @@ export const PostUpdateKid = async (
     headers,
   });
 };
+
+export const PostGetToken = async (
+  type: "get" | "refresh",
+  data: Partial<{
+    grant_type: string;
+    ticket: string;
+    refresh_token: string;
+  }>,
+): Promise<{
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  id_token: string;
+  refresh_token: string;
+}> => {
+  const client =
+    type === "get"
+      ? {
+          client_id: "",
+          client_secret: "",
+          scope: "",
+        }
+      : {
+          client_id: "",
+          client_secret: "",
+        };
+
+  const newData = {
+    ...data,
+    ...client,
+  };
+  return (
+    await api.post(
+      "/connect/token",
+      newData,
+
+      {
+        baseURL: "http://ome-account.wiltechs.com",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      },
+    )
+  ).data;
+};
