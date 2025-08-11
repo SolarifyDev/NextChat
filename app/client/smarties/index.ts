@@ -128,7 +128,7 @@ const authApi = axios.create({
   timeout: 120000,
 });
 
-api.interceptors.request.use(
+authApi.interceptors.request.use(
   async (config) => {
     config.baseURL =
       location.origin.includes("ai-chat-test") ||
