@@ -14,6 +14,9 @@ export type OmeStoreType = {
   ticket: string;
   refreshToken: string;
   expiresIn: null | number;
+  clientId: string | null;
+  clientSecret: string | null;
+  score: string | null;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -27,6 +30,7 @@ export type OmeStoreType = {
   setExpiresIn: (expiresIn: number) => void;
   refreshAccessToken: () => Promise<string>;
   shouldRefreshToken: () => boolean;
+  setClient: (clientId: string, clientSecret: string, score: string) => void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -42,6 +46,9 @@ export const useOmeStore = create<OmeStoreType>()(
       ticket: "",
       refreshToken: "",
       expiresIn: null,
+      clientId: null,
+      clientSecret: null,
+      score: null,
       clearCurrent: () => {
         set({
           token: "",
@@ -53,6 +60,9 @@ export const useOmeStore = create<OmeStoreType>()(
           ticket: "",
           refreshToken: "",
           expiresIn: null,
+          clientId: null,
+          clientSecret: null,
+          score: null,
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -82,6 +92,13 @@ export const useOmeStore = create<OmeStoreType>()(
       setRefreshToken: (refreshToken: string) => {
         set({ refreshToken });
       },
+      setClient: (clientId: string, clientSecret: string, score: string) => {
+        set({
+          clientId,
+          clientSecret,
+          score,
+        });
+      },
       setExpiresIn: (expiresIn: number) => {
         set({ expiresIn });
       },
@@ -92,7 +109,8 @@ export const useOmeStore = create<OmeStoreType>()(
         })
           .then((res) => {
             if (res && res.access_token) {
-              get().setToken(res.access_token);
+              get().setToken(res?.access_token ?? "");
+              get().setRefreshToken(res?.refresh_token ?? "");
               return res.access_token;
             }
 

@@ -319,7 +319,7 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    const handleMessage = (event: any) => {
+    const handleMessage = async (event: any) => {
       const data = event.data;
 
       if (isEmpty(data) || (typeof data === "string" && data === "")) return;
@@ -343,21 +343,51 @@ export function Home() {
           if (!isEmpty(params?.ticket)) {
             omeStore.setTicket(params?.ticket ?? "");
 
-            PostGetToken("get", {
+            try {
+              const res = await fetch("/api/omeAccount");
+              const config = await res.json();
+
+              console.log(config, "config");
+
+              omeStore.setClient(
+                config?.clientId || "",
+                config?.clientSecret || "",
+                config?.score || "",
+              );
+            } catch {
+              const message = {
+                data: {},
+                msg: "quit",
+                type: MessageEnum.Quit,
+              };
+
+              window.ReactNativeWebView.postMessage(JSON.stringify(message));
+            }
+
+            await PostGetToken("get", {
               grant_type: "ticket",
               ticket: params?.ticket ?? "",
             })
               .then((res) => {
                 omeStore.setToken(res.access_token ?? "");
+                omeStore.setRefreshToken(res.refresh_token ?? "");
+
                 omeStore.setIsFromApp(true);
+                useNewChatStore.getState().setIsDown(true);
               })
               .catch(() => {
-                // 需要做quit
+                const message = {
+                  data: {},
+                  msg: "quit",
+                  type: MessageEnum.Quit,
+                };
+
+                window.ReactNativeWebView.postMessage(JSON.stringify(message));
               });
           } else {
             omeStore.setIsFromApp(true);
+            useNewChatStore.getState().setIsDown(true);
           }
-          useNewChatStore.getState().setIsDown(true);
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
           }

@@ -379,6 +379,9 @@ export async function getHeaders(ignoreHeaders: boolean = false) {
       case "omeoffice 1.0":
         headers["Ome-Office-Oa-User-Id"] = omeStore.userId || "";
         break;
+      case "omeoffice 2.0":
+        headers["Authorization"] = "Bearer " + omeStore.token || "";
+        break;
     }
   } else {
     headers["OME-METIS-Authorization"] = omeStore.token || "";
