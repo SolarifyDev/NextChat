@@ -242,14 +242,14 @@ export const useAccessStore = createPersistStore(
         (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
       );
     },
-    fetch() {
+    async fetch() {
       if (fetchState > 0 || getClientConfig()?.buildMode === "export") return;
       fetchState = 1;
       fetch("/api/config", {
         method: "post",
         body: null,
         headers: {
-          ...getHeaders(),
+          ...(await getHeaders()),
         },
       })
         .then((res) => res.json())
