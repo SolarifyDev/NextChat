@@ -451,8 +451,12 @@ export function Home() {
           omeStore.setLanguage(data?.lanauge);
         }
       } catch (error) {
+        const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
+
         if (window?.webkit?.messageHandlers?.nativeListener) {
-          window?.webkit?.messageHandlers?.nativeListener.postMessage("quit");
+          window?.webkit?.messageHandlers?.nativeListener.postMessage(
+            JSON.stringify(message),
+          );
         }
       }
     };
@@ -479,18 +483,19 @@ export function Home() {
 
   useEffect(() => {
     if (appConfig._hasHydrated) {
+      const message = {
+        data: {},
+        msg: "omemetis is ready",
+        type: MessageEnum.Send,
+      };
+
       if (window.ReactNativeWebView) {
         try {
-          const message = {
-            data: {},
-            msg: "omemetis is ready",
-            type: MessageEnum.Send,
-          };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } catch {}
       } else if (window?.webkit?.messageHandlers?.nativeListener) {
         window?.webkit?.messageHandlers?.nativeListener.postMessage(
-          "omemetis is ready",
+          JSON.stringify(message),
         );
       } else {
         window.parent.postMessage("omemetis is ready", "*");
