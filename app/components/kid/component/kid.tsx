@@ -22,6 +22,7 @@ import SixM from "../../../icons/6M.png";
 import FourPC from "../../../icons/4PC.png";
 import FourPB from "../../../icons/4PB.png";
 import DeepReSearch from "../../../icons/deepresearch.png";
+import { TrackGrowingIO } from "@/app/utils/analytics";
 import { MessageEnum } from "@/app/enum";
 
 interface TeamLever {
@@ -96,7 +97,7 @@ export function Kid() {
     handleChangeCurrentKidIndex,
   } = useKidStore();
 
-  const { isFromApp, userId, from } = useOmeStore();
+  const { isFromApp, userId, from, userName } = useOmeStore();
 
   useEffect(() => {
     getKids();
@@ -175,6 +176,12 @@ export function Kid() {
                 cursor: "pointer",
               }}
               onClick={() => {
+                TrackGrowingIO("registerSuccess", {
+                  userName: userName,
+                  userId: userId,
+                  kid: "Deep Research",
+                });
+
                 try {
                   const message = {
                     data: {
@@ -230,6 +237,12 @@ export function Kid() {
                 }}
                 key={index}
                 onClick={() => {
+                  TrackGrowingIO("registerSuccess", {
+                    userName: userName,
+                    userId: userId,
+                    kid: item.name,
+                  });
+
                   try {
                     const message = {
                       data: {
