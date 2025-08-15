@@ -95,6 +95,12 @@ declare global {
       ENABLE_MCP?: string; // enable mcp functionality
 
       GROWING_ID?: string;
+
+      CLIENT_ID?: string;
+
+      CLIENT_SECRET?: string;
+
+      SCORE?: string;
     }
   }
 }
@@ -269,5 +275,8 @@ export const getServerSideConfig = () => {
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
     growingId: process.env.GROWING_ID,
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    score: process.env.SCORE,
   };
 };

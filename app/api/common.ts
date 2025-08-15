@@ -105,6 +105,7 @@ export async function requestOpenai(req: NextRequest) {
       "Omelink-Metis-Userid": req.headers.get("Omelink-Metis-Userid") || "",
       OnlineSearch: req.headers.get("OnlineSearch") || "0",
       "Ome-Office-Oa-User-Id": req.headers.get("Ome-Office-Oa-User-Id") || "",
+      Authorization: req.headers.get("Authorization") || "",
     },
     method: req.method,
     body: req.body,
