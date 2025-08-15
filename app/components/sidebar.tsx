@@ -262,12 +262,12 @@ export function SideBar(props: { className?: string }) {
   const { run: quitMetis } = useDebounceFn(
     () => {
       try {
+        const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
         if (window?.ReactNativeWebView) {
-          const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
           (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
-            "quit",
+            JSON.stringify(message),
           );
         }
       } catch {}
