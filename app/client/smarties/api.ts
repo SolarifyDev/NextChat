@@ -7,13 +7,11 @@ api.interceptors.request.use(
   async (config) => {
     // config.baseURL = process.env.NEXT_PUBLIC_SMARTIES_URL;
 
-    if (!config.baseURL || config.baseURL === "") {
-      config.baseURL =
-        location.origin.includes("ai-chat-test") ||
-        location.origin.includes("localhost")
-          ? "https://testsmarties.yamimeal.ca"
-          : "https://smarties.yamimeal.ca";
-    }
+    config.baseURL =
+      location.origin.includes("ai-chat-test") ||
+      location.origin.includes("localhost")
+        ? "https://testsmarties.yamimeal.ca"
+        : "https://smarties.yamimeal.ca";
 
     return config;
   },
