@@ -298,15 +298,7 @@ export const useNewChatStore = createPersistStore(
             isLoading: true,
           });
 
-          const data = await GetHistory(
-            getHeaders(
-              useOmeStore.getState().from,
-              useOmeStore.getState().isFromApp!,
-              useOmeStore.getState().userId,
-              useOmeStore.getState().userName,
-              useOmeStore.getState().token,
-            ),
-          );
+          const data = await GetHistory(await getHeaders());
           const newData: ChatSession[] = data.map((item) => ({
             ...item,
             messages: JSONParse(item.messages, "arr"),
@@ -660,13 +652,7 @@ export const useNewChatStore = createPersistStore(
 
             const config = useAppConfig.getState();
             await PostAddOrUpdateSession(
-              getHeaders(
-                useOmeStore.getState().from,
-                useOmeStore.getState().isFromApp!,
-                useOmeStore.getState().userId,
-                useOmeStore.getState().userName,
-                useOmeStore.getState().token,
-              ),
+              await getHeaders(),
               ConvertSession("update", sessions[index]),
             )
               .then(() => console.log("更新成功"))
@@ -875,16 +861,7 @@ export const useNewChatStore = createPersistStore(
           async () => {
             const data = ConvertSession("delete", deletedSession);
 
-            await PostAddOrUpdateSession(
-              getHeaders(
-                useOmeStore.getState().from,
-                useOmeStore.getState().isFromApp!,
-                useOmeStore.getState().userId,
-                useOmeStore.getState().userName,
-                useOmeStore.getState().token,
-              ),
-              data,
-            )
+            await PostAddOrUpdateSession(await getHeaders(), data)
               .then(() => {
                 console.log("delete成功");
               })
@@ -920,16 +897,7 @@ export const useNewChatStore = createPersistStore(
 
         const data = ConvertSession("add", newSession);
 
-        await PostAddOrUpdateSession(
-          getHeaders(
-            useOmeStore.getState().from,
-            useOmeStore.getState().isFromApp!,
-            useOmeStore.getState().userId,
-            useOmeStore.getState().userName,
-            useOmeStore.getState().token,
-          ),
-          data,
-        )
+        await PostAddOrUpdateSession(await getHeaders(), data)
           .then((res) => {
             if (res) {
               newSession.sessionId = res.sessionId;
@@ -970,16 +938,7 @@ export const useNewChatStore = createPersistStore(
 
         const data = ConvertSession("add", session);
 
-        await PostAddOrUpdateSession(
-          getHeaders(
-            useOmeStore.getState().from,
-            useOmeStore.getState().isFromApp!,
-            useOmeStore.getState().userId,
-            useOmeStore.getState().userName,
-            useOmeStore.getState().token,
-          ),
-          data,
-        )
+        await PostAddOrUpdateSession(await getHeaders(), data)
           .then((res) => {
             if (res) {
               session.sessionId = res.sessionId;
