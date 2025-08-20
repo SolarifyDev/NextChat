@@ -130,7 +130,7 @@ export class SiliconflowApi implements LLMApi {
         method: "POST",
         body: JSON.stringify(requestPayload),
         signal: controller.signal,
-        headers: getHeaders(),
+        headers: await getHeaders(),
       };
 
       // console.log(chatPayload);
@@ -149,7 +149,7 @@ export class SiliconflowApi implements LLMApi {
         return streamWithThink(
           chatPath,
           requestPayload,
-          getHeaders(),
+          await getHeaders(),
           tools as any,
           funcs,
           controller,
@@ -259,7 +259,7 @@ export class SiliconflowApi implements LLMApi {
     const res = await fetch(this.path(SiliconFlow.ListModelPath), {
       method: "GET",
       headers: {
-        ...getHeaders(),
+        ...(await getHeaders()),
       },
     });
 

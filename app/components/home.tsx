@@ -39,6 +39,7 @@ import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 import UserActivityMonitor from "../hook/use-activity";
 import { useInteractionMonitor } from "../hook/use-interaction-monitor";
 import { trackEvent } from "../utils/ga";
+import { PostGetToken } from "../client/smarties";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -368,7 +369,7 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    const handleMessage = (event: any) => {
+    const handleMessage = async (event: any) => {
       const data = event.data;
 
       if (isEmpty(data) || (typeof data === "string" && data === "")) return;
@@ -389,8 +390,52 @@ export function Home() {
           if (!isEmpty(params?.omeUserName)) {
             omeStore.setUserName(params?.omeUserName ?? "");
           }
-          omeStore.setIsFromApp(true);
-          useNewChatStore.getState().setIsDown(true);
+          if (!isEmpty(params?.ticket)) {
+            omeStore.setTicket(params?.ticket ?? "");
+
+            try {
+              const res = await fetch("/api/omeAccount");
+              const config = await res.json();
+
+              omeStore.setClient(
+                config?.clientId || "",
+                config?.clientSecret || "",
+                config?.score || "",
+              );
+            } catch {
+              const message = {
+                data: {},
+                msg: "quit",
+                type: MessageEnum.Quit,
+              };
+
+              window.ReactNativeWebView.postMessage(JSON.stringify(message));
+            }
+
+            await PostGetToken("get", {
+              grant_type: "ticket",
+              ticket: params?.ticket ?? "",
+            })
+              .then((res) => {
+                omeStore.setToken(res.access_token ?? "");
+                omeStore.setRefreshToken(res.refresh_token ?? "");
+
+                omeStore.setIsFromApp(true);
+                useNewChatStore.getState().setIsDown(true);
+              })
+              .catch(() => {
+                const message = {
+                  data: {},
+                  msg: "quit",
+                  type: MessageEnum.Quit,
+                };
+
+                window.ReactNativeWebView.postMessage(JSON.stringify(message));
+              });
+          } else {
+            omeStore.setIsFromApp(true);
+            useNewChatStore.getState().setIsDown(true);
+          }
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
           }

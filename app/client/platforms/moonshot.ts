@@ -105,7 +105,7 @@ export class MoonshotApi implements LLMApi {
         method: "POST",
         body: JSON.stringify(requestPayload),
         signal: controller.signal,
-        headers: getHeaders(),
+        headers: await getHeaders(),
       };
 
       // make a fetch request
@@ -122,7 +122,7 @@ export class MoonshotApi implements LLMApi {
         return stream(
           chatPath,
           requestPayload,
-          getHeaders(),
+          await getHeaders(),
           tools as any,
           funcs,
           controller,
