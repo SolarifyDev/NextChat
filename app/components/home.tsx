@@ -347,8 +347,6 @@ export function Home() {
               const res = await fetch("/api/omeAccount");
               const config = await res.json();
 
-              console.log(config, "config");
-
               omeStore.setClient(
                 config?.clientId || "",
                 config?.clientSecret || "",
