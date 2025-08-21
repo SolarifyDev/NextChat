@@ -1,7 +1,6 @@
 import { clone, isEmpty, isNil } from "lodash-es";
 import { GetKids, IAIKid, PostUpdateKid, getHeaders } from "../client/smarties";
 import { createPersistStore } from "../utils/store";
-import { useOmeStore } from "./ome";
 import { showToast } from "../components/ui-lib";
 import { t } from "i18next";
 
@@ -47,15 +46,7 @@ export const useKidStore = createPersistStore(
             isLoading: true,
           });
 
-          const data = await GetKids(
-            getHeaders(
-              useOmeStore.getState().from,
-              useOmeStore.getState().isFromApp!,
-              useOmeStore.getState().userId,
-              useOmeStore.getState().userName,
-              useOmeStore.getState().token,
-            ),
-          );
+          const data = await GetKids(await getHeaders());
 
           set({
             kids: data ?? [],
@@ -128,16 +119,7 @@ export const useKidStore = createPersistStore(
             formData.append("greeting", notSavekid.greeting);
             formData.append("voice", notSavekid.voice.toString());
 
-            await PostUpdateKid(
-              getHeaders(
-                useOmeStore.getState().from,
-                useOmeStore.getState().isFromApp!,
-                useOmeStore.getState().userId,
-                useOmeStore.getState().userName,
-                useOmeStore.getState().token,
-              ),
-              formData,
-            );
+            await PostUpdateKid(await getHeaders(), formData);
 
             set({
               isFetching: false,

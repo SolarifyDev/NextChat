@@ -186,7 +186,7 @@ export class ChatGLMApi implements LLMApi {
         method: "POST",
         body: JSON.stringify(requestPayload),
         signal: controller.signal,
-        headers: getHeaders(),
+        headers: await getHeaders(),
       };
 
       const requestTimeoutId = setTimeout(
@@ -214,7 +214,7 @@ export class ChatGLMApi implements LLMApi {
         return stream(
           path,
           requestPayload,
-          getHeaders(),
+          await getHeaders(),
           tools as any,
           funcs,
           controller,
