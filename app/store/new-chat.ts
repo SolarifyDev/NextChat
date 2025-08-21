@@ -443,6 +443,11 @@ export const useNewChatStore = createPersistStore(
         });
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
+
+        let pendingUpdate = false;
+
+        let rafId: number | null = null;
+
         // make request
         api.llm.chat({
           messages: sendMessages,
@@ -452,11 +457,35 @@ export const useNewChatStore = createPersistStore(
             if (message) {
               botMessage.content = message;
             }
-            get().updateTargetSession(session, (session) => {
-              session.messages = session.messages.concat();
-            });
+            // get().updateTargetSession(session, (session) => {
+            //   session.messages = session.messages.concat();
+            // });
+
+            if (!pendingUpdate) {
+              pendingUpdate = true;
+              rafId = requestAnimationFrame(() => {
+                pendingUpdate = false;
+                get().updateTargetSession(session, (s) => {
+                  const idx = s.messages.findIndex(
+                    (m) => m.id === botMessage.id,
+                  );
+                  if (idx >= 0) {
+                    if (s.messages[idx].content !== botMessage.content) {
+                      s.messages[idx] = { ...botMessage };
+                    }
+                  }
+                });
+              });
+            }
           },
           async onFinish(message) {
+            // 取消待处理的 RAF
+            if (rafId) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+              pendingUpdate = false;
+            }
+
             botMessage.streaming = false;
             if (message) {
               botMessage.content = message;
@@ -467,8 +496,14 @@ export const useNewChatStore = createPersistStore(
           },
           onBeforeTool(tool: ChatMessageTool) {
             (botMessage.tools = botMessage?.tools || []).push(tool);
-            get().updateTargetSession(session, (session) => {
-              session.messages = session.messages.concat();
+            // get().updateTargetSession(session, (session) => {
+            //   session.messages = session.messages.concat();
+            // });
+            get().updateTargetSession(session, (s) => {
+              const idx = s.messages.findIndex((m) => m.id === botMessage.id);
+              if (idx >= 0) {
+                s.messages[idx] = { ...botMessage };
+              }
             });
           },
           onAfterTool(tool: ChatMessageTool) {
@@ -477,11 +512,22 @@ export const useNewChatStore = createPersistStore(
                 tools[i] = { ...tool };
               }
             });
-            get().updateTargetSession(session, (session) => {
-              session.messages = session.messages.concat();
+            // get().updateTargetSession(session, (session) => {
+            //   session.messages = session.messages.concat();
+            // });
+            get().updateTargetSession(session, (s) => {
+              const idx = s.messages.findIndex((m) => m.id === botMessage.id);
+              if (idx >= 0) {
+                s.messages[idx] = { ...botMessage };
+              }
             });
           },
           onError(error) {
+            if (rafId) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+              pendingUpdate = false;
+            }
             const isAborted = error.message?.includes?.("aborted");
             botMessage.content +=
               "\n\n" +
@@ -495,7 +541,19 @@ export const useNewChatStore = createPersistStore(
             get().updateTargetSession(
               session,
               (session) => {
-                session.messages = session.messages.concat();
+                const userIdx = session.messages.findIndex(
+                  (m) => m.id === userMessage.id,
+                );
+                const botIdx = session.messages.findIndex(
+                  (m) => m.id === botMessage.id,
+                );
+
+                if (userIdx >= 0) {
+                  session.messages[userIdx] = { ...userMessage };
+                }
+                if (botIdx >= 0) {
+                  session.messages[botIdx] = { ...botMessage };
+                }
               },
               true,
             );
