@@ -388,6 +388,192 @@ export const useNewChatStore = createPersistStore(
           // TODO: should update chat count and word count
         });
       },
+      // async onUserInput(
+      //   content: string,
+      //   attachImages?: string[],
+      //   isMcpResponse?: boolean,
+      // ) {
+      //   const session = get().getCurrentSession();
+      //   if (!session) return;
+
+      //   const modelConfig = session.mask.modelConfig;
+
+      //   // MCP Response no need to fill template
+      //   let mContent: string | MultimodalContent[] = isMcpResponse
+      //     ? content
+      //     : fillTemplateWith(content, modelConfig);
+
+      //   if (!isMcpResponse && attachImages && attachImages.length > 0) {
+      //     mContent = [
+      //       ...(content ? [{ type: "text" as const, text: content }] : []),
+      //       ...attachImages.map((url) => ({
+      //         type: "image_url" as const,
+      //         image_url: { url },
+      //       })),
+      //     ];
+      //   }
+
+      //   let userMessage: ChatMessage = createMessage({
+      //     role: "user",
+      //     content: mContent,
+      //     isMcpResponse,
+      //   });
+
+      //   const botMessage: ChatMessage = createMessage({
+      //     role: "assistant",
+      //     streaming: true,
+      //     model: modelConfig.model,
+      //   });
+
+      //   // get recent messages
+      //   const recentMessages = await get().getMessagesWithMemory();
+      //   const sendMessages = recentMessages.concat(userMessage);
+      //   const messageIndex = session.messages.length + 1;
+
+      //   // save user's and bot's message
+      //   get().updateTargetSession(session, (session) => {
+      //     const savedUserMessage = {
+      //       ...userMessage,
+      //       content: mContent,
+      //     };
+      //     session.messages = session.messages.concat([
+      //       savedUserMessage,
+      //       botMessage,
+      //     ]);
+      //   });
+
+      //   const api: ClientApi = getClientApi(modelConfig.providerName);
+
+      //   let pendingUpdate = false;
+
+      //   let rafId: number | null = null;
+
+      //   // make request
+      //   api.llm.chat({
+      //     messages: sendMessages,
+      //     config: { ...modelConfig, stream: true },
+      //     onUpdate(message) {
+      //       botMessage.streaming = true;
+      //       if (message) {
+      //         botMessage.content = message;
+      //       }
+      //       // get().updateTargetSession(session, (session) => {
+      //       //   session.messages = session.messages.concat();
+      //       // });
+
+      //       if (!pendingUpdate) {
+      //         pendingUpdate = true;
+      //         rafId = requestAnimationFrame(() => {
+      //           pendingUpdate = false;
+      //           get().updateTargetSession(session, (s) => {
+      //             const idx = s.messages.findIndex(
+      //               (m) => m.id === botMessage.id,
+      //             );
+      //             if (idx >= 0) {
+      //               if (s.messages[idx].content !== botMessage.content) {
+      //                 s.messages[idx] = { ...botMessage };
+      //               }
+      //             }
+      //           });
+      //         });
+      //       }
+      //     },
+      //     async onFinish(message) {
+      //       // 取消待处理的 RAF
+      //       if (rafId) {
+      //         cancelAnimationFrame(rafId);
+      //         rafId = null;
+      //         pendingUpdate = false;
+      //       }
+
+      //       botMessage.streaming = false;
+      //       if (message) {
+      //         botMessage.content = message;
+      //         botMessage.date = new Date().toLocaleString();
+      //         get().onNewMessage(botMessage, session);
+      //       }
+      //       ChatControllerPool.remove(session.id, botMessage.id);
+      //     },
+      //     onBeforeTool(tool: ChatMessageTool) {
+      //       (botMessage.tools = botMessage?.tools || []).push(tool);
+      //       // get().updateTargetSession(session, (session) => {
+      //       //   session.messages = session.messages.concat();
+      //       // });
+      //       get().updateTargetSession(session, (s) => {
+      //         const idx = s.messages.findIndex((m) => m.id === botMessage.id);
+      //         if (idx >= 0) {
+      //           s.messages[idx] = { ...botMessage };
+      //         }
+      //       });
+      //     },
+      //     onAfterTool(tool: ChatMessageTool) {
+      //       botMessage?.tools?.forEach((t, i, tools) => {
+      //         if (tool.id == t.id) {
+      //           tools[i] = { ...tool };
+      //         }
+      //       });
+      //       // get().updateTargetSession(session, (session) => {
+      //       //   session.messages = session.messages.concat();
+      //       // });
+      //       get().updateTargetSession(session, (s) => {
+      //         const idx = s.messages.findIndex((m) => m.id === botMessage.id);
+      //         if (idx >= 0) {
+      //           s.messages[idx] = { ...botMessage };
+      //         }
+      //       });
+      //     },
+      //     onError(error) {
+      //       if (rafId) {
+      //         cancelAnimationFrame(rafId);
+      //         rafId = null;
+      //         pendingUpdate = false;
+      //       }
+      //       const isAborted = error.message?.includes?.("aborted");
+      //       botMessage.content +=
+      //         "\n\n" +
+      //         prettyObject({
+      //           error: true,
+      //           message: error.message,
+      //         });
+      //       botMessage.streaming = false;
+      //       userMessage.isError = !isAborted;
+      //       botMessage.isError = !isAborted;
+      //       get().updateTargetSession(
+      //         session,
+      //         (session) => {
+      //           const userIdx = session.messages.findIndex(
+      //             (m) => m.id === userMessage.id,
+      //           );
+      //           const botIdx = session.messages.findIndex(
+      //             (m) => m.id === botMessage.id,
+      //           );
+
+      //           if (userIdx >= 0) {
+      //             session.messages[userIdx] = { ...userMessage };
+      //           }
+      //           if (botIdx >= 0) {
+      //             session.messages[botIdx] = { ...botMessage };
+      //           }
+      //         },
+      //         true,
+      //       );
+      //       ChatControllerPool.remove(
+      //         session.id,
+      //         botMessage.id ?? messageIndex,
+      //       );
+
+      //       console.error("[Chat] failed ", error);
+      //     },
+      //     onController(controller) {
+      //       // collect controller for stop/retry
+      //       ChatControllerPool.addController(
+      //         session.id,
+      //         botMessage.id ?? messageIndex,
+      //         controller,
+      //       );
+      //     },
+      //   });
+      // },
       async onUserInput(
         content: string,
         attachImages?: string[],
@@ -445,7 +631,6 @@ export const useNewChatStore = createPersistStore(
         const api: ClientApi = getClientApi(modelConfig.providerName);
 
         let pendingUpdate = false;
-
         let rafId: number | null = null;
 
         // make request
@@ -457,9 +642,6 @@ export const useNewChatStore = createPersistStore(
             if (message) {
               botMessage.content = message;
             }
-            // get().updateTargetSession(session, (session) => {
-            //   session.messages = session.messages.concat();
-            // });
 
             if (!pendingUpdate) {
               pendingUpdate = true;
@@ -471,7 +653,9 @@ export const useNewChatStore = createPersistStore(
                   );
                   if (idx >= 0) {
                     if (s.messages[idx].content !== botMessage.content) {
-                      s.messages[idx] = { ...botMessage };
+                      // 🔧 只修改这一行：直接更新属性而不是创建新对象
+                      s.messages[idx].content = botMessage.content;
+                      s.messages[idx].streaming = botMessage.streaming;
                     }
                   }
                 });
@@ -496,29 +680,26 @@ export const useNewChatStore = createPersistStore(
           },
           onBeforeTool(tool: ChatMessageTool) {
             (botMessage.tools = botMessage?.tools || []).push(tool);
-            // get().updateTargetSession(session, (session) => {
-            //   session.messages = session.messages.concat();
-            // });
             get().updateTargetSession(session, (s) => {
               const idx = s.messages.findIndex((m) => m.id === botMessage.id);
               if (idx >= 0) {
-                s.messages[idx] = { ...botMessage };
+                // 🔧 直接更新 tools 属性
+                s.messages[idx].tools = botMessage.tools;
               }
             });
           },
           onAfterTool(tool: ChatMessageTool) {
             botMessage?.tools?.forEach((t, i, tools) => {
               if (tool.id == t.id) {
-                tools[i] = { ...tool };
+                // 🔧 直接修改属性而不是创建新对象
+                Object.assign(tools[i], tool);
               }
             });
-            // get().updateTargetSession(session, (session) => {
-            //   session.messages = session.messages.concat();
-            // });
             get().updateTargetSession(session, (s) => {
               const idx = s.messages.findIndex((m) => m.id === botMessage.id);
               if (idx >= 0) {
-                s.messages[idx] = { ...botMessage };
+                // 🔧 直接更新 tools 属性
+                s.messages[idx].tools = botMessage.tools;
               }
             });
           },
@@ -549,10 +730,11 @@ export const useNewChatStore = createPersistStore(
                 );
 
                 if (userIdx >= 0) {
-                  session.messages[userIdx] = { ...userMessage };
+                  // 🔧 直接修改属性而不是创建新对象
+                  Object.assign(session.messages[userIdx], userMessage);
                 }
                 if (botIdx >= 0) {
-                  session.messages[botIdx] = { ...botMessage };
+                  Object.assign(session.messages[botIdx], botMessage);
                 }
               },
               true,
