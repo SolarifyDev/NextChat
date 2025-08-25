@@ -21,7 +21,6 @@ import FiveM from "../../../icons/5M.png";
 import SixM from "../../../icons/6M.png";
 import FourPC from "../../../icons/4PC.png";
 import FourPB from "../../../icons/4PB.png";
-import DeepReSearch from "../../../icons/deepresearch.png";
 import NewsMinimalist from "../../../icons/News Minimalist.png";
 import { MessageEnum } from "@/app/enum";
 
@@ -84,12 +83,12 @@ const hierarchicalData: KidLever[] = [
 ];
 
 const toolData: KidLever[] = [
-  {
-    name: "Deep Research",
-    url: "http://47.238.241.114:3000/chat",
-    description: "你好，我是市場調研專家，你想要的任何諮詢，隨時問我！",
-    icon: DeepReSearch,
-  },
+  // {
+  //   name: "Deep Research",
+  //   url: "http://47.238.241.114:3000/chat",
+  //   description: "你好，我是市場調研專家，你想要的任何諮詢，隨時問我！",
+  //   icon: DeepReSearch,
+  // },
   {
     name: "News Minimalist",
     url: "http://47.238.241.114:9000/",
