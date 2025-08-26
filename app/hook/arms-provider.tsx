@@ -35,5 +35,7 @@ export const ArmsProvider = () => {
     initARMS();
   }, []);
 
+  if (!loaded) return <></>;
+
   return <></>;
 };
