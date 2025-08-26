@@ -83,6 +83,11 @@
     resize-observer-polyfill "^1.5.1"
     throttle-debounce "^5.0.0"
 
+"@arms/js-sdk@^1.8.36-beta.13":
+  version "1.8.36-beta.13"
+  resolved "https://registry.yarnpkg.com/@arms/js-sdk/-/js-sdk-1.8.36-beta.13.tgz#8a55b44d8e0a405bea915cc321ba8b58e41089cc"
+  integrity sha512-R/634KKi52NHMf/NWSHItSaNfuq6fYRGiyde3Lr0P7GEC7KxSlUet2QXrKbVrCWLcYbFN67JGEQow9LcD7eSAQ==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.18.6":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.18.6.tgz#3b25d38c89600baa2dcc219edfa88a74eb2c427a"
