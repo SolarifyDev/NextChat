@@ -12,7 +12,7 @@ export const ArmsProvider = () => {
         const res = await fetch("/api/arms");
         const config = await res.json();
 
-        const logger = BrowserLogger.singleton({
+        BrowserLogger.singleton({
           pid: config.pid,
           environment: config.environment || "pre",
           appType: "web",
@@ -23,8 +23,6 @@ export const ArmsProvider = () => {
           useFmp: true,
           imgUrl: "https://arms-retcode.aliyuncs.com/r.png?",
         });
-
-        (window as any).__bl = logger;
 
         setLoaded(true);
       } catch (err) {
