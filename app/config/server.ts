@@ -99,6 +99,10 @@ declare global {
       CLIENT_SECRET?: string;
 
       SCORE?: string;
+
+      ARMS?: string;
+
+      ENVIRONMENT?: string;
     }
   }
 }
@@ -275,5 +279,7 @@ export const getServerSideConfig = () => {
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     score: process.env.SCORE,
+    arms: process.env.ARMS,
+    environment: process.env.ENVIRONMENT,
   };
 };
