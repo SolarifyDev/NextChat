@@ -21,16 +21,17 @@ import FiveM from "../../../icons/5M.png";
 import SixM from "../../../icons/6M.png";
 import FourPC from "../../../icons/4PC.png";
 import FourPB from "../../../icons/4PB.png";
-import DeepReSearch from "../../../icons/deepresearch.png";
+import NewsMinimalist from "../../../icons/News Minimalist.png";
+import { MessageEnum } from "@/app/enum";
 
-interface TeamLever {
+interface KidLever {
   name: string;
   url: string;
   description: string;
   icon: StaticImageData;
 }
 
-const data: TeamLever[] = [
+const hierarchicalData: KidLever[] = [
   {
     name: "1P",
     url: "https://ai-studio.solarifyai.com/chat/ZlUhd7wPT5toGu4w",
@@ -81,6 +82,22 @@ const data: TeamLever[] = [
   },
 ];
 
+const toolData: KidLever[] = [
+  // {
+  //   name: "Deep Research",
+  //   url: "http://47.238.241.114:3000/chat",
+  //   description: "你好，我是市場調研專家，你想要的任何諮詢，隨時問我！",
+  //   icon: DeepReSearch,
+  // },
+  {
+    name: "News Minimalist",
+    url: "http://47.238.241.114:9000/",
+    description:
+      "你好，我是智能新聞助手，幫你快速發現和整理世界各地的新鮮資訊，隨時為你服務",
+    icon: NewsMinimalist,
+  },
+];
+
 export function Kid() {
   const navigate = useNavigate();
 
@@ -95,7 +112,7 @@ export function Kid() {
     handleChangeCurrentKidIndex,
   } = useKidStore();
 
-  const { isFromApp } = useOmeStore();
+  const { isFromApp, userId, from } = useOmeStore();
 
   useEffect(() => {
     getKids();
@@ -167,41 +184,8 @@ export function Kid() {
             );
           })}
 
-          {!isFromApp && (
-            <div
-              className={styles["listItem"]}
-              style={{
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                window.open("http://47.238.241.114:3000/chat", "_blank");
-              }}
-            >
-              <div className={styles["avatar"]}>
-                <img
-                  src={DeepReSearch.src as string}
-                  alt="Logo"
-                  style={{
-                    width: 48,
-                    height: 48,
-                    objectFit: "cover",
-                    userSelect: "none",
-                    pointerEvents: "none",
-                    borderRadius: "50%",
-                  }}
-                />
-              </div>
-              <div className={styles["content"]}>
-                <div className={styles["name"]}>Deep Research</div>
-                <div className={styles["message"]}>
-                  你好，我是市場調研專家，你想要的任何諮詢，隨時問我！
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!isFromApp &&
-            data.map((item, index) => (
+          {(!isFromApp || from.includes("omeoffice")) &&
+            toolData.map((item, index) => (
               <div
                 className={styles["listItem"]}
                 style={{
@@ -209,7 +193,84 @@ export function Kid() {
                 }}
                 key={index}
                 onClick={() => {
-                  window.open(item.url, "_blank");
+                  try {
+                    const message = {
+                      data: {
+                        url: item.url,
+                      },
+                      type: MessageEnum.Navigate,
+                      msg: "navigate",
+                    };
+
+                    if (window?.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else if (
+                      window?.webkit?.messageHandlers?.nativeListener
+                    ) {
+                      window?.webkit?.messageHandlers?.nativeListener.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else {
+                      window.open(item.url, "_blank");
+                    }
+                  } catch {}
+                }}
+              >
+                <div className={styles["avatar"]}>
+                  <img
+                    src={item.icon.src as string}
+                    alt="Logo"
+                    style={{
+                      width: 48,
+                      height: 48,
+                      objectFit: "cover",
+                      userSelect: "none",
+                      pointerEvents: "none",
+                      borderRadius: "50%",
+                    }}
+                  />
+                </div>
+                <div className={styles["content"]}>
+                  <div className={styles["name"]}>{item.name}</div>
+                  <div className={styles["message"]}>{item.description}</div>
+                </div>
+              </div>
+            ))}
+
+          {(!isFromApp || from.includes("omeoffice")) &&
+            hierarchicalData.map((item, index) => (
+              <div
+                className={styles["listItem"]}
+                style={{
+                  cursor: "pointer",
+                }}
+                key={index}
+                onClick={() => {
+                  try {
+                    const message = {
+                      data: {
+                        url: item.url,
+                      },
+                      type: MessageEnum.Navigate,
+                      msg: "navigate",
+                    };
+
+                    if (window?.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else if (
+                      window?.webkit?.messageHandlers?.nativeListener
+                    ) {
+                      window?.webkit?.messageHandlers?.nativeListener.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else {
+                      window.open(item.url, "_blank");
+                    }
+                  } catch {}
                 }}
               >
                 <div className={styles["avatar"]}>

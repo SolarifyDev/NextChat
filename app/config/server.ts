@@ -94,7 +94,14 @@ declare global {
 
       ENABLE_MCP?: string; // enable mcp functionality
 
+      CLIENT_ID?: string;
+
+      CLIENT_SECRET?: string;
+
+      SCORE?: string;
+
       ARMS?: string;
+
       ENVIRONMENT?: string;
     }
   }
@@ -269,6 +276,9 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    score: process.env.SCORE,
     arms: process.env.ARMS,
     environment: process.env.ENVIRONMENT,
   };
