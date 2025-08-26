@@ -337,6 +337,10 @@ export function Home() {
 
           if (!isEmpty(params?.from)) {
             omeStore.setFrom(params.from ?? "");
+
+            (window as any).__bl.setConfig({
+              tag: params?.from,
+            });
           }
           if (!isEmpty(params?.ometoken)) {
             omeStore.setToken(params?.ometoken ?? "");
@@ -422,6 +426,10 @@ export function Home() {
           omeStore.setUserName(event?.data?.omeUserName);
         }
         omeStore.setIsFromApp(false);
+
+        (window as any).__bl.setConfig({
+          tag: "omeoffice web",
+        });
       }
     };
 
@@ -434,6 +442,10 @@ export function Home() {
 
         if (!isEmpty(data?.from)) {
           omeStore.setFrom(data.from ?? "");
+
+          (window as any).__bl.setConfig({
+            tag: data.from,
+          });
         }
         if (!isEmpty(data?.ometoken)) {
           omeStore.setToken(data?.ometoken ?? "");
