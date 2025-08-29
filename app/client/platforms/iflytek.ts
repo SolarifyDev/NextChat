@@ -75,7 +75,7 @@ export class SparkApi implements LLMApi {
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
+      ...useNewChatStore.getState()?.currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,

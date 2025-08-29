@@ -80,7 +80,8 @@ export function PreCode(props: { children: any }) {
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
 
   const renderArtifacts = useDebouncedCallback(() => {
     if (!ref.current) return;
@@ -180,7 +181,8 @@ function CustomCode(props: { children: any; className?: string }) {
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
   const config = useAppConfig();
   const enableCodeFold =
     session.mask?.enableCodeFold !== false && config.enableCodeFold;

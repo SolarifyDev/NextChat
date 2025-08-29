@@ -120,11 +120,13 @@ export function ChatItem(props: {
 
 export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
   const {
-    currentSessionIndex,
+    // currentSessionIndex,
     sessions,
-    selectSession,
+    // selectSession,
     deleteSession,
     isLoading,
+    getCurrentSession,
+    currentSessionId,
   } = useNewChatStore();
   const { t } = useTranslation();
 
@@ -176,10 +178,14 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             key={item.id}
             id={item.id}
             index={i}
-            selected={i === currentSessionIndex}
+            // selected={i === currentSessionIndex}
+            selected={currentSessionId === item.id}
             onClick={() => {
-              navigate(Path.Chat);
-              selectSession(i);
+              // navigate(Path.Chat);
+              // selectSession(i);
+              getCurrentSession(item.id, item.userId!, item, () =>
+                navigate(Path.Chat),
+              );
               if (onlineSearch) {
                 setOnlineSearch(false);
               }

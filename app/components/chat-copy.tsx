@@ -185,7 +185,7 @@ const MCPAction = () => {
 export function SessionConfigModel(props: { onClose: () => void }) {
   const { t } = useTranslation();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
   const maskStore = useMaskStore();
   const navigate = useNavigate();
 
@@ -267,7 +267,7 @@ function PromptToast(props: {
 }) {
   const { t } = useTranslation();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore.currentSession;
   const context = session.mask.context;
 
   return (
@@ -414,7 +414,7 @@ export function PromptHints(props: {
 function ClearContextDivider() {
   const { t } = useTranslation();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
 
   return (
     <div
@@ -599,7 +599,7 @@ export function ChatActions(props: {
   const navigate = useNavigate();
   const chatStore = useNewChatStore();
   const pluginStore = usePluginStore();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
 
   // switch themes
   const theme = config.theme;
@@ -977,7 +977,7 @@ export function ChatActions(props: {
         {showPluginSelector && (
           <Selector
             multiple
-            defaultSelectedValue={chatStore.getCurrentSession().mask?.plugin}
+            defaultSelectedValue={chatStore?.currentSession?.mask?.plugin}
             items={pluginStore.getAll().map((item) => ({
               title: `${item?.title}@${item?.version}`,
               value: item?.id,
@@ -1021,7 +1021,7 @@ export function ChatActions(props: {
 export function EditMessageModal(props: { onClose: () => void }) {
   const { t } = useTranslation();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
   const [messages, setMessages] = useState(session.messages.slice());
 
   return (
@@ -1177,7 +1177,7 @@ export function _Chat_NEW() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
   const config = useAppConfig();
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
@@ -1709,7 +1709,7 @@ export function _Chat_NEW() {
 
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const currentModel = chatStore.getCurrentSession().mask.modelConfig.model;
+      const currentModel = chatStore?.currentSession?.mask?.modelConfig?.model;
       if (!isVisionModel(currentModel)) {
         return;
       }

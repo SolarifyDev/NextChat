@@ -41,6 +41,7 @@ import { t } from "i18next";
 import { useOmeStore } from "./ome";
 import { createPersistStore } from "../utils/store";
 import { indexedDBStorage } from "../utils/indexedDB-storage";
+import { getConversation, saveConversation } from "../dataBase/chatDB";
 
 export type ChatMessageTool = {
   id: string;
@@ -81,17 +82,21 @@ export interface ChatSession {
   clearContextIndex?: number | null;
 
   mask: Mask;
+  userId?: number;
 }
 
 export type ChatStoreType = {
+  currentSession?: ChatSession;
+  currentSessionId: string;
+  currentSessionUserId: number;
   currentSessionIndex: number;
   sessions: ChatSession[];
   lastInput: string;
   isDown: boolean;
   isLoading: boolean;
   selectSession: (i: number) => void;
-  getSession: () => Promise<void>;
-  getCurrentSession: () => ChatSession;
+  getSessions: () => Promise<void>;
+  getCurrentSession: () => void;
   clearCurrent: () => void;
   onUserInput(
     content: string,
@@ -214,7 +219,11 @@ export const getBotHello = (): ChatMessage => {
   });
 };
 
-function createEmptySession(): ChatSession {
+const generateHash = (data: ChatSession): string => {
+  return btoa(JSON.stringify(data)).substring(0, 32);
+};
+
+export function createEmptySession(): ChatSession {
   return {
     id: nanoid(),
     // topic: DEFAULT_TOPIC,
@@ -269,7 +278,10 @@ const detaultSessions: ChatSession[] = [];
 
 export const useNewChatStore = createPersistStore(
   {
-    currentSessionIndex: -1,
+    currentSession: createEmptySession(),
+    currentSessionId: "",
+    currentSessionUserId: 0,
+    currentSessionIndex: -1, // 这个也不用了
     sessions: detaultSessions,
     lastInput: "",
     isDown: false,
@@ -287,12 +299,19 @@ export const useNewChatStore = createPersistStore(
       setIsDown: (isDown: boolean) => {
         set({ isDown });
       },
-      isLoading: false,
       selectSession: (i: number) => {
         set({ currentSessionIndex: i });
       },
-
-      getSession: async () => {
+      selectSessionId: (id: string) => {
+        set({ currentSessionId: id });
+      },
+      selectSessionUserId: (i: number) => {
+        set({ currentSessionUserId: i });
+      },
+      selectCurrentSession: (currentSession: ChatSession) => {
+        set({ currentSession });
+      },
+      getSessions: async () => {
         try {
           set({
             isLoading: true,
@@ -322,8 +341,52 @@ export const useNewChatStore = createPersistStore(
         set({ isLoading });
       },
 
-      getCurrentSession: () => {
-        return get().sessions[get().currentSessionIndex];
+      // 这个方法不用了，后续直接用currentSceeion
+      getCurrentSession: async (
+        id: string,
+        userId: number,
+        item?: ChatSession,
+        callback?: () => void,
+      ) => {
+        console.log(556);
+        // 1. 请求详情接口
+
+        let apiData: ChatSession = createEmptySession();
+
+        // 2. 查看IndexDB是否有相同userId id的数据
+        const data = await getConversation(id, userId);
+
+        // 3. 做存入操作
+
+        if (item) {
+          apiData = item;
+        }
+
+        if (!apiData) {
+          return;
+        }
+
+        console.log(5569999);
+
+        get().selectSessionId(id);
+        get().selectSessionUserId(userId);
+        get().selectCurrentSession(apiData);
+
+        callback && callback();
+
+        if (data) {
+          if (apiData.lastUpdate !== data.lastUpdate) {
+            console.log("111");
+            // 数据不同，才存储
+            await saveConversation(apiData);
+          } else {
+            console.log("222");
+          }
+        } else {
+          console.log("333");
+
+          await saveConversation(apiData);
+        }
       },
 
       clearCurrent: () => {
@@ -332,6 +395,9 @@ export const useNewChatStore = createPersistStore(
           sessions: detaultSessions,
           isDown: false,
           isLoading: false,
+          currentSession: createEmptySession(),
+          currentSessionId: "",
+          currentSessionUserId: 0,
         });
       },
 
@@ -579,7 +645,8 @@ export const useNewChatStore = createPersistStore(
         attachImages?: string[],
         isMcpResponse?: boolean,
       ) {
-        const session = get().getCurrentSession();
+        // const session = get().getCurrentSession();
+        const session = get().currentSession;
         if (!session) return;
 
         const modelConfig = session.mask.modelConfig;
@@ -757,7 +824,8 @@ export const useNewChatStore = createPersistStore(
         });
       },
       async getMessagesWithMemory() {
-        const session = get().getCurrentSession();
+        // const session = get().getCurrentSession();
+        const session = get().currentSession;
 
         const modelConfig = session?.mask?.modelConfig;
         const clearContextIndex = session?.clearContextIndex ?? 0;
@@ -857,7 +925,9 @@ export const useNewChatStore = createPersistStore(
         return recentMessages;
       },
       getMemoryPrompt() {
-        const session = get().getCurrentSession();
+        // const session = get().getCurrentSession();
+
+        const session = get().currentSession;
 
         if (session?.memoryPrompt?.length) {
           return {
@@ -1115,7 +1185,8 @@ export const useNewChatStore = createPersistStore(
       },
       async forkSession() {
         // 获取当前会话
-        const currentSession = get().getCurrentSession();
+        // const currentSession = get().getCurrentSession();
+        const currentSession = get().currentSession;
         if (!currentSession) return;
 
         const newSession = createEmptySession();
@@ -1176,27 +1247,33 @@ export const useNewChatStore = createPersistStore(
           session.topic = mask.name;
         }
 
-        const data = ConvertSession("add", session);
+        // 1.先赋值session
+        get().selectSessionId(session.id);
+        get().selectCurrentSession(session);
 
-        await PostAddOrUpdateSession(await getHeaders(), data)
-          .then((res) => {
-            if (res) {
-              session.sessionId = res.sessionId;
+        callback && callback();
 
-              session.clearContextIndex = res.clearContextIndex;
+        // const data = ConvertSession("add", session);
 
-              set((state) => ({
-                currentSessionIndex: 0,
-                sessions: [session].concat(state.sessions),
-              }));
-            }
+        // await PostAddOrUpdateSession(await getHeaders(), data)
+        //   .then((res) => {
+        //     if (res) {
+        //       session.sessionId = res.sessionId;
 
-            callback && callback();
-          })
-          .catch(() => {
-            console.log("失败");
-            showToast("创建新聊天失败");
-          });
+        //       session.clearContextIndex = res.clearContextIndex;
+
+        //       set((state) => ({
+        //         currentSessionIndex: 0,
+        //         sessions: [session].concat(state.sessions),
+        //       }));
+        //     }
+
+        //     callback && callback();
+        //   })
+        //   .catch(() => {
+        //     console.log("失败");
+        //     showToast("创建新聊天失败");
+        //   });
       },
       async clearAllData() {
         await indexedDBStorage.clear();

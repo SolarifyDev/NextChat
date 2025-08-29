@@ -19,6 +19,7 @@ export interface ISession {
   mask: string;
   isDeleted: boolean;
   clearContextIndex: number | null;
+  userId?: number;
 }
 
 export interface IAIKid {

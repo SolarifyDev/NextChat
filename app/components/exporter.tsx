@@ -174,7 +174,8 @@ export function MessageExporter() {
   // const chatStore = useChatStore();
   const chatStore = useNewChatStore();
   // const session = chatStore.currentSession();
-  const session = chatStore.getCurrentSession();
+  // const session = chatStore.getCurrentSession();
+  const session = chatStore.currentSession;
   const { selection, updateSelection } = useMessageSelector();
   const selectedMessages = useMemo(() => {
     const ret: ChatMessage[] = [];
@@ -433,7 +434,8 @@ export function ImagePreviewer(props: {
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
   const mask = session.mask;
   const config = useAppConfig();
 

@@ -78,7 +78,8 @@ export function MessageSelector(props: {
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const session = chatStore.getCurrentSession();
+  const session = chatStore?.currentSession;
   const isValid = (m: ChatMessage) => m.content && !m.isError && !m.streaming;
   const allMessages = useMemo(() => {
     let startIndex = Math.max(0, session.clearContextIndex ?? 0);

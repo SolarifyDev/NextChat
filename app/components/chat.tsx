@@ -9,7 +9,9 @@
 //   useState,
 // } from "react";
 
+import { useLocation } from "react-router-dom";
 import { useNewChatStore } from "../store/new-chat";
+import { useOmeStore } from "../store/ome";
 import { _Chat_NEW } from "./chat-copy";
 
 // import SendWhiteIcon from "../icons/send-white.svg";
@@ -2181,11 +2183,19 @@ import { _Chat_NEW } from "./chat-copy";
 // }
 
 export function Chat() {
-  const { currentSessionIndex } = useNewChatStore();
+  const { currentSession } = useNewChatStore();
 
-  if (currentSessionIndex < 0) {
+  const { isFromApp } = useOmeStore();
+
+  const location = useLocation();
+
+  if (!isFromApp && location.pathname === "/") {
     return <></>;
   }
 
-  return <_Chat_NEW key={currentSessionIndex}></_Chat_NEW>;
+  // if (currentSessionIndex < 0) {
+  //   return <></>;
+  // }
+
+  return <_Chat_NEW key={currentSession.id}></_Chat_NEW>;
 }

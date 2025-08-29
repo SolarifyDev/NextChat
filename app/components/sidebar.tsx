@@ -250,7 +250,7 @@ export function SideBar(props: { className?: string }) {
   const omeStore = useOmeStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
-  const { getSession } = useNewChatStore();
+  const { getSessions } = useNewChatStore();
 
   const { run: addConversation } = useDebounceFn(
     () => {
@@ -287,7 +287,7 @@ export function SideBar(props: { className?: string }) {
 
   useEffect(() => {
     if (chatStore.isDown) {
-      getSession();
+      getSessions();
     }
   }, [chatStore.isDown]);
 
