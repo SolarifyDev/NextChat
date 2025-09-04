@@ -65,7 +65,7 @@ export async function getHeaders() {
         break;
       case "omeoffice 2.0":
         headers = {
-          Authorization: "Bearer " + state.token,
+          "Ome-Office-Authorization": "Bearer " + state.token,
         };
         break;
       default:

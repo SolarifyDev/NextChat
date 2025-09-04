@@ -380,7 +380,7 @@ export async function getHeaders(ignoreHeaders: boolean = false) {
         headers["Ome-Office-Oa-User-Id"] = omeStore.userId || "";
         break;
       case "omeoffice 2.0":
-        headers["Authorization"] = "Bearer " + omeStore.token || "";
+        headers["Ome-Office-Authorization"] = "Bearer " + omeStore.token || "";
         break;
     }
   } else {
