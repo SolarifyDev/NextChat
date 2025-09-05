@@ -13,6 +13,7 @@ import { useLocation } from "react-router-dom";
 import { useNewChatStore } from "../store/new-chat";
 import { useOmeStore } from "../store/ome";
 import { _Chat_NEW } from "./chat-copy";
+import { isNil } from "lodash";
 
 // import SendWhiteIcon from "../icons/send-white.svg";
 // import BrainIcon from "../icons/brain.svg";
@@ -2189,9 +2190,11 @@ export function Chat() {
 
   const location = useLocation();
 
-  if (!isFromApp && location.pathname === "/") {
+  if (!isFromApp && (location.pathname === "/" || isNil(currentSession))) {
     return <></>;
   }
+
+  if (isFromApp && isNil(currentSession)) return <></>;
 
   // if (currentSessionIndex < 0) {
   //   return <></>;

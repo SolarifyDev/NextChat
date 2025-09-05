@@ -702,6 +702,7 @@ export function ChatActions(props: {
     if (isUnavailableModel && models.length > 0) {
       // show next model to default model if exist
       let nextModel = models.find((model) => model.isDefault) || models[0];
+      // 如果是add的就不需要update给接口，不是new就update
       chatStore.updateTargetSession(
         session,
         (session) => {
@@ -717,7 +718,7 @@ export function ChatActions(props: {
           : nextModel.name,
       );
     }
-  }, [chatStore, currentModel, models, session]);
+  }, [currentModel, models, session]);
 
   return (
     <div className={styles["chat-input-actions"]}>
@@ -867,12 +868,17 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const [model, providerName] = getModelProvider(s[0]);
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.modelConfig.model = model as ModelType;
-                session.mask.modelConfig.providerName =
-                  providerName as ServiceProvider;
-                session.mask.syncGlobalConfig = false;
-              });
+              // chatStore.updateTargetSession(session, (session) => {
+              //   session.mask.modelConfig.model = model as ModelType;
+              //   session.mask.modelConfig.providerName =
+              //     providerName as ServiceProvider;
+              //   session.mask.syncGlobalConfig = false;
+              // });
+              session.mask.modelConfig.model = model as ModelType;
+              session.mask.modelConfig.providerName =
+                providerName as ServiceProvider;
+              session.mask.syncGlobalConfig = false;
+              chatStore.updateCurrentSession(session);
               if (providerName == "ByteDance") {
                 const selectedModel = models.find(
                   (m) =>
@@ -1262,13 +1268,14 @@ export function _Chat_NEW() {
     prev: () => chatStore.nextSession(-1),
     next: () => chatStore.nextSession(1),
     clear: () =>
+      // 需要調整 區分add和未add的場景
       chatStore.updateTargetSession(
         session,
         (session) => (session.clearContextIndex = session.messages.length),
         true,
       ),
     fork: () => chatStore.forkSession(),
-    del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
+    del: () => chatStore.deleteSession(chatStore.currentSessionParams.id),
   });
 
   // only search prompts when user input is short

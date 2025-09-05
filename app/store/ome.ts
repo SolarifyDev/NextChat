@@ -17,6 +17,7 @@ export type OmeStoreType = {
   clientId: string | null;
   clientSecret: string | null;
   score: string | null;
+  isShowHome: boolean | null;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -26,6 +27,7 @@ export type OmeStoreType = {
   setIsFromApp: (isFromApp: boolean) => void;
   setLanguage: (language: Lang) => void;
   setTicket: (ticket: string) => void;
+  setIsShowHome: (isShowHome: boolean) => void;
   setRefreshToken: (refreshToken: string) => void;
   setExpiresIn: (expiresIn: number) => void;
   refreshAccessToken: () => Promise<string>;
@@ -49,6 +51,7 @@ export const useOmeStore = create<OmeStoreType>()(
       clientId: null,
       clientSecret: null,
       score: null,
+      isShowHome: false,
       clearCurrent: () => {
         set({
           token: "",
@@ -63,6 +66,7 @@ export const useOmeStore = create<OmeStoreType>()(
           clientId: null,
           clientSecret: null,
           score: null,
+          isShowHome: false,
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -98,6 +102,9 @@ export const useOmeStore = create<OmeStoreType>()(
           clientSecret,
           score,
         });
+      },
+      setIsShowHome: (isShowHome: boolean) => {
+        set({ isShowHome });
       },
       setExpiresIn: (expiresIn: number) => {
         set({ expiresIn });

@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { Path } from "@/app/constant";
 
 import ArrowLeftIcon from "../icons/arrow-left.svg";
+import HistoryIcon from "../icons/new-history.svg";
 import AddKidIcon from "../icons/add-kid.svg";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useOmeStore } from "@/app/store/ome";
 import { useNewChatStore } from "../store/new-chat";
+import { isEmpty, isNil } from "lodash";
+import { MessageEnum } from "../enum";
 
 export function HomeTab() {
   const tabs = [
@@ -30,16 +33,46 @@ export function HomeTab() {
 
   const chatStore = useNewChatStore();
 
+  // useEffect(() => {
+  //   setActiveTab(
+  //     location.pathname === Path.Chat ||
+  //       (location.pathname === Path.Home && chatStore.currentSessionIndex > -1)
+  //       ? 0
+  //       : location.pathname === Path.AIKid
+  //       ? 1
+  //       : -1,
+  //   );
+  // }, [location.pathname, chatStore.currentSessionIndex]);
+
   useEffect(() => {
-    setActiveTab(
-      location.pathname === Path.Chat ||
-        (location.pathname === Path.Home && chatStore.currentSessionIndex > -1)
-        ? 0
-        : location.pathname === Path.AIKid
-        ? 1
-        : -1,
-    );
-  }, [location.pathname, chatStore.currentSessionIndex]);
+    if (omeStore.isFromApp) {
+      setActiveTab(
+        location.pathname === Path.Chat ||
+          (location.pathname === Path.Home &&
+            !isNil(omeStore.isShowHome) &&
+            !omeStore.isShowHome)
+          ? 0
+          : location.pathname === Path.AIKid
+          ? 1
+          : -1,
+      );
+    } else {
+      setActiveTab(
+        location.pathname === Path.Chat ||
+          (location.pathname === Path.Home &&
+            !isEmpty(chatStore.currentSessionId))
+          ? 0
+          : location.pathname === Path.AIKid
+          ? 1
+          : -1,
+      );
+    }
+  }, [
+    location.pathname,
+    omeStore.isShowHome,
+    omeStore.isFromApp,
+    chatStore.currentSessionId,
+  ]);
 
   return (
     <>
@@ -51,12 +84,33 @@ export function HomeTab() {
       >
         <div className={styles["tab-header"]}>
           <div
-            className={styles["tab-left-button"]}
+            className={clsx(styles["tab-left-button"], "no-dark")}
             style={{
               visibility: omeStore.isFromApp ? "visible" : "hidden",
             }}
             onClick={() => {
-              navigate(Path.Home);
+              if (omeStore.isFromApp) {
+                const message = {
+                  data: {},
+                  msg: "quit",
+                  type: MessageEnum.Quit,
+                };
+                if (window?.ReactNativeWebView) {
+                  window.ReactNativeWebView.postMessage(
+                    JSON.stringify(message),
+                  );
+                } else if (
+                  (window as any)?.webkit?.messageHandlers?.nativeListener
+                ) {
+                  (
+                    window as any
+                  )?.webkit?.messageHandlers?.nativeListener.postMessage(
+                    JSON.stringify(message),
+                  );
+                }
+              } else {
+                navigate(Path.Home);
+              }
             }}
           >
             <ArrowLeftIcon />
@@ -86,15 +140,21 @@ export function HomeTab() {
             ))}
           </div>
           <div
-            className={styles["tab-right-button"]}
-            style={{
-              visibility: activeTab !== 0 && false ? "visible" : "hidden",
-            }}
+            className={clsx(styles["tab-right-button"], "no-dark")}
+            style={
+              {
+                // visibility: activeTab !== 0 && false ? "visible" : "hidden",
+              }
+            }
             onClick={() => {
-              navigate(Path.AddOrUpdateKid);
+              navigate(activeTab < 1 ? Path.Home : Path.AddOrUpdateKid);
+
+              if (activeTab < 1 && omeStore.isFromApp) {
+                omeStore.setIsShowHome(true);
+              }
             }}
           >
-            <AddKidIcon />
+            {activeTab < 1 ? <HistoryIcon /> : <AddKidIcon />}
           </div>
         </div>
         <div className={styles["tab-content"]}>

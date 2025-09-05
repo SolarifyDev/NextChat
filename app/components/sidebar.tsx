@@ -5,7 +5,6 @@ import styles from "./home.module.scss";
 import { IconButton } from "./button";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
-import DeleteIcon from "../icons/delete.svg";
 import MaskIcon from "../icons/mask.svg";
 import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
@@ -27,7 +26,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { Selector, showConfirm } from "./ui-lib";
+import { Selector } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 import { useNewChatStore } from "../store/new-chat";
@@ -254,7 +253,13 @@ export function SideBar(props: { className?: string }) {
 
   const { run: addConversation } = useDebounceFn(
     () => {
-      chatStore.newSession(undefined, () => navigate(Path.Chat));
+      // chatStore.newSession(undefined, () => navigate(Path.Chat));
+      chatStore.newSession(undefined, () => {
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
+        navigate(Path.Chat);
+      });
     },
     { wait: 300 },
   );
@@ -262,13 +267,19 @@ export function SideBar(props: { className?: string }) {
   const { run: quitMetis } = useDebounceFn(
     () => {
       try {
-        const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
-        if (window?.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
-          (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
-            JSON.stringify(message),
-          );
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        } else {
+          const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
+          if (window?.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify(message));
+          } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
+            (
+              window as any
+            )?.webkit?.messageHandlers?.nativeListener.postMessage(
+              JSON.stringify(message),
+            );
+          }
         }
       } catch {}
     },
@@ -424,17 +435,17 @@ export function SideBar(props: { className?: string }) {
           primaryAction={
             <>
               {/* 手机场景 */}
-              <div className={clsx(styles["sidebar-action"], styles.mobile)}>
+              {/* <div className={clsx(styles["sidebar-action"], styles.mobile)}>
                 <IconButton
                   icon={<DeleteIcon />}
                   onClick={async () => {
                     // if (await showConfirm(Locale.Home.DeleteChat)) {
                     if (await showConfirm(t("Home.DeleteChat"))) {
-                      chatStore.deleteSession(chatStore.currentSessionIndex);
+                      // chatStore.deleteSession(chatStore.currentSessionIndex);
                     }
                   }}
                 />
-              </div>
+              </div> */}
               <div className={styles["sidebar-action"]}>
                 <Link to={Path.Settings}>
                   <IconButton
@@ -454,9 +465,17 @@ export function SideBar(props: { className?: string }) {
               text={shouldNarrow ? undefined : t("Home.NewChat")}
               onClick={() => {
                 if (config.dontShowMaskSplashScreen) {
-                  chatStore.newSession(undefined, () => navigate(Path.Chat));
+                  chatStore.newSession(undefined, () => {
+                    navigate(Path.Chat);
+                    if (omeStore.isFromApp) {
+                      omeStore.setIsShowHome(false);
+                    }
+                  });
                 } else {
                   navigate(Path.NewChat);
+                  if (omeStore.isFromApp) {
+                    omeStore.setIsShowHome(false);
+                  }
                 }
               }}
               shadow

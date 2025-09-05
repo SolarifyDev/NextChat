@@ -20,6 +20,7 @@ export interface ISession {
   isDeleted: boolean;
   clearContextIndex: number | null;
   userId?: number;
+  messagesLength: number;
 }
 
 export interface IAIKid {
@@ -88,6 +89,19 @@ export const GetHistory = async (headers: {
 }): Promise<ISession[]> => {
   return (
     await api.get("/api/v1/histories", {
+      headers,
+    })
+  ).data;
+};
+
+export const GetHistoryDetail = async (
+  headers: {
+    [key: string]: string;
+  },
+  sessionId: number,
+): Promise<ISession> => {
+  return (
+    await api.get(`/api/v1/history?SessionId=${sessionId}`, {
       headers,
     })
   ).data;

@@ -22,8 +22,9 @@ export function SearchChatPage() {
   // const chatStore = useChatStore();
   const chatStore = useNewChatStore();
 
+  // 需要考虑这个接口要怎么处理
   const sessions = chatStore.sessions;
-  const selectSession = chatStore.selectSession;
+  // const selectSession = chatStore.selectSession;
 
   const [searchResults, setSearchResults] = useState<Item[]>([]);
 
@@ -144,7 +145,7 @@ export function SearchChatPage() {
                 key={item.id}
                 onClick={() => {
                   navigate(Path.Chat);
-                  selectSession(item.id);
+                  // selectSession(item.id); 这个需要调整要保留
                 }}
                 style={{ cursor: "pointer" }}
               >

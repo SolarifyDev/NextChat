@@ -31,6 +31,7 @@ import { collectModelsWithDefaultModel } from "../utils/model";
 import { showToast } from "../components/ui-lib";
 import {
   GetHistory,
+  GetHistoryDetail,
   PostAddOrUpdateSession,
   getHeaders,
 } from "../client/smarties";
@@ -42,6 +43,7 @@ import { useOmeStore } from "./ome";
 import { createPersistStore } from "../utils/store";
 import { indexedDBStorage } from "../utils/indexedDB-storage";
 import { getConversation, saveConversation } from "../dataBase/chatDB";
+import { clone } from "lodash";
 
 export type ChatMessageTool = {
   id: string;
@@ -83,18 +85,27 @@ export interface ChatSession {
 
   mask: Mask;
   userId?: number;
+
+  isAdd?: boolean;
+  messagesLength: number;
 }
 
 export type ChatStoreType = {
   currentSession?: ChatSession;
-  currentSessionId: string;
-  currentSessionUserId: number;
-  currentSessionIndex: number;
+  currentSessionParams: {
+    id: string;
+    sessionId: number;
+    userId: number;
+  };
+  // currentSessionId: string;
+  // currentSessionSessionId?: number;
+  // currentSessionUserId: number;
+  // currentSessionIndex: number;
   sessions: ChatSession[];
   lastInput: string;
   isDown: boolean;
   isLoading: boolean;
-  selectSession: (i: number) => void;
+  // selectSession: (i: number) => void;
   getSessions: () => Promise<void>;
   getCurrentSession: () => void;
   clearCurrent: () => void;
@@ -124,6 +135,7 @@ export type ChatStoreType = {
   checkMcpJson(message: ChatMessage): void;
   clearAllData(): void;
   setIsDown: (isDown: boolean) => void;
+  updateCurrentSession(session: ChatSession): void;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -219,10 +231,6 @@ export const getBotHello = (): ChatMessage => {
   });
 };
 
-const generateHash = (data: ChatSession): string => {
-  return btoa(JSON.stringify(data)).substring(0, 32);
-};
-
 export function createEmptySession(): ChatSession {
   return {
     id: nanoid(),
@@ -239,6 +247,10 @@ export function createEmptySession(): ChatSession {
     lastSummarizeIndex: 0,
 
     mask: createEmptyMask(),
+
+    isAdd: true,
+
+    messagesLength: 0,
   };
 }
 
@@ -279,9 +291,14 @@ const detaultSessions: ChatSession[] = [];
 export const useNewChatStore = createPersistStore(
   {
     currentSession: createEmptySession(),
-    currentSessionId: "",
-    currentSessionUserId: 0,
-    currentSessionIndex: -1, // 这个也不用了
+    currentSessionParams: {
+      id: "",
+      sessionId: 0,
+      userId: 0,
+    },
+    // currentSessionId: "",
+    // currentSessionUserId: 0,
+    // currentSessionIndex: -1, // 这个也不用了
     sessions: detaultSessions,
     lastInput: "",
     isDown: false,
@@ -299,16 +316,23 @@ export const useNewChatStore = createPersistStore(
       setIsDown: (isDown: boolean) => {
         set({ isDown });
       },
-      selectSession: (i: number) => {
-        set({ currentSessionIndex: i });
+      // selectSession: (i: number) => {
+      //   set({ currentSessionIndex: i });
+      // },
+      // selectSessionId: (id: string) => {
+      //   set({ currentSessionId: id });
+      // },
+      // selectSessionUserId: (i: number) => {
+      //   set({ currentSessionUserId: i });
+      // },
+      setCurrentSessionParams: (currentSessionParams: {
+        id: string;
+        sessionId: number;
+        userId: number;
+      }) => {
+        set({ currentSessionParams });
       },
-      selectSessionId: (id: string) => {
-        set({ currentSessionId: id });
-      },
-      selectSessionUserId: (i: number) => {
-        set({ currentSessionUserId: i });
-      },
-      selectCurrentSession: (currentSession: ChatSession) => {
+      selectCurrentSession: (currentSession?: ChatSession) => {
         set({ currentSession });
       },
       getSessions: async () => {
@@ -343,78 +367,187 @@ export const useNewChatStore = createPersistStore(
 
       // 这个方法不用了，后续直接用currentSceeion
       getCurrentSession: async (
-        id: string,
-        userId: number,
-        item?: ChatSession,
+        item: ChatSession,
         callback?: () => void,
+        errorCallback?: () => void,
       ) => {
-        console.log(556);
-        // 1. 请求详情接口
-
-        let apiData: ChatSession = createEmptySession();
-
-        // 2. 查看IndexDB是否有相同userId id的数据
-        const data = await getConversation(id, userId);
-
-        // 3. 做存入操作
-
-        if (item) {
-          apiData = item;
-        }
-
-        if (!apiData) {
+        // 如果重复点击就不需要触发下面方法
+        if (
+          item.id === get().currentSessionParams?.id &&
+          !useOmeStore.getState().isFromApp
+        ) {
           return;
         }
 
-        console.log(5569999);
+        get().setCurrentSessionParams({
+          id: item.id,
+          sessionId: item.sessionId!,
+          userId: item.userId!,
+        });
+        get().selectCurrentSession(undefined);
 
-        get().selectSessionId(id);
-        get().selectSessionUserId(userId);
-        get().selectCurrentSession(apiData);
+        try {
+          const localData = await getConversation(item.id, item.userId!);
 
-        callback && callback();
+          let sessionData: ChatSession | null = localData;
 
-        if (data) {
-          if (apiData.lastUpdate !== data.lastUpdate) {
-            console.log("111");
-            // 数据不同，才存储
-            await saveConversation(apiData);
-          } else {
-            console.log("222");
+          const remoteData = await GetHistoryDetail(
+            await getHeaders(),
+            item.sessionId!,
+          );
+
+          if (remoteData) {
+            if (remoteData.id !== get().currentSessionParams.id) {
+              console.log("数据已经被还原了");
+              return;
+            }
+            sessionData = {
+              ...remoteData,
+              messages: JSONParse(remoteData.messages, "arr"),
+              stat: JSONParse(remoteData.stat, "obj"),
+              mask: JSONParse(remoteData.mask, "mask"),
+            };
+
+            // 检查是否需要保存（数据有更新或本地无数据）
+            if (!localData || sessionData.lastUpdate !== localData.lastUpdate) {
+              await saveConversation(sessionData);
+            }
+
+            get().selectCurrentSession(sessionData);
+
+            callback?.();
           }
-        } else {
-          console.log("333");
+        } catch (error) {
+          if (item.id !== get().currentSessionParams.id) {
+            console.log("数据已经被还原了");
+            return;
+          }
+          showToast("获取该条数据失败");
+          get().selectCurrentSession(createEmptySession());
+          get().setCurrentSessionParams({
+            id: "",
+            sessionId: 0,
+            userId: 0,
+          });
 
-          await saveConversation(apiData);
+          errorCallback?.();
         }
+
+        // const localData = await getConversation(id, userId);
+        // let sessionData: ChatSession | null = localData;
+
+        // // 尝试获取远程数据
+        // try {
+        //   const remoteData = await GetHistoryDetail(
+        //     await getHeaders(),
+        //     sessionId!,
+        //   );
+
+        //   if (remoteData) {
+        //     sessionData = {
+        //       ...remoteData,
+        //       messages: JSONParse(remoteData.messages, "arr"),
+        //       stat: JSONParse(remoteData.stat, "obj"),
+        //       mask: JSONParse(remoteData.mask, "mask"),
+        //     };
+
+        //     // 检查是否需要保存（数据有更新或本地无数据）
+        //     if (!localData || sessionData.lastUpdate !== localData.lastUpdate) {
+        //       console.log("更新进indexDB");
+        //       await saveConversation(sessionData);
+        //     }
+        //   }
+        // } catch (error) {
+        //   // 如果远程获取失败且没有本地数据，显示错误并返回
+        //   if (!localData) {
+        //     showToast("获取该条聊天失败，请重试");
+        //     return;
+        //   }
+        //   // 有本地数据时，继续使用本地数据
+        // }
+
+        // // 确保有数据才更新状态
+        // if (sessionData) {
+        //   get().selectSessionId(id);
+        //   get().selectSessionUserId(userId);
+        //   get().selectCurrentSession(sessionData);
+
+        //   callback?.();
+        // }
+
+        // 1. 请求详情接口
+
+        // let apiData: ChatSession = createEmptySession();
+
+        // 3. 做存入操作
+
+        // if (item) {
+        //   apiData = item;
+        // }
+
+        // if (!apiData) {
+        //   return;
+        // }
+
+        // console.log(5569999);
+
+        // get().selectSessionId(id);
+        // get().selectSessionUserId(userId);
+        // get().selectCurrentSession(apiData);
+
+        // callback && callback();
+
+        // if (data) {
+        //   if (apiData.lastUpdate !== data.lastUpdate) {
+        //     console.log("111");
+        //     // 数据不同，才存储
+        //     await saveConversation(apiData);
+        //   } else {
+        //   }
+        // } else {
+        //   await saveConversation(apiData);
+        // }
       },
 
       clearCurrent: () => {
         set({
-          currentSessionIndex: -1,
+          // currentSessionIndex: -1,
           sessions: detaultSessions,
           isDown: false,
           isLoading: false,
           currentSession: createEmptySession(),
-          currentSessionId: "",
-          currentSessionUserId: 0,
+          currentSessionParams: {
+            id: "",
+            sessionId: 0,
+            userId: 0,
+          },
         });
       },
 
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
-        get().updateTargetSession(
-          targetSession,
-          (session) => {
-            session.lastUpdate = Date.now();
-            session.messages = session.messages.concat();
-            session.stat.charCount += message.content.length;
-          },
-          true,
-        );
+        // get().updateTargetSession(
+        //   targetSession,
+        //   (session) => {
+        //     session.lastUpdate = Date.now();
+        //     session.messages = session.messages.concat();
+        //     session.stat.charCount += message.content.length;
+        //   },
+        //   true,
+        // );
 
-        get().checkMcpJson(message);
+        targetSession.lastUpdate = Date.now();
+        // targetSession.messages = targetSession.messages;
+        targetSession.stat.charCount += message.content.length;
 
-        get().summarizeSession(false, targetSession);
+        set({ currentSession: targetSession });
+
+        // 调用AddOrUpdate
+        //setIndexDB上
+        saveConversation(targetSession);
+
+        // get().checkMcpJson(message);
+
+        // get().summarizeSession(false, targetSession);
       },
       /** check if the message contains MCP JSON and execute the MCP action */
       checkMcpJson(message: ChatMessage) {
@@ -646,7 +779,7 @@ export const useNewChatStore = createPersistStore(
         isMcpResponse?: boolean,
       ) {
         // const session = get().getCurrentSession();
-        const session = get().currentSession;
+        let session = get().currentSession;
         if (!session) return;
 
         const modelConfig = session.mask.modelConfig;
@@ -684,16 +817,30 @@ export const useNewChatStore = createPersistStore(
         const messageIndex = session.messages.length + 1;
 
         // save user's and bot's message
-        get().updateTargetSession(session, (session) => {
-          const savedUserMessage = {
-            ...userMessage,
-            content: mContent,
-          };
-          session.messages = session.messages.concat([
-            savedUserMessage,
-            botMessage,
-          ]);
-        });
+        // get().updateTargetSession(session, (session) => {
+        //   const savedUserMessage = {
+        //     ...userMessage,
+        //     content: mContent,
+        //   };
+        //   session.messages = session.messages.concat([
+        //     savedUserMessage,
+        //     botMessage,
+        //   ]);
+        // });
+
+        const savedUserMessage = {
+          ...userMessage,
+          content: mContent,
+        };
+        // 待定
+        // session.messages = session.messages.concat([
+        //   savedUserMessage,
+        //   botMessage,
+        // ]);
+
+        session.messages.push(savedUserMessage, botMessage);
+
+        set({ currentSession: session });
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
 
@@ -710,22 +857,48 @@ export const useNewChatStore = createPersistStore(
               botMessage.content = message;
             }
 
+            console.log(pendingUpdate, "----pendingUpdate");
             if (!pendingUpdate) {
               pendingUpdate = true;
               rafId = requestAnimationFrame(() => {
                 pendingUpdate = false;
-                get().updateTargetSession(session, (s) => {
-                  const idx = s.messages.findIndex(
-                    (m) => m.id === botMessage.id,
-                  );
-                  if (idx >= 0) {
-                    if (s.messages[idx].content !== botMessage.content) {
-                      // 🔧 只修改这一行：直接更新属性而不是创建新对象
-                      s.messages[idx].content = botMessage.content;
-                      s.messages[idx].streaming = botMessage.streaming;
-                    }
+                // get().updateTargetSession(session, (s) => {
+                //   const idx = s.messages.findIndex(
+                //     (m) => m.id === botMessage.id,
+                //   );
+                //   if (idx >= 0) {
+                //     if (s.messages[idx].content !== botMessage.content) {
+                //       // 🔧 只修改这一行：直接更新属性而不是创建新对象
+                //       s.messages[idx].content = botMessage.content;
+                //       s.messages[idx].streaming = botMessage.streaming;
+                //     }
+                //   }
+                // });
+
+                const idx = session.messages.findIndex(
+                  (m) => m.id === botMessage.id,
+                );
+
+                if (idx >= 0) {
+                  session.messages[idx].content = botMessage.content;
+                  session.messages[idx].streaming = botMessage.streaming;
+
+                  if (session.isAdd) {
+                    const { isAdd, ...cleanSession } = session;
+                    const data = clone([cleanSession, ...get().sessions]);
+                    set(() => ({
+                      currentSession: cleanSession,
+                      sessions: data,
+                    }));
+
+                    session = cleanSession;
+                  } else {
+                    set(() => ({
+                      currentSession: session,
+                    }));
+                    session = session;
                   }
-                });
+                }
               });
             }
           },
@@ -747,13 +920,23 @@ export const useNewChatStore = createPersistStore(
           },
           onBeforeTool(tool: ChatMessageTool) {
             (botMessage.tools = botMessage?.tools || []).push(tool);
-            get().updateTargetSession(session, (s) => {
-              const idx = s.messages.findIndex((m) => m.id === botMessage.id);
-              if (idx >= 0) {
-                // 🔧 直接更新 tools 属性
-                s.messages[idx].tools = botMessage.tools;
-              }
-            });
+            // get().updateTargetSession(session, (s) => {
+            //   const idx = s.messages.findIndex((m) => m.id === botMessage.id);
+            //   if (idx >= 0) {
+            //     // 🔧 直接更新 tools 属性
+            //     s.messages[idx].tools = botMessage.tools;
+            //   }
+            // });
+
+            const idx = session.messages.findIndex(
+              (m) => m.id === botMessage.id,
+            );
+
+            if (idx >= 0) {
+              session.messages[idx].tools = botMessage.tools;
+
+              set({ currentSession: session });
+            }
           },
           onAfterTool(tool: ChatMessageTool) {
             botMessage?.tools?.forEach((t, i, tools) => {
@@ -762,13 +945,23 @@ export const useNewChatStore = createPersistStore(
                 Object.assign(tools[i], tool);
               }
             });
-            get().updateTargetSession(session, (s) => {
-              const idx = s.messages.findIndex((m) => m.id === botMessage.id);
-              if (idx >= 0) {
-                // 🔧 直接更新 tools 属性
-                s.messages[idx].tools = botMessage.tools;
-              }
-            });
+            // get().updateTargetSession(session, (s) => {
+            //   const idx = s.messages.findIndex((m) => m.id === botMessage.id);
+            //   if (idx >= 0) {
+            //     // 🔧 直接更新 tools 属性
+            //     s.messages[idx].tools = botMessage.tools;
+            //   }
+            // });
+
+            const idx = session.messages.findIndex(
+              (m) => m.id === botMessage.id,
+            );
+
+            if (idx >= 0) {
+              session.messages[idx].tools = botMessage.tools;
+
+              set({ currentSession: session });
+            }
           },
           onError(error) {
             if (rafId) {
@@ -786,26 +979,45 @@ export const useNewChatStore = createPersistStore(
             botMessage.streaming = false;
             userMessage.isError = !isAborted;
             botMessage.isError = !isAborted;
-            get().updateTargetSession(
-              session,
-              (session) => {
-                const userIdx = session.messages.findIndex(
-                  (m) => m.id === userMessage.id,
-                );
-                const botIdx = session.messages.findIndex(
-                  (m) => m.id === botMessage.id,
-                );
+            // get().updateTargetSession(
+            //   session,
+            //   (session) => {
+            //     const userIdx = session.messages.findIndex(
+            //       (m) => m.id === userMessage.id,
+            //     );
+            //     const botIdx = session.messages.findIndex(
+            //       (m) => m.id === botMessage.id,
+            //     );
 
-                if (userIdx >= 0) {
-                  // 🔧 直接修改属性而不是创建新对象
-                  Object.assign(session.messages[userIdx], userMessage);
-                }
-                if (botIdx >= 0) {
-                  Object.assign(session.messages[botIdx], botMessage);
-                }
-              },
-              true,
+            //     if (userIdx >= 0) {
+            //       // 🔧 直接修改属性而不是创建新对象
+            //       Object.assign(session.messages[userIdx], userMessage);
+            //     }
+            //     if (botIdx >= 0) {
+            //       Object.assign(session.messages[botIdx], botMessage);
+            //     }
+            //   },
+            //   true,
+            // );
+
+            const userIdx = session.messages.findIndex(
+              (m) => m.id === userMessage.id,
             );
+
+            const botIdx = session.messages.findIndex(
+              (m) => m.id === botMessage.id,
+            );
+
+            if (userIdx >= 0) {
+              // 🔧 直接修改属性而不是创建新对象
+              Object.assign(session.messages[userIdx], userMessage);
+            }
+            if (botIdx >= 0) {
+              Object.assign(session.messages[botIdx], botMessage);
+            }
+
+            set({ currentSession: session });
+
             ChatControllerPool.remove(
               session.id,
               botMessage.id ?? messageIndex,
@@ -1126,36 +1338,81 @@ export const useNewChatStore = createPersistStore(
           });
         }
       },
-      deleteSession(index: number) {
+      deleteSession(index: string) {
+        // 此时这里的是session.id  因為在詳情頁面，沒有創建到API端也可以在本地使用
         const deletingLastSession = get().sessions.length === 1;
-        const deletedSession = get().sessions.at(index);
-
+        const deletedSession = get().sessions.find(
+          (session) => session.id === index,
+        );
         if (!deletedSession) return;
 
-        const sessions = get().sessions.slice();
-        sessions.splice(index, 1);
-
-        const currentIndex = get().currentSessionIndex;
-        let nextIndex = Math.min(
-          currentIndex - Number(index < currentIndex),
-          sessions.length - 1,
-        );
+        const sessions = get()
+          .sessions.slice()
+          .filter((session) => session.id !== index);
 
         if (deletingLastSession) {
-          nextIndex = -1;
-          // sessions.push(createEmptySession());
+          // 如果是最后一条聊天
+          // 需要设置回
         }
 
-        // for undo delete action
         const restoreState = {
-          currentSessionIndex: get().currentSessionIndex,
           sessions: get().sessions.slice(),
+          currentSession: clone(get().currentSession),
+          // currentSessionId: clone(get().currentSessionId),
+          // currentSessionUserId: clone(get().currentSessionUserId),
+          currentSessionParams: clone(get().currentSessionParams),
         };
 
-        set(() => ({
-          currentSessionIndex: nextIndex,
-          sessions,
-        }));
+        // 证明当前是没有点击item的
+        if (get().currentSession?.isAdd) {
+          if (index === get().currentSessionParams.id) {
+            set({
+              sessions,
+              currentSession: undefined,
+              currentSessionParams: { id: "", sessionId: 0, userId: 0 },
+            });
+          } else {
+            set({
+              sessions,
+            });
+          }
+        } else {
+          // 点了删除，啥都不做焦点也清掉
+
+          if (index === get().currentSessionParams.id) {
+            // 刪除的是當前查看的
+            set({
+              sessions,
+              currentSession: undefined,
+              currentSessionParams: { id: "", sessionId: 0, userId: 0 },
+            });
+          } else {
+            set({
+              sessions,
+            });
+          }
+
+          // const currentIndex = get().sessions.findIndex(
+          //   (s) => s.sessionId === index,
+          // );
+          // let nextActiveSession =
+          //   sessions.length === 0
+          //     ? undefined
+          //     : sessions[Math.min(currentIndex, sessions.length - 1)];
+          // set({
+          //   sessions,
+          //   currentSession:
+          //     {
+          //       ...nextActiveSession!,
+          //       messages: [],
+          //     } ?? undefined,
+          //   currentSessionId: nextActiveSession?.id ?? "",
+          //   currentSessionUserId: nextActiveSession?.userId ?? 0,
+          // });
+          // if (nextActiveSession) {
+          //   get().getCurrentSession(nextActiveSession);
+          // }
+        }
 
         showToast(
           // Locale.Home.DeleteToast,
@@ -1169,19 +1426,72 @@ export const useNewChatStore = createPersistStore(
           },
           5000,
           async () => {
-            const data = ConvertSession("delete", deletedSession);
-
-            await PostAddOrUpdateSession(await getHeaders(), data)
-              .then(() => {
-                console.log("delete成功");
-              })
-              .catch(() => {
-                console.log("delete失败");
-                showToast("删除聊天失败");
-                set(() => restoreState);
-              });
+            if (get().currentSession?.isAdd) {
+              return;
+            }
+            // const data = ConvertSession("delete", deletedSession);
+            // await PostAddOrUpdateSession(await getHeaders(), data)
+            //   .then(() => {
+            //     console.log("delete成功");
+            //     deleteConversation(data.id!, data?.userId!);
+            //   })
+            //   .catch(() => {
+            //     console.log("delete失败");
+            //     showToast("删除聊天失败");
+            //     set(() => restoreState);
+            //   });
           },
         );
+
+        // 用下标去寻找
+        // const deletingLastSession = get().sessions.length === 1;
+        // const deletedSession = get().sessions.at(index);
+        // if (!deletedSession) return;
+        // const sessions = get().sessions.slice();
+        // sessions.splice(index, 1);
+        // const currentIndex = get().currentSessionIndex;
+        // let nextIndex = Math.min(
+        //   currentIndex - Number(index < currentIndex),
+        //   sessions.length - 1,
+        // );
+        // if (deletingLastSession) {
+        //   nextIndex = -1;
+        //   // sessions.push(createEmptySession());
+        // }
+        // // for undo delete action
+        // const restoreState = {
+        //   currentSessionIndex: get().currentSessionIndex,
+        //   sessions: get().sessions.slice(),
+        // };
+        // set(() => ({
+        //   currentSessionIndex: nextIndex,
+        //   sessions,
+        // }));
+        // showToast(
+        //   // Locale.Home.DeleteToast,
+        //   t("Home.DeleteToast"),
+        //   {
+        //     // text: Locale.Home.Revert,
+        //     text: t("Home.Revert"),
+        //     onClick() {
+        //       set(() => restoreState);
+        //     },
+        //   },
+        //   5000,
+        //   async () => {
+        //     const data = ConvertSession("delete", deletedSession);
+        //     await PostAddOrUpdateSession(await getHeaders(), data)
+        //       .then(() => {
+        //         console.log("delete成功");
+        //         deleteConversation(data.id!, data?.userId!);
+        //       })
+        //       .catch(() => {
+        //         console.log("delete失败");
+        //         showToast("删除聊天失败");
+        //         set(() => restoreState);
+        //       });
+        //   },
+        // );
       },
       async forkSession() {
         // 获取当前会话
@@ -1225,12 +1535,43 @@ export const useNewChatStore = createPersistStore(
           });
       },
       nextSession(delta: number) {
-        const n = get().sessions.length;
+        // 我只有當前的item數據，如何才能獲取到上條根下條的數據呢？
+
+        const sessions = get().sessions;
+
+        const session = get().currentSession;
+
+        // const sessionParams = get().currentSessionParams;
+
+        // 證明是新創建的，並沒有保存在數據中
+        if (session?.isAdd) {
+          return;
+        }
+
+        const currentIndex = sessions.findIndex((s) => session.id === s.id);
+
+        if (currentIndex === -1) {
+          console.warn("当前会话在列表中不存在");
+          return;
+        }
+
+        const n = sessions.length;
         const limit = (x: number) => (x + n) % n;
-        const i = get().currentSessionIndex;
-        get().selectSession(limit(i + delta));
+        const newIndex = limit(currentIndex + delta);
+        get().getCurrentSession(sessions[newIndex]);
+
+        // const n = get().sessions.length;
+        // const limit = (x: number) => (x + n) % n;
+        // const i = get().currentSessionIndex;
+        // get().selectSession(limit(i + delta));
       },
       async newSession(mask?: Mask, callback?: () => void) {
+        const currentSession = get().currentSession;
+
+        // 當前已經是新聊天，未請求到接口，不允許重新創建新對話
+        if (currentSession?.isAdd) {
+          return;
+        }
         const session = createEmptySession();
 
         if (mask) {
@@ -1248,7 +1589,11 @@ export const useNewChatStore = createPersistStore(
         }
 
         // 1.先赋值session
-        get().selectSessionId(session.id);
+        get().setCurrentSessionParams({
+          id: session.id,
+          sessionId: 0,
+          userId: 0,
+        });
         get().selectCurrentSession(session);
 
         callback && callback();
@@ -1274,6 +1619,9 @@ export const useNewChatStore = createPersistStore(
         //     console.log("失败");
         //     showToast("创建新聊天失败");
         //   });
+      },
+      updateCurrentSession(session: ChatSession) {
+        set({ currentSession: session });
       },
       async clearAllData() {
         await indexedDBStorage.clear();

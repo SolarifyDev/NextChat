@@ -121,13 +121,20 @@ export function ChatItem(props: {
 export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
   const {
     // currentSessionIndex,
-    sessions,
+    // sessions,
     // selectSession,
     deleteSession,
-    isLoading,
+    // isLoading,
     getCurrentSession,
-    currentSessionId,
+    // currentSessionId,
   } = useNewChatStore();
+
+  const sessions = useNewChatStore((state) => state.sessions);
+  const isLoading = useNewChatStore((state) => state.isLoading);
+  const currentSessionParams = useNewChatStore(
+    (state) => state.currentSessionParams,
+  );
+
   const { t } = useTranslation();
 
   const navigate = useNavigate();
@@ -174,17 +181,29 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
           <ChatItem
             title={item.topic}
             time={new Date(item.lastUpdate).toLocaleString()}
-            count={item?.messages?.length ?? 0}
+            count={item?.messagesLength ?? 0}
             key={item.id}
             id={item.id}
             index={i}
             // selected={i === currentSessionIndex}
-            selected={currentSessionId === item.id}
+            selected={currentSessionParams.id === item.id}
             onClick={() => {
               // navigate(Path.Chat);
               // selectSession(i);
-              getCurrentSession(item.id, item.userId!, item, () =>
-                navigate(Path.Chat),
+              // getCurrentSession(item.id, item.userId!, item.sessionId,item, () =>
+              getCurrentSession(
+                item,
+                () =>
+                  // navigate(Path.Chat),
+                  {
+                    if (useOmeStore.getState().isFromApp) {
+                      useOmeStore.getState().setIsShowHome(false);
+                    }
+                    navigate(Path.Chat);
+                  },
+                () => {
+                  navigate(Path.Home);
+                },
               );
               if (onlineSearch) {
                 setOnlineSearch(false);
@@ -196,7 +215,8 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
                 // (await showConfirm(Locale.Home.DeleteChat))
                 (await showConfirm(t("Home.DeleteChat")))
               ) {
-                deleteSession(i);
+                // deleteSession(i);
+                deleteSession(item.id);
               }
             }}
             narrow={props.narrow}

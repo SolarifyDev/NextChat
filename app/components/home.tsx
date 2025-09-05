@@ -231,7 +231,13 @@ function Screen() {
     if (isSdNew) return <Sd />;
     return (
       <>
-        <SideBar className={clsx({ [styles["sidebar-show"]]: isHome })} />
+        <SideBar
+          className={clsx({
+            [styles["sidebar-show"]]: omeStore.isFromApp
+              ? omeStore.isShowHome
+              : isHome,
+          })}
+        />
         <WindowContent>
           <Routes>
             {/* <Route path={Path.Home} element={<Chat />} /> */}
@@ -389,6 +395,8 @@ export function Home() {
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
           }
+
+          omeStore.setIsShowHome(false);
         } catch {}
       } else {
         if (
@@ -442,6 +450,7 @@ export function Home() {
         if (!isEmpty(data?.lanauge)) {
           omeStore.setLanguage(data?.lanauge);
         }
+        omeStore.setIsShowHome(false);
       } catch (error) {
         const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
 
