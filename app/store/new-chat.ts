@@ -1053,6 +1053,7 @@ export const useNewChatStore = createPersistStore(
             onError(err) {
               console.error("[Summarize] ", err);
             },
+            isSummary: true,
           });
         }
       },
