@@ -1208,9 +1208,9 @@ export const useNewChatStore = createPersistStore(
 
     return methods;
   },
-
   {
     name: "CHAT_STORE",
+    partialize: (state) => ({ lastInput: state.lastInput }) as any,
     onRehydrateStorage: (state) => {
       state?.clearCurrent();
     },
