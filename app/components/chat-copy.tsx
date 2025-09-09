@@ -205,7 +205,8 @@ export function SessionConfigModel(props: { onClose: () => void }) {
             onClick={async () => {
               // if (await showConfirm(Locale.Memory.ResetConfirm)) {
               if (await showConfirm(t("Memory.ResetConfirm"))) {
-                chatStore.updateTargetSession(
+                // chatStore.updateTargetSession(
+                chatStore.updateCurrentSession(
                   session,
                   (session) => (session.memoryPrompt = ""),
                   true,
@@ -233,7 +234,8 @@ export function SessionConfigModel(props: { onClose: () => void }) {
           updateMask={(updater) => {
             const mask = { ...session.mask };
             updater(mask);
-            chatStore.updateTargetSession(
+            // chatStore.updateTargetSession(
+            chatStore.updateCurrentSession(
               session,
               (session) => (session.mask = mask),
             );
@@ -289,7 +291,7 @@ function PromptToast(props: {
         <SessionConfigModel
           onClose={() => {
             props.setShowModal(false);
-            chatStore.updateTargetSession(session, (session) => {}, true);
+            // chatStore.updateTargetSession(session, (session) => {}, true);
           }}
         />
       )}
@@ -420,7 +422,8 @@ function ClearContextDivider() {
     <div
       className={styles["clear-context"]}
       onClick={() =>
-        chatStore.updateTargetSession(
+        // chatStore.updateTargetSession(
+        chatStore.updateCurrentSession(
           session,
           (session) => (session.clearContextIndex = null),
           true,
@@ -703,14 +706,15 @@ export function ChatActions(props: {
       // show next model to default model if exist
       let nextModel = models.find((model) => model.isDefault) || models[0];
       // 如果是add的就不需要update给接口，不是new就update
-      chatStore.updateTargetSession(
+      // chatStore.updateTargetSession(
+      chatStore.updateCurrentSession(
         session,
         (session) => {
           session.mask.modelConfig.model = nextModel.name;
           session.mask.modelConfig.providerName = nextModel?.provider
             ?.providerName as ServiceProvider;
         },
-        true,
+        !session.isAdd,
       );
       showToast(
         nextModel?.provider?.providerName == "ByteDance"
@@ -814,7 +818,8 @@ export function ChatActions(props: {
             text={t("Chat.InputActions.Clear")}
             icon={<BreakIcon />}
             onClick={() => {
-              chatStore.updateTargetSession(
+              // chatStore.updateTargetSession(
+              chatStore.updateCurrentSession(
                 session,
                 (session) => {
                   if (session.clearContextIndex === session.messages.length) {
@@ -874,11 +879,13 @@ export function ChatActions(props: {
               //     providerName as ServiceProvider;
               //   session.mask.syncGlobalConfig = false;
               // });
-              session.mask.modelConfig.model = model as ModelType;
-              session.mask.modelConfig.providerName =
-                providerName as ServiceProvider;
-              session.mask.syncGlobalConfig = false;
-              chatStore.updateCurrentSession(session);
+
+              chatStore.updateCurrentSession(session, (session) => {
+                session.mask.modelConfig.model = model as ModelType;
+                session.mask.modelConfig.providerName =
+                  providerName as ServiceProvider;
+                session.mask.syncGlobalConfig = false;
+              });
               if (providerName == "ByteDance") {
                 const selectedModel = models.find(
                   (m) =>
@@ -909,7 +916,8 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const size = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              // chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateCurrentSession(session, (session) => {
                 session.mask.modelConfig.size = size;
               });
               showToast(size);
@@ -933,7 +941,8 @@ export function ChatActions(props: {
             onSelection={(q) => {
               if (q.length === 0) return;
               const quality = q[0];
-              chatStore.updateTargetSession(session, (session) => {
+              // chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateCurrentSession(session, (session) => {
                 session.mask.modelConfig.quality = quality;
               });
               showToast(quality);
@@ -957,7 +966,8 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const style = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              // chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateCurrentSession(session, (session) => {
                 session.mask.modelConfig.style = style;
               });
               showToast(style);
@@ -990,7 +1000,8 @@ export function ChatActions(props: {
             }))}
             onClose={() => setShowPluginSelector(false)}
             onSelection={(s) => {
-              chatStore.updateTargetSession(
+              // chatStore.updateTargetSession(
+              chatStore.updateCurrentSession(
                 session,
                 (session) => {
                   session.mask.plugin = s as string[];
@@ -1053,7 +1064,8 @@ export function EditMessageModal(props: { onClose: () => void }) {
             icon={<ConfirmIcon />}
             key="ok"
             onClick={() => {
-              chatStore.updateTargetSession(
+              // chatStore.updateTargetSession(
+              chatStore.updateCurrentSession(
                 session,
                 (session) => (session.messages = messages),
                 true,
@@ -1074,7 +1086,8 @@ export function EditMessageModal(props: { onClose: () => void }) {
               type="text"
               value={session.topic}
               onInput={(e) =>
-                chatStore.updateTargetSession(
+                // chatStore.updateTargetSession(
+                chatStore.updateCurrentSession(
                   session,
                   (session) => (session.topic = e.currentTarget.value),
                 )
@@ -1269,10 +1282,11 @@ export function _Chat_NEW() {
     next: () => chatStore.nextSession(1),
     clear: () =>
       // 需要調整 區分add和未add的場景
-      chatStore.updateTargetSession(
+      // chatStore.updateTargetSession(
+      chatStore.updateCurrentSession(
         session,
         (session) => (session.clearContextIndex = session.messages.length),
-        true,
+        !session.isAdd,
       ),
     fork: () => chatStore.forkSession(),
     del: () => chatStore.deleteSession(chatStore.currentSessionParams.id),
@@ -1347,7 +1361,8 @@ export function _Chat_NEW() {
   };
 
   useEffect(() => {
-    chatStore.updateTargetSession(
+    // chatStore.updateTargetSession(
+    chatStore.updateCurrentSession(
       session,
       (session) => {
         const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
@@ -1406,7 +1421,8 @@ export function _Chat_NEW() {
   };
 
   const deleteMessage = (msgId?: string, isGetApi = false) => {
-    chatStore.updateTargetSession(
+    // chatStore.updateTargetSession(
+    chatStore.updateCurrentSession(
       session,
       (session) =>
         (session.messages = session.messages.filter((m) => m.id !== msgId)),
@@ -1469,7 +1485,8 @@ export function _Chat_NEW() {
   };
 
   const onPinMessage = (message: ChatMessage) => {
-    chatStore.updateTargetSession(
+    // chatStore.updateTargetSession(
+    chatStore.updateCurrentSession(
       session!,
       (session) => session.mask.context.push({ ...message, id: nanoid() }),
       true,
@@ -1884,7 +1901,8 @@ export function _Chat_NEW() {
         event.key.toLowerCase() === "backspace"
       ) {
         event.preventDefault();
-        chatStore.updateTargetSession(
+        // chatStore.updateTargetSession(
+        chatStore.updateCurrentSession(
           session,
           (session) => {
             if (session.clearContextIndex === session.messages.length) {
@@ -1894,7 +1912,7 @@ export function _Chat_NEW() {
               session.memoryPrompt = ""; // will clear memory
             }
           },
-          true,
+          !session?.isAdd,
         );
       }
     };
@@ -2134,7 +2152,8 @@ export function _Chat_NEW() {
                                           });
                                         }
                                       }
-                                      chatStore.updateTargetSession(
+                                      // chatStore.updateTargetSession(
+                                      chatStore.updateCurrentSession(
                                         session,
                                         (session) => {
                                           const m = session.mask.context

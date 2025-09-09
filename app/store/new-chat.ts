@@ -42,7 +42,11 @@ import { t } from "i18next";
 import { useOmeStore } from "./ome";
 import { createPersistStore } from "../utils/store";
 import { indexedDBStorage } from "../utils/indexedDB-storage";
-import { getConversation, saveConversation } from "../dataBase/chatDB";
+import {
+  deleteConversation,
+  getConversation,
+  saveConversation,
+} from "../dataBase/chatDB";
 import { clone } from "lodash";
 
 export type ChatMessageTool = {
@@ -365,7 +369,7 @@ export const useNewChatStore = createPersistStore(
         set({ isLoading });
       },
 
-      // 这个方法不用了，后续直接用currentSceeion
+      // 这个方法是去获取currentSession的数据 去赋值
       getCurrentSession: async (
         item: ChatSession,
         callback?: () => void,
@@ -511,7 +515,6 @@ export const useNewChatStore = createPersistStore(
 
       clearCurrent: () => {
         set({
-          // currentSessionIndex: -1,
           sessions: detaultSessions,
           isDown: false,
           isLoading: false,
@@ -582,7 +585,8 @@ export const useNewChatStore = createPersistStore(
         }
       },
       updateStat(message: ChatMessage, session: ChatSession) {
-        get().updateTargetSession(session, (session) => {
+        // get().updateTargetSession(session, (session) => {
+        get().updateCurrentSession(session, (session) => {
           session.stat.charCount += message.content.length;
           // TODO: should update chat count and word count
         });
@@ -857,7 +861,6 @@ export const useNewChatStore = createPersistStore(
               botMessage.content = message;
             }
 
-            console.log(pendingUpdate, "----pendingUpdate");
             if (!pendingUpdate) {
               pendingUpdate = true;
               rafId = requestAnimationFrame(() => {
@@ -1172,7 +1175,6 @@ export const useNewChatStore = createPersistStore(
           ) {
             set(() => ({ sessions }));
 
-            const config = useAppConfig.getState();
             await PostAddOrUpdateSession(
               await getHeaders(),
               ConvertSession("update", sessions[index]),
@@ -1247,7 +1249,8 @@ export const useNewChatStore = createPersistStore(
             },
             onFinish(message, responseRes) {
               if (responseRes?.status === 200) {
-                get().updateTargetSession(
+                // get().updateTargetSession(
+                get().updateCurrentSession(
                   session,
                   (session) =>
                     (session.topic =
@@ -1322,7 +1325,8 @@ export const useNewChatStore = createPersistStore(
             onFinish(message, responseRes) {
               if (responseRes?.status === 200) {
                 console.log("[Memory] ", message);
-                get().updateTargetSession(
+                // get().updateTargetSession(
+                get().updateCurrentSession(
                   session,
                   (session) => {
                     session.lastSummarizeIndex = lastSummarizeIndex;
@@ -1358,8 +1362,6 @@ export const useNewChatStore = createPersistStore(
         const restoreState = {
           sessions: get().sessions.slice(),
           currentSession: clone(get().currentSession),
-          // currentSessionId: clone(get().currentSessionId),
-          // currentSessionUserId: clone(get().currentSessionUserId),
           currentSessionParams: clone(get().currentSessionParams),
         };
 
@@ -1391,27 +1393,6 @@ export const useNewChatStore = createPersistStore(
               sessions,
             });
           }
-
-          // const currentIndex = get().sessions.findIndex(
-          //   (s) => s.sessionId === index,
-          // );
-          // let nextActiveSession =
-          //   sessions.length === 0
-          //     ? undefined
-          //     : sessions[Math.min(currentIndex, sessions.length - 1)];
-          // set({
-          //   sessions,
-          //   currentSession:
-          //     {
-          //       ...nextActiveSession!,
-          //       messages: [],
-          //     } ?? undefined,
-          //   currentSessionId: nextActiveSession?.id ?? "",
-          //   currentSessionUserId: nextActiveSession?.userId ?? 0,
-          // });
-          // if (nextActiveSession) {
-          //   get().getCurrentSession(nextActiveSession);
-          // }
         }
 
         showToast(
@@ -1429,17 +1410,17 @@ export const useNewChatStore = createPersistStore(
             if (get().currentSession?.isAdd) {
               return;
             }
-            // const data = ConvertSession("delete", deletedSession);
-            // await PostAddOrUpdateSession(await getHeaders(), data)
-            //   .then(() => {
-            //     console.log("delete成功");
-            //     deleteConversation(data.id!, data?.userId!);
-            //   })
-            //   .catch(() => {
-            //     console.log("delete失败");
-            //     showToast("删除聊天失败");
-            //     set(() => restoreState);
-            //   });
+            const data = ConvertSession("delete", deletedSession);
+            await PostAddOrUpdateSession(await getHeaders(), data)
+              .then(() => {
+                console.log("delete成功");
+                deleteConversation(data.id!, data?.userId!);
+              })
+              .catch(() => {
+                console.log("delete失败");
+                showToast("删除聊天失败");
+                set(() => restoreState);
+              });
           },
         );
 
@@ -1514,8 +1495,6 @@ export const useNewChatStore = createPersistStore(
           },
         };
 
-        const config = useAppConfig.getState();
-
         const data = ConvertSession("add", newSession);
 
         await PostAddOrUpdateSession(await getHeaders(), data)
@@ -1540,8 +1519,6 @@ export const useNewChatStore = createPersistStore(
         const sessions = get().sessions;
 
         const session = get().currentSession;
-
-        // const sessionParams = get().currentSessionParams;
 
         // 證明是新創建的，並沒有保存在數據中
         if (session?.isAdd) {
@@ -1620,8 +1597,44 @@ export const useNewChatStore = createPersistStore(
         //     showToast("创建新聊天失败");
         //   });
       },
-      updateCurrentSession(session: ChatSession) {
-        set({ currentSession: session });
+      async updateCurrentSession(
+        session: ChatSession,
+        updater: (session: ChatSession) => void,
+        isUpdate: boolean = false,
+      ) {
+        const sessions = get().sessions;
+        const index = sessions.findIndex((s) => s.id === session.id);
+        if (index < 0) return;
+        updater(session);
+
+        if (isUpdate) {
+          const data = ConvertSession("update", session);
+
+          if (
+            !isEmpty(data.messages) &&
+            !isEmpty(data.mask) &&
+            !isEmpty(data.stat)
+          ) {
+            sessions[index].messagesLength = session.messages.length;
+            set(() => ({
+              sessions: sessions,
+              currentSession: session,
+            }));
+
+            // await PostAddOrUpdateSession(
+            //   await getHeaders(),
+            //   ConvertSession("update", session),
+            // )
+            //   .then(() => console.log("更新成功"))
+            //   .catch(() => console.log("更新失败"));
+          }
+        } else {
+          sessions[index].messagesLength = session.messages.length;
+          set(() => ({
+            sessions: sessions,
+            currentSession: session,
+          }));
+        }
       },
       async clearAllData() {
         await indexedDBStorage.clear();

@@ -7,7 +7,7 @@ import clsx from "clsx";
 
 import { useState, useRef, useEffect } from "react";
 
-import { useChatStore, createMessage, useAppConfig } from "@/app/store";
+import { createMessage, useAppConfig } from "@/app/store";
 
 import { IconButton } from "@/app/components/button";
 
@@ -21,6 +21,7 @@ import {
 import { AudioHandler } from "@/app/lib/audio";
 import { uploadImage } from "@/app/utils/chat";
 import { VoicePrint } from "@/app/components/voice-print";
+import { useNewChatStore } from "@/app/store/new-chat";
 
 interface RealtimeChatProps {
   onClose?: () => void;
@@ -33,8 +34,9 @@ export function RealtimeChat({
   onStartVoice,
   onPausedVoice,
 }: RealtimeChatProps) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
+  const chatStore = useNewChatStore();
+  // const session = chatStore.currentSession();
+  const session = chatStore.currentSession;
   const config = useAppConfig();
   const [status, setStatus] = useState("");
   const [isRecording, setIsRecording] = useState(false);
@@ -156,6 +158,7 @@ export function RealtimeChat({
           content: "",
         });
         // add bot message first
+        // chatStore.updateTargetSession(session, (session) => {
         chatStore.updateTargetSession(session, (session) => {
           session.messages = session.messages.concat([botMessage]);
         });
@@ -181,7 +184,8 @@ export function RealtimeChat({
             await Promise.all([textTask(), audioTask()]);
           }
           // update message.content
-          chatStore.updateTargetSession(session, (session) => {
+          // chatStore.updateTargetSession(session, (session) => {
+          chatStore.updateCurrentSession(session, (session) => {
             session.messages = session.messages.concat();
           });
         }
@@ -191,7 +195,8 @@ export function RealtimeChat({
           uploadImage(blob!).then((audio_url) => {
             botMessage.audio_url = audio_url;
             // update text and audio_url
-            chatStore.updateTargetSession(session, (session) => {
+            // chatStore.updateTargetSession(session, (session) => {
+            chatStore.updateCurrentSession(session, (session) => {
               session.messages = session.messages.concat();
             });
           });
@@ -207,7 +212,8 @@ export function RealtimeChat({
         role: "user",
         content: item.transcription,
       });
-      chatStore.updateTargetSession(session, (session) => {
+      // chatStore.updateTargetSession(session, (session) => {
+      chatStore.updateCurrentSession(session, (session) => {
         session.messages = session.messages.concat([userMessage]);
       });
       // save input audio_url, and update session
@@ -219,7 +225,8 @@ export function RealtimeChat({
       );
       uploadImage(blob!).then((audio_url) => {
         userMessage.audio_url = audio_url;
-        chatStore.updateTargetSession(session, (session) => {
+        // chatStore.updateTargetSession(session, (session) => {
+        chatStore.updateCurrentSession(session, (session) => {
           session.messages = session.messages.concat();
         });
       });

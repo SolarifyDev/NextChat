@@ -33,17 +33,6 @@ export function HomeTab() {
 
   const chatStore = useNewChatStore();
 
-  // useEffect(() => {
-  //   setActiveTab(
-  //     location.pathname === Path.Chat ||
-  //       (location.pathname === Path.Home && chatStore.currentSessionIndex > -1)
-  //       ? 0
-  //       : location.pathname === Path.AIKid
-  //       ? 1
-  //       : -1,
-  //   );
-  // }, [location.pathname, chatStore.currentSessionIndex]);
-
   useEffect(() => {
     if (omeStore.isFromApp) {
       setActiveTab(
@@ -60,7 +49,7 @@ export function HomeTab() {
       setActiveTab(
         location.pathname === Path.Chat ||
           (location.pathname === Path.Home &&
-            !isEmpty(chatStore.currentSessionId))
+            !isEmpty(chatStore.currentSessionParams.id))
           ? 0
           : location.pathname === Path.AIKid
           ? 1
@@ -71,7 +60,7 @@ export function HomeTab() {
     location.pathname,
     omeStore.isShowHome,
     omeStore.isFromApp,
-    chatStore.currentSessionId,
+    chatStore.currentSessionParams.id,
   ]);
 
   return (
@@ -141,15 +130,14 @@ export function HomeTab() {
           </div>
           <div
             className={clsx(styles["tab-right-button"], "no-dark")}
-            style={
-              {
-                // visibility: activeTab !== 0 && false ? "visible" : "hidden",
-              }
-            }
+            style={{
+              visibility: activeTab !== 0 && false ? "visible" : "hidden",
+            }}
             onClick={() => {
               navigate(activeTab < 1 ? Path.Home : Path.AddOrUpdateKid);
 
               if (activeTab < 1 && omeStore.isFromApp) {
+                // 用这个字段在手机端显示历史界面
                 omeStore.setIsShowHome(true);
               }
             }}

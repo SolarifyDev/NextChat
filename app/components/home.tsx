@@ -234,7 +234,7 @@ function Screen() {
         <SideBar
           className={clsx({
             [styles["sidebar-show"]]: omeStore.isFromApp
-              ? omeStore.isShowHome
+              ? omeStore.isShowHome && isHome
               : isHome,
           })}
         />

@@ -5,6 +5,7 @@ import styles from "./home.module.scss";
 import { IconButton } from "./button";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
+import DeleteIcon from "../icons/delete.svg";
 import MaskIcon from "../icons/mask.svg";
 import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
@@ -26,7 +27,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { Selector } from "./ui-lib";
+import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 import { useNewChatStore } from "../store/new-chat";
@@ -34,6 +35,7 @@ import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
+import { isNil } from "lodash";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -264,6 +266,7 @@ export function SideBar(props: { className?: string }) {
     { wait: 300 },
   );
 
+  // 在web端是退出metis，但在App端只是返回详情页面
   const { run: quitMetis } = useDebounceFn(
     () => {
       try {
@@ -435,17 +438,23 @@ export function SideBar(props: { className?: string }) {
           primaryAction={
             <>
               {/* 手机场景 */}
-              {/* <div className={clsx(styles["sidebar-action"], styles.mobile)}>
+              <div className={clsx(styles["sidebar-action"], styles.mobile)}>
                 <IconButton
                   icon={<DeleteIcon />}
                   onClick={async () => {
                     // if (await showConfirm(Locale.Home.DeleteChat)) {
-                    if (await showConfirm(t("Home.DeleteChat"))) {
-                      // chatStore.deleteSession(chatStore.currentSessionIndex);
+                    if (
+                      (await showConfirm(t("Home.DeleteChat"))) &&
+                      !isNil(chatStore?.currentSession) &&
+                      !chatStore?.currentSession.isAdd // 不等于新建
+                    ) {
+                      chatStore.deleteSession(
+                        chatStore.currentSessionParams.id,
+                      );
                     }
                   }}
                 />
-              </div> */}
+              </div>
               <div className={styles["sidebar-action"]}>
                 <Link to={Path.Settings}>
                   <IconButton
