@@ -19,6 +19,7 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
@@ -193,7 +194,9 @@ export function WindowContent(props: { children: React.ReactNode }) {
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
+  const navigate = useNavigate();
   const omeStore = useOmeStore();
+  const chatStore = useNewChatStore();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -216,6 +219,12 @@ function Screen() {
     linkEl.href = googleFontUrl;
     document.head.appendChild(linkEl);
   }, []);
+
+  useEffect(() => {
+    if (omeStore.isFromApp) {
+      chatStore.newSession(undefined, () => navigate(Path.Chat));
+    }
+  }, [omeStore.isFromApp]);
 
   if (isArtifact) {
     return (
