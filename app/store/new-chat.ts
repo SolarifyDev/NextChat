@@ -287,7 +287,6 @@ export const useNewChatStore = createPersistStore(
       setIsDown: (isDown: boolean) => {
         set({ isDown });
       },
-      isLoading: false,
       selectSession: (i: number) => {
         set({ currentSessionIndex: i });
       },
@@ -331,7 +330,6 @@ export const useNewChatStore = createPersistStore(
           currentSessionIndex: -1,
           sessions: detaultSessions,
           isDown: false,
-          isLoading: false,
         });
       },
 

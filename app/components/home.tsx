@@ -222,7 +222,10 @@ function Screen() {
 
   useEffect(() => {
     if (omeStore.isFromApp) {
-      chatStore.newSession(undefined, () => navigate(Path.Chat));
+      chatStore.newSession(undefined, () => {
+        omeStore.setIsShowHome(false);
+        navigate(Path.Chat);
+      });
     }
   }, [omeStore.isFromApp]);
 
@@ -240,7 +243,13 @@ function Screen() {
     if (isSdNew) return <Sd />;
     return (
       <>
-        <SideBar className={clsx({ [styles["sidebar-show"]]: isHome })} />
+        <SideBar
+          className={clsx({
+            [styles["sidebar-show"]]: omeStore.isFromApp
+              ? omeStore.isShowHome && isHome
+              : isHome,
+          })}
+        />
         <WindowContent>
           <Routes>
             {/* <Route path={Path.Home} element={<Chat />} /> */}
