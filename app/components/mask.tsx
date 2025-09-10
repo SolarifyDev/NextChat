@@ -57,6 +57,7 @@ import { getMessageTextContent } from "../utils";
 import clsx from "clsx";
 import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { useOmeStore } from "../store/ome";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -643,7 +644,12 @@ export function MaskPage() {
                     // text={Locale.Mask.Item.Chat}
                     text={t("Mask.Item.Chat")}
                     onClick={() => {
-                      chatStore.newSession(m, () => navigate(Path.Chat));
+                      chatStore.newSession(m, () => {
+                        if (useOmeStore.getState().isFromApp) {
+                          useOmeStore.getState().setIsShowHome(false);
+                        }
+                        navigate(Path.Chat);
+                      });
                     }}
                   />
                   {m.builtin ? (

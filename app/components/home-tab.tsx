@@ -5,9 +5,11 @@ import { Path } from "@/app/constant";
 
 import ArrowLeftIcon from "../icons/arrow-left.svg";
 import AddKidIcon from "../icons/add-kid.svg";
+import MeitsHistoryIcon from "../icons/metis-history.svg";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useOmeStore } from "@/app/store/ome";
 import { useNewChatStore } from "../store/new-chat";
+import { MessageEnum } from "../enum";
 
 export function HomeTab() {
   const tabs = [
@@ -56,7 +58,28 @@ export function HomeTab() {
               visibility: omeStore.isFromApp ? "visible" : "hidden",
             }}
             onClick={() => {
-              navigate(Path.Home);
+              if (omeStore.isFromApp) {
+                const message = {
+                  data: {},
+                  msg: "quit",
+                  type: MessageEnum.Quit,
+                };
+                if (window?.ReactNativeWebView) {
+                  window.ReactNativeWebView.postMessage(
+                    JSON.stringify(message),
+                  );
+                } else if (
+                  (window as any)?.webkit?.messageHandlers?.nativeListener
+                ) {
+                  (
+                    window as any
+                  )?.webkit?.messageHandlers?.nativeListener.postMessage(
+                    JSON.stringify(message),
+                  );
+                }
+              } else {
+                navigate(Path.Home);
+              }
             }}
           >
             <ArrowLeftIcon />
@@ -88,13 +111,27 @@ export function HomeTab() {
           <div
             className={styles["tab-right-button"]}
             style={{
-              visibility: activeTab !== 0 && false ? "visible" : "hidden",
+              visibility:
+                activeTab === 0 && omeStore.isFromApp ? "visible" : "hidden",
             }}
             onClick={() => {
-              navigate(Path.AddOrUpdateKid);
+              if (omeStore.isFromApp) {
+                if (activeTab === 0) {
+                  omeStore.setIsShowHome(true);
+                }
+                navigate(activeTab === 0 ? Path.Home : Path.AddOrUpdateKid);
+              }
             }}
           >
-            <AddKidIcon />
+            {activeTab > -1 ? (
+              activeTab === 0 ? (
+                <MeitsHistoryIcon />
+              ) : (
+                <AddKidIcon />
+              )
+            ) : (
+              <></>
+            )}
           </div>
         </div>
         <div className={styles["tab-content"]}>
