@@ -312,6 +312,7 @@ export const useNewChatStore = createPersistStore(
           set({
             sessions: [],
             isLoading: false,
+            currentSessionIndex: -1,
           });
           showToast("获取聊天失败");
         }
