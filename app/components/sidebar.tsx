@@ -282,8 +282,12 @@ export function SideBar(props: {
     () => {
       try {
         if (omeStore.isFromApp) {
-          omeStore.setIsShowHome(false);
-          navigate(Path.Chat);
+          if (chatStore.sessions.length === 0) {
+            addConversation();
+          } else {
+            omeStore.setIsShowHome(false);
+            navigate(Path.Chat);
+          }
         } else {
           const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
           if (window?.ReactNativeWebView) {

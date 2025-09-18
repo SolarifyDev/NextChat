@@ -298,7 +298,7 @@ export const useNewChatStore = createPersistStore(
           });
 
           const data = await GetHistory(await getHeaders());
-          const newData: ChatSession[] = data.map((item) => ({
+          const newData: ChatSession[] = (data ?? []).map((item) => ({
             ...item,
             messages: JSONParse(item.messages, "arr"),
             stat: JSONParse(item.stat, "obj"),
