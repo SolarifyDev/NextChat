@@ -157,7 +157,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
       // ref={provided.innerRef}
       // {...provided.droppableProps}
     >
-      {props.isFromApp && isLoading && (
+      {isLoading && (
         <Spin
           style={{
             position: "absolute",

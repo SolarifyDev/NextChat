@@ -254,7 +254,12 @@ export function SideBar(props: { className?: string }) {
 
   const { run: addConversation } = useDebounceFn(
     () => {
-      chatStore.newSession(undefined, () => navigate(Path.Chat));
+      chatStore.newSession(undefined, () => {
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
+        navigate(Path.Chat);
+      });
     },
     { wait: 300 },
   );
@@ -262,13 +267,24 @@ export function SideBar(props: { className?: string }) {
   const { run: quitMetis } = useDebounceFn(
     () => {
       try {
-        const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
-        if (window?.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
-          (window as any)?.webkit?.messageHandlers?.nativeListener.postMessage(
-            JSON.stringify(message),
-          );
+        if (omeStore.isFromApp) {
+          if (chatStore.sessions.length === 0) {
+            addConversation();
+          } else {
+            omeStore.setIsShowHome(false);
+            navigate(Path.Chat);
+          }
+        } else {
+          const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
+          if (window?.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify(message));
+          } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
+            (
+              window as any
+            )?.webkit?.messageHandlers?.nativeListener.postMessage(
+              JSON.stringify(message),
+            );
+          }
         }
       } catch {}
     },
@@ -454,7 +470,12 @@ export function SideBar(props: { className?: string }) {
               text={shouldNarrow ? undefined : t("Home.NewChat")}
               onClick={() => {
                 if (config.dontShowMaskSplashScreen) {
-                  chatStore.newSession(undefined, () => navigate(Path.Chat));
+                  chatStore.newSession(undefined, () => {
+                    if (omeStore.isFromApp) {
+                      omeStore.setIsShowHome(false);
+                    }
+                    navigate(Path.Chat);
+                  });
                 } else {
                   navigate(Path.NewChat);
                 }

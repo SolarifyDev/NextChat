@@ -19,6 +19,7 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
@@ -193,7 +194,9 @@ export function WindowContent(props: { children: React.ReactNode }) {
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
+  const navigate = useNavigate();
   const omeStore = useOmeStore();
+  const chatStore = useNewChatStore();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -217,6 +220,15 @@ function Screen() {
     document.head.appendChild(linkEl);
   }, []);
 
+  useEffect(() => {
+    if (omeStore.isFromApp) {
+      chatStore.newSession(undefined, () => {
+        omeStore.setIsShowHome(false);
+        navigate(Path.Chat);
+      });
+    }
+  }, [omeStore.isFromApp]);
+
   if (isArtifact) {
     return (
       <Routes>
@@ -231,7 +243,13 @@ function Screen() {
     if (isSdNew) return <Sd />;
     return (
       <>
-        <SideBar className={clsx({ [styles["sidebar-show"]]: isHome })} />
+        <SideBar
+          className={clsx({
+            [styles["sidebar-show"]]: omeStore.isFromApp
+              ? omeStore.isShowHome && isHome
+              : isHome,
+          })}
+        />
         <WindowContent>
           <Routes>
             {/* <Route path={Path.Home} element={<Chat />} /> */}
