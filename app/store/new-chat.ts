@@ -114,7 +114,7 @@ export type ChatStoreType = {
   deleteSession(index: number): void;
   forkSession(): void;
   nextSession(delta: number): void;
-  newSession(mask?: Mask, callback?: () => void): void;
+  newSession(mask?: Mask, callback?: () => void, timeout?: number): void;
   updateStat(message: ChatMessage, session: ChatSession): void;
   checkMcpJson(message: ChatMessage): void;
   clearAllData(): void;
@@ -1158,7 +1158,7 @@ export const useNewChatStore = createPersistStore(
         const i = get().currentSessionIndex;
         get().selectSession(limit(i + delta));
       },
-      async newSession(mask?: Mask, callback?: () => void) {
+      async newSession(mask?: Mask, callback?: () => void, timeout?: number) {
         const session = createEmptySession();
 
         if (mask) {
@@ -1175,27 +1175,53 @@ export const useNewChatStore = createPersistStore(
           session.topic = mask.name;
         }
 
-        const data = ConvertSession("add", session);
+        if (timeout) {
+          setTimeout(async () => {
+            const data = ConvertSession("add", session);
 
-        await PostAddOrUpdateSession(await getHeaders(), data)
-          .then((res) => {
-            if (res) {
-              session.sessionId = res.sessionId;
+            await PostAddOrUpdateSession(await getHeaders(), data)
+              .then((res) => {
+                if (res) {
+                  session.sessionId = res.sessionId;
 
-              session.clearContextIndex = res.clearContextIndex;
+                  session.clearContextIndex = res.clearContextIndex;
 
-              set((state) => ({
-                currentSessionIndex: 0,
-                sessions: [session].concat(state.sessions),
-              }));
-            }
+                  set((state) => ({
+                    currentSessionIndex: 0,
+                    sessions: [session].concat(state.sessions),
+                  }));
+                }
 
-            callback && callback();
-          })
-          .catch(() => {
-            console.log("失败");
-            showToast("创建新聊天失败");
-          });
+                callback && callback();
+              })
+              .catch(() => {
+                console.log("失败");
+                showToast("创建新聊天失败");
+              });
+          }, timeout);
+        } else {
+          const data = ConvertSession("add", session);
+
+          await PostAddOrUpdateSession(await getHeaders(), data)
+            .then((res) => {
+              if (res) {
+                session.sessionId = res.sessionId;
+
+                session.clearContextIndex = res.clearContextIndex;
+
+                set((state) => ({
+                  currentSessionIndex: 0,
+                  sessions: [session].concat(state.sessions),
+                }));
+              }
+
+              callback && callback();
+            })
+            .catch(() => {
+              console.log("失败");
+              showToast("创建新聊天失败");
+            });
+        }
       },
       async clearAllData() {
         await indexedDBStorage.clear();
