@@ -1175,52 +1175,34 @@ export const useNewChatStore = createPersistStore(
           session.topic = mask.name;
         }
 
-        if (timeout) {
-          setTimeout(async () => {
+        // 提取公共的请求逻辑
+        const executeRequest = async () => {
+          try {
             const data = ConvertSession("add", session);
+            const res = await PostAddOrUpdateSession(await getHeaders(), data);
 
-            await PostAddOrUpdateSession(await getHeaders(), data)
-              .then((res) => {
-                if (res) {
-                  session.sessionId = res.sessionId;
+            if (res) {
+              session.sessionId = res.sessionId;
+              session.clearContextIndex = res.clearContextIndex;
 
-                  session.clearContextIndex = res.clearContextIndex;
+              set((state) => ({
+                currentSessionIndex: 0,
+                sessions: [session].concat(state.sessions),
+              }));
+            }
 
-                  set((state) => ({
-                    currentSessionIndex: 0,
-                    sessions: [session].concat(state.sessions),
-                  }));
-                }
+            callback?.();
+          } catch (error) {
+            console.log("失败");
+            showToast("创建新聊天失败");
+          }
+        };
 
-                callback && callback();
-              })
-              .catch(() => {
-                console.log("失败");
-                showToast("创建新聊天失败");
-              });
-          }, timeout);
+        // 根据是否有 timeout 决定执行方式
+        if (timeout) {
+          setTimeout(executeRequest, timeout);
         } else {
-          const data = ConvertSession("add", session);
-
-          await PostAddOrUpdateSession(await getHeaders(), data)
-            .then((res) => {
-              if (res) {
-                session.sessionId = res.sessionId;
-
-                session.clearContextIndex = res.clearContextIndex;
-
-                set((state) => ({
-                  currentSessionIndex: 0,
-                  sessions: [session].concat(state.sessions),
-                }));
-              }
-
-              callback && callback();
-            })
-            .catch(() => {
-              console.log("失败");
-              showToast("创建新聊天失败");
-            });
+          await executeRequest();
         }
       },
       async clearAllData() {
