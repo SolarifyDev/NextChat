@@ -92,6 +92,17 @@ export const GetHistory = async (headers: {
   ).data;
 };
 
+export const GetItemHistory = async (
+  headers: { [key: string]: string },
+  sessionId: number,
+): Promise<ISession> => {
+  return (
+    await api.get(`/api/v1/history?SessionId=${sessionId}`, {
+      headers,
+    })
+  ).data;
+};
+
 export const PostAddOrUpdateSession = async (
   headers: { [key: string]: string },
   data: Partial<ISession>,
