@@ -114,7 +114,7 @@ export type ChatStoreType = {
   deleteSession(index: number): void;
   forkSession(): void;
   nextSession(delta: number): void;
-  newSession(mask?: Mask, callback?: () => void): void;
+  newSession(mask?: Mask, callback?: () => void, timeout?: number): void;
   updateStat(message: ChatMessage, session: ChatSession): void;
   checkMcpJson(message: ChatMessage): void;
   clearAllData(): void;
@@ -1158,7 +1158,7 @@ export const useNewChatStore = createPersistStore(
         const i = get().currentSessionIndex;
         get().selectSession(limit(i + delta));
       },
-      async newSession(mask?: Mask, callback?: () => void) {
+      async newSession(mask?: Mask, callback?: () => void, timeout?: number) {
         const session = createEmptySession();
 
         if (mask) {
@@ -1175,13 +1175,14 @@ export const useNewChatStore = createPersistStore(
           session.topic = mask.name;
         }
 
-        const data = ConvertSession("add", session);
+        // 提取公共的请求逻辑
+        const executeRequest = async () => {
+          try {
+            const data = ConvertSession("add", session);
+            const res = await PostAddOrUpdateSession(await getHeaders(), data);
 
-        await PostAddOrUpdateSession(await getHeaders(), data)
-          .then((res) => {
             if (res) {
               session.sessionId = res.sessionId;
-
               session.clearContextIndex = res.clearContextIndex;
 
               set((state) => ({
@@ -1190,12 +1191,19 @@ export const useNewChatStore = createPersistStore(
               }));
             }
 
-            callback && callback();
-          })
-          .catch(() => {
+            callback?.();
+          } catch (error) {
             console.log("失败");
             showToast("创建新聊天失败");
-          });
+          }
+        };
+
+        // 根据是否有 timeout 决定执行方式
+        if (timeout) {
+          setTimeout(executeRequest, timeout);
+        } else {
+          await executeRequest();
+        }
       },
       async clearAllData() {
         await indexedDBStorage.clear();

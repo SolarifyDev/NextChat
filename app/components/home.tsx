@@ -222,10 +222,14 @@ function Screen() {
 
   useEffect(() => {
     if (omeStore.isFromApp) {
-      chatStore.newSession(undefined, () => {
-        omeStore.setIsShowHome(false);
-        navigate(Path.Chat);
-      });
+      chatStore.newSession(
+        undefined,
+        () => {
+          omeStore.setIsShowHome(false);
+          navigate(Path.Chat);
+        },
+        1000,
+      );
     }
   }, [omeStore.isFromApp]);
 
