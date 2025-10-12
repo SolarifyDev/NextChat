@@ -145,6 +145,7 @@ import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
 import { useDebounceFn } from "ahooks";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 const localStorage = safeLocalStorage();
 
@@ -184,8 +185,11 @@ const MCPAction = () => {
 
 export function SessionConfigModel(props: { onClose: () => void }) {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const chatStore = useNewChatStore();
+  // const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
   const maskStore = useMaskStore();
   const navigate = useNavigate();
 
@@ -266,13 +270,16 @@ function PromptToast(props: {
   setShowModal: (_: boolean) => void;
 }) {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
-  const context = session.mask.context;
+  // const chatStore = useNewChatStore();
+  // const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
+  const context = session?.mask?.context;
 
   return (
     <div className={styles["prompt-toast"]} key="prompt-toast">
-      {props.showToast && context.length > 0 && (
+      {props.showToast && context?.length > 0 && (
         <div
           className={clsx(styles["prompt-toast-inner"], "clickable")}
           role="button"
@@ -413,18 +420,22 @@ export function PromptHints(props: {
 
 function ClearContextDivider() {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const chatStore = useNewChatStore();
+  // const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
 
   return (
     <div
       className={styles["clear-context"]}
-      onClick={() =>
-        chatStore.updateTargetSession(
-          session,
-          (session) => (session.clearContextIndex = null),
-          true,
-        )
+      onClick={
+        () => {}
+        // chatStore.updateTargetSession(
+        //   session,
+        //   (session) => (session.clearContextIndex = null),
+        //   true,
+        // )
       }
     >
       {/* <div className={styles["clear-context-tips"]}>{Locale.Context.Clear}</div> */}
@@ -597,9 +608,11 @@ export function ChatActions(props: {
   const config = useAppConfig();
   const omeStore = useOmeStore();
   const navigate = useNavigate();
-  const chatStore = useNewChatStore();
+  // const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   const pluginStore = usePluginStore();
-  const session = chatStore.getCurrentSession();
+  // const session = chatStore.getCurrentSession();
+  const session = chatStore.currentSession!;
 
   // switch themes
   const theme = config.theme;
@@ -1020,8 +1033,11 @@ export function ChatActions(props: {
 
 export function EditMessageModal(props: { onClose: () => void }) {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const chatStore = useNewChatStore();
+  // const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
   const [messages, setMessages] = useState(session.messages.slice());
 
   return (
@@ -1177,7 +1193,9 @@ export function _Chat_NEW() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
   const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const newChatStore = useEnhanceChatStore();
+  // const session = chatStore.getCurrentSession();
+  const session = newChatStore.currentSession!;
   const config = useAppConfig();
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
@@ -1302,7 +1320,9 @@ export function _Chat_NEW() {
     }
     setIsLoading(true);
 
-    chatStore
+    console.log("111");
+
+    newChatStore
       .onUserInput(userInput, attachImages)
       .then(() => setIsLoading(false));
     setAttachImages([]);

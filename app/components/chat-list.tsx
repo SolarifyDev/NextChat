@@ -14,6 +14,7 @@ import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -121,11 +122,15 @@ export function ChatItem(props: {
 export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
   const {
     currentSessionIndex,
-    sessions,
+    // sessions,
     selectSession,
     deleteSession,
-    isLoading,
+    // isLoading,
   } = useNewChatStore();
+
+  const { sessions, isLoading, sessionId, getCurrentSession } =
+    useEnhanceChatStore();
+
   const { t } = useTranslation();
 
   const navigate = useNavigate();
@@ -172,14 +177,18 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
           <ChatItem
             title={item.topic}
             time={new Date(item.lastUpdate).toLocaleString()}
-            count={item?.messages?.length ?? 0}
+            // count={item?.messages?.length ?? 0}
+            count={item?.messagesLength ?? 0}
             key={item.id}
             id={item.id}
             index={i}
-            selected={i === currentSessionIndex}
+            // selected={i === currentSessionIndex}
+            selected={item?.sessionId === sessionId}
             onClick={() => {
+              // selectSession(i);
+
               navigate(Path.Chat);
-              selectSession(i);
+              getCurrentSession(item?.sessionId!);
               if (onlineSearch) {
                 setOnlineSearch(false);
               }

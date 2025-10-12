@@ -35,6 +35,7 @@ import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -247,6 +248,7 @@ export function SideBar(props: { className?: string }) {
   const navigate = useNavigate();
   const config = useAppConfig();
   const chatStore = useNewChatStore();
+  const newChatStore = useEnhanceChatStore();
   const omeStore = useOmeStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
@@ -301,11 +303,17 @@ export function SideBar(props: { className?: string }) {
     checkMcpStatus();
   }, []);
 
+  // useEffect(() => {
+  //   if (chatStore.isDown) {
+  //     getSession();
+  //   }
+  // }, [chatStore.isDown]);
+
   useEffect(() => {
-    if (chatStore.isDown) {
-      getSession();
+    if (newChatStore.isDown) {
+      newChatStore.getSessions();
     }
-  }, [chatStore.isDown]);
+  }, [newChatStore.isDown]);
 
   return (
     <SideBarContainer

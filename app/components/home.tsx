@@ -38,6 +38,7 @@ import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 import { PostGetToken } from "../client/smarties";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -402,7 +403,8 @@ export function Home() {
               });
           } else {
             omeStore.setIsFromApp(true);
-            useNewChatStore.getState().setIsDown(true);
+            // useNewChatStore.getState().setIsDown(true);
+            useEnhanceChatStore.getState().setIsDown(true);
           }
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
@@ -422,7 +424,8 @@ export function Home() {
             event.data.ometoken,
           );
           omeStore.setToken(event.data.ometoken);
-          useNewChatStore.getState().setIsDown(true);
+          // useNewChatStore.getState().setIsDown(true);
+          useEnhanceChatStore.getState().setIsDown(true);
         }
 
         if (!isEmpty(event?.data?.omeUserId)) {
@@ -456,7 +459,9 @@ export function Home() {
           omeStore.setUserName(data?.omeUserName ?? "");
         }
         omeStore.setIsFromApp(true);
-        useNewChatStore.getState().setIsDown(true);
+        // useNewChatStore.getState().setIsDown(true);
+        useEnhanceChatStore.getState().setIsDown(true);
+
         if (!isEmpty(data?.lanauge)) {
           omeStore.setLanguage(data?.lanauge);
         }
