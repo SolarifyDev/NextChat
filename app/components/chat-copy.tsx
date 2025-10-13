@@ -134,11 +134,7 @@ import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
-import {
-  getBotHello,
-  getDefaultTopic,
-  useNewChatStore,
-} from "../store/new-chat";
+import { getBotHello, getDefaultTopic } from "../store/new-chat";
 import { nanoid } from "nanoid";
 import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
@@ -1164,7 +1160,6 @@ export function _Chat_NEW() {
   const { t } = useTranslation();
   type RenderMessage = ChatMessage & { preview?: boolean };
 
-  const chatStore = useNewChatStore();
   const newChatStore = useEnhanceChatStore();
   // const session = chatStore.getCurrentSession();
   const session = newChatStore.currentSession!;
@@ -1295,7 +1290,7 @@ export function _Chat_NEW() {
       .onUserInput(userInput, attachImages)
       .then(() => setIsLoading(false));
     setAttachImages([]);
-    chatStore.setLastInput(userInput);
+    newChatStore.setLastInput(userInput);
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) {
@@ -1329,8 +1324,7 @@ export function _Chat_NEW() {
   };
 
   useEffect(() => {
-    chatStore.updateTargetSession(
-      session,
+    newChatStore.updateTargetSession(
       (session) => {
         const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
         session.messages.forEach((m) => {
@@ -1388,8 +1382,7 @@ export function _Chat_NEW() {
   };
 
   const deleteMessage = (msgId?: string, isGetApi = false) => {
-    chatStore.updateTargetSession(
-      session,
+    newChatStore.updateTargetSession(
       (session) =>
         (session.messages = session.messages.filter((m) => m.id !== msgId)),
       isGetApi,
@@ -1453,8 +1446,7 @@ export function _Chat_NEW() {
   };
 
   const onPinMessage = (message: ChatMessage) => {
-    chatStore.updateTargetSession(
-      session!,
+    newChatStore.updateTargetSession(
       (session) => session.mask.context.push({ ...message, id: nanoid() }),
       true,
     );
@@ -1700,7 +1692,7 @@ export function _Chat_NEW() {
 
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const currentModel = chatStore.getCurrentSession().mask.modelConfig.model;
+      const currentModel = newChatStore.currentSession!.mask.modelConfig.model;
       if (!isVisionModel(currentModel)) {
         return;
       }
@@ -1737,7 +1729,7 @@ export function _Chat_NEW() {
         }
       }
     },
-    [attachImages, chatStore],
+    [attachImages, newChatStore],
   );
 
   async function uploadImage() {
@@ -1819,7 +1811,7 @@ export function _Chat_NEW() {
       ) {
         event.preventDefault();
         setTimeout(() => {
-          chatStore.newSession(undefined, () => navigate(Path.Chat));
+          newChatStore.newSession(undefined, () => navigate(Path.Chat));
         }, 10);
       }
       // 聚焦聊天输入 shift + esc
@@ -1868,25 +1860,21 @@ export function _Chat_NEW() {
         event.key.toLowerCase() === "backspace"
       ) {
         event.preventDefault();
-        chatStore.updateTargetSession(
-          session,
-          (session) => {
-            if (session.clearContextIndex === session.messages.length) {
-              session.clearContextIndex = null;
-            } else {
-              session.clearContextIndex = session.messages.length;
-              session.memoryPrompt = ""; // will clear memory
-            }
-          },
-          true,
-        );
+        newChatStore.updateTargetSession((session) => {
+          if (session.clearContextIndex === session.messages.length) {
+            session.clearContextIndex = null;
+          } else {
+            session.clearContextIndex = session.messages.length;
+            session.memoryPrompt = ""; // will clear memory
+          }
+        }, true);
       }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [messages, chatStore, navigate, session]);
+  }, [messages, newChatStore, navigate, session]);
 
   useEffect(() => {
     if (omeStore.isFromApp) {
@@ -1988,7 +1976,7 @@ export function _Chat_NEW() {
                   onClick={() => {
                     // showToast(Locale.Chat.Actions.RefreshToast);
                     showToast(t("Chat.Actions.RefreshToast"));
-                    chatStore.summarizeSession(true, session);
+                    newChatStore.summarizeSession(true, session);
                   }}
                 />
               </div>
