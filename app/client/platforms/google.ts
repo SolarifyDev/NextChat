@@ -28,6 +28,7 @@ import { nanoid } from "nanoid";
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
 import { useNewChatStore } from "@/app/store/new-chat";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 export class GeminiProApi implements LLMApi {
   path(path: string, shouldStream = false): string {
@@ -209,7 +210,8 @@ export class GeminiProApi implements LLMApi {
       if (shouldStream) {
         const [tools, funcs] = usePluginStore.getState().getAsTools(
           // useChatStore.getState().currentSession().mask?.plugin || [],
-          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          // useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          useEnhanceChatStore.getState().currentSession!.mask?.plugin || [],
         );
         return stream(
           chatPath,

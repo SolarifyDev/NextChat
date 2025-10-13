@@ -22,8 +22,8 @@ import { IconButton } from "./button";
 
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -79,8 +79,11 @@ export function PreCode(props: { children: any }) {
   const { height } = useWindowSize();
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const chatStore = useNewChatStore();
+  // const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
 
   const renderArtifacts = useDebouncedCallback(() => {
     if (!ref.current) return;
@@ -179,8 +182,11 @@ function CustomCode(props: { children: any; className?: string }) {
   const { t } = useTranslation();
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  // const chatStore = useNewChatStore();
+  // const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
   const config = useAppConfig();
   const enableCodeFold =
     session.mask?.enableCodeFold !== false && config.enableCodeFold;

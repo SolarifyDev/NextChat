@@ -255,6 +255,7 @@ export const useEnhanceChatStore = createPersistStore(
     sessionId: 0,
     isDown: false,
     isLoading: false,
+    lastInput: "",
   },
   (set, _get) => {
     function get() {
@@ -273,6 +274,14 @@ export const useEnhanceChatStore = createPersistStore(
       },
       setSessionId(sessionId: number) {
         set({ sessionId });
+      },
+      setCurrentSession(session: ChatSession | null) {
+        set({ currentSession: session });
+      },
+      setLastInput(lastInput: string) {
+        set({
+          lastInput,
+        });
       },
 
       // 获取左侧聊天List
@@ -307,6 +316,8 @@ export const useEnhanceChatStore = createPersistStore(
         try {
           get().setSessionId(sessionId);
 
+          get().setCurrentSession(null);
+
           const data = await GetItemHistory(await getHeaders(), sessionId);
 
           const newData: ChatSession = {
@@ -318,9 +329,11 @@ export const useEnhanceChatStore = createPersistStore(
 
           console.log("获取成功");
 
-          set({
-            currentSession: newData,
-          });
+          if (get().sessionId === sessionId) {
+            set({
+              currentSession: newData,
+            });
+          }
         } catch {
           console.log("获取失败");
 
@@ -331,7 +344,7 @@ export const useEnhanceChatStore = createPersistStore(
         }
       },
       // 创建新聊天(本地)
-      createSession: async (mask?: Mask, callback?: () => void) => {
+      newSession: async (mask?: Mask, callback?: () => void) => {
         const session = createEmptySession();
 
         if (mask) {
@@ -349,13 +362,141 @@ export const useEnhanceChatStore = createPersistStore(
         }
 
         set(() => ({
+          sessionId: 0,
           currentSession: session,
         }));
 
         callback?.();
       },
       // 删除聊天
-      deleteSession: async () => {},
+      deleteSession: async (sessionId: number) => {
+        const sessions = get().sessions.slice();
+
+        // 找到要删除的 session 的索引
+        const index = sessions.findIndex(
+          (session) => session.sessionId === sessionId,
+        );
+
+        // 如果没找到，直接返回
+        if (index === -1) return;
+
+        const deletedSession = sessions[index];
+
+        if (!deletedSession) return;
+
+        sessions.splice(index, 1);
+
+        // 先暂时将sessionId重置
+
+        const restoreState = {
+          sessionId,
+          sessions: get().sessions.slice(),
+        };
+
+        set({
+          sessionId: 0,
+          sessions,
+        });
+
+        showToast(
+          // Locale.Home.DeleteToast,
+          t("Home.DeleteToast"),
+          {
+            // text: Locale.Home.Revert,
+            text: t("Home.Revert"),
+            onClick() {
+              set(() => restoreState);
+            },
+          },
+          5000,
+          async () => {
+            await PostAddOrUpdateSession(await getHeaders(), {
+              sessionId: deletedSession.sessionId,
+              id: deletedSession.id,
+              isDeleted: true,
+            })
+              .then(() => {
+                const nowCurrentSession = get().currentSession;
+
+                if (
+                  deletedSession.sessionId === nowCurrentSession?.sessionId &&
+                  !isNil(nowCurrentSession)
+                )
+                  set({
+                    currentSession: null,
+                  });
+              })
+              .catch(() => {
+                console.log("delete失败");
+                showToast("删除聊天失败");
+                set(() => restoreState);
+              });
+          },
+        );
+      },
+      async forkSession() {
+        // 获取当前会话
+        const currentSession = get().currentSession;
+        if (!currentSession) return;
+
+        const newSession = createEmptySession();
+
+        newSession.topic = currentSession.topic;
+        // 深拷贝消息
+        newSession.messages = currentSession.messages.map((msg) => ({
+          ...msg,
+          id: nanoid(), // 生成新的消息 ID
+        }));
+        newSession.mask = {
+          ...currentSession.mask,
+          modelConfig: {
+            ...currentSession.mask.modelConfig,
+          },
+        };
+
+        const data = ConvertSession("add", newSession);
+
+        await PostAddOrUpdateSession(await getHeaders(), data)
+          .then((res) => {
+            if (res) {
+              newSession.sessionId = res.sessionId;
+
+              const { messages, isAdd, ...data } = newSession;
+
+              set((state) => ({
+                sessionId: res.sessionId,
+                currentSession: {
+                  ...data,
+                  messages,
+                },
+                sessions: [
+                  {
+                    ...data,
+                    messagesLength: messages?.length ?? 0,
+                  },
+                  ...state.sessions,
+                ],
+              }));
+            }
+          })
+          .catch(() => {
+            console.log("失败");
+            showToast("复制聊天失败");
+          });
+      },
+      nextSession(delta: number) {
+        const n = get().sessions.length;
+        const limit = (x: number) => (x + n) % n;
+        const i = get().sessions.findIndex(
+          (i) => i.sessionId === get().sessionId,
+        );
+
+        if (i <= -1) {
+          return;
+        }
+
+        get().getCurrentSession(get().sessions[limit(i + delta)].sessionId!);
+      },
       // 更新当前聊天
       updateTargetSession: async (
         updater: (session: ChatSession) => void,
@@ -371,6 +512,9 @@ export const useEnhanceChatStore = createPersistStore(
         if (isNil(currentSession)) return;
 
         updater(currentSession!);
+
+        const newCurrentSession = clone(currentSession);
+        set({ currentSession: newCurrentSession });
 
         // 判断是否需要同步给服务端
         if (!isUpdate) return;
@@ -396,6 +540,7 @@ export const useEnhanceChatStore = createPersistStore(
                 const { messages, ...data } = newCurrentSession;
 
                 set({
+                  sessionId: res.sessionId,
                   currentSession: newCurrentSession,
                   sessions: [
                     {
@@ -405,9 +550,10 @@ export const useEnhanceChatStore = createPersistStore(
                     ...sessions,
                   ],
                 });
+                console.log("添加成功");
               }
             })
-            .catch(() => console.log("更新失败"));
+            .catch(() => console.log("添加失败"));
         } else {
           // 如果左侧有一样的聊天item，需要同步 messageLength,tootip,lastupdatetime
 
@@ -456,18 +602,14 @@ export const useEnhanceChatStore = createPersistStore(
         }
       },
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
-        get().updateTargetSession(
-          (session) => {
-            session.lastUpdate = Date.now();
-            session.messages = session.messages.concat();
-            session.stat.charCount += message.content.length;
-          },
-          //true
-        );
-
-        get().checkMcpJson(message);
-
-        get().summarizeSession(false, targetSession);
+        get().updateTargetSession((session) => {
+          console.log(session.messages, "session.messages onNewMessage");
+          session.lastUpdate = Date.now();
+          session.messages = session.messages.concat();
+          session.stat.charCount += message.content.length;
+        }, true);
+        // get().checkMcpJson(message);
+        // get().summarizeSession(false, targetSession);
       },
       /** check if the message contains MCP JSON and execute the MCP action */
       checkMcpJson(message: ChatMessage) {
@@ -566,7 +708,7 @@ export const useEnhanceChatStore = createPersistStore(
                       message.length > 0
                         ? trimTopic(message)
                         : getDefaultTopic()),
-                  // true,
+                  true,
                 );
               }
             },
@@ -691,8 +833,6 @@ export const useEnhanceChatStore = createPersistStore(
         const sendMessages = recentMessages.concat(userMessage);
         const messageIndex = session.messages.length + 1;
 
-        console.log(1);
-
         // save user's and bot's message
         get().updateTargetSession((session) => {
           const savedUserMessage = {
@@ -703,14 +843,10 @@ export const useEnhanceChatStore = createPersistStore(
             savedUserMessage,
             botMessage,
           ]);
+          console.log(savedUserMessage, botMessage);
         });
 
-        console.log(2);
-
         const api: ClientApi = getClientApi(modelConfig.providerName);
-
-        let pendingUpdate = false;
-        let rafId: number | null = null;
 
         // make request
         api.llm.chat({
@@ -721,34 +857,17 @@ export const useEnhanceChatStore = createPersistStore(
             if (message) {
               botMessage.content = message;
             }
+            get().updateTargetSession((s) => {
+              const idx = s.messages.findIndex((m) => m.id === botMessage.id);
 
-            if (!pendingUpdate) {
-              pendingUpdate = true;
-              rafId = requestAnimationFrame(() => {
-                pendingUpdate = false;
-                get().updateTargetSession((s) => {
-                  const idx = s.messages.findIndex(
-                    (m) => m.id === botMessage.id,
-                  );
-                  if (idx >= 0) {
-                    if (s.messages[idx].content !== botMessage.content) {
-                      // 🔧 只修改这一行：直接更新属性而不是创建新对象
-                      s.messages[idx].content = botMessage.content;
-                      s.messages[idx].streaming = botMessage.streaming;
-                    }
-                  }
-                });
-              });
-            }
+              if (idx >= 0) {
+                if (s.messages[idx].content !== botMessage.content) {
+                  s.messages[idx] = { ...clone(botMessage) };
+                }
+              }
+            });
           },
           async onFinish(message) {
-            // 取消待处理的 RAF
-            if (rafId) {
-              cancelAnimationFrame(rafId);
-              rafId = null;
-              pendingUpdate = false;
-            }
-
             botMessage.streaming = false;
             if (message) {
               botMessage.content = message;
@@ -783,11 +902,6 @@ export const useEnhanceChatStore = createPersistStore(
             });
           },
           onError(error) {
-            if (rafId) {
-              cancelAnimationFrame(rafId);
-              rafId = null;
-              pendingUpdate = false;
-            }
             const isAborted = error.message?.includes?.("aborted");
             botMessage.content +=
               "\n\n" +

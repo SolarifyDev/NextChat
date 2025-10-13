@@ -429,13 +429,11 @@ function ClearContextDivider() {
   return (
     <div
       className={styles["clear-context"]}
-      onClick={
-        () => {}
-        // chatStore.updateTargetSession(
-        //   session,
-        //   (session) => (session.clearContextIndex = null),
-        //   true,
-        // )
+      onClick={() =>
+        chatStore.updateTargetSession(
+          (session) => (session.clearContextIndex = null),
+          true,
+        )
       }
     >
       {/* <div className={styles["clear-context-tips"]}>{Locale.Context.Clear}</div> */}
@@ -1275,18 +1273,17 @@ export function _Chat_NEW() {
 
   // chat commands shortcuts
   const chatCommands = useChatCommand({
-    new: () => chatStore.newSession(),
+    new: () => newChatStore.newSession(),
     newm: () => navigate(Path.NewChat),
-    prev: () => chatStore.nextSession(-1),
-    next: () => chatStore.nextSession(1),
+    prev: () => newChatStore.nextSession(-1),
+    next: () => newChatStore.nextSession(1),
     clear: () =>
-      chatStore.updateTargetSession(
-        session,
+      newChatStore.updateTargetSession(
         (session) => (session.clearContextIndex = session.messages.length),
         true,
       ),
-    fork: () => chatStore.forkSession(),
-    del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
+    fork: () => newChatStore.forkSession(),
+    del: () => newChatStore.deleteSession(newChatStore.sessionId),
   });
 
   // only search prompts when user input is short
@@ -1299,7 +1296,7 @@ export function _Chat_NEW() {
     if (n === 0) {
       setPromptHints([]);
     } else if (text.match(ChatCommandPrefix)) {
-      setPromptHints(chatCommands.search(text));
+      if (!session.isAdd) setPromptHints(chatCommands.search(text));
     } else if (!config.disablePromptHint && n < SEARCH_TEXT_LIMIT) {
       // check if need to trigger auto completion
       if (text.startsWith("/")) {
@@ -1319,8 +1316,6 @@ export function _Chat_NEW() {
       return;
     }
     setIsLoading(true);
-
-    console.log("111");
 
     newChatStore
       .onUserInput(userInput, attachImages)

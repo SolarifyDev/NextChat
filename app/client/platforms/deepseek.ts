@@ -25,6 +25,7 @@ import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
 import { useNewChatStore } from "@/app/store/new-chat";
 import { useOmeStore } from "@/app/store/ome";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 export class DeepSeekApi implements LLMApi {
   private disableListModels = true;
@@ -143,7 +144,8 @@ export class DeepSeekApi implements LLMApi {
       if (shouldStream) {
         const [tools, funcs] = usePluginStore.getState().getAsTools(
           // useChatStore.getState().currentSession().mask?.plugin || [],
-          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          // useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          useEnhanceChatStore.getState().currentSession!.mask?.plugin || [],
         );
         return streamWithThink(
           chatPath,

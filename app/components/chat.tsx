@@ -2194,10 +2194,14 @@ import { _Chat_NEW } from "./chat-copy";
 export function Chat() {
   const { currentSession, sessionId } = useEnhanceChatStore();
 
-  if (isNil(currentSession) && !isNil(sessionId) && sessionId != 0)
-    return <>loading... {sessionId}</>;
+  // 不属于本地新增的session就跌入逻辑
+  if (!currentSession?.isAdd) {
+    if (isNil(currentSession) && !isNil(sessionId) && sessionId != 0)
+      return <>loading... {sessionId}</>;
 
-  if (isNil(currentSession)) return <></>;
+    if (isNil(currentSession) || currentSession.sessionId !== sessionId)
+      return <></>;
+  }
 
   return <_Chat_NEW key={currentSession.id}></_Chat_NEW>;
 }

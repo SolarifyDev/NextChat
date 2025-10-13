@@ -124,12 +124,19 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
     currentSessionIndex,
     // sessions,
     selectSession,
-    deleteSession,
+    // deleteSession,
     // isLoading,
   } = useNewChatStore();
 
-  const { sessions, isLoading, sessionId, getCurrentSession } =
-    useEnhanceChatStore();
+  const {
+    sessions,
+    isLoading,
+    sessionId,
+    getCurrentSession,
+    deleteSession,
+    setSessionId,
+    setCurrentSession,
+  } = useEnhanceChatStore();
 
   const { t } = useTranslation();
 
@@ -187,8 +194,14 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             onClick={() => {
               // selectSession(i);
 
-              navigate(Path.Chat);
-              getCurrentSession(item?.sessionId!);
+              if (sessionId === item.sessionId) {
+                setSessionId(0);
+                setCurrentSession(null);
+              } else {
+                navigate(Path.Chat);
+                getCurrentSession(item?.sessionId!);
+              }
+
               if (onlineSearch) {
                 setOnlineSearch(false);
               }
@@ -199,7 +212,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
                 // (await showConfirm(Locale.Home.DeleteChat))
                 (await showConfirm(t("Home.DeleteChat")))
               ) {
-                deleteSession(i);
+                deleteSession(item.sessionId!);
               }
             }}
             narrow={props.narrow}

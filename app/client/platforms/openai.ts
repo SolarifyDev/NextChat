@@ -45,6 +45,7 @@ import { fetch } from "@/app/utils/stream";
 import { useNewChatStore } from "@/app/store/new-chat";
 import { t } from "i18next";
 import { useOmeStore } from "@/app/store/ome";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -301,7 +302,8 @@ export class ChatGPTApi implements LLMApi {
         let index = -1;
         const [tools, funcs] = usePluginStore.getState().getAsTools(
           // useChatStore.getState().currentSession().mask?.plugin || [],
-          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          // useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          useEnhanceChatStore.getState().currentSession!.mask?.plugin || [],
         );
         // console.log("getAsTools", tools, funcs);
         streamWithThink(

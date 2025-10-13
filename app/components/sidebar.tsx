@@ -252,11 +252,9 @@ export function SideBar(props: { className?: string }) {
   const omeStore = useOmeStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
-  const { getSession } = useNewChatStore();
-
   const { run: addConversation } = useDebounceFn(
     () => {
-      chatStore.newSession(undefined, () => {
+      newChatStore.newSession(undefined, () => {
         if (omeStore.isFromApp) {
           omeStore.setIsShowHome(false);
         }
@@ -270,7 +268,7 @@ export function SideBar(props: { className?: string }) {
     () => {
       try {
         if (omeStore.isFromApp) {
-          if (chatStore.sessions.length === 0) {
+          if (newChatStore.sessions.length === 0) {
             addConversation();
           } else {
             omeStore.setIsShowHome(false);
@@ -478,7 +476,7 @@ export function SideBar(props: { className?: string }) {
               text={shouldNarrow ? undefined : t("Home.NewChat")}
               onClick={() => {
                 if (config.dontShowMaskSplashScreen) {
-                  chatStore.newSession(undefined, () => {
+                  newChatStore.newSession(undefined, () => {
                     if (omeStore.isFromApp) {
                       omeStore.setIsShowHome(false);
                     }
