@@ -35,6 +35,7 @@ import { collectModelsWithDefaultModel } from "../utils/model";
 import { estimateTokenLength } from "../utils/token";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
+import { indexedDBStorage } from "../utils/indexedDB-storage";
 
 export interface ChatStat {
   tokenCount: number;
@@ -502,9 +503,6 @@ export const useEnhanceChatStore = createPersistStore(
         updater: (session: ChatSession) => void,
         isUpdate: boolean = false,
       ) => {
-        // 1. isAdd = true，左侧list不存在当前，调接口然后给做左侧add
-        // 2. 此时左侧有相同的值，把current调整同步到左侧，调用接口
-
         const currentSession = get().currentSession;
 
         const sessions = get().sessions;
@@ -513,78 +511,84 @@ export const useEnhanceChatStore = createPersistStore(
 
         updater(currentSession!);
 
-        const newCurrentSession = clone(currentSession);
-        set({ currentSession: newCurrentSession });
-
-        // 判断是否需要同步给服务端
-        if (!isUpdate) return;
-
-        // 判断左侧是否存在
-        const hasSessionId = sessions.some(
-          (obj) => obj?.sessionId === currentSession?.sessionId,
-        );
-
-        // 新聊天
-        if (currentSession?.isAdd && !hasSessionId) {
-          const data = ConvertSession("add", currentSession);
-
-          await PostAddOrUpdateSession(await getHeaders(), data)
-            .then((res) => {
-              if (res) {
-                const newCurrentSession = clone(currentSession);
-
-                newCurrentSession.isAdd = false;
-
-                newCurrentSession.sessionId = res?.sessionId || undefined;
-
-                const { messages, ...data } = newCurrentSession;
-
-                set({
-                  sessionId: res.sessionId,
-                  currentSession: newCurrentSession,
-                  sessions: [
-                    {
-                      ...data,
-                      messagesLength: messages.length,
-                    },
-                    ...sessions,
-                  ],
-                });
-                console.log("添加成功");
-              }
-            })
-            .catch(() => console.log("添加失败"));
-        } else {
-          // 如果左侧有一样的聊天item，需要同步 messageLength,tootip,lastupdatetime
-
-          const newCurrentSession = clone(currentSession);
-
-          const { messages, ...data } = newCurrentSession;
-
-          const index = sessions.findIndex(
-            (item) => item.sessionId === currentSession.sessionId,
+        if (isUpdate) {
+          // 判断左侧是否存在
+          const hasSessionId = sessions.some(
+            (obj) => obj?.sessionId === currentSession?.sessionId,
           );
 
-          if (index !== -1) {
+          // 新聊天
+          if (currentSession?.isAdd && !hasSessionId) {
+            const data = ConvertSession("add", currentSession);
+
+            await PostAddOrUpdateSession(await getHeaders(), data)
+              .then((res) => {
+                if (res) {
+                  const newCurrentSession = clone(currentSession);
+
+                  newCurrentSession.isAdd = false;
+
+                  newCurrentSession.sessionId = res?.sessionId || undefined;
+
+                  const { messages, ...data } = newCurrentSession;
+
+                  console.log(
+                    "messagesLength add",
+                    newCurrentSession,
+                    messages.length,
+                  );
+
+                  set({
+                    sessionId: res.sessionId,
+                    currentSession: newCurrentSession,
+                    sessions: [
+                      {
+                        ...data,
+                        messagesLength: messages.length,
+                      },
+                      ...sessions,
+                    ],
+                  });
+                  console.log("添加成功");
+                }
+              })
+              .catch(() => console.log("添加失败"));
+          } else {
+            // 如果左侧有一样的聊天item，需要同步 messageLength,tootip,lastupdatetime
+
+            const newCurrentSession = clone(currentSession);
+
+            const { messages, ...data } = newCurrentSession;
+
+            const index = sessions.findIndex(
+              (item) => item.sessionId === currentSession.sessionId,
+            );
+
+            if (index <= -1) return;
+
             const newSessions = [...sessions];
 
             newSessions[index] = {
               ...data,
               messagesLength: messages.length,
             };
+
+            set({
+              currentSession: newCurrentSession,
+              sessions: newSessions,
+            });
+
+            await PostAddOrUpdateSession(
+              await getHeaders(),
+              ConvertSession("update", currentSession),
+            )
+              .then(() => console.log("更新成功"))
+              .catch(() => console.log("更新失败"));
           }
-
+        } else {
           set({
-            currentSession: newCurrentSession,
-            sessions: sessions,
+            currentSession: currentSession,
           });
-
-          await PostAddOrUpdateSession(
-            await getHeaders(),
-            ConvertSession("update", currentSession),
-          )
-            .then(() => console.log("更新成功"))
-            .catch(() => console.log("更新失败"));
         }
       },
       getMemoryPrompt() {
@@ -603,13 +607,14 @@ export const useEnhanceChatStore = createPersistStore(
       },
       onNewMessage(message: ChatMessage, targetSession: ChatSession) {
         get().updateTargetSession((session) => {
-          console.log(session.messages, "session.messages onNewMessage");
           session.lastUpdate = Date.now();
           session.messages = session.messages.concat();
           session.stat.charCount += message.content.length;
         }, true);
-        // get().checkMcpJson(message);
-        // get().summarizeSession(false, targetSession);
+
+        get().checkMcpJson(message);
+
+        get().summarizeSession(false, targetSession);
       },
       /** check if the message contains MCP JSON and execute the MCP action */
       checkMcpJson(message: ChatMessage) {
@@ -843,7 +848,6 @@ export const useEnhanceChatStore = createPersistStore(
             savedUserMessage,
             botMessage,
           ]);
-          console.log(savedUserMessage, botMessage);
         });
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
@@ -857,14 +861,8 @@ export const useEnhanceChatStore = createPersistStore(
             if (message) {
               botMessage.content = message;
             }
-            get().updateTargetSession((s) => {
-              const idx = s.messages.findIndex((m) => m.id === botMessage.id);
-
-              if (idx >= 0) {
-                if (s.messages[idx].content !== botMessage.content) {
-                  s.messages[idx] = { ...clone(botMessage) };
-                }
-              }
+            get().updateTargetSession((session) => {
+              session.messages = session.messages.concat();
             });
           },
           async onFinish(message) {
@@ -1056,6 +1054,11 @@ export const useEnhanceChatStore = createPersistStore(
           isDown: false,
           // isLoading: false,
         });
+      },
+      async clearAllData() {
+        await indexedDBStorage.clear();
+        localStorage.clear();
+        location.reload();
       },
     };
 
