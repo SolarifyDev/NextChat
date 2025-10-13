@@ -210,7 +210,6 @@ export function SessionConfigModel(props: { onClose: () => void }) {
               // if (await showConfirm(Locale.Memory.ResetConfirm)) {
               if (await showConfirm(t("Memory.ResetConfirm"))) {
                 chatStore.updateTargetSession(
-                  session,
                   (session) => (session.memoryPrompt = ""),
                   true,
                 );
@@ -237,10 +236,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
           updateMask={(updater) => {
             const mask = { ...session.mask };
             updater(mask);
-            chatStore.updateTargetSession(
-              session,
-              (session) => (session.mask = mask),
-            );
+            chatStore.updateTargetSession((session) => (session.mask = mask));
           }}
           shouldSyncFromGlobal
           extraListItems={
@@ -296,7 +292,7 @@ function PromptToast(props: {
         <SessionConfigModel
           onClose={() => {
             props.setShowModal(false);
-            chatStore.updateTargetSession(session, (session) => {}, true);
+            chatStore.updateTargetSession((session) => {}, true);
           }}
         />
       )}
