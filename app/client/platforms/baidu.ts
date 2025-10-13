@@ -19,8 +19,8 @@ import { prettyObject } from "@/app/utils/format";
 import { getClientConfig } from "@/app/config/client";
 import { getMessageTextContent, getTimeoutMSByModel } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
-import { useNewChatStore } from "@/app/store/new-chat";
 import { t } from "i18next";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -102,7 +102,7 @@ export class ErnieApi implements LLMApi {
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
+      ...useEnhanceChatStore.getState()?.currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
       },
