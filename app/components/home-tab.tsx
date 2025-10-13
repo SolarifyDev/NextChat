@@ -8,8 +8,9 @@ import AddKidIcon from "../icons/add-kid.svg";
 import MeitsHistoryIcon from "../icons/metis-history.svg";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useOmeStore } from "@/app/store/ome";
-import { useNewChatStore } from "../store/new-chat";
 import { MessageEnum } from "../enum";
+import { useEnhanceChatStore } from "../store/enhance-chat";
+import { isNil } from "lodash";
 
 export function HomeTab() {
   const tabs = [
@@ -30,18 +31,19 @@ export function HomeTab() {
 
   const omeStore = useOmeStore();
 
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
 
   useEffect(() => {
     setActiveTab(
       location.pathname === Path.Chat ||
-        (location.pathname === Path.Home && chatStore.currentSessionIndex > -1)
+        (location.pathname === Path.Home &&
+          (chatStore.sessionId > 0 || !isNil(chatStore.currentSession)))
         ? 0
         : location.pathname === Path.AIKid
         ? 1
         : -1,
     );
-  }, [location.pathname, chatStore.currentSessionIndex]);
+  }, [location.pathname, chatStore.sessionId, chatStore.currentSession]);
 
   return (
     <>

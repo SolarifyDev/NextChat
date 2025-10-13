@@ -79,7 +79,6 @@ function useMaskGroup(masks: Mask[]) {
 
 export function NewChat() {
   const { t } = useTranslation();
-  // const chatStore = useNewChatStore();
   const chatStore = useEnhanceChatStore();
   const maskStore = useMaskStore();
   const omeStore = useOmeStore();

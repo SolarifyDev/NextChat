@@ -10,7 +10,6 @@ import { Mask } from "../store/mask";
 import { showConfirm } from "./ui-lib";
 import { useMobileScreen } from "../utils";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { useOmeStore } from "../store/ome";
@@ -120,14 +119,6 @@ export function ChatItem(props: {
 }
 
 export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
-  const {
-    currentSessionIndex,
-    // sessions,
-    selectSession,
-    // deleteSession,
-    // isLoading,
-  } = useNewChatStore();
-
   const {
     sessions,
     isLoading,

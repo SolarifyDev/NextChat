@@ -30,7 +30,6 @@ import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 import isEmpty from "lodash-es/isEmpty";
-import { useNewChatStore } from "../store/new-chat";
 import "../locales/i18n";
 import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
@@ -197,7 +196,7 @@ function Screen() {
   const location = useLocation();
   const navigate = useNavigate();
   const omeStore = useOmeStore();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -390,7 +389,7 @@ export function Home() {
                 omeStore.setRefreshToken(res.refresh_token ?? "");
 
                 omeStore.setIsFromApp(true);
-                useNewChatStore.getState().setIsDown(true);
+                useEnhanceChatStore.getState().setIsDown(true);
               })
               .catch(() => {
                 const message = {
@@ -403,7 +402,6 @@ export function Home() {
               });
           } else {
             omeStore.setIsFromApp(true);
-            // useNewChatStore.getState().setIsDown(true);
             useEnhanceChatStore.getState().setIsDown(true);
           }
           if (!isEmpty(params?.lanauge)) {
@@ -424,7 +422,6 @@ export function Home() {
             event.data.ometoken,
           );
           omeStore.setToken(event.data.ometoken);
-          // useNewChatStore.getState().setIsDown(true);
           useEnhanceChatStore.getState().setIsDown(true);
         }
 
@@ -459,7 +456,6 @@ export function Home() {
           omeStore.setUserName(data?.omeUserName ?? "");
         }
         omeStore.setIsFromApp(true);
-        // useNewChatStore.getState().setIsDown(true);
         useEnhanceChatStore.getState().setIsDown(true);
 
         if (!isEmpty(data?.lanauge)) {

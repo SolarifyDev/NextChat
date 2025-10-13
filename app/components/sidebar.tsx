@@ -30,7 +30,6 @@ import dynamic from "next/dynamic";
 import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
@@ -42,7 +41,7 @@ const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
 });
 
 export function useHotKey() {
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -247,7 +246,6 @@ export function SideBar(props: { className?: string }) {
   const [showDiscoverySelector, setshowDiscoverySelector] = useState(false);
   const navigate = useNavigate();
   const config = useAppConfig();
-  const chatStore = useNewChatStore();
   const newChatStore = useEnhanceChatStore();
   const omeStore = useOmeStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
@@ -452,7 +450,7 @@ export function SideBar(props: { className?: string }) {
                   onClick={async () => {
                     // if (await showConfirm(Locale.Home.DeleteChat)) {
                     if (await showConfirm(t("Home.DeleteChat"))) {
-                      chatStore.deleteSession(chatStore.currentSessionIndex);
+                      // chatStore.deleteSession(chatStore.currentSessionIndex);
                     }
                   }}
                 />

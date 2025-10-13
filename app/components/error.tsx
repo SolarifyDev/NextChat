@@ -7,8 +7,8 @@ import ResetIcon from "../icons/reload.svg";
 import { ISSUE_URL } from "../constant";
 import { showConfirm } from "./ui-lib";
 import { useSyncStore } from "../store/sync";
-import { useNewChatStore } from "../store/new-chat";
 import { withTranslation, WithTranslation } from "react-i18next";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 interface IErrorBoundaryState {
   hasError: boolean;
@@ -38,7 +38,7 @@ class ErrorBoundary extends React.Component<
     try {
       useSyncStore.getState().export();
     } finally {
-      useNewChatStore.getState().clearAllData();
+      useEnhanceChatStore.getState().clearAllData();
     }
   }
 

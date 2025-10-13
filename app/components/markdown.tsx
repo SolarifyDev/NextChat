@@ -79,8 +79,6 @@ export function PreCode(props: { children: any }) {
   const { height } = useWindowSize();
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
-  // const chatStore = useNewChatStore();
-  // const session = chatStore.getCurrentSession();
 
   const chatStore = useEnhanceChatStore();
   const session = chatStore.currentSession!;
@@ -182,8 +180,6 @@ function CustomCode(props: { children: any; className?: string }) {
   const { t } = useTranslation();
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
-  // const chatStore = useNewChatStore();
-  // const session = chatStore.getCurrentSession();
 
   const chatStore = useEnhanceChatStore();
   const session = chatStore.currentSession!;
