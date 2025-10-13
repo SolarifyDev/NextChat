@@ -1048,7 +1048,6 @@ export function EditMessageModal(props: { onClose: () => void }) {
             key="ok"
             onClick={() => {
               chatStore.updateTargetSession(
-                session,
                 (session) => (session.messages = messages),
                 true,
               );
@@ -1069,7 +1068,6 @@ export function EditMessageModal(props: { onClose: () => void }) {
               value={session.topic}
               onInput={(e) =>
                 chatStore.updateTargetSession(
-                  session,
                   (session) => (session.topic = e.currentTarget.value),
                 )
               }
@@ -1457,7 +1455,9 @@ export function _Chat_NEW() {
     setIsLoading(true);
     const textContent = getMessageTextContent(userMessage);
     const images = getMessageImages(userMessage);
-    chatStore.onUserInput(textContent, images).then(() => setIsLoading(false));
+    newChatStore
+      .onUserInput(textContent, images)
+      .then(() => setIsLoading(false));
     // inputRef.current?.focus();
     textareaRef.current?.focus();
   };
@@ -2128,8 +2128,7 @@ export function _Chat_NEW() {
                                           });
                                         }
                                       }
-                                      chatStore.updateTargetSession(
-                                        session,
+                                      newChatStore.updateTargetSession(
                                         (session) => {
                                           const m = session.mask.context
                                             .concat(session.messages)
