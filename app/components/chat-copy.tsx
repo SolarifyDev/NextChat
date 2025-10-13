@@ -420,7 +420,6 @@ function ClearContextDivider() {
   // const session = chatStore.getCurrentSession();
 
   const chatStore = useEnhanceChatStore();
-  const session = chatStore.currentSession!;
 
   return (
     <div
@@ -710,13 +709,12 @@ export function ChatActions(props: {
       // show next model to default model if exist
       let nextModel = models.find((model) => model.isDefault) || models[0];
       chatStore.updateTargetSession(
-        session,
         (session) => {
           session.mask.modelConfig.model = nextModel.name;
           session.mask.modelConfig.providerName = nextModel?.provider
             ?.providerName as ServiceProvider;
         },
-        true,
+        // true,
       );
       showToast(
         nextModel?.provider?.providerName == "ByteDance"
@@ -724,7 +722,7 @@ export function ChatActions(props: {
           : nextModel.name,
       );
     }
-  }, [chatStore, currentModel, models, session]);
+  }, [currentModel, models, session]);
 
   return (
     <div className={styles["chat-input-actions"]}>
@@ -820,18 +818,14 @@ export function ChatActions(props: {
             text={t("Chat.InputActions.Clear")}
             icon={<BreakIcon />}
             onClick={() => {
-              chatStore.updateTargetSession(
-                session,
-                (session) => {
-                  if (session.clearContextIndex === session.messages.length) {
-                    session.clearContextIndex = null;
-                  } else {
-                    session.clearContextIndex = session.messages.length;
-                    session.memoryPrompt = ""; // will clear memory
-                  }
-                },
-                true,
-              );
+              chatStore.updateTargetSession((session) => {
+                if (session.clearContextIndex === session.messages.length) {
+                  session.clearContextIndex = null;
+                } else {
+                  session.clearContextIndex = session.messages.length;
+                  session.memoryPrompt = ""; // will clear memory
+                }
+              }, true);
             }}
           />
         )}
@@ -874,7 +868,7 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const [model, providerName] = getModelProvider(s[0]);
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.model = model as ModelType;
                 session.mask.modelConfig.providerName =
                   providerName as ServiceProvider;
@@ -910,7 +904,7 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const size = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.size = size;
               });
               showToast(size);
@@ -934,7 +928,7 @@ export function ChatActions(props: {
             onSelection={(q) => {
               if (q.length === 0) return;
               const quality = q[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.quality = quality;
               });
               showToast(quality);
@@ -958,7 +952,7 @@ export function ChatActions(props: {
             onSelection={(s) => {
               if (s.length === 0) return;
               const style = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.style = style;
               });
               showToast(style);
@@ -984,20 +978,16 @@ export function ChatActions(props: {
         {showPluginSelector && (
           <Selector
             multiple
-            defaultSelectedValue={chatStore.getCurrentSession().mask?.plugin}
+            defaultSelectedValue={chatStore.currentSession!.mask?.plugin}
             items={pluginStore.getAll().map((item) => ({
               title: `${item?.title}@${item?.version}`,
               value: item?.id,
             }))}
             onClose={() => setShowPluginSelector(false)}
             onSelection={(s) => {
-              chatStore.updateTargetSession(
-                session,
-                (session) => {
-                  session.mask.plugin = s as string[];
-                },
-                true,
-              );
+              chatStore.updateTargetSession((session) => {
+                session.mask.plugin = s as string[];
+              }, true);
             }}
           />
         )}
