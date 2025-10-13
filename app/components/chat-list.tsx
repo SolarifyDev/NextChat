@@ -186,8 +186,8 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             time={new Date(item.lastUpdate).toLocaleString()}
             // count={item?.messages?.length ?? 0}
             count={item?.messagesLength ?? 0}
-            key={item.id}
-            id={item.id}
+            key={item.sessionId}
+            id={item.sessionId!.toString()}
             index={i}
             // selected={i === currentSessionIndex}
             selected={item?.sessionId === sessionId}
