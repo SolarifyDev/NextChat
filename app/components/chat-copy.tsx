@@ -185,8 +185,6 @@ const MCPAction = () => {
 
 export function SessionConfigModel(props: { onClose: () => void }) {
   const { t } = useTranslation();
-  // const chatStore = useNewChatStore();
-  // const session = chatStore.getCurrentSession();
 
   const chatStore = useEnhanceChatStore();
   const session = chatStore.currentSession!;
@@ -266,8 +264,6 @@ function PromptToast(props: {
   setShowModal: (_: boolean) => void;
 }) {
   const { t } = useTranslation();
-  // const chatStore = useNewChatStore();
-  // const session = chatStore.getCurrentSession();
 
   const chatStore = useEnhanceChatStore();
   const session = chatStore.currentSession!;
@@ -416,8 +412,6 @@ export function PromptHints(props: {
 
 function ClearContextDivider() {
   const { t } = useTranslation();
-  // const chatStore = useNewChatStore();
-  // const session = chatStore.getCurrentSession();
 
   const chatStore = useEnhanceChatStore();
 
@@ -601,10 +595,8 @@ export function ChatActions(props: {
   const config = useAppConfig();
   const omeStore = useOmeStore();
   const navigate = useNavigate();
-  // const chatStore = useNewChatStore();
   const chatStore = useEnhanceChatStore();
   const pluginStore = usePluginStore();
-  // const session = chatStore.getCurrentSession();
   const session = chatStore.currentSession!;
 
   // switch themes
@@ -1017,8 +1009,6 @@ export function ChatActions(props: {
 
 export function EditMessageModal(props: { onClose: () => void }) {
   const { t } = useTranslation();
-  // const chatStore = useNewChatStore();
-  // const session = chatStore.getCurrentSession();
 
   const chatStore = useEnhanceChatStore();
   const session = chatStore.currentSession!;
