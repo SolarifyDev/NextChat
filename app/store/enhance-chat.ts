@@ -774,13 +774,10 @@ export const useEnhanceChatStore = createPersistStore(
             onFinish(message, responseRes) {
               if (responseRes?.status === 200) {
                 console.log("[Memory] ", message);
-                get().updateTargetSession(
-                  (session) => {
-                    session.lastSummarizeIndex = lastSummarizeIndex;
-                    session.memoryPrompt = message; // Update the memory prompt for stored it in local storage
-                  },
-                  // true
-                );
+                get().updateTargetSession((session) => {
+                  session.lastSummarizeIndex = lastSummarizeIndex;
+                  session.memoryPrompt = message; // Update the memory prompt for stored it in local storage
+                }, true);
               }
             },
             onError(err) {
