@@ -846,6 +846,9 @@ export const useEnhanceChatStore = createPersistStore(
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
 
+        let pendingUpdate = false;
+        let rafId: number | null = null;
+
         // make request
         api.llm.chat({
           messages: sendMessages,
@@ -855,11 +858,37 @@ export const useEnhanceChatStore = createPersistStore(
             if (message) {
               botMessage.content = message;
             }
-            get().updateTargetSession((session) => {
-              session.messages = session.messages.concat();
-            });
+            // get().updateTargetSession((session) => {
+            //   session.messages = session.messages.concat();
+            // });
+
+            if (!pendingUpdate) {
+              pendingUpdate = true;
+              rafId = requestAnimationFrame(() => {
+                pendingUpdate = false;
+                get().updateTargetSession((s) => {
+                  const idx = s.messages.findIndex(
+                    (m) => m.id === botMessage.id,
+                  );
+                  if (idx >= 0) {
+                    if (s.messages[idx].content !== botMessage.content) {
+                      // 🔧 只修改这一行：直接更新属性而不是创建新对象
+                      s.messages[idx].content = botMessage.content;
+                      s.messages[idx].streaming = botMessage.streaming;
+                    }
+                  }
+                });
+              });
+            }
           },
           async onFinish(message) {
+            // 取消待处理的 RAF
+            if (rafId) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+              pendingUpdate = false;
+            }
+
             botMessage.streaming = false;
             if (message) {
               botMessage.content = message;
@@ -894,6 +923,11 @@ export const useEnhanceChatStore = createPersistStore(
             });
           },
           onError(error) {
+            if (rafId) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+              pendingUpdate = false;
+            }
             const isAborted = error.message?.includes?.("aborted");
             botMessage.content +=
               "\n\n" +
@@ -904,25 +938,22 @@ export const useEnhanceChatStore = createPersistStore(
             botMessage.streaming = false;
             userMessage.isError = !isAborted;
             botMessage.isError = !isAborted;
-            get().updateTargetSession(
-              (session) => {
-                const userIdx = session.messages.findIndex(
-                  (m) => m.id === userMessage.id,
-                );
-                const botIdx = session.messages.findIndex(
-                  (m) => m.id === botMessage.id,
-                );
+            get().updateTargetSession((session) => {
+              const userIdx = session.messages.findIndex(
+                (m) => m.id === userMessage.id,
+              );
+              const botIdx = session.messages.findIndex(
+                (m) => m.id === botMessage.id,
+              );
 
-                if (userIdx >= 0) {
-                  // 🔧 直接修改属性而不是创建新对象
-                  Object.assign(session.messages[userIdx], userMessage);
-                }
-                if (botIdx >= 0) {
-                  Object.assign(session.messages[botIdx], botMessage);
-                }
-              },
-              //true
-            );
+              if (userIdx >= 0) {
+                // 🔧 直接修改属性而不是创建新对象
+                Object.assign(session.messages[userIdx], userMessage);
+              }
+              if (botIdx >= 0) {
+                Object.assign(session.messages[botIdx], botMessage);
+              }
+            }, true);
             ChatControllerPool.remove(
               session.id,
               botMessage.id ?? messageIndex,

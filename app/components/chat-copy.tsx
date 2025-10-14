@@ -704,11 +704,11 @@ export function ChatActions(props: {
         },
         // true,
       );
-      showToast(
-        nextModel?.provider?.providerName == "ByteDance"
-          ? nextModel.displayName
-          : nextModel.name,
-      );
+      // showToast(
+      //   nextModel?.provider?.providerName == "ByteDance"
+      //     ? nextModel.displayName
+      //     : nextModel.name,
+      // );
     }
   }, [currentModel, models, session]);
 

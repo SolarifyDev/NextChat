@@ -2197,7 +2197,7 @@ export function Chat() {
   // 不属于本地新增的session就跌入逻辑
   if (!currentSession?.isAdd) {
     if (isNil(currentSession) && !isNil(sessionId) && sessionId != 0)
-      return <>loading... {sessionId}</>;
+      return <>loading...</>;
 
     if (currentSession?.sessionId !== sessionId) return <></>;
   }
