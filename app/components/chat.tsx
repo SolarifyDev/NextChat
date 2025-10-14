@@ -2199,9 +2199,10 @@ export function Chat() {
     if (isNil(currentSession) && !isNil(sessionId) && sessionId != 0)
       return <>loading... {sessionId}</>;
 
-    if (isNil(currentSession) || currentSession.sessionId !== sessionId)
-      return <></>;
+    if (currentSession?.sessionId !== sessionId) return <></>;
   }
+
+  if (isNil(currentSession)) return <></>;
 
   return <_Chat_NEW key={currentSession.id}></_Chat_NEW>;
 }

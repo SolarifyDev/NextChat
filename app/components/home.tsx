@@ -221,13 +221,15 @@ function Screen() {
   }, []);
 
   useEffect(() => {
-    if (omeStore.isFromApp) {
+    if (chatStore._hasHydrated && omeStore.isFromApp) {
       chatStore.newSession(undefined, () => {
-        omeStore.setIsShowHome(false);
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
         navigate(Path.Chat);
       });
     }
-  }, [omeStore.isFromApp]);
+  }, [omeStore.isFromApp, chatStore._hasHydrated]);
 
   if (isArtifact) {
     return (

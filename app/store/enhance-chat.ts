@@ -532,12 +532,6 @@ export const useEnhanceChatStore = createPersistStore(
 
                   const { messages, ...data } = newCurrentSession;
 
-                  console.log(
-                    "messagesLength add",
-                    newCurrentSession,
-                    messages.length,
-                  );
-
                   set({
                     sessionId: res.sessionId,
                     currentSession: newCurrentSession,
@@ -605,19 +599,19 @@ export const useEnhanceChatStore = createPersistStore(
           } as ChatMessage;
         }
       },
-      onNewMessage(message: ChatMessage, targetSession: ChatSession) {
-        get().updateTargetSession((session) => {
+      async onNewMessage(message: ChatMessage, targetSession: ChatSession) {
+        await get().updateTargetSession((session) => {
           session.lastUpdate = Date.now();
           session.messages = session.messages.concat();
           session.stat.charCount += message.content.length;
         }, true);
 
-        get().checkMcpJson(message);
+        await get().checkMcpJson(message);
 
-        get().summarizeSession(false, targetSession);
+        await get().summarizeSession(false, targetSession);
       },
       /** check if the message contains MCP JSON and execute the MCP action */
-      checkMcpJson(message: ChatMessage) {
+      async checkMcpJson(message: ChatMessage) {
         const mcpEnabled = isMcpEnabled();
         console.log(mcpEnabled, "mcpEnabled");
         if (!mcpEnabled) return;
@@ -628,7 +622,7 @@ export const useEnhanceChatStore = createPersistStore(
             if (mcpRequest) {
               console.debug("[MCP Request]", mcpRequest);
 
-              executeMcpAction(mcpRequest.clientId, mcpRequest.mcp)
+              await executeMcpAction(mcpRequest.clientId, mcpRequest.mcp)
                 .then((result) => {
                   console.log("[MCP Response]", result);
                   const mcpResponse =
@@ -648,7 +642,7 @@ export const useEnhanceChatStore = createPersistStore(
           }
         }
       },
-      summarizeSession(
+      async summarizeSession(
         refreshTitle: boolean = false,
         targetSession: ChatSession,
       ) {
@@ -697,7 +691,7 @@ export const useEnhanceChatStore = createPersistStore(
                 content: t("Store.Prompt.Topic"),
               }),
             );
-          api.llm.chat({
+          await api.llm.chat({
             messages: topicMessages,
             config: {
               model,
@@ -759,7 +753,7 @@ export const useEnhanceChatStore = createPersistStore(
            * this param is just shit
            **/
           const { max_tokens, ...modelcfg } = modelConfig;
-          api.llm.chat({
+          await api.llm.chat({
             messages: toBeSummarizedMsgs.concat(
               createMessage({
                 role: "system",
@@ -1052,7 +1046,7 @@ export const useEnhanceChatStore = createPersistStore(
           currentSession: defaultCurrentSession,
           sessionId: 0,
           isDown: false,
-          // isLoading: false,
+          lastInput: "",
         });
       },
       async clearAllData() {
