@@ -185,13 +185,13 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             onClick={() => {
               // selectSession(i);
 
-              if (sessionId === item.sessionId) {
-                setSessionId(0);
-                setCurrentSession(null);
-              } else {
-                navigate(Path.Chat);
-                getCurrentSession(item?.sessionId!);
-              }
+              // if (sessionId === item.sessionId) {
+              //   setSessionId(0);
+              //   setCurrentSession(null);
+              // } else {
+              navigate(Path.Chat);
+              getCurrentSession(item?.sessionId!);
+              // }
 
               if (onlineSearch) {
                 setOnlineSearch(false);

@@ -82,11 +82,14 @@ export async function getHeaders() {
   return headers;
 }
 
-export const GetHistory = async (headers: {
-  [key: string]: string;
-}): Promise<ISession[]> => {
+export const GetHistory = async (
+  headers: {
+    [key: string]: string;
+  },
+  includeMessages: boolean = false,
+): Promise<ISession[]> => {
   return (
-    await api.get("/api/v1/histories", {
+    await api.get(`/api/v1/histories?IncludeMessages=${includeMessages}`, {
       headers,
     })
   ).data;
