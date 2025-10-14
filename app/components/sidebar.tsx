@@ -35,6 +35,7 @@ import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
 import { useEnhanceChatStore } from "../store/enhance-chat";
+import { isNil } from "lodash";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -259,18 +260,18 @@ export function SideBar(props: { className?: string }) {
         navigate(Path.Chat);
       });
     },
-    { wait: 300 },
+    { wait: 100 },
   );
 
   const { run: quitMetis } = useDebounceFn(
     () => {
       try {
         if (omeStore.isFromApp) {
-          if (newChatStore.sessions.length === 0) {
-            addConversation();
-          } else {
+          if (!isNil(newChatStore.currentSession)) {
             omeStore.setIsShowHome(false);
             navigate(Path.Chat);
+          } else {
+            addConversation();
           }
         } else {
           const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
