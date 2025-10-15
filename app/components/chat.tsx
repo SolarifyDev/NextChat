@@ -2199,7 +2199,8 @@ export function Chat() {
     if (isNil(currentSession) && !isNil(sessionId) && sessionId != 0)
       return <>loading...</>;
 
-    if (currentSession?.sessionId !== sessionId) return <></>;
+    if (isNil(currentSession) || currentSession?.sessionId !== sessionId)
+      return <></>;
   }
 
   if (isNil(currentSession)) return <></>;
