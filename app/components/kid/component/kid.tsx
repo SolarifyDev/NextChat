@@ -115,7 +115,9 @@ export function Kid() {
     },
     {
       name: "AI HR",
-      url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY&userId=${userName}`,
+      url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY&userId=${
+        userName ?? userId ?? ""
+      }&from=${from}`,
       description:
         "我是AI HR，專注於人力資源自助服務，幫你即時解答HR相關問題。",
       icon: HrAi,
