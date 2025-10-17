@@ -134,14 +134,17 @@ import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
-import { getBotHello, getDefaultTopic } from "../store/new-chat";
 import { nanoid } from "nanoid";
 import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
 import { useDebounceFn } from "ahooks";
-import { useEnhanceChatStore } from "../store/enhance-chat";
+import {
+  getBotHello,
+  getDefaultTopic,
+  useEnhanceChatStore,
+} from "../store/enhance-chat";
 
 const localStorage = safeLocalStorage();
 
