@@ -193,6 +193,13 @@ export const getDefaultTopic = () => {
   return t("Store.DefaultTopic");
 };
 
+export const getBotHello = (): ChatMessage => {
+  return createMessage({
+    role: "assistant",
+    content: t("Store.BotHello"),
+  });
+};
+
 function createEmptySession(): ChatSession {
   return {
     isAdd: true,
