@@ -434,6 +434,7 @@ export function Home() {
         if (!isEmpty(event?.data?.omeUserName)) {
           omeStore.setUserName(event?.data?.omeUserName);
         }
+        omeStore.setFrom("omeoffice web");
         omeStore.setIsFromApp(false);
       }
     };
