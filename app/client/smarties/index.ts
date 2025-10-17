@@ -35,6 +35,14 @@ export interface IAIKid {
   createdDate: string;
 }
 
+export interface ITopics {
+  id: number;
+  title: string;
+  answer: string;
+  language: number;
+  createTime: string;
+}
+
 export async function getHeaders() {
   if (useOmeStore.getState().shouldRefreshToken()) {
     await useOmeStore.getState().refreshAccessToken();
@@ -112,6 +120,27 @@ export const PostAddOrUpdateSession = async (
 ): Promise<ISession> => {
   return (
     await api.post("/api/v1/history/addOrUpdate", data, {
+      headers,
+    })
+  ).data;
+};
+
+export const GetRecommendTopics = async (
+  headers: {
+    [key: string]: string;
+  },
+  language: number,
+  sessionId?: number,
+): Promise<ITopics> => {
+  const params = new URLSearchParams();
+  params.append("Language", language.toString());
+
+  if (sessionId) {
+    params.append("SessionId", sessionId.toString());
+  }
+
+  return (
+    await api.get(`/api/v1/recommend/topics?${params.toString()}`, {
       headers,
     })
   ).data;

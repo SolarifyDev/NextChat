@@ -2,6 +2,8 @@ import { nanoid } from "nanoid";
 import {
   GetHistory,
   GetItemHistory,
+  GetRecommendTopics,
+  ITopics,
   PostAddOrUpdateSession,
   getHeaders,
 } from "../client/smarties";
@@ -256,6 +258,8 @@ const defaultSessions: SessionItem[] = [];
 
 const defaultCurrentSession = null as ChatSession | null;
 
+const topics: ITopics[] = [];
+
 export const useEnhanceChatStore = createPersistStore(
   {
     sessions: defaultSessions, // 左边list
@@ -264,6 +268,7 @@ export const useEnhanceChatStore = createPersistStore(
     isDown: false,
     isLoading: false,
     lastInput: "",
+    topics,
   },
   (set, _get) => {
     function get() {
@@ -335,7 +340,7 @@ export const useEnhanceChatStore = createPersistStore(
             mask: JSONParse(data.mask, "mask"),
           };
 
-          console.log("获取成功");
+          console.log("获取成功", newData);
 
           if (get().sessionId === sessionId) {
             set({
@@ -350,6 +355,17 @@ export const useEnhanceChatStore = createPersistStore(
             sessionId: 0,
           });
         }
+      },
+      getRecommendTopics: async (sessionId?: number) => {
+        try {
+          useOmeStore.getState().language;
+          const data = await GetRecommendTopics(
+            await getHeaders(),
+            1,
+            sessionId,
+          );
+        } catch {}
+        // 需要根据数据获取
       },
       // 创建新聊天(本地)
       newSession: async (mask?: Mask, callback?: () => void) => {
