@@ -7,7 +7,7 @@ import { Path } from "@/app/constant";
 
 import styles from "./kid.module.scss";
 import { useTranslation } from "react-i18next";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { IType, useKidStore } from "@/app/store/kid";
 import { Spin } from "antd";
 import clsx from "clsx";
@@ -24,7 +24,6 @@ import FourPB from "../../../icons/4PB.png";
 import NewsMinimalist from "../../../icons/News Minimalist.png";
 import HrAi from "../../../icons/HR AI.png";
 import { MessageEnum } from "@/app/enum";
-import pako from "pako";
 
 interface KidLever {
   name: string;
@@ -32,17 +31,6 @@ interface KidLever {
   description: string;
   icon: StaticImageData;
 }
-
-const compressWithPako = (input: string) => {
-  try {
-    const compressed = pako.gzip(input);
-
-    const base64 = btoa(String.fromCharCode(...compressed));
-    return base64 ?? "";
-  } catch {
-    return "";
-  }
-};
 
 export function Kid() {
   const navigate = useNavigate();
@@ -111,32 +99,30 @@ export function Kid() {
     },
   ];
 
-  const toolData: KidLever[] = useMemo(() => {
-    return [
-      // {
-      //   name: "Deep Research",
-      //   url: "http://47.238.241.114:3000/chat",
-      //   description: "你好，我是市場調研專家，你想要的任何諮詢，隨時問我！",
-      //   icon: DeepReSearch,
-      // },
-      {
-        name: "News Minimalist",
-        url: "http://47.238.241.114:9000/",
-        description:
-          "你好，我是智能新聞助手，幫你快速發現和整理世界各地的新鮮資訊，隨時為你服務",
-        icon: NewsMinimalist,
-      },
-      {
-        name: "AI HR",
-        url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY&userId=${compressWithPako(
-          userName ?? userId ?? "",
-        )}&from=${compressWithPako(from)}`,
-        description:
-          "我是AI HR，專注於人力資源自助服務，幫你即時解答HR相關問題。",
-        icon: HrAi,
-      },
-    ];
-  }, [userName, userId, from]);
+  const toolData: KidLever[] = [
+    // {
+    //   name: "Deep Research",
+    //   url: "http://47.238.241.114:3000/chat",
+    //   description: "你好，我是市場調研專家，你想要的任何諮詢，隨時問我！",
+    //   icon: DeepReSearch,
+    // },
+    {
+      name: "News Minimalist",
+      url: "http://47.238.241.114:9000/",
+      description:
+        "你好，我是智能新聞助手，幫你快速發現和整理世界各地的新鮮資訊，隨時為你服務",
+      icon: NewsMinimalist,
+    },
+    {
+      name: "AI HR",
+      url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY&userId=${
+        userName ?? userId ?? ""
+      }&from=${from}`,
+      description:
+        "我是AI HR，專注於人力資源自助服務，幫你即時解答HR相關問題。",
+      icon: HrAi,
+    },
+  ];
 
   useEffect(() => {
     getKids();
