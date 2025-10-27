@@ -23,7 +23,7 @@ import {
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
 import { preProcessImageContent } from "@/app/utils/chat";
-import { useNewChatStore } from "@/app/store/new-chat";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 interface BasePayload {
   model: string;
@@ -166,7 +166,7 @@ export class ChatGLMApi implements LLMApi {
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
+      ...useEnhanceChatStore.getState()?.currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,
@@ -209,7 +209,7 @@ export class ChatGLMApi implements LLMApi {
       if (shouldStream) {
         const [tools, funcs] = usePluginStore.getState().getAsTools(
           // useChatStore.getState().currentSession().mask?.plugin || [],
-          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          useEnhanceChatStore.getState().currentSession!.mask?.plugin || [],
         );
         return stream(
           path,

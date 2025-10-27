@@ -55,9 +55,9 @@ import {
 } from "@hello-pangea/dnd";
 import { getMessageTextContent } from "../utils";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -472,7 +472,7 @@ export function MaskPage() {
   const navigate = useNavigate();
 
   const maskStore = useMaskStore();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
 
   const filterLang = maskStore.language;
 

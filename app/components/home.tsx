@@ -30,7 +30,6 @@ import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 import isEmpty from "lodash-es/isEmpty";
-import { useNewChatStore } from "../store/new-chat";
 import "../locales/i18n";
 import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
@@ -38,6 +37,7 @@ import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 import { PostGetToken } from "../client/smarties";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -196,7 +196,7 @@ function Screen() {
   const location = useLocation();
   const navigate = useNavigate();
   const omeStore = useOmeStore();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -221,13 +221,15 @@ function Screen() {
   }, []);
 
   useEffect(() => {
-    if (omeStore.isFromApp) {
+    if (chatStore._hasHydrated && omeStore.isFromApp) {
       chatStore.newSession(undefined, () => {
-        omeStore.setIsShowHome(false);
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
         navigate(Path.Chat);
       });
     }
-  }, [omeStore.isFromApp]);
+  }, [omeStore.isFromApp, chatStore._hasHydrated]);
 
   if (isArtifact) {
     return (
@@ -389,7 +391,7 @@ export function Home() {
                 omeStore.setRefreshToken(res.refresh_token ?? "");
 
                 omeStore.setIsFromApp(true);
-                useNewChatStore.getState().setIsDown(true);
+                useEnhanceChatStore.getState().setIsDown(true);
               })
               .catch(() => {
                 const message = {
@@ -402,7 +404,7 @@ export function Home() {
               });
           } else {
             omeStore.setIsFromApp(true);
-            useNewChatStore.getState().setIsDown(true);
+            useEnhanceChatStore.getState().setIsDown(true);
           }
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
@@ -422,7 +424,7 @@ export function Home() {
             event.data.ometoken,
           );
           omeStore.setToken(event.data.ometoken);
-          useNewChatStore.getState().setIsDown(true);
+          useEnhanceChatStore.getState().setIsDown(true);
         }
 
         if (!isEmpty(event?.data?.omeUserId)) {
@@ -432,6 +434,7 @@ export function Home() {
         if (!isEmpty(event?.data?.omeUserName)) {
           omeStore.setUserName(event?.data?.omeUserName);
         }
+        omeStore.setFrom("omeoffice web");
         omeStore.setIsFromApp(false);
       }
     };
@@ -456,7 +459,8 @@ export function Home() {
           omeStore.setUserName(data?.omeUserName ?? "");
         }
         omeStore.setIsFromApp(true);
-        useNewChatStore.getState().setIsDown(true);
+        useEnhanceChatStore.getState().setIsDown(true);
+
         if (!isEmpty(data?.lanauge)) {
           omeStore.setLanguage(data?.lanauge);
         }
