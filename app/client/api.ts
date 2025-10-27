@@ -24,8 +24,8 @@ import { DeepSeekApi } from "./platforms/deepseek";
 import { XAIApi } from "./platforms/xai";
 import { ChatGLMApi } from "./platforms/glm";
 import { SiliconflowApi } from "./platforms/siliconflow";
-import { useNewChatStore } from "../store/new-chat";
 import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -246,7 +246,7 @@ export async function getHeaders(ignoreHeaders: boolean = false) {
   const omeStore = useOmeStore.getState();
   const accessStore = useAccessStore.getState();
   // const chatStore = useChatStore.getState();
-  const chatStore = useNewChatStore.getState();
+  const chatStore = useEnhanceChatStore.getState();
   let headers: Record<string, string> = {};
   if (!ignoreHeaders) {
     headers = {
@@ -258,7 +258,7 @@ export async function getHeaders(ignoreHeaders: boolean = false) {
   const clientConfig = getClientConfig();
 
   function getConfig() {
-    const modelConfig = chatStore.getCurrentSession()?.mask?.modelConfig;
+    const modelConfig = chatStore.currentSession?.mask?.modelConfig;
     const isGoogle = modelConfig?.providerName === ServiceProvider.Google;
     const isAzure = modelConfig?.providerName === ServiceProvider.Azure;
     const isAnthropic = modelConfig?.providerName === ServiceProvider.Anthropic;

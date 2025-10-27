@@ -8,8 +8,8 @@ import { MaskAvatar } from "./mask";
 import styles from "./message-selector.module.scss";
 import { getMessageTextContent } from "../utils";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 function useShiftRange() {
   const [startIndex, setStartIndex] = useState<number>();
@@ -77,16 +77,16 @@ export function MessageSelector(props: {
   const LATEST_COUNT = 4;
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
   const isValid = (m: ChatMessage) => m.content && !m.isError && !m.streaming;
   const allMessages = useMemo(() => {
-    let startIndex = Math.max(0, session.clearContextIndex ?? 0);
-    if (startIndex === session.messages.length - 1) {
+    let startIndex = Math.max(0, session?.clearContextIndex ?? 0);
+    if (startIndex === (session?.messages ?? []).length - 1) {
       startIndex = 0;
     }
-    return session.messages.slice(startIndex);
-  }, [session.messages, session.clearContextIndex]);
+    return session?.messages.slice(startIndex);
+  }, [session?.messages, session?.clearContextIndex]);
 
   const messages = useMemo(
     () =>
