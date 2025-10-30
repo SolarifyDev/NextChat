@@ -2021,7 +2021,7 @@ export function _Chat_NEW() {
             // 转换为分钟
             const minutesDiff = timeDiff / (1000 * 60);
 
-            if (minutesDiff > 2) {
+            if (minutesDiff > 30) {
               setIsShowTopic(true);
             } else {
               setIsShowTopic(false);
