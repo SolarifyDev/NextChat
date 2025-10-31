@@ -348,8 +348,6 @@ export const useEnhanceChatStore = createPersistStore(
             mask: JSONParse(data.mask, "mask"),
           };
 
-          console.log("获取成功", newData);
-
           if (get().sessionId === sessionId) {
             set({
               currentSession: newData,
