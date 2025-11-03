@@ -1,3 +1,5 @@
+"use client";
+
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./home.module.scss";
@@ -34,6 +36,7 @@ import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
+import { trackEvent } from "../utils/ga";
 import { useEnhanceChatStore } from "../store/enhance-chat";
 import { isNil } from "lodash";
 
@@ -231,7 +234,10 @@ export function SideBarTail(props: {
   );
 }
 
-export function SideBar(props: { className?: string }) {
+export function SideBar(props: {
+  getCurrentInteractedMs: (isAll?: boolean) => number;
+  className?: string;
+}) {
   const { t } = useTranslation();
 
   const DISCOVERY = [
@@ -253,6 +259,14 @@ export function SideBar(props: { className?: string }) {
 
   const { run: addConversation } = useDebounceFn(
     () => {
+      if (omeStore.from === "omelinkapp") {
+        trackEvent("click_chat_timestamp", {
+          userId: omeStore.userId,
+          time: Date.now(),
+          metis_event_id: omeStore.eventUuid,
+        });
+      }
+
       newChatStore.newSession(undefined, () => {
         if (omeStore.isFromApp) {
           omeStore.setIsShowHome(false);
@@ -276,6 +290,12 @@ export function SideBar(props: { className?: string }) {
         } else {
           const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
           if (window?.ReactNativeWebView) {
+            if (omeStore.from === "omelinkapp") {
+              const ms = props.getCurrentInteractedMs(true);
+
+              message.data = { time: ms };
+            }
+
             window.ReactNativeWebView.postMessage(JSON.stringify(message));
           } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
             (

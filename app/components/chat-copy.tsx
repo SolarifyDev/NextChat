@@ -1,3 +1,5 @@
+"use client";
+
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   Fragment,
@@ -140,6 +142,7 @@ import { Divider, Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
 import { useDebounceFn, useUpdateEffect } from "ahooks";
+import { trackEvent } from "../utils/ga";
 import {
   getBotHello,
   getDefaultTopic,
@@ -1280,6 +1283,15 @@ export function _Chat_NEW() {
 
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
+
+    if (omeStore.from === "omelinkapp") {
+      trackEvent("click_send_timestamp", {
+        userId: omeStore.userId,
+        time: Date.now(),
+        metis_event_id: omeStore.eventUuid,
+      });
+    }
+
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
