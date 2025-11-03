@@ -2570,8 +2570,8 @@ export function _Chat_NEW() {
                         <div
                           className={
                             omeStore.isFromApp
-                              ? styles["chat-message-item-is-app"]
-                              : styles["chat-message-item"]
+                              ? styles["chat-topic-item-is-app"]
+                              : styles["chat-topic-item"]
                           }
                           style={{
                             cursor: "pointer",
@@ -2629,8 +2629,8 @@ export function _Chat_NEW() {
                                 <div
                                   className={
                                     omeStore.isFromApp
-                                      ? styles["chat-message-item-is-app"]
-                                      : styles["chat-message-item"]
+                                      ? styles["chat-topic-item-is-app"]
+                                      : styles["chat-topic-item"]
                                   }
                                   style={{
                                     cursor: "pointer",
@@ -2688,8 +2688,8 @@ export function _Chat_NEW() {
                             <div
                               className={
                                 omeStore.isFromApp
-                                  ? styles["chat-message-item-is-app"]
-                                  : styles["chat-message-item"]
+                                  ? styles["chat-topic-item-is-app"]
+                                  : styles["chat-topic-item"]
                               }
                               style={{
                                 cursor: "pointer",
