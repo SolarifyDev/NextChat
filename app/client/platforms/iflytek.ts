@@ -24,8 +24,8 @@ import { getMessageTextContent } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
 
 import { RequestPayload } from "./openai";
-import { useNewChatStore } from "@/app/store/new-chat";
 import { t } from "i18next";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 export class SparkApi implements LLMApi {
   private disableListModels = true;
@@ -75,7 +75,7 @@ export class SparkApi implements LLMApi {
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
+      ...useEnhanceChatStore.getState()?.currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,

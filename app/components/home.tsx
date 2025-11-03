@@ -19,6 +19,7 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
@@ -29,7 +30,6 @@ import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 import isEmpty from "lodash-es/isEmpty";
-import { useNewChatStore } from "../store/new-chat";
 import "../locales/i18n";
 import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
@@ -40,6 +40,7 @@ import UserActivityMonitor from "../hook/use-activity";
 import { useInteractionMonitor } from "../hook/use-interaction-monitor";
 import { trackEvent } from "../utils/ga";
 import { PostGetToken } from "../client/smarties";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -196,7 +197,9 @@ export function WindowContent(props: { children: React.ReactNode }) {
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
+  const navigate = useNavigate();
   const omeStore = useOmeStore();
+  const chatStore = useEnhanceChatStore();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -264,6 +267,17 @@ function Screen() {
     document.head.appendChild(linkEl);
   }, []);
 
+  useEffect(() => {
+    if (chatStore._hasHydrated && omeStore.isFromApp) {
+      chatStore.newSession(undefined, () => {
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
+        navigate(Path.Chat);
+      });
+    }
+  }, [omeStore.isFromApp, chatStore._hasHydrated]);
+
   if (isArtifact) {
     return (
       <Routes>
@@ -279,7 +293,11 @@ function Screen() {
     return (
       <>
         <SideBar
-          className={clsx({ [styles["sidebar-show"]]: isHome })}
+          className={clsx({
+            [styles["sidebar-show"]]: omeStore.isFromApp
+              ? omeStore.isShowHome && isHome
+              : isHome,
+          })}
           getCurrentInteractedMs={getCurrentInteractedMs}
         />
         <WindowContent>
@@ -421,7 +439,7 @@ export function Home() {
                 omeStore.setRefreshToken(res.refresh_token ?? "");
 
                 omeStore.setIsFromApp(true);
-                useNewChatStore.getState().setIsDown(true);
+                useEnhanceChatStore.getState().setIsDown(true);
               })
               .catch(() => {
                 const message = {
@@ -434,7 +452,7 @@ export function Home() {
               });
           } else {
             omeStore.setIsFromApp(true);
-            useNewChatStore.getState().setIsDown(true);
+            useEnhanceChatStore.getState().setIsDown(true);
           }
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
@@ -457,7 +475,7 @@ export function Home() {
             event.data.ometoken,
           );
           omeStore.setToken(event.data.ometoken);
-          useNewChatStore.getState().setIsDown(true);
+          useEnhanceChatStore.getState().setIsDown(true);
         }
 
         if (!isEmpty(event?.data?.omeUserId)) {
@@ -467,6 +485,7 @@ export function Home() {
         if (!isEmpty(event?.data?.omeUserName)) {
           omeStore.setUserName(event?.data?.omeUserName);
         }
+        omeStore.setFrom("omeoffice web");
         omeStore.setIsFromApp(false);
       }
     };
@@ -491,7 +510,8 @@ export function Home() {
           omeStore.setUserName(data?.omeUserName ?? "");
         }
         omeStore.setIsFromApp(true);
-        useNewChatStore.getState().setIsDown(true);
+        useEnhanceChatStore.getState().setIsDown(true);
+
         if (!isEmpty(data?.lanauge)) {
           omeStore.setLanguage(data?.lanauge);
         }

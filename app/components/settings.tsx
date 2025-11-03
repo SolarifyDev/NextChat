@@ -78,9 +78,9 @@ import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";
 import { ProviderType } from "../utils/cloud";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 function EditPromptModal(props: { id: string; onClose: () => void }) {
   const { t } = useTranslation();
@@ -245,7 +245,7 @@ function UserPromptModal(props: { onClose?: () => void }) {
 
 function DangerItems() {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   const appConfig = useAppConfig();
 
   return (
@@ -517,7 +517,7 @@ function SyncItems() {
   const { t } = useTranslation();
   const syncStore = useSyncStore();
   // const chatStore = useChatStore();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   const promptStore = usePromptStore();
   const maskStore = useMaskStore();
   const couldSync = useMemo(() => {
@@ -528,7 +528,10 @@ function SyncItems() {
 
   const stateOverview = useMemo(() => {
     const sessions = chatStore.sessions;
-    const messageCount = sessions.reduce((p, c) => p + c.messages.length, 0);
+    const messageCount = sessions.reduce(
+      (p, c) => p + (c?.messagesLength! ?? 0),
+      0,
+    );
 
     return {
       chat: sessions.length,
