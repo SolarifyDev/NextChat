@@ -144,11 +144,11 @@ export const useOmeStore = create<OmeStoreType>()(
       getSourceSystem: () => {
         switch (get().from) {
           case "omeoffice web":
-            return SourceSystem.WeChat;
+            return SourceSystem.OMEv1;
           case "omelinkapp":
             return SourceSystem.OMELink;
           case "omeoffice 1.0":
-            return SourceSystem.OMEv1;
+            return SourceSystem.OMEApp;
           case "omeoffice 2.0":
             return SourceSystem.OMEv2;
           default:

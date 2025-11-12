@@ -12,6 +12,7 @@ export enum SourceSystem {
   OMEv1,
   OMELink,
   OMEv2,
+  OMEApp,
 }
 
 export enum LanguageEnum {
