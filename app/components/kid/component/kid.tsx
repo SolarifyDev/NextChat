@@ -35,10 +35,11 @@ interface KidLever {
 
 const compressWithPako = (input: string) => {
   try {
-    const compressed = pako.gzip(input);
+    const utf8Bytes = new TextEncoder().encode(input);
 
-    const base64 = btoa(String.fromCharCode(...compressed));
-    return base64 ?? "";
+    const compressed = pako.gzip(utf8Bytes);
+
+    return btoa(String.fromCharCode(...compressed));
   } catch {
     return "";
   }
@@ -129,7 +130,7 @@ export function Kid() {
       {
         name: "AI HR",
         url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY&userId=${compressWithPako(
-          userName ?? userId ?? "",
+          userName ? userName.toUpperCase() : "",
         )}&from=${compressWithPako(from)}`,
         description:
           "我是AI HR，專注於人力資源自助服務，幫你即時解答HR相關問題。",
