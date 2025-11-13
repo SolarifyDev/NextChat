@@ -7,6 +7,12 @@ export enum AiKidVoiceType {
   Female,
 }
 
+export enum AiKidSystemSource {
+  SmartTalk,
+  DifyLevelAgent,
+  ToolAgent,
+}
+
 export interface ISession {
   sessionId: number;
   id: string;
@@ -30,7 +36,11 @@ export interface IAIKid {
   avatarUrl: string | File;
   greeting: string;
   voice: AiKidVoiceType;
+  mediaType: number;
   userId: number;
+  externalUrl: string;
+  systemSource: AiKidSystemSource;
+  description: string;
   createdBy: number;
   createdDate: string;
 }
