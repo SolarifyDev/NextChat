@@ -9,8 +9,8 @@ export enum AiKidVoiceType {
 
 export enum AiKidSystemSource {
   SmartTalk,
-  DifyLevelAgent,
   ToolAgent,
+  DifyLevelAgent,
 }
 
 export interface ISession {
