@@ -40,9 +40,11 @@ export interface IAIKid {
   userId: number;
   externalUrl: string;
   systemSource: AiKidSystemSource;
+  domian: string;
   description: string;
   createdBy: number;
   createdDate: string;
+  sortOrder: number;
 }
 
 export async function getHeaders() {

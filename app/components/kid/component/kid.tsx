@@ -160,6 +160,7 @@ export function Kid() {
               description,
               greeting,
               externalUrl,
+              domian,
             } = item;
 
             const renderAvatar = () => (
@@ -216,7 +217,7 @@ export function Kid() {
               if (url.includes("https://metis-ai-kid.testomenow.com")) {
                 url += `&userId=${compressWithPako(
                   userName ?? "",
-                )}&from=${compressWithPako(from)}`;
+                )}&from=${compressWithPako(from)}&baseUrl=${domian}`;
               }
 
               try {
