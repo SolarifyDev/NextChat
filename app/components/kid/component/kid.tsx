@@ -109,10 +109,11 @@ interface KidLever {
 
 const compressWithPako = (input: string) => {
   try {
-    const compressed = pako.gzip(input);
+    const utf8Bytes = new TextEncoder().encode(input);
 
-    const base64 = btoa(String.fromCharCode(...compressed));
-    return base64 ?? "";
+    const compressed = pako.gzip(utf8Bytes);
+
+    return btoa(String.fromCharCode(...compressed));
   } catch {
     return "";
   }
@@ -216,7 +217,7 @@ export function Kid() {
 
               if (url.includes("https://metis-ai-kid.testomenow.com")) {
                 url += `&userId=${compressWithPako(
-                  userName ?? "",
+                  userName ? userName.toUpperCase() : "",
                 )}&from=${compressWithPako(from)}&baseUrl=${domian}`;
               }
 
