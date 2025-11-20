@@ -222,6 +222,8 @@ function Screen() {
 
   useEffect(() => {
     if (chatStore._hasHydrated && omeStore.isFromApp) {
+      if (location.pathname !== Path.Home) return;
+
       chatStore.newSession(undefined, () => {
         if (omeStore.isFromApp) {
           omeStore.setIsShowHome(false);
