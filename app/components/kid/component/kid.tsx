@@ -93,7 +93,7 @@ interface KidLever {
 //   //   icon: DeepReSearch,
 //   // },
 //   {
-//     name: "News Minimalist",
+//     name: "新闻速递",
 //     url: "http://47.238.241.114:9000/",
 //     description:
 //       "你好，我是智能新聞助手，幫你快速發現和整理世界各地的新鮮資訊，隨時為你服務",
