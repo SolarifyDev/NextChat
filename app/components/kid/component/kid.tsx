@@ -32,19 +32,58 @@ interface KidLever {
   icon: StaticImageData;
 }
 
-const compressWithPako = async (input: string) => {
-  try {
-    const uint8Array = new TextEncoder().encode(input);
-    const compressedStream = new Response(
-      new Blob([uint8Array])
-        .stream()
-        .pipeThrough(new CompressionStream("gzip")),
-    ).arrayBuffer();
-    const compressedUint8Array = new Uint8Array(await compressedStream);
-    return btoa(String.fromCharCode(...compressedUint8Array));
-  } catch {
-    return "";
+// 生成所有大小写组合
+function generateCasePermutations(str: string): string[] {
+  const results: string[] = [];
+
+  function helper(current: string, index: number) {
+    if (index === str.length) {
+      results.push(current);
+      return;
+    }
+
+    const char = str[index];
+
+    // 非字母保持原样
+    if (!/[a-zA-Z]/.test(char)) {
+      helper(current + char, index + 1);
+    } else {
+      helper(current + char.toLowerCase(), index + 1);
+      helper(current + char.toUpperCase(), index + 1);
+    }
   }
+
+  helper("", 0);
+  return results;
+}
+
+// 你原来的压缩方法
+const gzipToBase64 = async (input: string) => {
+  const uint8Array = new TextEncoder().encode(input);
+  const compressedStream = new Response(
+    new Blob([uint8Array]).stream().pipeThrough(new CompressionStream("gzip")),
+  ).arrayBuffer();
+  const compressedUint8Array = new Uint8Array(await compressedStream);
+  return btoa(String.fromCharCode(...compressedUint8Array));
+};
+
+// 新方法：自动找不含 + 或 - 的 base64
+const compressWithoutPlusOrMinus = async (input: string) => {
+  const combos = generateCasePermutations(input);
+
+  for (const combo of combos) {
+    const b64 = await gzipToBase64(combo);
+
+    // ⚠ 注意：base64 只会产生 "+" 不会产生 "-"（除非你 URL-safe 转换）
+    // 所以这里一起判断
+    if (!b64.includes("+") && !b64.includes("-")) {
+      return { input: combo, base64: b64 };
+    }
+  }
+
+  // 全部都含 + 或 -，返回最后一个
+  const last = await gzipToBase64(combos[combos.length - 1]);
+  return { input: combos[combos.length - 1], base64: last };
 };
 
 async function decodeBase64AndDecompress(base64String: string) {
@@ -163,10 +202,10 @@ export function Kid() {
 
   useEffect(() => {
     async function buildToolData() {
-      const encodedUserName = await compressWithPako(
+      const encodedUserName = await compressWithoutPlusOrMinus(
         userName ? userName.toUpperCase() : "",
       );
-      const encodedFrom = await compressWithPako(from);
+      const encodedFrom = await compressWithoutPlusOrMinus(from);
 
       setToolData([
         {
@@ -178,7 +217,7 @@ export function Kid() {
         },
         {
           name: "AI HR",
-          url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY&userId=${encodedUserName}&from=${encodedFrom}`,
+          url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY&userId=${encodedUserName.base64}&from=${encodedFrom.base64}`,
           description:
             "我是AI HR，專注於人力資源自助服務，幫你即時解答HR相關問題。",
           icon: HrAi,
