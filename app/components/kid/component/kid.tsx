@@ -24,7 +24,6 @@ import { StaticImageData } from "next/image";
 // import NewsMinimalist from "../../../icons/News Minimalist.png";
 // import HrAi from "../../../icons/HR AI.png";
 import { MessageEnum } from "@/app/enum";
-import pako from "pako";
 import { AiKidSystemSource } from "@/app/client/smarties";
 
 interface KidLever {
@@ -34,90 +33,77 @@ interface KidLever {
   icon: StaticImageData;
 }
 
-// const hierarchicalData: KidLever[] = [
-//   {
-//     name: "1P",
-//     url: "https://ai-studio.solarifyai.com/chat/ZlUhd7wPT5toGu4w",
-//     description: "我是1P執行者，通過合作完成任務",
-//     icon: OneP,
-//   },
-//   {
-//     name: "2M",
-//     url: "https://ai-studio.solarifyai.com/chat/LMbjcrcjcUXIqFWj",
-//     description: "我是2M初級管理者，通過採集資訊制定計劃",
-//     icon: TwoM,
-//   },
-//   {
-//     name: "3M",
-//     url: "https://ai-studio.solarifyai.com/chat/UJ21XpGMb1iTIBFI",
-//     description: "我是3M中級管理者，通過策略性得尋找和解決問題",
-//     icon: ThreeM,
-//   },
-//   {
-//     name: "4M",
-//     url: "https://ai-studio.solarifyai.com/chat/0OlFDW0LRJwIpYQz",
-//     description: "我是4M高級管理層，通過構建標準推進組織營運",
-//     icon: FourM,
-//   },
-//   {
-//     name: "5M",
-//     url: "https://ai-studio.solarifyai.com/chat/OSWxFGpde5RHcP16",
-//     description: "我是5M決策者，通過資源的合理分配投資",
-//     icon: FiveM,
-//   },
-//   {
-//     name: "6M",
-//     url: "https://ai-studio.solarifyai.com/chat/TKbaJembu1qiNrtV",
-//     description: "我是6M戰略決策者，通過願景和戰略佈局",
-//     icon: SixM,
-//   },
-//   {
-//     name: "4PC",
-//     url: "https://ai-studio.solarifyai.com/chat/w6psxCl0cN90OZn6",
-//     description: "我是4PC市場定位專家，針對個人消費者需求",
-//     icon: FourPC,
-//   },
-//   {
-//     name: "4PB",
-//     url: "https://ai-studio.solarifyai.com/chat/SPzkVHRDci9yHMPw",
-//     description: "我是4PB市場定位專家，專注企業客人服務",
-//     icon: FourPB,
-//   },
-// ];
+// 生成所有大小写组合
+function generateCasePermutations(str: string): string[] {
+  const results: string[] = [];
 
-// const toolData: KidLever[] = [
-//   // {
-//   //   name: "Deep Research",
-//   //   url: "http://47.238.241.114:3000/chat",
-//   //   description: "你好，我是市場調研專家，你想要的任何諮詢，隨時問我！",
-//   //   icon: DeepReSearch,
-//   // },
-//   {
-//     name: "新闻速递",
-//     url: "http://47.238.241.114:9000/",
-//     description:
-//       "你好，我是智能新聞助手，幫你快速發現和整理世界各地的新鮮資訊，隨時為你服務",
-//     icon: NewsMinimalist,
-//   },
-//   {
-//     name: "AI HR",
-//     url: `https://metis-ai-kid.testomenow.com/chatbot?token=HRhnj6GwltwSzJNY`,
-//     description: "我是AI HR，專注於人力資源自助服務，幫你即時解答HR相關問題。",
-//     icon: HrAi,
-//   },
-// ];
+  function helper(current: string, index: number) {
+    if (index === str.length) {
+      results.push(current);
+      return;
+    }
 
-const compressWithPako = (input: string) => {
-  try {
-    const utf8Bytes = new TextEncoder().encode(input);
+    const char = str[index];
 
-    const compressed = pako.gzip(utf8Bytes);
-
-    return btoa(String.fromCharCode(...compressed));
-  } catch {
-    return "";
+    // 非字母保持原样
+    if (!/[a-zA-Z]/.test(char)) {
+      helper(current + char, index + 1);
+    } else {
+      helper(current + char.toLowerCase(), index + 1);
+      helper(current + char.toUpperCase(), index + 1);
+    }
   }
+
+  helper("", 0);
+  return results;
+}
+
+// 你原来的压缩方法
+const gzipToBase64 = async (input: string) => {
+  const uint8Array = new TextEncoder().encode(input);
+  const compressedStream = new Response(
+    new Blob([uint8Array]).stream().pipeThrough(new CompressionStream("gzip")),
+  ).arrayBuffer();
+  const compressedUint8Array = new Uint8Array(await compressedStream);
+  return btoa(String.fromCharCode(...compressedUint8Array));
 };
+
+// 新方法：自动找不含 + 或 - 的 base64
+const compressWithoutPlusOrMinus = async (input: string) => {
+  const combos = generateCasePermutations(input);
+
+  for (const combo of combos) {
+    const b64 = await gzipToBase64(combo);
+
+    // ⚠ 注意：base64 只会产生 "+" 不会产生 "-"（除非你 URL-safe 转换）
+    // 所以这里一起判断
+    if (!b64.includes("+") && !b64.includes("-")) {
+      return { input: combo, base64: b64 };
+    }
+  }
+
+  // 全部都含 + 或 -，返回最后一个
+  const last = await gzipToBase64(combos[combos.length - 1]);
+  return { input: combos[combos.length - 1], base64: last };
+};
+
+async function decodeBase64AndDecompress(base64String: string) {
+  try {
+    const binaryString = atob(base64String);
+    const compressedUint8Array = Uint8Array.from(binaryString, (char) =>
+      char.charCodeAt(0),
+    );
+    const decompressedStream = new Response(
+      compressedUint8Array,
+    ).body?.pipeThrough(new DecompressionStream("gzip"));
+    const decompressedArrayBuffer = await new Response(
+      decompressedStream,
+    ).arrayBuffer();
+    return new TextDecoder().decode(decompressedArrayBuffer);
+  } catch {
+    return undefined;
+  }
+}
 
 export function Kid() {
   const navigate = useNavigate();
@@ -222,17 +208,20 @@ export function Kid() {
               </div>
             );
 
-            const handleOpenUrl = () => {
+            const handleOpenUrl = async () => {
               if (!externalUrl) return;
 
               const { userName, from } = useOmeStore.getState();
 
               let url = externalUrl;
 
+              const encodedUserName = await compressWithoutPlusOrMinus(
+                userName ?? "",
+              );
+              const encodedFrom = await compressWithoutPlusOrMinus(from);
+
               if (url.includes("https://metis-ai-kid.testomenow.com")) {
-                url += `&userId=${compressWithPako(
-                  userName ? userName.toUpperCase() : "",
-                )}&from=${compressWithPako(from)}&baseUrl=${domian}`;
+                url += `&userId=${encodedUserName}&from=${encodedFrom}&baseUrl=${domian}`;
               }
 
               try {
