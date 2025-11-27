@@ -124,6 +124,8 @@ export function Kid() {
 
   const { t } = useTranslation();
 
+  const { language } = useOmeStore();
+
   const {
     isLoading,
     kids,
@@ -205,6 +207,18 @@ export function Kid() {
                   )}
                 </div>
                 <div className={styles["message"]}>{text}</div>
+                <div
+                  style={{
+                    width: "100%",
+                    color: "rgba(158, 157, 176, 1)",
+                    display: "flex",
+                    fontSize: "12px",
+                  }}
+                >
+                  {language !== "cn" && language !== "tw"
+                    ? "AI-generated content"
+                    : "內容由AI生成"}
+                </div>
               </div>
             );
 
