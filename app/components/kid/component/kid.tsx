@@ -221,7 +221,7 @@ export function Kid() {
               const encodedFrom = await compressWithoutPlusOrMinus(from);
 
               if (url.includes("https://metis-ai-kid.testomenow.com")) {
-                url += `&userId=${encodedUserName}&from=${encodedFrom}&baseUrl=${domian}`;
+                url += `&userId=${encodedUserName.base64}&from=${encodedFrom.base64}&baseUrl=${domian}`;
               }
 
               try {
