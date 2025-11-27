@@ -24,7 +24,6 @@ import { StaticImageData } from "next/image";
 // import NewsMinimalist from "../../../icons/News Minimalist.png";
 // import HrAi from "../../../icons/HR AI.png";
 import { MessageEnum } from "@/app/enum";
-import pako from "pako";
 import { AiKidSystemSource } from "@/app/client/smarties";
 
 interface KidLever {
@@ -107,17 +106,38 @@ interface KidLever {
 //   },
 // ];
 
-const compressWithPako = (input: string) => {
+const compressWithPako = async (input: string) => {
   try {
-    const utf8Bytes = new TextEncoder().encode(input);
-
-    const compressed = pako.gzip(utf8Bytes);
-
-    return btoa(String.fromCharCode(...compressed));
+    const uint8Array = new TextEncoder().encode(input);
+    const compressedStream = new Response(
+      new Blob([uint8Array])
+        .stream()
+        .pipeThrough(new CompressionStream("gzip")),
+    ).arrayBuffer();
+    const compressedUint8Array = new Uint8Array(await compressedStream);
+    return btoa(String.fromCharCode(...compressedUint8Array));
   } catch {
     return "";
   }
 };
+
+async function decodeBase64AndDecompress(base64String: string) {
+  try {
+    const binaryString = atob(base64String);
+    const compressedUint8Array = Uint8Array.from(binaryString, (char) =>
+      char.charCodeAt(0),
+    );
+    const decompressedStream = new Response(
+      compressedUint8Array,
+    ).body?.pipeThrough(new DecompressionStream("gzip"));
+    const decompressedArrayBuffer = await new Response(
+      decompressedStream,
+    ).arrayBuffer();
+    return new TextDecoder().decode(decompressedArrayBuffer);
+  } catch {
+    return undefined;
+  }
+}
 
 export function Kid() {
   const navigate = useNavigate();
@@ -222,7 +242,7 @@ export function Kid() {
               </div>
             );
 
-            const handleOpenUrl = () => {
+            const handleOpenUrl = async () => {
               if (!externalUrl) return;
 
               const { userName, from } = useOmeStore.getState();
@@ -230,9 +250,9 @@ export function Kid() {
               let url = externalUrl;
 
               if (url.includes("https://metis-ai-kid.testomenow.com")) {
-                url += `&userId=${compressWithPako(
+                url += `&userId=${await compressWithPako(
                   userName ? userName.toUpperCase() : "",
-                )}&from=${compressWithPako(from)}&baseUrl=${domian}`;
+                )}&from=${await compressWithPako(from)}&baseUrl=${domian}`;
               }
 
               try {
