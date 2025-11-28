@@ -437,6 +437,54 @@ export function Home() {
           omeStore.setUserName(event?.data?.omeUserName);
         }
         omeStore.setFrom("omeoffice web");
+
+        // if (!isEmpty(event?.data?.ticket)) {
+        //   omeStore.setTicket(event?.data?.ticket ?? "");
+
+        //   try {
+        //     const res = await fetch("/api/omeAccount");
+        //     const config = await res.json();
+
+        //     omeStore.setClient(
+        //       config?.clientId || "",
+        //       config?.clientSecret || "",
+        //       config?.score || "",
+        //     );
+        //   } catch {
+        //     const message = {
+        //       data: {},
+        //       msg: "quit",
+        //       type: MessageEnum.Quit,
+        //     };
+
+        //     window.ReactNativeWebView.postMessage(JSON.stringify(message));
+        //   }
+
+        //   await PostGetToken("get", {
+        //     grant_type: "ticket",
+        //     ticket: event?.data?.ticket ?? "",
+        //   })
+        //     .then((res) => {
+        //       omeStore.setToken(res.access_token ?? "");
+        //       omeStore.setRefreshToken(res.refresh_token ?? "");
+
+        //       omeStore.setIsFromApp(false);
+        //       useEnhanceChatStore.getState().setIsDown(true);
+        //     })
+        //     .catch(() => {
+        //       const message = {
+        //         data: {},
+        //         msg: "quit",
+        //         type: MessageEnum.Quit,
+        //       };
+
+        //       window.ReactNativeWebView.postMessage(JSON.stringify(message));
+        //     });
+        // } else {
+        //   omeStore.setIsFromApp(false);
+        //   useEnhanceChatStore.getState().setIsDown(true);
+        // }
+
         omeStore.setIsFromApp(false);
       }
     };
