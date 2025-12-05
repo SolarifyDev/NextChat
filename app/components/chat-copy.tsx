@@ -145,6 +145,7 @@ import {
   getDefaultTopic,
   useEnhanceChatStore,
 } from "../store/enhance-chat";
+import VoiceChatButton from "./voice";
 
 const localStorage = safeLocalStorage();
 
@@ -2645,6 +2646,7 @@ export function _Chat_NEW() {
                   </>
                 )}
               </label> */}
+              <VoiceChatButton onSend={(result) => console.log(result)} />
             </div>
           </div>
           <div
