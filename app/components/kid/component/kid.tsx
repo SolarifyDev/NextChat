@@ -24,7 +24,6 @@ import { StaticImageData } from "next/image";
 // import NewsMinimalist from "../../../icons/News Minimalist.png";
 // import HrAi from "../../../icons/HR AI.png";
 import { MessageEnum } from "@/app/enum";
-import pako from "pako";
 import { AiKidSystemSource } from "@/app/client/smarties";
 
 interface KidLever {
@@ -107,17 +106,88 @@ interface KidLever {
 //   },
 // ];
 
-const compressWithPako = (input: string) => {
-  try {
-    const utf8Bytes = new TextEncoder().encode(input);
-
-    const compressed = pako.gzip(utf8Bytes);
-
-    return btoa(String.fromCharCode(...compressed));
-  } catch {
-    return "";
-  }
+// 你原来的压缩方法
+const gzipToBase64 = async (input: string) => {
+  const uint8Array = new TextEncoder().encode(input);
+  const compressedStream = new Response(
+    new Blob([uint8Array]).stream().pipeThrough(new CompressionStream("gzip")),
+  ).arrayBuffer();
+  const compressedUint8Array = new Uint8Array(await compressedStream);
+  return btoa(String.fromCharCode(...compressedUint8Array));
 };
+
+// 优化后的方法：边生成边检查，找到就立即返回
+const compressWithoutPlusOrMinus = async (input: string) => {
+  // 递归生成并立即检查
+  async function tryPermutation(
+    current: string,
+    index: number,
+  ): Promise<{ input: string; base64: string } | null> {
+    // 递归终点：生成完整字符串，立即压缩并检查
+    if (index === input.length) {
+      const b64 = await gzipToBase64(current);
+
+      // ⚠ 注意：base64 只会产生 "+" 不会产生 "-"（除非你 URL-safe 转换）
+      // 所以这里一起判断
+      if (!b64.includes("+") && !b64.includes("-")) {
+        return { input: current, base64: b64 };
+      }
+      return null;
+    }
+
+    const char = input[index];
+
+    // 非字母保持原样
+    if (!/[a-zA-Z]/.test(char)) {
+      return await tryPermutation(current + char, index + 1);
+    }
+
+    // 先尝试小写
+    const lowerResult = await tryPermutation(
+      current + char.toLowerCase(),
+      index + 1,
+    );
+    if (lowerResult) return lowerResult; // 找到了就立即返回
+
+    // 小写不行，再尝试大写
+    const upperResult = await tryPermutation(
+      current + char.toUpperCase(),
+      index + 1,
+    );
+    if (upperResult) return upperResult;
+
+    return null;
+  }
+
+  // 开始尝试
+  const result = await tryPermutation("", 0);
+
+  // 如果所有组合都含 + 或 -，返回原始字符串的压缩结果
+  if (!result) {
+    const fallbackBase64 = await gzipToBase64(input);
+    return { input, base64: fallbackBase64 };
+  }
+
+  return result;
+};
+
+async function decodeBase64AndDecompress(base64String: string) {
+  try {
+    const binaryString = atob(base64String);
+    const compressedUint8Array = Uint8Array.from(binaryString, (char) =>
+      char.charCodeAt(0),
+    );
+    const decompressedStream = new Response(
+      compressedUint8Array,
+    ).body?.pipeThrough(new DecompressionStream("gzip"));
+    const decompressedArrayBuffer = await new Response(
+      decompressedStream,
+    ).arrayBuffer();
+    return new TextDecoder().decode(decompressedArrayBuffer);
+  } catch {
+    return undefined;
+  }
+}
 
 export function Kid() {
   const navigate = useNavigate();
@@ -208,7 +278,7 @@ export function Kid() {
               </div>
             );
 
-            const handleOpenUrl = () => {
+            const handleOpenUrl = async () => {
               if (!externalUrl) return;
 
               const { userName, from } = useOmeStore.getState();
@@ -216,9 +286,11 @@ export function Kid() {
               let url = externalUrl;
 
               if (url.includes("https://metis-ai-kid.testomenow.com")) {
-                url += `&userId=${compressWithPako(
-                  userName ? userName.toUpperCase() : "",
-                )}&from=${compressWithPako(from)}&baseUrl=${domian}`;
+                const encodedUserName =
+                  await compressWithoutPlusOrMinus(userName);
+
+                const encodedFrom = await compressWithoutPlusOrMinus(from);
+                url += `&userId=${encodedUserName.base64}&from=${encodedFrom.base64}&baseUrl=${domian}`;
               }
 
               try {
