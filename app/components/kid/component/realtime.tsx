@@ -272,6 +272,21 @@ export function Realtime() {
         </div>
       </div>
 
+      <div
+        style={{
+          color: "rgba(158, 157, 176, 1)",
+          display: "flex",
+          fontSize: "12px",
+          position: "absolute",
+          bottom: "5%",
+          zIndex: 2,
+        }}
+      >
+        {omeStore.language !== "cn" && omeStore.language !== "tw"
+          ? "AI-generated content"
+          : "內容由AI生成"}
+      </div>
+
       {omeStore.isFromApp ? (
         <div className={styles.waveWrapper}>
           <div className={styles.waveContainer}>

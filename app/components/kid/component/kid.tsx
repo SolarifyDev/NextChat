@@ -118,7 +118,7 @@ export function Kid() {
     handleChangeCurrentKidIndex,
   } = useKidStore();
 
-  const { isFromApp, userId, userName, from } = useOmeStore();
+  const { isFromApp, userId, userName, from, language } = useOmeStore();
 
   const hierarchicalData: KidLever[] = [
     {
@@ -268,6 +268,18 @@ export function Kid() {
                 <div className={styles["content"]}>
                   <div className={styles["name"]}>{item.name}</div>
                   <div className={styles["message"]}>{item.greeting}</div>
+                  <div
+                    style={{
+                      width: "100%",
+                      color: "rgba(158, 157, 176, 1)",
+                      display: "flex",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {language !== "cn" && language !== "tw"
+                      ? "AI-generated content"
+                      : "內容由AI生成"}
+                  </div>
                 </div>
                 <div className={styles["actions"]}>
                   <div
@@ -349,6 +361,18 @@ export function Kid() {
                 <div className={styles["content"]}>
                   <div className={styles["name"]}>{item.name}</div>
                   <div className={styles["message"]}>{item.description}</div>
+                  <div
+                    style={{
+                      width: "100%",
+                      color: "rgba(158, 157, 176, 1)",
+                      display: "flex",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {language !== "cn" && language !== "tw"
+                      ? "AI-generated content"
+                      : "內容由AI生成"}
+                  </div>
                 </div>
               </div>
             ))}
@@ -424,6 +448,18 @@ export function Kid() {
                   </div>
 
                   <div className={styles["message"]}>{item.description}</div>
+                  <div
+                    style={{
+                      width: "100%",
+                      color: "rgba(158, 157, 176, 1)",
+                      display: "flex",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {language !== "cn" && language !== "tw"
+                      ? "AI-generated content"
+                      : "內容由AI生成"}
+                  </div>
                 </div>
               </div>
             ))}
