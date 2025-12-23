@@ -56,7 +56,7 @@ import AppSearchOnlineIcon from "../icons/search-online-app.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
 import MetisIcon from "../icons/metis.png";
 import SendIcon from "../icons/green-send.png";
-import GraySendIcon from "../icons/gray-send.png";
+import YuYinIcon from "../icons/yuyin.svg";
 
 import NextImage from "next/image";
 
@@ -1279,7 +1279,7 @@ export function _Chat_NEW() {
     }
   };
 
-  const doSubmit = (userInput: string) => {
+  const doSubmit = async (userInput: string) => {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
@@ -1290,9 +1290,10 @@ export function _Chat_NEW() {
     }
     setIsLoading(true);
 
-    newChatStore
+    await newChatStore
       .onUserInput(userInput, attachImages)
       .then(() => setIsLoading(false));
+    console.log(556);
     setAttachImages([]);
     newChatStore.setLastInput(userInput);
     setUserInput("");
@@ -1888,6 +1889,8 @@ export function _Chat_NEW() {
 
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
+  const [isShowVoice, setIsShowVoice] = useState<boolean>(false);
+
   if (!session) {
     return <></>;
   }
@@ -2379,7 +2382,6 @@ export function _Chat_NEW() {
                 prompts={promptHints}
                 onPromptSelect={onPromptSelect}
               />
-
               <ChatActions
                 uploadImage={uploadImage}
                 setAttachImages={setAttachImages}
@@ -2404,6 +2406,173 @@ export function _Chat_NEW() {
                 setUserInput={setUserInput}
                 setShowChatSidePanel={setShowChatSidePanel}
               />
+              {/* {isShowVoice ? (
+                <VoiceChatButton
+                  onSend={(result) => {
+                    if (result?.blob) {
+                      showToast("111");
+                    }
+                  }}
+                  onSwitch={() => setIsShowVoice(false)}
+                />
+              ) : (
+                <div
+                  className={
+                    omeStore.isFromApp
+                      ? styles["chat-input-panel-inner-is-app"]
+                      : styles["chat-input-panel-inner"]
+                  }
+                  style={
+                    omeStore.isFromApp
+                      ? {
+                          padding: "12px 16px",
+                          borderRadius: "32px",
+                          display: "flex",
+                          flexDirection: "row",
+                        }
+                      : { padding: "10px 10px", position: "relative" }
+                  }
+                >
+                  <div style={{ width: "100%" }}>
+                    <Input.TextArea
+                      id="chat-input"
+                      ref={textareaRef}
+                      className={
+                        omeStore.isFromApp
+                          ? styles["chat-input-is-app"]
+                          : styles["chat-input"]
+                      }
+                      // placeholder={Locale.Chat.Input(submitKey, config.isFromApp)}
+                      placeholder={
+                        omeStore.isFromApp
+                          ? t("Chat.AppInput")
+                          : t("Chat.Input", { submitKey })
+                      }
+                      onInput={(e) => onInput(e.currentTarget.value)}
+                      value={userInput}
+                      onKeyDown={onInputKeyDown}
+                      onFocus={scrollToBottom}
+                      onClick={scrollToBottom}
+                      onPaste={handlePaste}
+                      autoFocus={autoFocus}
+                      autoSize={{
+                        minRows: omeStore.isFromApp ? 1 : 2,
+                        maxRows: 6,
+                      }}
+                      style={{
+                        fontSize: config.fontSize,
+                        fontFamily: config.fontFamily,
+                        backgroundColor: omeStore.isFromApp
+                          ? "#fafaff"
+                          : undefined,
+                        marginRight: 2,
+                        border: "none",
+                        marginBottom: attachImages.length != 0 ? "8px" : 0,
+                      }}
+                    />
+
+                    {attachImages.length != 0 && (
+                      <div className={styles["attach-images-app"]}>
+                        {attachImages.map((image, index) => {
+                          return (
+                            <div
+                              key={index}
+                              className={styles["attach-image"]}
+                              style={{ backgroundImage: `url("${image}")` }}
+                            >
+                              <div className={styles["attach-image-mask"]}>
+                                <DeleteImageButton
+                                  deleteImage={() => {
+                                    setAttachImages(
+                                      attachImages.filter(
+                                        (_, i) => i !== index,
+                                      ),
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div
+                    style={{
+                      maxHeight: omeStore.isFromApp ? 30 : undefined,
+                      marginLeft: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: omeStore.isFromApp ? "center" : "end",
+                      position: !omeStore.isFromApp ? "absolute" : undefined,
+                      right: !omeStore.isFromApp ? "20px" : undefined,
+                      bottom: !omeStore.isFromApp ? "10px" : undefined,
+                    }}
+                  >
+                    {omeStore.isFromApp ? (
+                      isEmpty(userInput) && attachImages.length === 0 ? (
+                        // <NextImage
+                        //   src={GraySendIcon.src}
+                        //   alt=""
+                        //   width={32}
+                        //   height={32}
+                        //   // onClick={() => doSubmit(userInput)}
+                        //   onClick={() => setIsShowVoice(true)}
+                        // />
+                        <div
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                          }}
+                          onClick={() => setIsShowVoice(true)}
+                        >
+                          <YuYinIcon />
+                        </div>
+                      ) : (
+                        <NextImage
+                          src={SendIcon.src}
+                          alt=""
+                          width={32}
+                          height={32}
+                          onClick={() => doSubmit(userInput)}
+                        />
+                      )
+                    ) : (
+                      <button
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 10,
+                          border: "none",
+                          outline: "none",
+                          cursor: "pointer",
+                          color: "var(--black)",
+                          backgroundColor: "var(--primary)",
+                          padding: "10px",
+                        }}
+                        onClick={() => doSubmit(userInput)}
+                      >
+                        <SendWhiteIcon />
+                        <div
+                          style={{
+                            fontSize: 12,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            marginLeft: 5,
+                            color: "white",
+                          }}
+                        >
+                          {t("Chat.Send")}
+                        </div>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )} */}
+
               <div
                 className={
                   omeStore.isFromApp
@@ -2413,7 +2582,7 @@ export function _Chat_NEW() {
                 style={
                   omeStore.isFromApp
                     ? {
-                        padding: "12px 16px",
+                        padding: isShowVoice ? "0px" : "12px 16px",
                         borderRadius: "32px",
                         display: "flex",
                         flexDirection: "row",
@@ -2421,74 +2590,127 @@ export function _Chat_NEW() {
                     : { padding: "10px 10px", position: "relative" }
                 }
               >
-                <div style={{ width: "100%" }}>
-                  <Input.TextArea
-                    id="chat-input"
-                    ref={textareaRef}
-                    className={
-                      omeStore.isFromApp
-                        ? styles["chat-input-is-app"]
-                        : styles["chat-input"]
-                    }
-                    // placeholder={Locale.Chat.Input(submitKey, config.isFromApp)}
-                    placeholder={
-                      omeStore.isFromApp
-                        ? t("Chat.AppInput")
-                        : t("Chat.Input", { submitKey })
-                    }
-                    onInput={(e) => onInput(e.currentTarget.value)}
-                    value={userInput}
-                    onKeyDown={onInputKeyDown}
-                    onFocus={scrollToBottom}
-                    onClick={scrollToBottom}
-                    onPaste={handlePaste}
-                    autoFocus={autoFocus}
-                    autoSize={{
-                      minRows: omeStore.isFromApp ? 1 : 2,
-                      maxRows: 6,
-                    }}
-                    style={{
-                      fontSize: config.fontSize,
-                      fontFamily: config.fontFamily,
-                      backgroundColor: omeStore.isFromApp
-                        ? "#fafaff"
-                        : undefined,
-                      marginRight: 2,
-                      border: "none",
-                      marginBottom: attachImages.length != 0 ? "8px" : 0,
-                    }}
-                  />
-
-                  {attachImages.length != 0 && (
-                    <div className={styles["attach-images-app"]}>
-                      {attachImages.map((image, index) => {
-                        return (
-                          <div
-                            key={index}
-                            className={styles["attach-image"]}
-                            style={{ backgroundImage: `url("${image}")` }}
-                          >
-                            <div className={styles["attach-image-mask"]}>
-                              <DeleteImageButton
-                                deleteImage={() => {
-                                  setAttachImages(
-                                    attachImages.filter((_, i) => i !== index),
-                                  );
-                                }}
-                              />
-                            </div>
-                          </div>
+                <div
+                  style={{
+                    display:
+                      // omeStore.isFromApp &&
+                      isShowVoice ? "flex" : "none",
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                  }}
+                >
+                  <VoiceChatButton
+                    embedded={true}
+                    onSend={async (result) => {
+                      if (result?.blob) {
+                        showToast(
+                          "语音录制完成，时长: " + result.duration + "秒",
                         );
-                      })}
-                    </div>
-                  )}
+
+                        const text = await newChatStore.translateAudio(
+                          result.blob,
+                        );
+
+                        if (text.trim() === "") return;
+
+                        const audio = new Audio(result.url);
+                        audio.play();
+
+                        await doSubmit(text);
+
+                        // 处理语音数据
+                        console.log("Voice blob:", result.blob);
+                        console.log("Voice url:", result.url);
+                      }
+                    }}
+                    onCancel={() => {
+                      console.log("Voice cancelled");
+                    }}
+                    onSwitch={() => setIsShowVoice(false)}
+                  />
+                </div>
+                <div
+                  style={{
+                    display:
+                      // omeStore.isFromApp &&
+                      isShowVoice ? "none" : "flex",
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ width: "100%" }}>
+                    <Input.TextArea
+                      id="chat-input"
+                      ref={textareaRef}
+                      className={
+                        omeStore.isFromApp
+                          ? styles["chat-input-is-app"]
+                          : styles["chat-input"]
+                      }
+                      // placeholder={Locale.Chat.Input(submitKey, config.isFromApp)}
+                      placeholder={
+                        omeStore.isFromApp
+                          ? t("Chat.AppInput")
+                          : t("Chat.Input", { submitKey })
+                      }
+                      onInput={(e) => onInput(e.currentTarget.value)}
+                      value={userInput}
+                      onKeyDown={onInputKeyDown}
+                      onFocus={scrollToBottom}
+                      onClick={scrollToBottom}
+                      onPaste={handlePaste}
+                      autoFocus={autoFocus}
+                      autoSize={{
+                        minRows: omeStore.isFromApp ? 1 : 2,
+                        maxRows: 6,
+                      }}
+                      style={{
+                        fontSize: config.fontSize,
+                        fontFamily: config.fontFamily,
+                        backgroundColor: omeStore.isFromApp
+                          ? "#fafaff"
+                          : undefined,
+                        marginRight: 2,
+                        border: "none",
+                        marginBottom: attachImages.length != 0 ? "8px" : 0,
+                      }}
+                    />
+
+                    {attachImages.length != 0 && (
+                      <div className={styles["attach-images-app"]}>
+                        {attachImages.map((image, index) => {
+                          return (
+                            <div
+                              key={index}
+                              className={styles["attach-image"]}
+                              style={{ backgroundImage: `url("${image}")` }}
+                            >
+                              <div className={styles["attach-image-mask"]}>
+                                <DeleteImageButton
+                                  deleteImage={() => {
+                                    setAttachImages(
+                                      attachImages.filter(
+                                        (_, i) => i !== index,
+                                      ),
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div
                   style={{
                     maxHeight: omeStore.isFromApp ? 30 : undefined,
                     marginLeft: 4,
-                    display: "flex",
+                    display: isShowVoice ? "none" : "flex",
                     justifyContent: "center",
                     alignItems: omeStore.isFromApp ? "center" : "end",
                     position: !omeStore.isFromApp ? "absolute" : undefined,
@@ -2496,57 +2718,71 @@ export function _Chat_NEW() {
                     bottom: !omeStore.isFromApp ? "10px" : undefined,
                   }}
                 >
-                  {omeStore.isFromApp ? (
-                    isEmpty(userInput) && attachImages.length === 0 ? (
-                      <NextImage
-                        src={GraySendIcon.src}
-                        alt=""
-                        width={32}
-                        height={32}
-                        onClick={() => doSubmit(userInput)}
-                      />
+                  {
+                    // omeStore.isFromApp
+                    true ? (
+                      isEmpty(userInput) && attachImages.length === 0 ? (
+                        // <NextImage
+                        //   src={GraySendIcon.src}
+                        //   alt=""
+                        //   width={32}
+                        //   height={32}
+                        //   // onClick={() => doSubmit(userInput)}
+                        //   onClick={() => setIsShowVoice(true)}
+                        // />
+                        <div
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                          }}
+                          onClick={() => setIsShowVoice((prev) => !prev)}
+                        >
+                          <YuYinIcon />
+                        </div>
+                      ) : (
+                        <NextImage
+                          src={SendIcon.src}
+                          alt=""
+                          width={32}
+                          height={32}
+                          onClick={() => doSubmit(userInput)}
+                        />
+                      )
                     ) : (
-                      <NextImage
-                        src={SendIcon.src}
-                        alt=""
-                        width={32}
-                        height={32}
-                        onClick={() => doSubmit(userInput)}
-                      />
-                    )
-                  ) : (
-                    <button
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: 10,
-                        border: "none",
-                        outline: "none",
-                        cursor: "pointer",
-                        color: "var(--black)",
-                        backgroundColor: "var(--primary)",
-                        padding: "10px",
-                      }}
-                      onClick={() => doSubmit(userInput)}
-                    >
-                      <SendWhiteIcon />
-                      <div
+                      <button
                         style={{
-                          fontSize: 12,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          marginLeft: 5,
-                          color: "white",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 10,
+                          border: "none",
+                          outline: "none",
+                          cursor: "pointer",
+                          color: "var(--black)",
+                          backgroundColor: "var(--primary)",
+                          padding: "10px",
                         }}
+                        onClick={() => doSubmit(userInput)}
                       >
-                        {t("Chat.Send")}
-                      </div>
-                    </button>
-                  )}
+                        <SendWhiteIcon />
+                        <div
+                          style={{
+                            fontSize: 12,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            marginLeft: 5,
+                            color: "white",
+                          }}
+                        >
+                          {t("Chat.Send")}
+                        </div>
+                      </button>
+                    )
+                  }
                 </div>
               </div>
+
               {/* <label
                 className={clsx(
                   config.isFromApp
@@ -2646,7 +2882,6 @@ export function _Chat_NEW() {
                   </>
                 )}
               </label> */}
-              <VoiceChatButton onSend={(result) => console.log(result)} />
             </div>
           </div>
           <div

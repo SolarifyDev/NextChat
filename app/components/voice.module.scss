@@ -1,3 +1,258 @@
+// // // // // // // // VoiceChatButton.module.scss
+
+// // // // // // // .container {
+// // // // // // //   width: 100%;
+// // // // // // // }
+
+// // // // // // // .card {
+// // // // // // //   width: 100%;
+// // // // // // // }
+
+// // // // // // // .buttonContainer {
+// // // // // // //   position: relative;
+// // // // // // //   display: flex;
+// // // // // // //   flex-direction: column;
+// // // // // // //   align-items: center;
+// // // // // // // }
+
+// // // // // // // // 错误提示
+// // // // // // // .errorTooltip {
+// // // // // // //   position: absolute;
+// // // // // // //   bottom: 100%;
+// // // // // // //   margin-bottom: 1rem;
+// // // // // // //   left: 50%;
+// // // // // // //   transform: translateX(-50%);
+// // // // // // //   z-index: 20;
+// // // // // // //   width: 16rem;
+// // // // // // // }
+
+// // // // // // // .errorContent {
+// // // // // // //   background-color: #ef4444;
+// // // // // // //   color: #ffffff;
+// // // // // // //   font-size: 0.875rem;
+// // // // // // //   padding: 0.75rem 1rem;
+// // // // // // //   border-radius: 1rem;
+// // // // // // //   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+// // // // // // //   text-align: center;
+// // // // // // // }
+
+// // // // // // // .errorHeader {
+// // // // // // //   display: flex;
+// // // // // // //   align-items: center;
+// // // // // // //   justify-content: center;
+// // // // // // //   gap: 0.5rem;
+// // // // // // //   margin-bottom: 0.25rem;
+// // // // // // // }
+
+// // // // // // // .errorIcon {
+// // // // // // //   width: 1.25rem;
+// // // // // // //   height: 1.25rem;
+// // // // // // // }
+
+// // // // // // // .errorTitle {
+// // // // // // //   font-weight: 500;
+// // // // // // // }
+
+// // // // // // // .errorMessage {
+// // // // // // //   color: rgba(255, 255, 255, 0.9);
+// // // // // // //   font-size: 0.75rem;
+// // // // // // // }
+
+// // // // // // // .errorArrow {
+// // // // // // //   position: absolute;
+// // // // // // //   left: 50%;
+// // // // // // //   transform: translateX(-50%);
+// // // // // // //   bottom: -0.5rem;
+// // // // // // //   width: 0;
+// // // // // // //   height: 0;
+// // // // // // //   border-left: 0.5rem solid transparent;
+// // // // // // //   border-right: 0.5rem solid transparent;
+// // // // // // //   border-top: 0.5rem solid #ef4444;
+// // // // // // // }
+
+// // // // // // // // 录音状态提示
+// // // // // // // .stateTooltip {
+// // // // // // //   position: absolute;
+// // // // // // //   bottom: 100%;
+// // // // // // //   margin-bottom: 1rem;
+// // // // // // //   left: 50%;
+// // // // // // //   transform: translateX(-50%);
+// // // // // // //   z-index: 10;
+// // // // // // //   transition: all 0.2s ease;
+// // // // // // //   pointer-events: none;
+// // // // // // //   opacity: 0;
+
+// // // // // // //   &.visible {
+// // // // // // //     opacity: 1;
+// // // // // // //   }
+
+// // // // // // //   &.hidden {
+// // // // // // //     transform: translateX(-50%) translateY(1rem);
+// // // // // // //   }
+// // // // // // // }
+
+// // // // // // // .stateContent {
+// // // // // // //   padding: 0.75rem 1.5rem;
+// // // // // // //   border-radius: 1rem;
+// // // // // // //   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+// // // // // // //   white-space: nowrap;
+
+// // // // // // //   &.recording {
+// // // // // // //     background-color: #1f2937;
+// // // // // // //   }
+
+// // // // // // //   &.cancel {
+// // // // // // //     background-color: #ef4444;
+// // // // // // //   }
+// // // // // // // }
+
+// // // // // // // .stateText {
+// // // // // // //   color: #ffffff;
+// // // // // // //   font-size: 0.875rem;
+// // // // // // //   font-weight: 500;
+// // // // // // //   text-align: center;
+// // // // // // // }
+
+// // // // // // // .stateDuration {
+// // // // // // //   color: rgba(255, 255, 255, 0.8);
+// // // // // // //   font-size: 0.75rem;
+// // // // // // //   text-align: center;
+// // // // // // //   margin-top: 0.25rem;
+// // // // // // // }
+
+// // // // // // // .stateCountdown {
+// // // // // // //   color: #fde047;
+// // // // // // //   font-size: 0.75rem;
+// // // // // // //   text-align: center;
+// // // // // // //   margin-top: 0.25rem;
+// // // // // // //   animation: pulse 1s infinite;
+// // // // // // // }
+
+// // // // // // // .stateArrow {
+// // // // // // //   position: absolute;
+// // // // // // //   left: 50%;
+// // // // // // //   transform: translateX(-50%);
+// // // // // // //   bottom: -0.5rem;
+// // // // // // //   width: 0;
+// // // // // // //   height: 0;
+// // // // // // //   border-left: 0.5rem solid transparent;
+// // // // // // //   border-right: 0.5rem solid transparent;
+
+// // // // // // //   &.recording {
+// // // // // // //     border-top: 0.5rem solid #1f2937;
+// // // // // // //   }
+
+// // // // // // //   &.cancel {
+// // // // // // //     border-top: 0.5rem solid #ef4444;
+// // // // // // //   }
+// // // // // // // }
+
+// // // // // // // // 主按钮
+// // // // // // // .voiceButton {
+// // // // // // //   position: relative;
+// // // // // // //   width: 100%;
+// // // // // // //   height: 3rem;
+// // // // // // //   border-radius: 0.5rem;
+// // // // // // //   border: 1px solid #d1d5db;
+// // // // // // //   font-weight: 500;
+// // // // // // //   color: #374151;
+// // // // // // //   background-color: #ffffff;
+// // // // // // //   transition: all 0.2s ease;
+// // // // // // //   user-select: none;
+// // // // // // //   touch-action: none;
+// // // // // // //   cursor: pointer;
+
+// // // // // // //   &:active {
+// // // // // // //     transform: scale(0.98);
+// // // // // // //   }
+
+// // // // // // //   &.idle {
+// // // // // // //     background-color: #ffffff;
+
+// // // // // // //     &:hover {
+// // // // // // //       background-color: #f9fafb;
+// // // // // // //       border-color: #9ca3af;
+// // // // // // //     }
+// // // // // // //   }
+
+// // // // // // //   &.recording {
+// // // // // // //     background-color: #3b82f6;
+// // // // // // //     border-color: #3b82f6;
+// // // // // // //     color: #ffffff;
+// // // // // // //   }
+
+// // // // // // //   &.cancel {
+// // // // // // //     background-color: #ef4444;
+// // // // // // //     border-color: #ef4444;
+// // // // // // //     color: #ffffff;
+// // // // // // //   }
+// // // // // // // }
+
+// // // // // // // .buttonContent {
+// // // // // // //   display: flex;
+// // // // // // //   align-items: center;
+// // // // // // //   justify-content: center;
+// // // // // // //   gap: 0.5rem;
+// // // // // // //   height: 100%;
+// // // // // // //   padding: 0 1rem;
+// // // // // // // }
+
+// // // // // // // .micIcon {
+// // // // // // //   width: 1.25rem;
+// // // // // // //   height: 1.25rem;
+// // // // // // // }
+
+// // // // // // // .buttonText {
+// // // // // // //   font-size: 0.875rem;
+// // // // // // // }
+
+// // // // // // // .buttonTextSmall {
+// // // // // // //   font-size: 0.875rem;
+// // // // // // // }
+
+// // // // // // // // 波形动画
+// // // // // // // .waveContainer {
+// // // // // // //   display: flex;
+// // // // // // //   align-items: center;
+// // // // // // //   justify-content: center;
+// // // // // // //   gap: 0.2rem;
+// // // // // // //   height: 1.5rem;
+// // // // // // // }
+
+// // // // // // // .waveBar {
+// // // // // // //   width: 0.2rem;
+// // // // // // //   border-radius: 9999px;
+// // // // // // //   background-color: #ffffff;
+// // // // // // //   transition: all 0.1s ease;
+// // // // // // // }
+
+// // // // // // // // 底部提示（可选显示）
+// // // // // // // .hintContainer {
+// // // // // // //   display: none;
+// // // // // // // }
+
+// // // // // // // .hintText {
+// // // // // // //   font-size: 0.75rem;
+// // // // // // //   color: #9ca3af;
+// // // // // // //   text-align: center;
+// // // // // // //   margin-top: 0.5rem;
+
+// // // // // // //   &.hidden {
+// // // // // // //     opacity: 0;
+// // // // // // //   }
+// // // // // // // }
+
+// // // // // // // // 动画
+// // // // // // // @keyframes pulse {
+// // // // // // //   0%,
+// // // // // // //   100% {
+// // // // // // //     opacity: 1;
+// // // // // // //   }
+// // // // // // //   50% {
+// // // // // // //     opacity: 0.5;
+// // // // // // //   }
+// // // // // // // }
+
 // // // // // // // VoiceChatButton.module.scss
 
 // // // // // // .container {
@@ -78,7 +333,7 @@
 // // // // // //   left: 50%;
 // // // // // //   transform: translateX(-50%);
 // // // // // //   z-index: 10;
-// // // // // //   transition: all 0.2s ease;
+// // // // // //   // 移除 transition，防止 WebView 渲染延迟
 // // // // // //   pointer-events: none;
 // // // // // //   opacity: 0;
 
@@ -147,7 +402,7 @@
 // // // // // //   }
 // // // // // // }
 
-// // // // // // // 主按钮
+// // // // // // // 主按钮 - 移除 transition 防止 WebView 延迟
 // // // // // // .voiceButton {
 // // // // // //   position: relative;
 // // // // // //   width: 100%;
@@ -157,10 +412,12 @@
 // // // // // //   font-weight: 500;
 // // // // // //   color: #374151;
 // // // // // //   background-color: #ffffff;
-// // // // // //   transition: all 0.2s ease;
+// // // // // //   // 移除 transition: all 0.2s ease; 防止 WebView 渲染延迟
 // // // // // //   user-select: none;
 // // // // // //   touch-action: none;
 // // // // // //   cursor: pointer;
+// // // // // //   // 添加 will-change 提示浏览器优化
+// // // // // //   will-change: background-color, border-color, color;
 
 // // // // // //   &:active {
 // // // // // //     transform: scale(0.98);
@@ -168,6 +425,8 @@
 
 // // // // // //   &.idle {
 // // // // // //     background-color: #ffffff;
+// // // // // //     border-color: #d1d5db;
+// // // // // //     color: #374151;
 
 // // // // // //     &:hover {
 // // // // // //       background-color: #f9fafb;
@@ -223,7 +482,8 @@
 // // // // // //   width: 0.2rem;
 // // // // // //   border-radius: 9999px;
 // // // // // //   background-color: #ffffff;
-// // // // // //   transition: all 0.1s ease;
+// // // // // //   // 保留波形动画的 transition，这个是需要的
+// // // // // //   transition: height 0.1s ease;
 // // // // // // }
 
 // // // // // // // 底部提示（可选显示）
@@ -253,7 +513,7 @@
 // // // // // //   }
 // // // // // // }
 
-// // // // // // VoiceChatButton.module.scss
+// // // // // // voice.module.scss
 
 // // // // // .container {
 // // // // //   width: 100%;
@@ -333,7 +593,6 @@
 // // // // //   left: 50%;
 // // // // //   transform: translateX(-50%);
 // // // // //   z-index: 10;
-// // // // //   // 移除 transition，防止 WebView 渲染延迟
 // // // // //   pointer-events: none;
 // // // // //   opacity: 0;
 
@@ -342,7 +601,8 @@
 // // // // //   }
 
 // // // // //   &.hidden {
-// // // // //     transform: translateX(-50%) translateY(1rem);
+// // // // //     opacity: 0;
+// // // // //     transform: translateX(-50%) translateY(0.5rem);
 // // // // //   }
 // // // // // }
 
@@ -402,7 +662,7 @@
 // // // // //   }
 // // // // // }
 
-// // // // // // 主按钮 - 移除 transition 防止 WebView 延迟
+// // // // // // 主按钮
 // // // // // .voiceButton {
 // // // // //   position: relative;
 // // // // //   width: 100%;
@@ -412,11 +672,9 @@
 // // // // //   font-weight: 500;
 // // // // //   color: #374151;
 // // // // //   background-color: #ffffff;
-// // // // //   // 移除 transition: all 0.2s ease; 防止 WebView 渲染延迟
 // // // // //   user-select: none;
 // // // // //   touch-action: none;
 // // // // //   cursor: pointer;
-// // // // //   // 添加 will-change 提示浏览器优化
 // // // // //   will-change: background-color, border-color, color;
 
 // // // // //   &:active {
@@ -482,24 +740,7 @@
 // // // // //   width: 0.2rem;
 // // // // //   border-radius: 9999px;
 // // // // //   background-color: #ffffff;
-// // // // //   // 保留波形动画的 transition，这个是需要的
 // // // // //   transition: height 0.1s ease;
-// // // // // }
-
-// // // // // // 底部提示（可选显示）
-// // // // // .hintContainer {
-// // // // //   display: none;
-// // // // // }
-
-// // // // // .hintText {
-// // // // //   font-size: 0.75rem;
-// // // // //   color: #9ca3af;
-// // // // //   text-align: center;
-// // // // //   margin-top: 0.5rem;
-
-// // // // //   &.hidden {
-// // // // //     opacity: 0;
-// // // // //   }
 // // // // // }
 
 // // // // // // 动画
@@ -517,6 +758,7 @@
 
 // // // // .container {
 // // // //   width: 100%;
+// // // //   position: relative;
 // // // // }
 
 // // // // .card {
@@ -530,7 +772,74 @@
 // // // //   align-items: center;
 // // // // }
 
-// // // // // 错误提示
+// // // // // ========== 居中倒计时弹窗 ==========
+// // // // .countdownOverlay {
+// // // //   position: fixed;
+// // // //   top: 50%;
+// // // //   left: 50%;
+// // // //   transform: translate(-50%, -50%);
+// // // //   z-index: 1000;
+// // // //   animation: fadeIn 0.2s ease-out;
+// // // // }
+
+// // // // .countdownContent {
+// // // //   display: flex;
+// // // //   flex-direction: column;
+// // // //   align-items: center;
+// // // //   justify-content: center;
+// // // //   background-color: rgba(55, 65, 81, 0.9); // 深灰色半透明背景
+// // // //   border-radius: 16px;
+// // // //   padding: 20px;
+// // // //   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+// // // // }
+
+// // // // .countdownCircle {
+// // // //   position: relative;
+// // // //   width: 100px;
+// // // //   height: 100px;
+// // // //   display: flex;
+// // // //   align-items: center;
+// // // //   justify-content: center;
+// // // // }
+
+// // // // .countdownSvg {
+// // // //   position: absolute;
+// // // //   width: 100%;
+// // // //   height: 100%;
+// // // //   transform: scaleX(-1); // 镜像使进度顺时针
+// // // // }
+
+// // // // .countdownBg {
+// // // //   stroke: rgba(255, 255, 255, 0.2);
+// // // // }
+
+// // // // .countdownProgress {
+// // // //   stroke: #6366f1; // 紫色进度条
+// // // //   transition: stroke-dashoffset 0.3s ease;
+// // // // }
+
+// // // // .countdownNumber {
+// // // //   display: flex;
+// // // //   align-items: baseline;
+// // // //   justify-content: center;
+// // // //   color: #ffffff;
+// // // //   z-index: 1;
+// // // // }
+
+// // // // .countdownValue {
+// // // //   font-size: 2.5rem;
+// // // //   font-weight: 600;
+// // // //   line-height: 1;
+// // // // }
+
+// // // // .countdownUnit {
+// // // //   font-size: 1rem;
+// // // //   font-weight: 400;
+// // // //   margin-left: 2px;
+// // // //   opacity: 0.8;
+// // // // }
+
+// // // // // ========== 错误提示 ==========
 // // // // .errorTooltip {
 // // // //   position: absolute;
 // // // //   bottom: 100%;
@@ -585,7 +894,7 @@
 // // // //   border-top: 0.5rem solid #ef4444;
 // // // // }
 
-// // // // // 录音状态提示
+// // // // // ========== 录音状态提示 ==========
 // // // // .stateTooltip {
 // // // //   position: absolute;
 // // // //   bottom: 100%;
@@ -635,14 +944,6 @@
 // // // //   margin-top: 0.25rem;
 // // // // }
 
-// // // // .stateCountdown {
-// // // //   color: #fde047;
-// // // //   font-size: 0.75rem;
-// // // //   text-align: center;
-// // // //   margin-top: 0.25rem;
-// // // //   animation: pulse 1s infinite;
-// // // // }
-
 // // // // .stateArrow {
 // // // //   position: absolute;
 // // // //   left: 50%;
@@ -662,7 +963,7 @@
 // // // //   }
 // // // // }
 
-// // // // // 主按钮
+// // // // // ========== 主按钮 ==========
 // // // // .voiceButton {
 // // // //   position: relative;
 // // // //   width: 100%;
@@ -727,7 +1028,7 @@
 // // // //   font-size: 0.875rem;
 // // // // }
 
-// // // // // 波形动画
+// // // // // ========== 波形动画 ==========
 // // // // .waveContainer {
 // // // //   display: flex;
 // // // //   align-items: center;
@@ -743,7 +1044,16 @@
 // // // //   transition: height 0.1s ease;
 // // // // }
 
-// // // // // 动画
+// // // // // ========== 动画 ==========
+// // // // @keyframes fadeIn {
+// // // //   from {
+// // // //     opacity: 0;
+// // // //   }
+// // // //   to {
+// // // //     opacity: 1;
+// // // //   }
+// // // // }
+
 // // // // @keyframes pulse {
 // // // //   0%,
 // // // //   100% {
@@ -787,16 +1097,16 @@
 // // //   flex-direction: column;
 // // //   align-items: center;
 // // //   justify-content: center;
-// // //   background-color: rgba(55, 65, 81, 0.9); // 深灰色半透明背景
+// // //   width: 96px;
+// // //   height: 96px;
+// // //   background-color: rgba(51, 52, 56, 0.45);
 // // //   border-radius: 16px;
-// // //   padding: 20px;
-// // //   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 // // // }
 
 // // // .countdownCircle {
 // // //   position: relative;
-// // //   width: 100px;
-// // //   height: 100px;
+// // //   width: 64px;
+// // //   height: 64px;
 // // //   display: flex;
 // // //   align-items: center;
 // // //   justify-content: center;
@@ -814,7 +1124,7 @@
 // // // }
 
 // // // .countdownProgress {
-// // //   stroke: #6366f1; // 紫色进度条
+// // //   stroke: rgba(96, 93, 236, 1);
 // // //   transition: stroke-dashoffset 0.3s ease;
 // // // }
 
@@ -822,21 +1132,20 @@
 // // //   display: flex;
 // // //   align-items: baseline;
 // // //   justify-content: center;
-// // //   color: #ffffff;
 // // //   z-index: 1;
 // // // }
 
 // // // .countdownValue {
-// // //   font-size: 2.5rem;
-// // //   font-weight: 600;
+// // //   font-size: 20px;
+// // //   font-weight: 500;
 // // //   line-height: 1;
+// // //   color: rgba(242, 242, 255, 1);
 // // // }
 
 // // // .countdownUnit {
-// // //   font-size: 1rem;
-// // //   font-weight: 400;
-// // //   margin-left: 2px;
-// // //   opacity: 0.8;
+// // //   font-size: 20px;
+// // //   font-weight: 500;
+// // //   color: rgba(242, 242, 255, 1);
 // // // }
 
 // // // // ========== 错误提示 ==========
@@ -1207,12 +1516,13 @@
 // // .stateTooltip {
 // //   position: absolute;
 // //   bottom: 100%;
-// //   margin-bottom: 1rem;
+// //   margin-bottom: 12px;
 // //   left: 50%;
 // //   transform: translateX(-50%);
 // //   z-index: 10;
 // //   pointer-events: none;
 // //   opacity: 0;
+// //   transition: opacity 0.2s ease;
 
 // //   &.visible {
 // //     opacity: 1;
@@ -1220,18 +1530,20 @@
 
 // //   &.hidden {
 // //     opacity: 0;
-// //     transform: translateX(-50%) translateY(0.5rem);
 // //   }
 // // }
 
 // // .stateContent {
-// //   padding: 0.75rem 1.5rem;
-// //   border-radius: 1rem;
-// //   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// //   height: 33px;
+// //   padding: 0 20px;
+// //   border-radius: 46px;
 // //   white-space: nowrap;
 
 // //   &.recording {
-// //     background-color: #1f2937;
+// //     background-color: rgba(51, 52, 56, 0.45);
 // //   }
 
 // //   &.cancel {
@@ -1240,45 +1552,30 @@
 // // }
 
 // // .stateText {
-// //   color: #ffffff;
-// //   font-size: 0.875rem;
+// //   color: rgba(255, 255, 255, 1);
+// //   font-size: 14px;
 // //   font-weight: 500;
 // //   text-align: center;
 // // }
 
 // // .stateDuration {
 // //   color: rgba(255, 255, 255, 0.8);
-// //   font-size: 0.75rem;
+// //   font-size: 12px;
 // //   text-align: center;
-// //   margin-top: 0.25rem;
+// //   margin-top: 4px;
 // // }
 
 // // .stateArrow {
-// //   position: absolute;
-// //   left: 50%;
-// //   transform: translateX(-50%);
-// //   bottom: -0.5rem;
-// //   width: 0;
-// //   height: 0;
-// //   border-left: 0.5rem solid transparent;
-// //   border-right: 0.5rem solid transparent;
-
-// //   &.recording {
-// //     border-top: 0.5rem solid #1f2937;
-// //   }
-
-// //   &.cancel {
-// //     border-top: 0.5rem solid #ef4444;
-// //   }
+// //   display: none; // 隐藏箭头
 // // }
 
 // // // ========== 主按钮 ==========
 // // .voiceButton {
 // //   position: relative;
 // //   width: 100%;
-// //   height: 3rem;
-// //   border-radius: 0.5rem;
-// //   border: 1px solid #d1d5db;
+// //   height: 48px;
+// //   border-radius: 24px;
+// //   border: none;
 // //   font-weight: 500;
 // //   color: #374151;
 // //   background-color: #ffffff;
@@ -1286,6 +1583,7 @@
 // //   touch-action: none;
 // //   cursor: pointer;
 // //   will-change: background-color, border-color, color;
+// //   transition: transform 0.1s ease;
 
 // //   &:active {
 // //     transform: scale(0.98);
@@ -1293,24 +1591,22 @@
 
 // //   &.idle {
 // //     background-color: #ffffff;
-// //     border-color: #d1d5db;
+// //     border: 1px solid #e5e7eb;
 // //     color: #374151;
 
 // //     &:hover {
 // //       background-color: #f9fafb;
-// //       border-color: #9ca3af;
+// //       border-color: #d1d5db;
 // //     }
 // //   }
 
 // //   &.recording {
-// //     background-color: #3b82f6;
-// //     border-color: #3b82f6;
+// //     background-color: rgba(96, 93, 236, 1);
 // //     color: #ffffff;
 // //   }
 
 // //   &.cancel {
 // //     background-color: #ef4444;
-// //     border-color: #ef4444;
 // //     color: #ffffff;
 // //   }
 // // }
@@ -1319,37 +1615,39 @@
 // //   display: flex;
 // //   align-items: center;
 // //   justify-content: center;
-// //   gap: 0.5rem;
+// //   gap: 8px;
 // //   height: 100%;
-// //   padding: 0 1rem;
+// //   padding: 0 24px;
 // // }
 
 // // .micIcon {
-// //   width: 1.25rem;
-// //   height: 1.25rem;
+// //   width: 20px;
+// //   height: 20px;
 // // }
 
 // // .buttonText {
-// //   font-size: 0.875rem;
+// //   font-size: 14px;
+// //   font-weight: 500;
 // // }
 
 // // .buttonTextSmall {
-// //   font-size: 0.875rem;
+// //   display: none; // 录音时隐藏文字，只显示波形
 // // }
 
 // // // ========== 波形动画 ==========
 // // .waveContainer {
 // //   display: flex;
 // //   align-items: center;
-// //   justify-content: center;
-// //   gap: 0.2rem;
-// //   height: 1.5rem;
+// //   justify-content: space-between;
+// //   height: 24px;
+// //   width: 100%;
 // // }
 
 // // .waveBar {
-// //   width: 0.2rem;
-// //   border-radius: 9999px;
-// //   background-color: #ffffff;
+// //   width: 2px;
+// //   flex-shrink: 0;
+// //   border-radius: 100px;
+// //   background-color: rgba(255, 255, 255, 0.9);
 // //   transition: height 0.1s ease;
 // // }
 
@@ -1389,6 +1687,48 @@
 //   display: flex;
 //   flex-direction: column;
 //   align-items: center;
+// }
+
+// // 按钮行容器
+// .buttonRow {
+//   position: relative;
+//   display: flex;
+//   align-items: center;
+//   width: 100%;
+//   height: 56px;
+// }
+
+// // Log按钮 - 叠加在语音按钮右侧上层
+// .logButton {
+//   position: absolute;
+//   right: 17px;
+//   top: 50%;
+//   transform: translateY(-50%);
+//   z-index: 10;
+//   width: 32px;
+//   height: 32px;
+//   border-radius: 20px;
+//   border: none;
+//   background-color: transparent;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   cursor: pointer;
+//   transition: background-color 0.2s ease;
+
+//   &:hover {
+//     background-color: rgba(0, 0, 0, 0.05);
+//   }
+
+//   &:active {
+//     background-color: rgba(0, 0, 0, 0.1);
+//   }
+
+//   svg {
+//     width: 32px;
+//     height: 32px;
+//     // color: #6b7280;
+//   }
 // }
 
 // // ========== 居中倒计时弹窗 ==========
@@ -1516,7 +1856,7 @@
 // .stateTooltip {
 //   position: absolute;
 //   bottom: 100%;
-//   margin-bottom: 12px;
+//   margin-bottom: 16px;
 //   left: 50%;
 //   transform: translateX(-50%);
 //   z-index: 10;
@@ -1590,8 +1930,15 @@
 //   }
 
 //   &.idle {
-//     background-color: #ffffff;
-//     border: 1px solid #e5e7eb;
+//     // background-color: #ffffff;
+//     // border: 1px solid #e5e7eb;
+//     // color: #374151;
+
+//     border: 1px solid transparent;
+//     background:
+//       linear-gradient(#fafafa, #fafafa) padding-box,
+//       linear-gradient(45deg, #fff2eb, #caffd6, #dcdaff) border-box;
+//     box-shadow: 0px 0px 22px 0px rgba(204, 192, 249, 0.25);
 //     color: #374151;
 
 //     &:hover {
@@ -1640,7 +1987,7 @@
 //   align-items: center;
 //   justify-content: space-between;
 //   height: 24px;
-//   width: 100%;
+//   width: 60%;
 // }
 
 // .waveBar {
@@ -1695,12 +2042,119 @@
   display: flex;
   align-items: center;
   width: 100%;
+  height: 56px;
 }
 
 // Log按钮 - 叠加在语音按钮右侧上层
 .logButton {
   position: absolute;
-  right: 17px;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 20px;
+  border: none;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+// ========== 嵌入模式样式 (Embedded Mode) ==========
+.embeddedContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 32px;
+}
+
+.embeddedButton {
+  flex: 1;
+  height: 100%;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+  border-radius: 28px;
+  // transition: background-color 0.2s ease;
+}
+
+// idle 状态：透明背景（边框由外层容器提供）
+.embeddedIdle {
+  background-color: transparent;
+}
+
+// recording 状态：紫色背景
+.embeddedRecording {
+  background-color: rgba(96, 93, 236, 1);
+
+  .embeddedButtonContent {
+    width: 100%;
+    color: #ffffff;
+  }
+
+  .embeddedButtonText {
+    color: #ffffff;
+  }
+}
+
+// cancel 状态：红色背景
+.embeddedCancel {
+  background-color: #ef4444;
+
+  .embeddedButtonContent {
+    width: 100%;
+    color: #ffffff;
+  }
+
+  .embeddedButtonText {
+    color: #ffffff;
+  }
+}
+
+.embeddedButtonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  padding: 0 16px;
+  color: #374151;
+}
+
+.embeddedButtonText {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+// 嵌入模式的键盘切换按钮
+.embeddedLogButton {
+  position: absolute;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
@@ -1724,9 +2178,8 @@
   }
 
   svg {
-    width: 20px;
-    height: 20px;
-    color: #6b7280;
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -1908,7 +2361,7 @@
   display: none; // 隐藏箭头
 }
 
-// ========== 主按钮 ==========
+// ========== 主按钮（非嵌入模式） ==========
 .voiceButton {
   position: relative;
   width: 100%;
@@ -1929,8 +2382,11 @@
   }
 
   &.idle {
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(#fafafa, #fafafa) padding-box,
+      linear-gradient(45deg, #fff2eb, #caffd6, #dcdaff) border-box;
+    box-shadow: 0px 0px 22px 0px rgba(204, 192, 249, 0.25);
     color: #374151;
 
     &:hover {

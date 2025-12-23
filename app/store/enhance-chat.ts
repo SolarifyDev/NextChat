@@ -3,6 +3,7 @@ import {
   GetHistory,
   GetItemHistory,
   PostAddOrUpdateSession,
+  PostTranslationSpeech,
   getHeaders,
 } from "../client/smarties";
 import { showToast } from "../components/ui-lib";
@@ -1074,6 +1075,18 @@ export const useEnhanceChatStore = createPersistStore(
         ];
 
         return recentMessages;
+      },
+      translateAudio: async (audioBlob: Blob): Promise<string> => {
+        const formData = new FormData();
+        formData.append("file", audioBlob, "recording.webm");
+
+        try {
+          const res = await PostTranslationSpeech(await getHeaders(), formData);
+          return res; // 返回转换后的文本
+        } catch (error) {
+          console.error("translateAudio error:", error);
+          return ""; // 或者抛出错误 throw error;
+        }
       },
       clearCurrent: () => {
         set({
