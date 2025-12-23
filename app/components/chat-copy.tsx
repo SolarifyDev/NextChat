@@ -2887,6 +2887,19 @@ export function _Chat_NEW() {
                   )}
                 </div>
               </div>
+              <div
+                style={{
+                  width: "100%",
+                  color: "rgba(43, 43, 51, 0.40)",
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "1rem",
+                }}
+              >
+                {omeStore.language !== "cn" && omeStore.language !== "tw"
+                  ? "AI-generated content"
+                  : "內容由AI生成"}
+              </div>
               {/* <label
                 className={clsx(
                   config.isFromApp
