@@ -485,8 +485,6 @@ export const VISION_MODEL_REGEXES = [
   /gpt-4.1-mini/,
   /o3/,
   /o4-mini/,
-  /gpt-5.1/,
-  /gpt-5-mini/,
 ];
 
 export const EXCLUDE_VISION_MODEL_REGEXES = [/claude-3-5-haiku-20241022/];
@@ -527,8 +525,6 @@ const openaiModels = [
   "o3-mini",
   "o3",
   "o4-mini",
-  "gpt-5.1",
-  "gpt-5-mini",
 ];
 
 const googleModels = [
