@@ -40,7 +40,7 @@
   align-items: center;
   min-height: 40px;
   border-bottom: var(--border-in-light);
-  padding: 10px 20px;
+  // padding: 0 20px;  // 隐藏
   animation: slide-in ease 0.6s;
 
   .list-header {
@@ -53,7 +53,7 @@
 
     .list-item-title {
       font-size: 14px;
-      font-weight: bolder;
+      font-weight: normal;
     }
 
     .list-item-sub-title {
@@ -133,9 +133,10 @@
   border: var(--border-in-light);
   border-radius: 10px;
   box-shadow: var(--card-shadow);
-  margin-bottom: 20px;
+  // margin-bottom: 20px; // 测试
   animation: slide-in ease 0.3s;
   background: var(--white);
+  padding: 16px;
 }
 
 .list .list-item:last-child {
@@ -146,7 +147,7 @@
   // border: var(--border-in-light);
   border-radius: 16px;
   box-shadow: var(--card-shadow);
-  margin-bottom: 20px;
+  // margin-bottom: 20px;  // 测试
   animation: slide-in ease 0.3s;
   background: var(--white);
 }
@@ -375,6 +376,10 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
+
+  .selector-content {
+    background-color: rebeccapurple;
+  }
 
   .selector-item-disabled {
     opacity: 0.6;
