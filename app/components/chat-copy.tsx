@@ -130,7 +130,7 @@ import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
 import { isEmpty, isNil } from "lodash-es";
-import { getModelProvider } from "../utils/model";
+import { getModelProvider, nameLocales } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
@@ -618,6 +618,49 @@ export function ChatActions(props: {
   const currentProviderName =
     session.mask.modelConfig?.providerName || ServiceProvider.OpenAI;
   const allModels = useAllModels();
+  // const models = useMemo(() => {
+  //   const filteredModels = allModels.filter((m) => m.available);
+  //   const defaultModel = filteredModels.find((m) => m.isDefault);
+
+  //   const deepseekModels = filteredModels.filter((m) =>
+  //     m.displayName.toLowerCase().includes("deepseek"),
+  //   );
+  //   const metisModels = filteredModels.filter((m) =>
+  //     m.displayName.toLowerCase().includes("metis"),
+  //   );
+  //   const otherModels = filteredModels.filter(
+  //     (m) =>
+  //       !m.displayName.toLowerCase().includes("deepseek") &&
+  //       !m.displayName.toLowerCase().includes("metis"),
+  //   );
+
+  //   if (defaultModel) {
+  //     const arr = [
+  //       defaultModel,
+  //       ...deepseekModels.filter((m) => m !== defaultModel),
+  //       ...metisModels.filter((m) => m !== defaultModel),
+  //       ...otherModels.filter((m) => m !== defaultModel),
+  //     ];
+  //     if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
+  //       return arr.filter((i) =>
+  //         ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
+  //           (item) => item === i.displayName.toLowerCase(),
+  //         ),
+  //       );
+  //     }
+  //     return arr;
+  //   } else {
+  //     if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
+  //       return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
+  //         ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
+  //           (item) => item === i.displayName.toLowerCase(),
+  //         ),
+  //       );
+  //     }
+  //     return [...deepseekModels, ...metisModels, ...otherModels];
+  //   }
+  // }, [allModels, omeStore.language]);
+
   const models = useMemo(() => {
     const filteredModels = allModels.filter((m) => m.available);
     const defaultModel = filteredModels.find((m) => m.isDefault);
@@ -634,6 +677,8 @@ export function ChatActions(props: {
         !m.displayName.toLowerCase().includes("metis"),
     );
 
+    let result: typeof filteredModels;
+
     if (defaultModel) {
       const arr = [
         defaultModel,
@@ -642,24 +687,51 @@ export function ChatActions(props: {
         ...otherModels.filter((m) => m !== defaultModel),
       ];
       if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-        return arr.filter((i) =>
+        result = arr.filter((i) =>
           ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
             (item) => item === i.displayName.toLowerCase(),
           ),
         );
+      } else {
+        result = arr;
       }
-      return arr;
     } else {
+      const arr = [...deepseekModels, ...metisModels, ...otherModels];
       if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-        return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
+        result = arr.filter((i) =>
           ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
             (item) => item === i.displayName.toLowerCase(),
           ),
         );
+      } else {
+        result = arr;
       }
-      return [...deepseekModels, ...metisModels, ...otherModels];
     }
-  }, [allModels]);
+
+    // 匹配 nameLocales，添加 releaseDate 和 description
+    return result.map((model) => {
+      console.log(model, "model");
+      const locale = nameLocales.find(
+        (item) => item.name.toLowerCase() === model.displayName.toLowerCase(),
+      );
+
+      // 获取当前语种的描述，如果没有则默认用简体中文
+      const lang = omeStore.language;
+      const description =
+        locale?.translations?.[lang] ?? locale?.translations?.cn ?? "";
+
+      return {
+        ...model,
+        releaseDate: locale?.releaseDateDev,
+        description,
+      };
+    });
+  }, [allModels, omeStore.language]);
+
+  useEffect(() => {
+    console.log(models, "models");
+  }, [models]);
+
   const currentModelName = useMemo(() => {
     const model = models.find(
       (m) =>
@@ -844,40 +916,41 @@ export function ChatActions(props: {
           isWebClick={true}
         />
 
-        {showModelSelector && (
-          <Selector
-            defaultSelectedValue={`${currentModel}@${currentProviderName}`}
-            items={models.map((m) => ({
-              title: `${m.displayName}${
-                m?.provider?.providerName
-                  ? " (" + m?.provider?.providerName + ")"
-                  : ""
-              }`,
-              value: `${m.name}@${m?.provider?.providerName}`,
-            }))}
-            onClose={() => setShowModelSelector(false)}
-            onSelection={(s) => {
-              if (s.length === 0) return;
-              const [model, providerName] = getModelProvider(s[0]);
-              chatStore.updateTargetSession((session) => {
-                session.mask.modelConfig.model = model as ModelType;
-                session.mask.modelConfig.providerName =
-                  providerName as ServiceProvider;
-                session.mask.syncGlobalConfig = false;
-              });
-              if (providerName == "ByteDance") {
-                const selectedModel = models.find(
-                  (m) =>
-                    m.name == model &&
-                    m?.provider?.providerName == providerName,
-                );
-                showToast(selectedModel?.displayName ?? "");
-              } else {
-                showToast(model);
-              }
-            }}
-          />
-        )}
+        {/* {showModelSelector && ( */}
+        <Selector
+          defaultSelectedValue={`${currentModel}@${currentProviderName}`}
+          items={models.map((m) => ({
+            title: `${m.displayName}${
+              m?.provider?.providerName
+                ? " (" + m?.provider?.providerName + ")"
+                : ""
+            }`,
+            value: `${m.name}@${m?.provider?.providerName}`,
+            subTitle: m.description,
+            releaseDate: m.releaseDate,
+          }))}
+          onClose={() => setShowModelSelector(false)}
+          onSelection={(s) => {
+            if (s.length === 0) return;
+            const [model, providerName] = getModelProvider(s[0]);
+            chatStore.updateTargetSession((session) => {
+              session.mask.modelConfig.model = model as ModelType;
+              session.mask.modelConfig.providerName =
+                providerName as ServiceProvider;
+              session.mask.syncGlobalConfig = false;
+            });
+            if (providerName == "ByteDance") {
+              const selectedModel = models.find(
+                (m) =>
+                  m.name == model && m?.provider?.providerName == providerName,
+              );
+              showToast(selectedModel?.displayName ?? "");
+            } else {
+              showToast(model);
+            }
+          }}
+        />
+        {/* )} */}
 
         {supportsCustomSize(currentModel) && (
           <ChatAction
