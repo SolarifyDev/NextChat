@@ -618,48 +618,6 @@ export function ChatActions(props: {
   const currentProviderName =
     session.mask.modelConfig?.providerName || ServiceProvider.OpenAI;
   const allModels = useAllModels();
-  // const models = useMemo(() => {
-  //   const filteredModels = allModels.filter((m) => m.available);
-  //   const defaultModel = filteredModels.find((m) => m.isDefault);
-
-  //   const deepseekModels = filteredModels.filter((m) =>
-  //     m.displayName.toLowerCase().includes("deepseek"),
-  //   );
-  //   const metisModels = filteredModels.filter((m) =>
-  //     m.displayName.toLowerCase().includes("metis"),
-  //   );
-  //   const otherModels = filteredModels.filter(
-  //     (m) =>
-  //       !m.displayName.toLowerCase().includes("deepseek") &&
-  //       !m.displayName.toLowerCase().includes("metis"),
-  //   );
-
-  //   if (defaultModel) {
-  //     const arr = [
-  //       defaultModel,
-  //       ...deepseekModels.filter((m) => m !== defaultModel),
-  //       ...metisModels.filter((m) => m !== defaultModel),
-  //       ...otherModels.filter((m) => m !== defaultModel),
-  //     ];
-  //     if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-  //       return arr.filter((i) =>
-  //         ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-  //           (item) => item === i.displayName.toLowerCase(),
-  //         ),
-  //       );
-  //     }
-  //     return arr;
-  //   } else {
-  //     if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-  //       return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
-  //         ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-  //           (item) => item === i.displayName.toLowerCase(),
-  //         ),
-  //       );
-  //     }
-  //     return [...deepseekModels, ...metisModels, ...otherModels];
-  //   }
-  // }, [allModels, omeStore.language]);
 
   const models = useMemo(() => {
     const filteredModels = allModels.filter((m) => m.available);
@@ -710,7 +668,6 @@ export function ChatActions(props: {
 
     // 匹配 nameLocales，添加 releaseDate 和 description
     return result.map((model) => {
-      console.log(model, "model");
       const locale = nameLocales.find(
         (item) => item.name.toLowerCase() === model.displayName.toLowerCase(),
       );
@@ -727,10 +684,6 @@ export function ChatActions(props: {
       };
     });
   }, [allModels, omeStore.language]);
-
-  useEffect(() => {
-    console.log(models, "models");
-  }, [models]);
 
   const currentModelName = useMemo(() => {
     const model = models.find(
