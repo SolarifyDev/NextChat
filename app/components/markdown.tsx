@@ -24,6 +24,7 @@ import { useAppConfig } from "../store/config";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { useEnhanceChatStore } from "../store/enhance-chat";
+import { MessageEnum } from "../enum";
 
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -275,10 +276,21 @@ function tryWrapHtmlCode(text: string) {
     );
 }
 
-function _MarkDownContent(props: { content: string }) {
+function _MarkDownContent(props: {
+  content: string;
+  topicUrlClick: (url: string) => Promise<void>;
+}) {
   const escapedContent = useMemo(() => {
     return tryWrapHtmlCode(escapeBrackets(props.content));
   }, [props.content]);
+
+  const trackExternalLink = async (url: string) => {
+    try {
+      await props.topicUrlClick(url);
+    } catch (error) {
+      console.error("记录链接失败:", error);
+    }
+  };
 
   return (
     <ReactMarkdown
@@ -299,6 +311,8 @@ function _MarkDownContent(props: { content: string }) {
         p: (pProps) => <p {...pProps} dir="auto" />,
         a: (aProps) => {
           const href = aProps.href || "";
+
+          // 音频链接
           if (/\.(aac|mp3|opus|wav)$/.test(href)) {
             return (
               <figure>
@@ -306,6 +320,8 @@ function _MarkDownContent(props: { content: string }) {
               </figure>
             );
           }
+
+          // 视频链接
           if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
             return (
               <video controls width="99.9%">
@@ -313,8 +329,50 @@ function _MarkDownContent(props: { content: string }) {
               </video>
             );
           }
+
           const isInternal = /^\/#/i.test(href);
           const target = isInternal ? "_self" : aProps.target ?? "_blank";
+
+          // ✅ 修改：外部链接添加点击事件
+          if (!isInternal) {
+            return (
+              <a
+                {...aProps}
+                target={target}
+                onClick={async (e) => {
+                  e.preventDefault(); // 阻止默认跳转
+
+                  try {
+                    await trackExternalLink(href);
+
+                    const message = {
+                      data: {
+                        url: href,
+                      },
+                      type: MessageEnum.Navigate,
+                      msg: "navigate",
+                    };
+
+                    if (window?.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else if (
+                      window?.webkit?.messageHandlers?.nativeListener
+                    ) {
+                      window?.webkit?.messageHandlers?.nativeListener.postMessage(
+                        JSON.stringify(message),
+                      );
+                    } else {
+                      window.open(href, "target");
+                    }
+                  } catch {}
+                }}
+              />
+            );
+          }
+
+          // 内部链接保持原样
           return <a {...aProps} target={target} />;
         },
       }}
@@ -338,6 +396,8 @@ export function Markdown(
 ) {
   const mdRef = useRef<HTMLDivElement>(null);
 
+  const chatStore = useEnhanceChatStore();
+
   return (
     <div
       className="markdown-body"
@@ -353,7 +413,10 @@ export function Markdown(
       {props.loading ? (
         <LoadingIcon />
       ) : (
-        <MarkdownContent content={props.content} />
+        <MarkdownContent
+          content={props.content}
+          topicUrlClick={chatStore.topicUrlClick}
+        />
       )}
     </div>
   );
