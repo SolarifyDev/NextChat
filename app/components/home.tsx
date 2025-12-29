@@ -420,72 +420,37 @@ export function Home() {
           return; // 如果不是信任的源，忽略消息
         }
 
-        if (!isEmpty(event?.data?.ometoken)) {
-          console.log(
-            "[OmeToken] got ometoken from iframe",
-            event.data.ometoken,
-          );
-          omeStore.setToken(event.data.ometoken);
-          useEnhanceChatStore.getState().setIsDown(true);
-        }
-
-        if (!isEmpty(event?.data?.omeUserId)) {
-          omeStore.setUserId(event?.data?.omeUserId);
-        }
-
-        if (!isEmpty(event?.data?.omeUserName)) {
-          omeStore.setUserName(event?.data?.omeUserName);
-        }
-        omeStore.setFrom("omeoffice web");
-
-        // if (!isEmpty(event?.data?.ticket)) {
-        //   omeStore.setTicket(event?.data?.ticket ?? "");
-
-        //   try {
-        //     const res = await fetch("/api/omeAccount");
-        //     const config = await res.json();
-
-        //     omeStore.setClient(
-        //       config?.clientId || "",
-        //       config?.clientSecret || "",
-        //       config?.score || "",
-        //     );
-        //   } catch {
-        //     const message = {
-        //       data: {},
-        //       msg: "quit",
-        //       type: MessageEnum.Quit,
-        //     };
-
-        //     window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        //   }
-
-        //   await PostGetToken("get", {
-        //     grant_type: "ticket",
-        //     ticket: event?.data?.ticket ?? "",
-        //   })
-        //     .then((res) => {
-        //       omeStore.setToken(res.access_token ?? "");
-        //       omeStore.setRefreshToken(res.refresh_token ?? "");
-
-        //       omeStore.setIsFromApp(false);
-        //       useEnhanceChatStore.getState().setIsDown(true);
-        //     })
-        //     .catch(() => {
-        //       const message = {
-        //         data: {},
-        //         msg: "quit",
-        //         type: MessageEnum.Quit,
-        //       };
-
-        //       window.ReactNativeWebView.postMessage(JSON.stringify(message));
-        //     });
-        // } else {
-        //   omeStore.setIsFromApp(false);
+        // if (!isEmpty(event?.data?.ometoken)) {
+        //   console.log(
+        //     "[OmeToken] got ometoken from iframe",
+        //     event.data.ometoken,
+        //   );
+        //   omeStore.setToken(event.data.ometoken);
         //   useEnhanceChatStore.getState().setIsDown(true);
         // }
 
-        omeStore.setIsFromApp(false);
+        // if (!isEmpty(event?.data?.omeUserId)) {
+        //   omeStore.setUserId(event?.data?.omeUserId);
+        // }
+
+        // if (!isEmpty(event?.data?.omeUserName)) {
+        //   omeStore.setUserName(event?.data?.omeUserName);
+        // }
+
+        // omeStore.setFrom("omeoffice web");
+
+        // omeStore.setIsFromApp(false);
+
+        if (
+          !isEmpty(event?.data?.omeUserId) &&
+          !isEmpty(event?.data?.omeUserName)
+        ) {
+          omeStore.setUserId(event?.data?.omeUserId);
+          omeStore.setUserName(event?.data?.omeUserName);
+          omeStore.setFrom("omeoffice web");
+          omeStore.setIsFromApp(false);
+          useEnhanceChatStore.getState().setIsDown(true);
+        }
       }
     };
 
