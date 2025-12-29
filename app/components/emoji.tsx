@@ -106,12 +106,7 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
   }
 
   return (
-    <div
-      className="user-avatar"
-      style={{
-        backgroundColor: "red",
-      }}
-    >
+    <div className="user-avatar">
       {props.avatar && <EmojiAvatar avatar={props.avatar} />}
     </div>
   );
