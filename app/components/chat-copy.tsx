@@ -635,36 +635,23 @@ export function ChatActions(props: {
         !m.displayName.toLowerCase().includes("metis"),
     );
 
-    let result: typeof filteredModels;
+    let arr: typeof filteredModels;
 
     if (defaultModel) {
-      const arr = [
+      arr = [
         defaultModel,
         ...deepseekModels.filter((m) => m !== defaultModel),
         ...metisModels.filter((m) => m !== defaultModel),
         ...otherModels.filter((m) => m !== defaultModel),
       ];
-      if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-        result = arr.filter((i) =>
-          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
-        );
-      } else {
-        result = arr;
-      }
     } else {
-      const arr = [...deepseekModels, ...metisModels, ...otherModels];
-      if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-        result = arr.filter((i) =>
-          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
-        );
-      } else {
-        result = arr;
-      }
+      arr = [...deepseekModels, ...metisModels, ...otherModels];
     }
+
+    const result =
+      omeStore.isFromApp && omeStore.from !== "omeoffice 2.0"
+        ? arr.filter((i) => !i.displayName.toLowerCase().includes("deepseek"))
+        : arr;
 
     // 匹配 nameLocales，添加 releaseDate 和 description
     return result.map((model) => {
@@ -672,7 +659,6 @@ export function ChatActions(props: {
         (item) => item.name.toLowerCase() === model.displayName.toLowerCase(),
       );
 
-      // 获取当前语种的描述，如果没有则默认用简体中文
       const lang = omeStore.language;
       const description =
         locale?.translations?.[lang] ?? locale?.translations?.cn ?? "";
