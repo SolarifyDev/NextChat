@@ -22,6 +22,12 @@ export enum LanguageEnum {
   Spanish = 4,
 }
 
+export enum AiKidSystemSource {
+  SmartTalk,
+  ToolAgent,
+  DifyLevelAgent,
+}
+
 export interface ISession {
   sessionId: number;
   id: string;
@@ -45,9 +51,15 @@ export interface IAIKid {
   avatarUrl: string | File;
   greeting: string;
   voice: AiKidVoiceType;
+  mediaType: number;
   userId: number;
+  externalUrl: string;
+  systemSource: AiKidSystemSource;
+  domian: string;
+  description: string;
   createdBy: number;
   createdDate: string;
+  sortOrder: number;
 }
 
 export interface ITopics {
