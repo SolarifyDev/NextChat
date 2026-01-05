@@ -322,7 +322,8 @@ export const useEnhanceChatStore = createPersistStore(
             sessions: newData,
             isLoading: false,
           });
-        } catch {
+        } catch (err) {
+          console.log(err, "getSessions");
           set({
             sessions: [],
             isLoading: false,
