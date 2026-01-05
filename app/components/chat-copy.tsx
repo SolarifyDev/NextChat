@@ -665,7 +665,11 @@ export function ChatActions(props: {
 
       return {
         ...model,
-        releaseDate: locale?.releaseDateDev,
+        releaseDate:
+          location.origin.includes("ai-chat-test") ||
+          location.origin.includes("localhost")
+            ? locale?.releaseDateDev
+            : locale?.releaseDateProd,
         description,
       };
     });
