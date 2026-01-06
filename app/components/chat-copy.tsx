@@ -620,6 +620,7 @@ export function ChatActions(props: {
   const allModels = useAllModels();
 
   const models = useMemo(() => {
+    console.log(models, "models");
     const filteredModels = allModels.filter((m) => m.available);
     const defaultModel = filteredModels.find((m) => m.isDefault);
 
