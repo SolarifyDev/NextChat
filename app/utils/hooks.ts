@@ -6,7 +6,6 @@ export function useAllModels() {
   const accessStore = useAccessStore();
   const configStore = useAppConfig();
   const models = useMemo(() => {
-    console.log(accessStore.customModels, "--accessStore.customModels");
     return collectModelsWithDefaultModel(
       configStore.models,
       [configStore.customModels, accessStore.customModels].join(","),
