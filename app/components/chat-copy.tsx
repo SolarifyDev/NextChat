@@ -656,6 +656,11 @@ export function ChatActions(props: {
         ? arr.filter((i) => !i.displayName.toLowerCase().includes("deepseek"))
         : arr;
 
+    location.origin.includes("ai-chat-test") ||
+    location.origin.includes("localhost")
+      ? console.log("dev")
+      : console.log("prd");
+
     // 匹配 nameLocales，添加 releaseDate 和 description
     return result.map((model) => {
       const locale = nameLocales.find(
