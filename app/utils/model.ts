@@ -55,7 +55,7 @@ export const nameLocales: NameLocale[] = [
       es: "Inteligencia adaptativa insignia",
     },
     releaseDateDev: "2025-12-25",
-    releaseDateProd: "2026-01-05",
+    releaseDateProd: "2026-01-06",
   },
   {
     name: "gpt-5-mini",
@@ -66,7 +66,7 @@ export const nameLocales: NameLocale[] = [
       es: "Modelo rápido, ligero y económico",
     },
     releaseDateDev: "2025-12-25",
-    releaseDateProd: "2026-01-05",
+    releaseDateProd: "2026-01-06",
   },
 ];
 
