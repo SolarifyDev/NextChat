@@ -130,7 +130,7 @@ import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
 import { isEmpty, isNil } from "lodash-es";
-import { getModelProvider } from "../utils/model";
+import { getModelProvider, nameLocales } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
@@ -618,6 +618,7 @@ export function ChatActions(props: {
   const currentProviderName =
     session.mask.modelConfig?.providerName || ServiceProvider.OpenAI;
   const allModels = useAllModels();
+
   const models = useMemo(() => {
     const filteredModels = allModels.filter((m) => m.available);
     const defaultModel = filteredModels.find((m) => m.isDefault);
@@ -634,32 +635,46 @@ export function ChatActions(props: {
         !m.displayName.toLowerCase().includes("metis"),
     );
 
+    let arr: typeof filteredModels;
+
     if (defaultModel) {
-      const arr = [
+      arr = [
         defaultModel,
         ...deepseekModels.filter((m) => m !== defaultModel),
         ...metisModels.filter((m) => m !== defaultModel),
         ...otherModels.filter((m) => m !== defaultModel),
       ];
-      if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-        return arr.filter((i) =>
-          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
-        );
-      }
-      return arr;
     } else {
-      if (omeStore.isFromApp && omeStore.from !== "omeoffice 2.0") {
-        return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
-          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
-        );
-      }
-      return [...deepseekModels, ...metisModels, ...otherModels];
+      arr = [...deepseekModels, ...metisModels, ...otherModels];
     }
-  }, [allModels]);
+
+    const result =
+      omeStore.isFromApp && omeStore.from !== "omeoffice 2.0"
+        ? arr.filter((i) => !i.displayName.toLowerCase().includes("deepseek"))
+        : arr;
+
+    // 匹配 nameLocales，添加 releaseDate 和 description
+    return result.map((model) => {
+      const locale = nameLocales.find(
+        (item) => item.name.toLowerCase() === model.displayName.toLowerCase(),
+      );
+
+      const lang = omeStore.language;
+      const description =
+        locale?.translations?.[lang] ?? locale?.translations?.cn ?? "";
+
+      return {
+        ...model,
+        releaseDate:
+          location.origin.includes("ai-chat-test") ||
+          location.origin.includes("localhost")
+            ? locale?.releaseDateDev
+            : locale?.releaseDateProd,
+        description,
+      };
+    });
+  }, [allModels, omeStore.language]);
+
   const currentModelName = useMemo(() => {
     const model = models.find(
       (m) =>
@@ -854,6 +869,8 @@ export function ChatActions(props: {
                   : ""
               }`,
               value: `${m.name}@${m?.provider?.providerName}`,
+              subTitle: m.description,
+              releaseDate: m.releaseDate,
             }))}
             onClose={() => setShowModelSelector(false)}
             onSelection={(s) => {
