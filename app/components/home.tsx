@@ -324,7 +324,6 @@ export function Home() {
 
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
-    useAccessStore.getState().fetch();
 
     const initMcp = async () => {
       try {
@@ -340,6 +339,12 @@ export function Home() {
     };
     initMcp();
   }, []);
+
+  useEffect(() => {
+    if (useAccessStore.getState()._hasHydrated) {
+      useAccessStore.getState().fetch();
+    }
+  }, [useAccessStore.getState()._hasHydrated]);
 
   useEffect(() => {
     const handleMessage = async (event: any) => {
