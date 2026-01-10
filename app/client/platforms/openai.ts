@@ -42,9 +42,9 @@ import {
   getTimeoutMSByModel,
 } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
-import { useNewChatStore } from "@/app/store/new-chat";
 import { t } from "i18next";
 import { useOmeStore } from "@/app/store/ome";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -169,7 +169,7 @@ export class ChatGPTApi implements LLMApi {
         method: "POST",
         body: JSON.stringify(requestPayload),
         signal: controller.signal,
-        headers: getHeaders(),
+        headers: await getHeaders(),
       };
 
       // make a fetch request
@@ -191,7 +191,7 @@ export class ChatGPTApi implements LLMApi {
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
+      ...useEnhanceChatStore.getState()?.currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,
@@ -301,13 +301,13 @@ export class ChatGPTApi implements LLMApi {
         let index = -1;
         const [tools, funcs] = usePluginStore.getState().getAsTools(
           // useChatStore.getState().currentSession().mask?.plugin || [],
-          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          useEnhanceChatStore.getState().currentSession!.mask?.plugin || [],
         );
         // console.log("getAsTools", tools, funcs);
         streamWithThink(
           chatPath,
           requestPayload,
-          getHeaders(),
+          await getHeaders(),
           tools as any,
           funcs,
           controller,
@@ -400,7 +400,7 @@ export class ChatGPTApi implements LLMApi {
           method: "POST",
           body: JSON.stringify(requestPayload),
           signal: controller.signal,
-          headers: getHeaders(),
+          headers: await getHeaders(),
         };
 
         // make a fetch request
@@ -440,12 +440,12 @@ export class ChatGPTApi implements LLMApi {
         ),
         {
           method: "GET",
-          headers: getHeaders(),
+          headers: await getHeaders(),
         },
       ),
       fetch(this.path(OpenaiPath.SubsPath), {
         method: "GET",
-        headers: getHeaders(),
+        headers: await getHeaders(),
       }),
     ]);
 
@@ -496,7 +496,7 @@ export class ChatGPTApi implements LLMApi {
     const res = await fetch(this.path(OpenaiPath.ListModelPath), {
       method: "GET",
       headers: {
-        ...getHeaders(),
+        ...(await getHeaders()),
       },
     });
 

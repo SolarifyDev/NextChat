@@ -1,8 +1,16 @@
+import axios from "axios";
 import { api } from "./api";
+import { useOmeStore } from "@/app/store/ome";
 
 export enum AiKidVoiceType {
   Male,
   Female,
+}
+
+export enum AiKidSystemSource {
+  SmartTalk,
+  ToolAgent,
+  DifyLevelAgent,
 }
 
 export interface ISession {
@@ -28,32 +36,48 @@ export interface IAIKid {
   avatarUrl: string | File;
   greeting: string;
   voice: AiKidVoiceType;
+  mediaType: number;
   userId: number;
+  externalUrl: string;
+  systemSource: AiKidSystemSource;
+  domian: string;
+  description: string;
   createdBy: number;
   createdDate: string;
+  sortOrder: number;
 }
 
-export function getHeaders(
-  from: string,
-  isFromApp: boolean,
-  userId: string,
-  userName: string,
-  token: string,
-) {
+export async function getHeaders() {
+  if (useOmeStore.getState().shouldRefreshToken()) {
+    await useOmeStore.getState().refreshAccessToken();
+  }
+
   let headers: { [key: string]: string } = {};
 
-  if (isFromApp) {
-    switch (from.toLowerCase()) {
+  const state = useOmeStore.getState();
+
+  if (state.isFromApp) {
+    switch (state.from.toLowerCase()) {
       case "omeofficeapp":
         headers = {
-          "Ome-Metis-Authorization": token,
-          "Ome-Metis-Userid": userId,
-          "Ome-Metis-Username": userName,
+          "Ome-Metis-Authorization": state.token,
+          "Ome-Metis-Userid": state.userId,
+          "Ome-Metis-Username": state.userName,
         };
         break;
       case "omelinkapp":
         headers = {
-          "Omelink-Metis-Userid": userId,
+          "Omelink-Metis-Userid": state.userId,
+        };
+        break;
+      case "omeoffice 1.0":
+        headers = {
+          "Ome-Office-Oa-User-Id": state.userId,
+        };
+        break;
+      case "omeoffice 2.0":
+        headers = {
+          "Ome-Office-Authorization": "Bearer " + state.token,
         };
         break;
       default:
@@ -61,20 +85,34 @@ export function getHeaders(
     }
   } else {
     headers = {
-      "Ome-Metis-Authorization": token,
-      "Ome-Metis-Userid": userId,
-      "Ome-Metis-Username": userName,
+      "Ome-Metis-Authorization": state.token,
+      "Ome-Metis-Userid": state.userId,
+      "Ome-Metis-Username": state.userName,
     };
   }
 
   return headers;
 }
 
-export const GetHistory = async (headers: {
-  [key: string]: string;
-}): Promise<ISession[]> => {
+export const GetHistory = async (
+  headers: {
+    [key: string]: string;
+  },
+  includeMessages: boolean = false,
+): Promise<ISession[]> => {
   return (
-    await api.get("/api/v1/histories", {
+    await api.get(`/api/v1/histories?IncludeMessages=${includeMessages}`, {
+      headers,
+    })
+  ).data;
+};
+
+export const GetItemHistory = async (
+  headers: { [key: string]: string },
+  sessionId: number,
+): Promise<ISession> => {
+  return (
+    await api.get(`/api/v1/history?SessionId=${sessionId}`, {
       headers,
     })
   ).data;
@@ -110,4 +148,65 @@ export const PostUpdateKid = async (
   return await api.post("/api/Ome/ai/kid/update", data, {
     headers,
   });
+};
+
+const authApi = axios.create({
+  timeout: 120000,
+});
+
+authApi.interceptors.request.use(
+  async (config) => {
+    config.baseURL =
+      location.origin.includes("ai-chat-test") ||
+      location.origin.includes("localhost")
+        ? "https://ome-account.wiltechs.com"
+        : "https://ome-account.omenow.com";
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+export const PostGetToken = async (
+  type: "get" | "refresh",
+  data: Partial<{
+    grant_type: string;
+    ticket: string;
+    refresh_token: string;
+  }>,
+): Promise<{
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  id_token: string;
+  refresh_token: string;
+}> => {
+  const omeState = useOmeStore.getState();
+
+  const client =
+    type === "get"
+      ? {
+          client_id: omeState.clientId || "",
+          client_secret: omeState.clientSecret || "",
+          scope: omeState.score || "",
+        }
+      : {
+          client_id: omeState.clientId || "",
+          client_secret: omeState.clientSecret || "",
+        };
+
+  const newData = {
+    ...data,
+    ...client,
+  };
+
+  return (
+    await authApi.post("/connect/token", newData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+  ).data;
 };

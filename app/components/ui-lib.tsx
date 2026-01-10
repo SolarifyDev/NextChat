@@ -26,6 +26,7 @@ import { Avatar } from "./emoji";
 import clsx from "clsx";
 import { t } from "i18next";
 import { useOmeStore } from "../store/ome";
+import { isWithinReleasePeriod } from "../utils/model";
 
 export function Popover(props: {
   children: JSX.Element;
@@ -60,8 +61,12 @@ export function ListItem(props: {
   className?: string;
   onClick?: (e: MouseEvent) => void;
   vertical?: boolean;
+  releaseDate?: string;
 }) {
   const { isFromApp } = useOmeStore();
+
+  const isNew = isWithinReleasePeriod(props.releaseDate);
+
   return (
     <div
       className={clsx(
@@ -71,18 +76,58 @@ export function ListItem(props: {
         },
         props.className,
       )}
+      style={{
+        borderBottom: "none",
+      }}
       onClick={props.onClick}
     >
       <div className={styles["list-header"]}>
         {props.icon && <div className={styles["list-icon"]}>{props.icon}</div>}
         <div
           className={
-            isFromApp ? styles["list-item--is-app"] : styles["list-item-title"]
+            isFromApp
+              ? styles["list-item-title-is-app"]
+              : styles["list-item-title"]
           }
+          style={{
+            gap: "2px",
+          }}
         >
-          <div>{props.title}</div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {props.title}
+
+            <div
+              style={{
+                color: "#918FFC",
+                backgroundColor: "#F2F2FF",
+                border: "1px solid #918FFC",
+                borderRadius: "8px",
+                width: "50px",
+                marginLeft: "4px",
+                display: isNew ? "flex" : "none",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              NEW
+            </div>
+          </div>
           {props.subTitle && (
-            <div className={styles["list-item-sub-title"]}>
+            <div
+              className={styles["list-item-sub-title"]}
+              style={{
+                width: "290px",
+                fontWeight: "normal",
+                fontSize: "10px",
+                color: " #8B8CAD",
+                textTransform: "none",
+                flexShrink: 1,
+                minWidth: 0,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {props.subTitle}
             </div>
           )}
@@ -99,6 +144,11 @@ export function List(props: { children: React.ReactNode; id?: string }) {
     <div
       className={isFromApp ? styles["list-is-app"] : styles.list}
       id={props.id}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+      }}
     >
       {props.children}
     </div>
@@ -519,13 +569,13 @@ export function Selector<T>(props: {
     subTitle?: string;
     value: T;
     disable?: boolean;
+    releaseDate?: string;
   }>;
   defaultSelectedValue?: T[] | T;
   onSelection?: (selection: T[]) => void;
   onClose?: () => void;
   multiple?: boolean;
 }) {
-  const omeStore = useOmeStore();
   const [selectedValues, setSelectedValues] = useState<T[]>(
     Array.isArray(props.defaultSelectedValue)
       ? props.defaultSelectedValue
@@ -563,6 +613,7 @@ export function Selector<T>(props: {
                 key={i}
                 title={item.title}
                 subTitle={item.subTitle}
+                releaseDate={item.releaseDate}
                 icon={<Avatar model={item.value as string} />}
                 onClick={(e) => {
                   if (item.disable) {
@@ -572,22 +623,27 @@ export function Selector<T>(props: {
                   }
                 }}
               >
-                {selected ? (
-                  omeStore.isFromApp ? (
-                    <OkIcon />
-                  ) : (
-                    <div
-                      style={{
-                        height: 10,
-                        width: 10,
-                        backgroundColor: "var(--primary)",
-                        borderRadius: 10,
-                      }}
-                    ></div>
-                  )
+                {/* {selected ? (
+                  // omeStore.isFromApp ? (
+                  //   <OkIcon />
+                  // ) : (
+                  //   <div
+                  //     style={{
+                  //       height: 10,
+                  //       width: 10,
+                  //       backgroundColor: "var(--primary)",
+                  //       borderRadius: 10,
+                  //     }}
+                  //   ></div>
+                  // )
+                  <OkIcon />
                 ) : (
                   <></>
-                )}
+                )} */}
+
+                <OkIcon
+                  style={{ visibility: selected ? "visible" : "hidden" }}
+                />
               </ListItem>
             );
           })}

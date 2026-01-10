@@ -10,10 +10,10 @@ import { Mask } from "../store/mask";
 import { showConfirm } from "./ui-lib";
 import { useMobileScreen } from "../utils";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -120,12 +120,15 @@ export function ChatItem(props: {
 
 export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
   const {
-    currentSessionIndex,
     sessions,
-    selectSession,
-    deleteSession,
     isLoading,
-  } = useNewChatStore();
+    sessionId,
+    getCurrentSession,
+    deleteSession,
+    setSessionId,
+    setCurrentSession,
+  } = useEnhanceChatStore();
+
   const { t } = useTranslation();
 
   const navigate = useNavigate();
@@ -157,7 +160,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
       // ref={provided.innerRef}
       // {...provided.droppableProps}
     >
-      {props.isFromApp && isLoading && (
+      {isLoading && (
         <Spin
           style={{
             position: "absolute",
@@ -172,14 +175,24 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
           <ChatItem
             title={item.topic}
             time={new Date(item.lastUpdate).toLocaleString()}
-            count={item?.messages?.length ?? 0}
-            key={item.id}
-            id={item.id}
+            // count={item?.messages?.length ?? 0}
+            count={item?.messagesLength ?? 0}
+            key={item.sessionId}
+            id={item.sessionId!.toString()}
             index={i}
-            selected={i === currentSessionIndex}
+            // selected={i === currentSessionIndex}
+            selected={item?.sessionId === sessionId}
             onClick={() => {
+              // selectSession(i);
+
+              // if (sessionId === item.sessionId) {
+              //   setSessionId(0);
+              //   setCurrentSession(null);
+              // } else {
               navigate(Path.Chat);
-              selectSession(i);
+              getCurrentSession(item?.sessionId!);
+              // }
+
               if (onlineSearch) {
                 setOnlineSearch(false);
               }
@@ -190,7 +203,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
                 // (await showConfirm(Locale.Home.DeleteChat))
                 (await showConfirm(t("Home.DeleteChat")))
               ) {
-                deleteSession(i);
+                deleteSession(item.sessionId!);
               }
             }}
             narrow={props.narrow}

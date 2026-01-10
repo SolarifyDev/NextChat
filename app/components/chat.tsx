@@ -9,7 +9,8 @@
 //   useState,
 // } from "react";
 
-import { useNewChatStore } from "../store/new-chat";
+import { isNil } from "lodash";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 import { _Chat_NEW } from "./chat-copy";
 
 // import SendWhiteIcon from "../icons/send-white.svg";
@@ -2180,12 +2181,29 @@ import { _Chat_NEW } from "./chat-copy";
 //   return <_Chat key={session.id}></_Chat>;
 // }
 
-export function Chat() {
-  const { currentSessionIndex } = useNewChatStore();
+// export function Chat() {
+//   const { currentSessionIndex } = useNewChatStore();
 
-  if (currentSessionIndex < 0) {
-    return <></>;
+//   if (currentSessionIndex < 0) {
+//     return <></>;
+//   }
+
+//   return <_Chat_NEW key={currentSessionIndex}></_Chat_NEW>;
+// }
+
+export function Chat() {
+  const { currentSession, sessionId } = useEnhanceChatStore();
+
+  // 不属于本地新增的session就跌入逻辑
+  if (!currentSession?.isAdd) {
+    if (isNil(currentSession) && !isNil(sessionId) && sessionId != 0)
+      return <>loading...</>;
+
+    if (isNil(currentSession) || currentSession?.sessionId !== sessionId)
+      return <></>;
   }
 
-  return <_Chat_NEW key={currentSessionIndex}></_Chat_NEW>;
+  if (isNil(currentSession)) return <></>;
+
+  return <_Chat_NEW key={currentSession.id}></_Chat_NEW>;
 }

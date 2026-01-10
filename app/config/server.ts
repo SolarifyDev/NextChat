@@ -93,6 +93,12 @@ declare global {
       DEFAULT_INPUT_TEMPLATE?: string;
 
       ENABLE_MCP?: string; // enable mcp functionality
+
+      CLIENT_ID?: string;
+
+      CLIENT_SECRET?: string;
+
+      SCORE?: string;
     }
   }
 }
@@ -266,5 +272,8 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    score: process.env.SCORE,
   };
 };
