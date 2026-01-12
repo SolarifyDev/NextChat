@@ -2617,18 +2617,11 @@ export function _Chat_NEW() {
                     embedded={true}
                     onSend={async (result) => {
                       if (result?.blob) {
-                        showToast(
-                          "语音录制完成，时长: " + result.duration + "秒",
-                        );
-
                         const text = await newChatStore.translateAudio(
                           result.blob,
                         );
 
                         if (text.trim() === "") return;
-
-                        const audio = new Audio(result.url);
-                        audio.play();
 
                         await doSubmit(text);
                       }
