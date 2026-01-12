@@ -4,6 +4,7 @@ import {
   GetItemHistory,
   PostAddOrUpdateSession,
   PostTranslationSpeech,
+  QuestionInputType,
   getHeaders,
 } from "../client/smarties";
 import { showToast } from "../components/ui-lib";
@@ -87,6 +88,8 @@ export interface ChatSession {
   clearContextIndex?: number | null;
 
   mask: Mask;
+
+  inputType: QuestionInputType;
 }
 
 // 提供给左侧List显示
@@ -218,6 +221,7 @@ function createEmptySession(): ChatSession {
     lastSummarizeIndex: 0,
 
     mask: createEmptyMask(),
+    inputType: QuestionInputType.Text,
   };
 }
 
