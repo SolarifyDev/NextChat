@@ -1,3 +1,5 @@
+"use client";
+
 import DeleteIcon from "../icons/delete.svg";
 
 import styles from "./home.module.scss";
@@ -13,6 +15,7 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { useOmeStore } from "../store/ome";
+import { trackEvent } from "../utils/ga";
 import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export function ChatItem(props: {
@@ -133,7 +136,8 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
-  const { onlineSearch, setOnlineSearch } = useOmeStore();
+  const { onlineSearch, userId, from, eventUuid, setOnlineSearch } =
+    useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
@@ -183,6 +187,14 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             // selected={i === currentSessionIndex}
             selected={item?.sessionId === sessionId}
             onClick={() => {
+              if (from === "omelinkapp") {
+                trackEvent("click_chat_timestamp", {
+                  userId: userId,
+                  time: Date.now(),
+                  metis_event_id: eventUuid,
+                });
+              }
+
               // selectSession(i);
 
               // if (sessionId === item.sessionId) {
