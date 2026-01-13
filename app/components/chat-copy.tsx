@@ -2442,7 +2442,6 @@ export function _Chat_NEW() {
                 setUserInput={setUserInput}
                 setShowChatSidePanel={setShowChatSidePanel}
               />
-
               {/* 原本的输入框组件 */}
               {/* <div
                 className={
