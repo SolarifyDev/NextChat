@@ -7,6 +7,12 @@ export enum AiKidVoiceType {
   Female,
 }
 
+export enum AiKidSystemSource {
+  SmartTalk,
+  ToolAgent,
+  DifyLevelAgent,
+}
+
 export enum QuestionInputType {
   Text,
   Voice,
@@ -36,9 +42,15 @@ export interface IAIKid {
   avatarUrl: string | File;
   greeting: string;
   voice: AiKidVoiceType;
+  mediaType: number;
   userId: number;
+  externalUrl: string;
+  systemSource: AiKidSystemSource;
+  domian: string;
+  description: string;
   createdBy: number;
   createdDate: string;
+  sortOrder: number;
 }
 
 export async function getHeaders() {
