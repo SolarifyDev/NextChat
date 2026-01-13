@@ -17,8 +17,9 @@ import { useCommand } from "../command";
 import { showConfirm } from "./ui-lib";
 import { BUILTIN_MASK_STORE } from "../masks";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
@@ -78,8 +79,9 @@ function useMaskGroup(masks: Mask[]) {
 
 export function NewChat() {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   const maskStore = useMaskStore();
+  const omeStore = useOmeStore();
 
   const masks = maskStore.getAll();
   const groups = useMaskGroup(masks);
@@ -93,7 +95,12 @@ export function NewChat() {
 
   const startChat = (mask?: Mask) => {
     setTimeout(() => {
-      chatStore.newSession(mask, () => navigate(Path.Chat));
+      chatStore.newSession(mask, () => {
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
+        navigate(Path.Chat);
+      });
     }, 10);
   };
 

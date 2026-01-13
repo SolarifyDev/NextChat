@@ -130,21 +130,21 @@ import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
 import { isEmpty, isNil } from "lodash-es";
-import { getModelProvider } from "../utils/model";
+import { getModelProvider, nameLocales } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
-import {
-  getBotHello,
-  getDefaultTopic,
-  useNewChatStore,
-} from "../store/new-chat";
 import { nanoid } from "nanoid";
 import { TextAreaRef } from "antd/es/input/TextArea";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
 import { useDebounceFn } from "ahooks";
+import {
+  getBotHello,
+  getDefaultTopic,
+  useEnhanceChatStore,
+} from "../store/enhance-chat";
 
 const localStorage = safeLocalStorage();
 
@@ -184,8 +184,9 @@ const MCPAction = () => {
 
 export function SessionConfigModel(props: { onClose: () => void }) {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
   const maskStore = useMaskStore();
   const navigate = useNavigate();
 
@@ -206,7 +207,6 @@ export function SessionConfigModel(props: { onClose: () => void }) {
               // if (await showConfirm(Locale.Memory.ResetConfirm)) {
               if (await showConfirm(t("Memory.ResetConfirm"))) {
                 chatStore.updateTargetSession(
-                  session,
                   (session) => (session.memoryPrompt = ""),
                   true,
                 );
@@ -233,10 +233,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
           updateMask={(updater) => {
             const mask = { ...session.mask };
             updater(mask);
-            chatStore.updateTargetSession(
-              session,
-              (session) => (session.mask = mask),
-            );
+            chatStore.updateTargetSession((session) => (session.mask = mask));
           }}
           shouldSyncFromGlobal
           extraListItems={
@@ -266,13 +263,14 @@ function PromptToast(props: {
   setShowModal: (_: boolean) => void;
 }) {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
-  const context = session.mask.context;
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
+  const context = session?.mask?.context;
 
   return (
     <div className={styles["prompt-toast"]} key="prompt-toast">
-      {props.showToast && context.length > 0 && (
+      {props.showToast && context?.length > 0 && (
         <div
           className={clsx(styles["prompt-toast-inner"], "clickable")}
           role="button"
@@ -289,7 +287,7 @@ function PromptToast(props: {
         <SessionConfigModel
           onClose={() => {
             props.setShowModal(false);
-            chatStore.updateTargetSession(session, (session) => {}, true);
+            chatStore.updateTargetSession((session) => {}, true);
           }}
         />
       )}
@@ -338,10 +336,7 @@ function useSubmitHandler() {
     );
   };
 
-  return {
-    submitKey,
-    shouldSubmit,
-  };
+  return { submitKey, shouldSubmit };
 }
 
 export type RenderPrompt = Pick<Prompt, "title" | "content">;
@@ -372,9 +367,7 @@ export function PromptHints(props: {
           Math.min(props.prompts.length - 1, selectIndex + delta),
         );
         setSelectIndex(nextIndex);
-        selectedRef.current?.scrollIntoView({
-          block: "center",
-        });
+        selectedRef.current?.scrollIntoView({ block: "center" });
       };
 
       if (e.key === "ArrowUp") {
@@ -418,15 +411,14 @@ export function PromptHints(props: {
 
 function ClearContextDivider() {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
 
   return (
     <div
       className={styles["clear-context"]}
       onClick={() =>
         chatStore.updateTargetSession(
-          session,
           (session) => (session.clearContextIndex = null),
           true,
         )
@@ -457,20 +449,14 @@ export function ChatAction(props: {
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = useState(false);
-  const [width, setWidth] = useState({
-    full: 16,
-    icon: 16,
-  });
+  const [width, setWidth] = useState({ full: 16, icon: 16 });
 
   function updateWidth() {
     if (!iconRef.current || !textRef.current) return;
     const getWidth = (dom: HTMLDivElement) => dom.getBoundingClientRect().width;
     const textWidth = getWidth(textRef.current);
     const iconWidth = getWidth(iconRef.current);
-    setWidth({
-      full: textWidth + iconWidth,
-      icon: iconWidth,
-    });
+    setWidth({ full: textWidth + iconWidth, icon: iconWidth });
   }
 
   const { run: onClick } = useDebounceFn(
@@ -478,9 +464,7 @@ export function ChatAction(props: {
       props.onClick();
       setTimeout(updateWidth, 1);
     },
-    {
-      wait: 300,
-    },
+    { wait: 300 },
   );
 
   return (
@@ -589,12 +573,7 @@ function useScrollToBottom(
     lastMessagesLength.current = messages.length;
   }, [messages.length, detach, scrollDomToBottom]);
 
-  return {
-    scrollRef,
-    autoScroll,
-    setAutoScroll,
-    scrollDomToBottom,
-  };
+  return { scrollRef, autoScroll, setAutoScroll, scrollDomToBottom };
 }
 
 export function ChatActions(props: {
@@ -615,9 +594,9 @@ export function ChatActions(props: {
   const config = useAppConfig();
   const omeStore = useOmeStore();
   const navigate = useNavigate();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   const pluginStore = usePluginStore();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore.currentSession!;
 
   // switch themes
   const theme = config.theme;
@@ -639,6 +618,7 @@ export function ChatActions(props: {
   const currentProviderName =
     session.mask.modelConfig?.providerName || ServiceProvider.OpenAI;
   const allModels = useAllModels();
+
   const models = useMemo(() => {
     const filteredModels = allModels.filter((m) => m.available);
     const defaultModel = filteredModels.find((m) => m.isDefault);
@@ -655,32 +635,46 @@ export function ChatActions(props: {
         !m.displayName.toLowerCase().includes("metis"),
     );
 
+    let arr: typeof filteredModels;
+
     if (defaultModel) {
-      const arr = [
+      arr = [
         defaultModel,
         ...deepseekModels.filter((m) => m !== defaultModel),
         ...metisModels.filter((m) => m !== defaultModel),
         ...otherModels.filter((m) => m !== defaultModel),
       ];
-      if (omeStore.isFromApp) {
-        return arr.filter((i) =>
-          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
-        );
-      }
-      return arr;
     } else {
-      if (omeStore.isFromApp) {
-        return [...deepseekModels, ...metisModels, ...otherModels].filter((i) =>
-          ["gpt-4.1", "gpt-4.1-mini", "metis-chat", "metis-reasoner"].some(
-            (item) => item === i.displayName.toLowerCase(),
-          ),
-        );
-      }
-      return [...deepseekModels, ...metisModels, ...otherModels];
+      arr = [...deepseekModels, ...metisModels, ...otherModels];
     }
-  }, [allModels]);
+
+    const result =
+      omeStore.isFromApp && omeStore.from !== "omeoffice 2.0"
+        ? arr.filter((i) => !i.displayName.toLowerCase().includes("deepseek"))
+        : arr;
+
+    // 匹配 nameLocales，添加 releaseDate 和 description
+    return result.map((model) => {
+      const locale = nameLocales.find(
+        (item) => item.name.toLowerCase() === model.displayName.toLowerCase(),
+      );
+
+      const lang = omeStore.language;
+      const description =
+        locale?.translations?.[lang] ?? locale?.translations?.cn ?? "";
+
+      return {
+        ...model,
+        releaseDate:
+          location.origin.includes("ai-chat-test") ||
+          location.origin.includes("localhost")
+            ? locale?.releaseDateDev
+            : locale?.releaseDateProd,
+        description,
+      };
+    });
+  }, [allModels, omeStore.language]);
+
   const currentModelName = useMemo(() => {
     const model = models.find(
       (m) =>
@@ -721,21 +715,20 @@ export function ChatActions(props: {
       // show next model to default model if exist
       let nextModel = models.find((model) => model.isDefault) || models[0];
       chatStore.updateTargetSession(
-        session,
         (session) => {
           session.mask.modelConfig.model = nextModel.name;
           session.mask.modelConfig.providerName = nextModel?.provider
             ?.providerName as ServiceProvider;
         },
-        true,
+        // true,
       );
-      showToast(
-        nextModel?.provider?.providerName == "ByteDance"
-          ? nextModel.displayName
-          : nextModel.name,
-      );
+      // showToast(
+      //   nextModel?.provider?.providerName == "ByteDance"
+      //     ? nextModel.displayName
+      //     : nextModel.name,
+      // );
     }
-  }, [chatStore, currentModel, models, session]);
+  }, [currentModel, models, session]);
 
   return (
     <div className={styles["chat-input-actions"]}>
@@ -831,18 +824,14 @@ export function ChatActions(props: {
             text={t("Chat.InputActions.Clear")}
             icon={<BreakIcon />}
             onClick={() => {
-              chatStore.updateTargetSession(
-                session,
-                (session) => {
-                  if (session.clearContextIndex === session.messages.length) {
-                    session.clearContextIndex = null;
-                  } else {
-                    session.clearContextIndex = session.messages.length;
-                    session.memoryPrompt = ""; // will clear memory
-                  }
-                },
-                true,
-              );
+              chatStore.updateTargetSession((session) => {
+                if (session.clearContextIndex === session.messages.length) {
+                  session.clearContextIndex = null;
+                } else {
+                  session.clearContextIndex = session.messages.length;
+                  session.memoryPrompt = ""; // will clear memory
+                }
+              }, true);
             }}
           />
         )}
@@ -880,12 +869,14 @@ export function ChatActions(props: {
                   : ""
               }`,
               value: `${m.name}@${m?.provider?.providerName}`,
+              subTitle: m.description,
+              releaseDate: m.releaseDate,
             }))}
             onClose={() => setShowModelSelector(false)}
             onSelection={(s) => {
               if (s.length === 0) return;
               const [model, providerName] = getModelProvider(s[0]);
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.model = model as ModelType;
                 session.mask.modelConfig.providerName =
                   providerName as ServiceProvider;
@@ -916,15 +907,12 @@ export function ChatActions(props: {
         {showSizeSelector && (
           <Selector
             defaultSelectedValue={currentSize}
-            items={modelSizes.map((m) => ({
-              title: m,
-              value: m,
-            }))}
+            items={modelSizes.map((m) => ({ title: m, value: m }))}
             onClose={() => setShowSizeSelector(false)}
             onSelection={(s) => {
               if (s.length === 0) return;
               const size = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.size = size;
               });
               showToast(size);
@@ -943,15 +931,12 @@ export function ChatActions(props: {
         {showQualitySelector && (
           <Selector
             defaultSelectedValue={currentQuality}
-            items={dalle3Qualitys.map((m) => ({
-              title: m,
-              value: m,
-            }))}
+            items={dalle3Qualitys.map((m) => ({ title: m, value: m }))}
             onClose={() => setShowQualitySelector(false)}
             onSelection={(q) => {
               if (q.length === 0) return;
               const quality = q[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.quality = quality;
               });
               showToast(quality);
@@ -970,15 +955,12 @@ export function ChatActions(props: {
         {showStyleSelector && (
           <Selector
             defaultSelectedValue={currentStyle}
-            items={dalle3Styles.map((m) => ({
-              title: m,
-              value: m,
-            }))}
+            items={dalle3Styles.map((m) => ({ title: m, value: m }))}
             onClose={() => setShowStyleSelector(false)}
             onSelection={(s) => {
               if (s.length === 0) return;
               const style = s[0];
-              chatStore.updateTargetSession(session, (session) => {
+              chatStore.updateTargetSession((session) => {
                 session.mask.modelConfig.style = style;
               });
               showToast(style);
@@ -1004,20 +986,16 @@ export function ChatActions(props: {
         {showPluginSelector && (
           <Selector
             multiple
-            defaultSelectedValue={chatStore.getCurrentSession().mask?.plugin}
+            defaultSelectedValue={chatStore.currentSession!.mask?.plugin}
             items={pluginStore.getAll().map((item) => ({
               title: `${item?.title}@${item?.version}`,
               value: item?.id,
             }))}
             onClose={() => setShowPluginSelector(false)}
             onSelection={(s) => {
-              chatStore.updateTargetSession(
-                session,
-                (session) => {
-                  session.mask.plugin = s as string[];
-                },
-                true,
-              );
+              chatStore.updateTargetSession((session) => {
+                session.mask.plugin = s as string[];
+              }, true);
             }}
           />
         )}
@@ -1047,8 +1025,9 @@ export function ChatActions(props: {
 
 export function EditMessageModal(props: { onClose: () => void }) {
   const { t } = useTranslation();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
   const [messages, setMessages] = useState(session.messages.slice());
 
   return (
@@ -1075,7 +1054,6 @@ export function EditMessageModal(props: { onClose: () => void }) {
             key="ok"
             onClick={() => {
               chatStore.updateTargetSession(
-                session,
                 (session) => (session.messages = messages),
                 true,
               );
@@ -1096,7 +1074,6 @@ export function EditMessageModal(props: { onClose: () => void }) {
               value={session.topic}
               onInput={(e) =>
                 chatStore.updateTargetSession(
-                  session,
                   (session) => (session.topic = e.currentTarget.value),
                 )
               }
@@ -1203,8 +1180,9 @@ export function _Chat_NEW() {
   const { t } = useTranslation();
   type RenderMessage = ChatMessage & { preview?: boolean };
 
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
+  const newChatStore = useEnhanceChatStore();
+  // const session = chatStore.getCurrentSession();
+  const session = newChatStore.currentSession!;
   const config = useAppConfig();
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
@@ -1284,18 +1262,17 @@ export function _Chat_NEW() {
 
   // chat commands shortcuts
   const chatCommands = useChatCommand({
-    new: () => chatStore.newSession(),
+    new: () => newChatStore.newSession(),
     newm: () => navigate(Path.NewChat),
-    prev: () => chatStore.nextSession(-1),
-    next: () => chatStore.nextSession(1),
+    prev: () => newChatStore.nextSession(-1),
+    next: () => newChatStore.nextSession(1),
     clear: () =>
-      chatStore.updateTargetSession(
-        session,
+      newChatStore.updateTargetSession(
         (session) => (session.clearContextIndex = session.messages.length),
         true,
       ),
-    fork: () => chatStore.forkSession(),
-    del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
+    fork: () => newChatStore.forkSession(),
+    del: () => newChatStore.deleteSession(newChatStore.sessionId),
   });
 
   // only search prompts when user input is short
@@ -1308,7 +1285,7 @@ export function _Chat_NEW() {
     if (n === 0) {
       setPromptHints([]);
     } else if (text.match(ChatCommandPrefix)) {
-      setPromptHints(chatCommands.search(text));
+      if (!session.isAdd) setPromptHints(chatCommands.search(text));
     } else if (!config.disablePromptHint && n < SEARCH_TEXT_LIMIT) {
       // check if need to trigger auto completion
       if (text.startsWith("/")) {
@@ -1329,11 +1306,11 @@ export function _Chat_NEW() {
     }
     setIsLoading(true);
 
-    chatStore
+    newChatStore
       .onUserInput(userInput, attachImages)
       .then(() => setIsLoading(false));
     setAttachImages([]);
-    chatStore.setLastInput(userInput);
+    newChatStore.setLastInput(userInput);
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) {
@@ -1367,8 +1344,7 @@ export function _Chat_NEW() {
   };
 
   useEffect(() => {
-    chatStore.updateTargetSession(
-      session,
+    newChatStore.updateTargetSession(
       (session) => {
         const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
         session.messages.forEach((m) => {
@@ -1426,8 +1402,7 @@ export function _Chat_NEW() {
   };
 
   const deleteMessage = (msgId?: string, isGetApi = false) => {
-    chatStore.updateTargetSession(
-      session,
+    newChatStore.updateTargetSession(
       (session) =>
         (session.messages = session.messages.filter((m) => m.id !== msgId)),
       isGetApi,
@@ -1483,19 +1458,16 @@ export function _Chat_NEW() {
     setIsLoading(true);
     const textContent = getMessageTextContent(userMessage);
     const images = getMessageImages(userMessage);
-    chatStore.onUserInput(textContent, images).then(() => setIsLoading(false));
+    newChatStore
+      .onUserInput(textContent, images)
+      .then(() => setIsLoading(false));
     // inputRef.current?.focus();
     textareaRef.current?.focus();
   };
 
   const onPinMessage = (message: ChatMessage) => {
-    chatStore.updateTargetSession(
-      session!,
-      (session) =>
-        session.mask.context.push({
-          ...message,
-          id: nanoid(),
-        }),
+    newChatStore.updateTargetSession(
+      (session) => session.mask.context.push({ ...message, id: nanoid() }),
       true,
     );
 
@@ -1589,10 +1561,7 @@ export function _Chat_NEW() {
         isLoading
           ? [
               {
-                ...createMessage({
-                  role: "assistant",
-                  content: "……",
-                }),
+                ...createMessage({ role: "assistant", content: "……" }),
                 preview: true,
               },
             ]
@@ -1602,10 +1571,7 @@ export function _Chat_NEW() {
         userInput.length > 0 && config.sendPreviewBubble
           ? [
               {
-                ...createMessage({
-                  role: "user",
-                  content: userInput,
-                }),
+                ...createMessage({ role: "user", content: userInput }),
                 preview: true,
               },
             ]
@@ -1696,10 +1662,7 @@ export function _Chat_NEW() {
       if (accessStore.disableFastLink) return;
 
       try {
-        const payload = JSON.parse(text) as {
-          key?: string;
-          url?: string;
-        };
+        const payload = JSON.parse(text) as { key?: string; url?: string };
 
         console.log("[Command] got settings from url: ", payload);
 
@@ -1749,7 +1712,7 @@ export function _Chat_NEW() {
 
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const currentModel = chatStore.getCurrentSession().mask.modelConfig.model;
+      const currentModel = newChatStore.currentSession!.mask.modelConfig.model;
       if (!isVisionModel(currentModel)) {
         return;
       }
@@ -1786,7 +1749,7 @@ export function _Chat_NEW() {
         }
       }
     },
-    [attachImages, chatStore],
+    [attachImages, newChatStore],
   );
 
   async function uploadImage() {
@@ -1868,7 +1831,7 @@ export function _Chat_NEW() {
       ) {
         event.preventDefault();
         setTimeout(() => {
-          chatStore.newSession(undefined, () => navigate(Path.Chat));
+          newChatStore.newSession(undefined, () => navigate(Path.Chat));
         }, 10);
       }
       // 聚焦聊天输入 shift + esc
@@ -1917,25 +1880,21 @@ export function _Chat_NEW() {
         event.key.toLowerCase() === "backspace"
       ) {
         event.preventDefault();
-        chatStore.updateTargetSession(
-          session,
-          (session) => {
-            if (session.clearContextIndex === session.messages.length) {
-              session.clearContextIndex = null;
-            } else {
-              session.clearContextIndex = session.messages.length;
-              session.memoryPrompt = ""; // will clear memory
-            }
-          },
-          true,
-        );
+        newChatStore.updateTargetSession((session) => {
+          if (session.clearContextIndex === session.messages.length) {
+            session.clearContextIndex = null;
+          } else {
+            session.clearContextIndex = session.messages.length;
+            session.memoryPrompt = ""; // will clear memory
+          }
+        }, true);
       }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [messages, chatStore, navigate, session]);
+  }, [messages, newChatStore, navigate, session]);
 
   useEffect(() => {
     if (omeStore.isFromApp) {
@@ -2037,7 +1996,7 @@ export function _Chat_NEW() {
                   onClick={() => {
                     // showToast(Locale.Chat.Actions.RefreshToast);
                     showToast(t("Chat.Actions.RefreshToast"));
-                    chatStore.summarizeSession(true, session);
+                    newChatStore.summarizeSession(true, session);
                   }}
                 />
               </div>
@@ -2163,14 +2122,11 @@ export function _Chat_NEW() {
                                         ) {
                                           newContent.push({
                                             type: "image_url",
-                                            image_url: {
-                                              url: images[i],
-                                            },
+                                            image_url: { url: images[i] },
                                           });
                                         }
                                       }
-                                      chatStore.updateTargetSession(
-                                        session,
+                                      newChatStore.updateTargetSession(
                                         (session) => {
                                           const m = session.mask.context
                                             .concat(session.messages)
@@ -2420,10 +2376,7 @@ export function _Chat_NEW() {
                     {t("Chat.Metis.Title")}
                   </div>
                   <div
-                    style={{
-                      color: "rgba(160, 158, 187, 1)",
-                      width: "279px",
-                    }}
+                    style={{ color: "rgba(160, 158, 187, 1)", width: "279px" }}
                   >
                     {/* {Locale.Chat.Metis.Content} */}
                     {t("Chat.Metis.Content")}
@@ -2481,17 +2434,10 @@ export function _Chat_NEW() {
                         display: "flex",
                         flexDirection: "row",
                       }
-                    : {
-                        padding: "10px 10px",
-                        position: "relative",
-                      }
+                    : { padding: "10px 10px", position: "relative" }
                 }
               >
-                <div
-                  style={{
-                    width: "100%",
-                  }}
-                >
+                <div style={{ width: "100%" }}>
                   <Input.TextArea
                     id="chat-input"
                     ref={textareaRef}
@@ -2504,9 +2450,7 @@ export function _Chat_NEW() {
                     placeholder={
                       omeStore.isFromApp
                         ? t("Chat.AppInput")
-                        : t("Chat.Input", {
-                            submitKey,
-                          })
+                        : t("Chat.Input", { submitKey })
                     }
                     onInput={(e) => onInput(e.currentTarget.value)}
                     value={userInput}
@@ -2618,6 +2562,19 @@ export function _Chat_NEW() {
                     </button>
                   )}
                 </div>
+              </div>
+              <div
+                style={{
+                  width: "100%",
+                  color: "rgba(43, 43, 51, 0.40)",
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "1rem",
+                }}
+              >
+                {omeStore.language !== "cn" && omeStore.language !== "tw"
+                  ? "AI-generated content"
+                  : "內容由AI生成"}
               </div>
               {/* <label
                 className={clsx(

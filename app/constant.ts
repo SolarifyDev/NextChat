@@ -113,7 +113,7 @@ export const UNFINISHED_INPUT = (id: string) => "unfinished-input-" + id;
 
 export const STORAGE_KEY = "chatgpt-next-web";
 
-export const REQUEST_TIMEOUT_MS = 180000;
+export const REQUEST_TIMEOUT_MS = 300000;
 export const REQUEST_TIMEOUT_MS_FOR_THINKING = REQUEST_TIMEOUT_MS * 5;
 
 export const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
@@ -485,6 +485,8 @@ export const VISION_MODEL_REGEXES = [
   /gpt-4.1-mini/,
   /o3/,
   /o4-mini/,
+  /gpt-5.1/,
+  /gpt-5-mini/,
 ];
 
 export const EXCLUDE_VISION_MODEL_REGEXES = [/claude-3-5-haiku-20241022/];
@@ -525,6 +527,8 @@ const openaiModels = [
   "o3-mini",
   "o3",
   "o4-mini",
+  "gpt-5.1",
+  "gpt-5-mini",
 ];
 
 const googleModels = [

@@ -30,7 +30,8 @@ import {
 import { RequestPayload } from "./openai";
 
 import { fetch } from "@/app/utils/stream";
-import { useNewChatStore } from "@/app/store/new-chat";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
+
 export interface SiliconFlowListModelResponse {
   object: string;
   data: Array<{
@@ -99,7 +100,7 @@ export class SiliconflowApi implements LLMApi {
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
+      ...useEnhanceChatStore.getState()?.currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,
@@ -130,7 +131,7 @@ export class SiliconflowApi implements LLMApi {
         method: "POST",
         body: JSON.stringify(requestPayload),
         signal: controller.signal,
-        headers: getHeaders(),
+        headers: await getHeaders(),
       };
 
       // console.log(chatPayload);
@@ -144,12 +145,12 @@ export class SiliconflowApi implements LLMApi {
       if (shouldStream) {
         const [tools, funcs] = usePluginStore.getState().getAsTools(
           // useChatStore.getState().currentSession().mask?.plugin || [],
-          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          useEnhanceChatStore.getState().currentSession!.mask?.plugin || [],
         );
         return streamWithThink(
           chatPath,
           requestPayload,
-          getHeaders(),
+          await getHeaders(),
           tools as any,
           funcs,
           controller,
@@ -259,7 +260,7 @@ export class SiliconflowApi implements LLMApi {
     const res = await fetch(this.path(SiliconFlow.ListModelPath), {
       method: "GET",
       headers: {
-        ...getHeaders(),
+        ...(await getHeaders()),
       },
     });
 

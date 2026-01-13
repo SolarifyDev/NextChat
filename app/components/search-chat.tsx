@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import ErrorBoundary from "./error";
 import styles from "./mask.module.scss";
 import { useNavigate } from "react-router-dom";
@@ -7,61 +7,82 @@ import CloseIcon from "../icons/close.svg";
 import EyeIcon from "../icons/eye.svg";
 import { Path } from "../constant";
 
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { GetHistory, getHeaders } from "../client/smarties";
+import { ChatSession, useEnhanceChatStore } from "../store/enhance-chat";
+import { JSONParse } from "../utils/convert";
 
 type Item = {
   id: number;
   name: string;
   content: string;
+  sessionId: number;
 };
+
 export function SearchChatPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   // const chatStore = useChatStore();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
 
-  const sessions = chatStore.sessions;
-  const selectSession = chatStore.selectSession;
+  // const sessions = chatStore.sessions;
+  const selectSession = chatStore.getCurrentSession;
 
   const [searchResults, setSearchResults] = useState<Item[]>([]);
 
   const previousValueRef = useRef<string>("");
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const doSearch = useCallback((text: string) => {
+  const doSearch = useCallback(async (text: string) => {
     const lowerCaseText = text.toLowerCase();
     const results: Item[] = [];
 
-    sessions.forEach((session, index) => {
-      const fullTextContents: string[] = [];
+    try {
+      const data = await GetHistory(await getHeaders(), true);
 
-      session.messages.forEach((message) => {
-        const content = message.content as string;
-        if (!content.toLowerCase || content === "") return;
-        const lowerCaseContent = content.toLowerCase();
+      const sessions: ChatSession[] = data.map((item) => ({
+        ...item,
+        messages: JSONParse(item.messages, "arr"),
+        stat: JSONParse(item.stat, "obj"),
+        mask: JSONParse(item.mask, "mask"),
+      }));
 
-        // full text search
-        let pos = lowerCaseContent.indexOf(lowerCaseText);
-        while (pos !== -1) {
-          const start = Math.max(0, pos - 35);
-          const end = Math.min(content.length, pos + lowerCaseText.length + 35);
-          fullTextContents.push(content.substring(start, end));
-          pos = lowerCaseContent.indexOf(
-            lowerCaseText,
-            pos + lowerCaseText.length,
-          );
+      sessions.forEach((session, index) => {
+        const fullTextContents: string[] = [];
+
+        session.messages.forEach((message) => {
+          const content = message.content as string;
+          if (!content.toLowerCase || content === "") return;
+          const lowerCaseContent = content.toLowerCase();
+
+          // full text search
+          let pos = lowerCaseContent.indexOf(lowerCaseText);
+          while (pos !== -1) {
+            const start = Math.max(0, pos - 35);
+            const end = Math.min(
+              content.length,
+              pos + lowerCaseText.length + 35,
+            );
+            fullTextContents.push(content.substring(start, end));
+            pos = lowerCaseContent.indexOf(
+              lowerCaseText,
+              pos + lowerCaseText.length,
+            );
+          }
+        });
+
+        if (fullTextContents.length > 0) {
+          results.push({
+            id: index,
+            name: session.topic,
+            content: fullTextContents.join("... "), // concat content with...
+            sessionId: session.sessionId!,
+          });
         }
       });
-
-      if (fullTextContents.length > 0) {
-        results.push({
-          id: index,
-          name: session.topic,
-          content: fullTextContents.join("... "), // concat content with...
-        });
-      }
-    });
+    } catch {
+      return [];
+    }
 
     // sort by length of matching content
     results.sort((a, b) => b.content.length - a.content.length);
@@ -69,23 +90,23 @@ export function SearchChatPage() {
     return results;
   }, []);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (searchInputRef.current) {
-        const currentValue = searchInputRef.current.value;
-        if (currentValue !== previousValueRef.current) {
-          if (currentValue.length > 0) {
-            const result = doSearch(currentValue);
-            setSearchResults(result);
-          }
-          previousValueRef.current = currentValue;
-        }
-      }
-    }, 1000);
+  // useEffect(() => {
+  //   const intervalId = setInterval(async () => {
+  //     if (searchInputRef.current) {
+  //       const currentValue = searchInputRef.current.value;
+  //       if (currentValue !== previousValueRef.current) {
+  //         if (currentValue.length > 0) {
+  //           const result = await doSearch(currentValue);
+  //           setSearchResults(result);
+  //         }
+  //         previousValueRef.current = currentValue;
+  //       }
+  //     }
+  //   }, 1000);
 
-    // Cleanup the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, [doSearch]);
+  //   // Cleanup the interval on component unmount
+  //   return () => clearInterval(intervalId);
+  // }, [doSearch]);
 
   return (
     <ErrorBoundary>
@@ -124,12 +145,12 @@ export function SearchChatPage() {
               placeholder={t("SearchChat.Page.Search")}
               autoFocus
               ref={searchInputRef}
-              onKeyDown={(e) => {
+              onKeyDown={async (e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   const searchText = e.currentTarget.value;
                   if (searchText.length > 0) {
-                    const result = doSearch(searchText);
+                    const result = await doSearch(searchText);
                     setSearchResults(result);
                   }
                 }
@@ -144,7 +165,7 @@ export function SearchChatPage() {
                 key={item.id}
                 onClick={() => {
                   navigate(Path.Chat);
-                  selectSession(item.id);
+                  selectSession(item.sessionId);
                 }}
                 style={{ cursor: "pointer" }}
               >
