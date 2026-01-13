@@ -2538,23 +2538,13 @@ export function _Chat_NEW() {
                 >
                   {omeStore.isFromApp ? (
                     isEmpty(userInput) && attachImages.length === 0 ? (
-                      // <NextImage
-                      //   src={GraySendIcon.src}
-                      //   alt=""
-                      //   width={32}
-                      //   height={32}
-                      //   // onClick={() => doSubmit(userInput)}
-                      //   onClick={() => setIsShowVoice(true)}
-                      // />
-                      <div
-                        style={{
-                          width: "32px",
-                          height: "32px",
-                        }}
-                        onClick={() => setIsShowVoice(true)}
-                      >
-                        <YuYinIcon />
-                      </div>
+                      <NextImage
+                        src={GraySendIcon.src}
+                        alt=""
+                        width={32}
+                        height={32}
+                        onClick={() => doSubmit(userInput)}
+                      />
                     ) : (
                       <NextImage
                         src={SendIcon.src}

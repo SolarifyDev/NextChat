@@ -1087,9 +1087,8 @@ export const useEnhanceChatStore = createPersistStore(
         try {
           const res = await PostTranslationSpeech(await getHeaders(), formData);
           return res; // 返回转换后的文本
-        } catch (error) {
-          console.error("translateAudio error:", error);
-          return ""; // 或者抛出错误 throw error;
+        } catch {
+          return "";
         }
       },
       clearCurrent: () => {
