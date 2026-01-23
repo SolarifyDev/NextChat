@@ -5779,6 +5779,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./voice.module.scss";
 import KeyBoardIcon from "../icons/keyboard.svg";
 import clsx from "clsx";
+import { useTranslation } from "react-i18next";
 
 // 类型定义
 type RecordingState = "idle" | "recording" | "cancel";
@@ -5935,6 +5936,8 @@ const VoiceChatButton: React.FC<VoiceChatButtonProps> = ({
   onSwitch,
   embedded = false,
 }) => {
+  const { t } = useTranslation();
+
   const [state, setState] = useState<RecordingState>("idle");
   const [duration, setDuration] = useState<number>(0);
   const [micError, setMicError] = useState<string | null>(null);
@@ -6401,7 +6404,9 @@ const VoiceChatButton: React.FC<VoiceChatButtonProps> = ({
     <div className={getStateTooltipClassName()}>
       <div className={getStateContentClassName()}>
         <div className={styles.stateText}>
-          {state === "cancel" ? "松手取消" : "松开发送 / 上滑取消"}
+          {state === "cancel"
+            ? t("Chat.Voice.ReleaseToCancel")
+            : t("Chat.Voice.ReleaseToSendSlideUpToCancel")}
         </div>
       </div>
     </div>
@@ -6440,10 +6445,14 @@ const VoiceChatButton: React.FC<VoiceChatButtonProps> = ({
             {isProcessing ? (
               <>
                 <LoadingSpinner />
-                <span className={styles.embeddedButtonText}>处理中...</span>
+                <span className={styles.embeddedButtonText}>
+                  {t("Chat.Voice.Processing")}...
+                </span>
               </>
             ) : state === "idle" ? (
-              <span className={styles.embeddedButtonText}>按住说话</span>
+              <span className={styles.embeddedButtonText}>
+                {t("Chat.Voice.HoldToTalk")}
+              </span>
             ) : (
               <WaveAnimation isActive={isRecordingActive} />
             )}
@@ -6501,17 +6510,23 @@ const VoiceChatButton: React.FC<VoiceChatButtonProps> = ({
                 {isProcessing ? (
                   <>
                     <LoadingSpinner />
-                    <span className={styles.buttonTextSmall}>处理中...</span>
+                    <span className={styles.buttonTextSmall}>
+                      {t("Chat.Voice.Processing")}...
+                    </span>
                   </>
                 ) : state === "idle" ? (
                   <>
-                    <span className={styles.buttonText}>按住说话</span>
+                    <span className={styles.buttonText}>
+                      {t("Chat.Voice.HoldToTalk")}
+                    </span>
                   </>
                 ) : (
                   <>
                     <WaveAnimation isActive={isRecordingActive} />
                     <span className={styles.buttonTextSmall}>
-                      {state === "cancel" ? "松手取消" : "录音中..."}
+                      {state === "cancel"
+                        ? t("Chat.Voice.ReleaseToCancel")
+                        : t("Chat.Voice.Processing")}
                     </span>
                   </>
                 )}

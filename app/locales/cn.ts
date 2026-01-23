@@ -108,6 +108,12 @@ const cn = {
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
     UploadImageTips: "最多只允许上传三张图片!",
+    Voice: {
+      HoldToTalk: "按住说话",
+      ReleaseToSendSlideUpToCancel: "松开发送，上滑取消",
+      ReleaseToCancel: "松手取消",
+      Processing: "处理中",
+    },
   },
   Export: {
     Title: "分享聊天记录",
