@@ -97,6 +97,13 @@ const es: PartialLocaleType = {
         "Puedo ayudarte a buscar y responder preguntas. ¡Pregúntame lo que quieras!",
     },
     UploadImageTips: "¡Solo se permite subir un máximo de tres imágenes!",
+    Voice: {
+      HoldToTalk: "Mantén pulsado",
+      ReleaseToSendSlideUpToCancel:
+        "Suelta para enviar, desliza arriba para cancelar",
+      ReleaseToCancel: "Suelta para cancelar",
+      Processing: "Procesando",
+    },
   },
   Export: {
     Title: "Compartir historial de chat",

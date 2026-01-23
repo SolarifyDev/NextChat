@@ -94,6 +94,13 @@ const tr: PartialLocaleType = {
         "Arama yapabilir ve sorularınızı yanıtlayabilirim. Bana istediğinizi sorabilirsiniz!",
     },
     UploadImageTips: "En fazla üç resim yüklenebilir!",
+    Voice: {
+      HoldToTalk: "Konuşmak için basılı tutun",
+      ReleaseToSendSlideUpToCancel:
+        "Göndermek için bırakın, iptal etmek için yukarı kaydırın",
+      ReleaseToCancel: "İptal etmek için bırakın",
+      Processing: "İşleniyor",
+    },
   },
   Export: {
     Title: "Sohbet kayıtlarını paylaş",

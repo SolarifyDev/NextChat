@@ -94,6 +94,13 @@ const pt: PartialLocaleType = {
         "Posso ajudar você a pesquisar e responder perguntas. Pergunte-me qualquer coisa!",
     },
     UploadImageTips: "É permitido enviar no máximo três imagens!",
+    Voice: {
+      HoldToTalk: "Mantenha pressionado para falar",
+      ReleaseToSendSlideUpToCancel:
+        "Solte para enviar, deslize para cima para cancelar",
+      ReleaseToCancel: "Solte para cancelar",
+      Processing: "Processando",
+    },
   },
   Export: {
     Title: "Exportar Mensagens",
