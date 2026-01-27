@@ -498,10 +498,14 @@ export function Home() {
 
         // omeStore.setIsFromApp(false);
 
+        console.log("metis开始检测");
+
         if (
           !isEmpty(event?.data?.omeUserId) &&
           !isEmpty(event?.data?.omeUserName)
         ) {
+          console.log("metis进来了");
+
           omeStore.setUserId(event?.data?.omeUserId);
           omeStore.setUserName(event?.data?.omeUserName);
           omeStore.setFrom("omeoffice web");
