@@ -93,6 +93,12 @@ const jp: PartialLocaleType = {
       Content: "検索や質問にお答えできます。何でも聞いてくださいね！",
     },
     UploadImageTips: "アップロードできる画像は最大3枚までです!",
+    Voice: {
+      HoldToTalk: "押して話す",
+      ReleaseToSendSlideUpToCancel: "離して送信、上にスワイプでキャンセル",
+      ReleaseToCancel: "離してキャンセル",
+      Processing: "処理中",
+    },
   },
   Export: {
     Title: "チャット履歴を共有",

@@ -97,6 +97,12 @@ const no: PartialLocaleType = {
         "Jeg kan hjelpe deg med å søke og svare på spørsmål. Spør meg om hva som helst!",
     },
     UploadImageTips: "Bare maksimalt tre bilete kan lastast opp!",
+    Voice: {
+      HoldToTalk: "Hold inne for å snakke",
+      ReleaseToSendSlideUpToCancel: "Slipp for å sende, dra opp for å avbryte",
+      ReleaseToCancel: "Slipp for å avbryte",
+      Processing: "Behandler",
+    },
   },
   Export: {
     Title: "Del samtalehistorikk",

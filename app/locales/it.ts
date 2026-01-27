@@ -96,6 +96,13 @@ const it: PartialLocaleType = {
         "Posso aiutarti a cercare e rispondere alle domande. Chiedimi qualsiasi cosa!",
     },
     UploadImageTips: "È consentito caricare un massimo di tre immagini!",
+    Voice: {
+      HoldToTalk: "Tieni premuto per parlare",
+      ReleaseToSendSlideUpToCancel:
+        "Rilascia per inviare, scorri verso l’alto per annullare",
+      ReleaseToCancel: "Rilascia per annullare",
+      Processing: "Elaborazione in corso",
+    },
   },
   Export: {
     Title: "Condividi cronologia chat",
