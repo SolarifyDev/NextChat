@@ -500,6 +500,12 @@ export function Home() {
 
         console.log("metis开始检测");
 
+        console.log(
+          !isEmpty(event?.data?.omeUserId),
+          !isEmpty(event?.data?.omeUserName),
+          event?.data,
+        );
+
         if (
           !isEmpty(event?.data?.omeUserId) &&
           !isEmpty(event?.data?.omeUserName)
