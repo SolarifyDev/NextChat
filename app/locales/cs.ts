@@ -94,6 +94,13 @@ const cs: PartialLocaleType = {
         "Mohu vám pomoci s hledáním a odpověďmi na otázky. Ptejte se na cokoliv!",
     },
     UploadImageTips: "Je povoleno nahrát maximálně tři obrázky!",
+    Voice: {
+      HoldToTalk: "Podržte pro mluvení",
+      ReleaseToSendSlideUpToCancel:
+        "Uvolněte pro odeslání, posuňte nahoru pro zrušení",
+      ReleaseToCancel: "Uvolněte pro zrušení",
+      Processing: "Zpracovává se",
+    },
   },
   Export: {
     Title: "Sdílet konverzace",

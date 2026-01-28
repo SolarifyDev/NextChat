@@ -102,6 +102,12 @@ const tw = {
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
     UploadImageTips: "最多只允許上傳三張圖片",
+    Voice: {
+      HoldToTalk: "按住說話",
+      ReleaseToSendSlideUpToCancel: "鬆開發送，上滑取消",
+      ReleaseToCancel: "鬆手取消",
+      Processing: "處理中",
+    },
   },
   Export: {
     Title: "將聊天記錄匯出為 Markdown",

@@ -94,6 +94,12 @@ const ar: PartialLocaleType = {
         "يمكنني مساعدتك في البحث والإجابة على الأسئلة. اسألني عن أي شيء!",
     },
     UploadImageTips: "يُسمح بتحميل ثلاث صور كحد أقصى فقط!",
+    Voice: {
+      HoldToTalk: "اضغط مع الاستمرار للتحدث",
+      ReleaseToSendSlideUpToCancel: "حرّر للإرسال، اسحب للأعلى للإلغاء",
+      ReleaseToCancel: "حرّر للإلغاء",
+      Processing: "جارٍ المعالجة",
+    },
   },
   Export: {
     Title: "مشاركة سجل الدردشة",
