@@ -1909,7 +1909,9 @@ export function _Chat_NEW() {
   const { run: debouncedAction } = useDebounceFn(
     () => {
       // 空 updater，仅触发后端同步
-      newChatStore.updateTargetSession(() => {}, true);
+      if (!isNil(useEnhanceChatStore.getState().currentSession?.sessionId)) {
+        newChatStore.updateTargetSession(() => {}, true);
+      }
     },
     { wait: 1500 },
   );
