@@ -111,6 +111,12 @@ const en: LocaleType = {
     },
     UploadImageTips:
       "A maximum of only three images are allowed to be uploaded!",
+    Voice: {
+      HoldToTalk: "Hold to talk",
+      ReleaseToSendSlideUpToCancel: "Release to send, slide up to cancel",
+      ReleaseToCancel: "Release to cancel",
+      Processing: "Processing",
+    },
   },
   Export: {
     Title: "Export Messages",

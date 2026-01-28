@@ -108,6 +108,13 @@ const da: PartialLocaleType = {
         "Jeg kan hjælpe dig med at søge og besvare spørgsmål. Spørg mig hvad som helst!",
     },
     UploadImageTips: "Der må kun uploades maksimalt tre billeder!",
+    Voice: {
+      HoldToTalk: "Hold nede for at tale",
+      ReleaseToSendSlideUpToCancel:
+        "Slip for at sende, skub op for at annullere",
+      ReleaseToCancel: "Slip for at annullere",
+      Processing: "Behandler",
+    },
   },
   Export: {
     Title: "Eksportér beskeder",

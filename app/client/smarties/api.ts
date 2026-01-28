@@ -29,7 +29,6 @@ api.interceptors.response.use(
     return Promise.reject(response.data.msg ?? "");
   },
   async (error) => {
-    console.log(error, "error");
     const { status } = error.response;
 
     if (status === 401) {
