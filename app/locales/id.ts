@@ -94,6 +94,13 @@ const id: PartialLocaleType = {
         "Saya bisa membantu Anda mencari dan menjawab pertanyaan. Silakan tanyakan apa saja!",
     },
     UploadImageTips: "Hanya boleh mengunggah maksimal tiga gambar!",
+    Voice: {
+      HoldToTalk: "Tahan untuk berbicara",
+      ReleaseToSendSlideUpToCancel:
+        "Lepaskan untuk mengirim, geser ke atas untuk membatalkan",
+      ReleaseToCancel: "Lepaskan untuk membatalkan",
+      Processing: "Sedang diproses",
+    },
   },
   Export: {
     Title: "Bagikan Riwayat Obrolan",

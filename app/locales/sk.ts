@@ -95,6 +95,13 @@ const sk: PartialLocaleType = {
         "Môžem vám pomôcť s vyhľadávaním a odpovedaním na otázky. Spýtajte sa ma na čokoľvek!",
     },
     UploadImageTips: "Povolené je nahrať maximálne tri obrázky!",
+    Voice: {
+      HoldToTalk: "Podržte pre hovorenie",
+      ReleaseToSendSlideUpToCancel:
+        "Uvoľnite pre odoslanie, potiahnite nahor pre zrušenie",
+      ReleaseToCancel: "Uvoľnite pre zrušenie",
+      Processing: "Spracováva sa",
+    },
   },
   Export: {
     Title: "Export správ",

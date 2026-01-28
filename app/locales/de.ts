@@ -95,6 +95,13 @@ const de: PartialLocaleType = {
         "Ich kann dir bei der Suche helfen und Fragen beantworten. Frag mich einfach alles!",
     },
     UploadImageTips: "Es dürfen maximal drei Bilder hochgeladen werden!",
+    Voice: {
+      HoldToTalk: "Gedrückt halten zum Sprechen",
+      ReleaseToSendSlideUpToCancel:
+        "Loslassen zum Senden, nach oben wischen zum Abbrechen",
+      ReleaseToCancel: "Loslassen zum Abbrechen",
+      Processing: "Wird verarbeitet",
+    },
   },
   Export: {
     Title: "Chatverlauf teilen",

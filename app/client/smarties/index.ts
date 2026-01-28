@@ -13,6 +13,11 @@ export enum AiKidSystemSource {
   DifyLevelAgent,
 }
 
+export enum QuestionInputType {
+  Text,
+  Voice,
+}
+
 export interface ISession {
   sessionId: number;
   id: string;
@@ -25,6 +30,7 @@ export interface ISession {
   mask: string;
   isDeleted: boolean;
   clearContextIndex: number | null;
+  inputType: QuestionInputType;
 }
 
 export interface IAIKid {
@@ -148,6 +154,17 @@ export const PostUpdateKid = async (
   return await api.post("/api/Ome/ai/kid/update", data, {
     headers,
   });
+};
+
+export const PostTranslationSpeech = async (
+  headers: { [key: string]: string },
+  data: FormData,
+) => {
+  return (
+    await api.post("/api/Translation/speech/to/text", data, {
+      headers,
+    })
+  ).data;
 };
 
 const authApi = axios.create({
