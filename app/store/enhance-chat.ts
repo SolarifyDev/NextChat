@@ -8,6 +8,8 @@ import {
   ITopics,
   PostAddOrUpdateSession,
   SourceSystem,
+  PostTranslationSpeech,
+  QuestionInputType,
   getHeaders,
 } from "../client/smarties";
 import { showToast } from "../components/ui-lib";
@@ -91,6 +93,8 @@ export interface ChatSession {
   clearContextIndex?: number | null;
 
   mask: Mask;
+
+  inputType: QuestionInputType;
 }
 
 // 提供给左侧List显示
@@ -222,6 +226,7 @@ function createEmptySession(): ChatSession {
     lastSummarizeIndex: 0,
 
     mask: createEmptyMask(),
+    inputType: QuestionInputType.Text,
   };
 }
 
@@ -1160,6 +1165,17 @@ export const useEnhanceChatStore = createPersistStore(
             systemSoure as SourceSystem,
           );
         } catch {}
+      },
+      translateAudio: async (audioBlob: Blob): Promise<string> => {
+        const formData = new FormData();
+        formData.append("file", audioBlob, "recording.webm");
+
+        try {
+          const res = await PostTranslationSpeech(await getHeaders(), formData);
+          return res; // 返回转换后的文本
+        } catch {
+          return "";
+        }
       },
       clearCurrent: () => {
         set({

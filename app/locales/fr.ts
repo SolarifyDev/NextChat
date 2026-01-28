@@ -97,6 +97,13 @@ const fr: PartialLocaleType = {
     },
     UploadImageTips:
       "Il est permis de télécharger un maximum de trois images seulement !",
+    Voice: {
+      HoldToTalk: "Maintenez pour parler",
+      ReleaseToSendSlideUpToCancel:
+        "Relâchez pour envoyer, faites glisser vers le haut pour annuler",
+      ReleaseToCancel: "Relâchez pour annuler",
+      Processing: "Traitement en cours",
+    },
   },
   Export: {
     Title: "Partager l'historique des discussions",

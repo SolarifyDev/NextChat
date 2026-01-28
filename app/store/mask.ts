@@ -5,7 +5,7 @@ import { ModelConfig, useAppConfig } from "./config";
 import { StoreKey } from "../constant";
 import { nanoid } from "nanoid";
 import { createPersistStore } from "../utils/store";
-import { getDefaultTopic } from "./new-chat";
+import { getDefaultTopic } from "./enhance-chat";
 import { useOmeStore } from "./ome";
 
 export type Mask = {

@@ -1,6 +1,6 @@
-import { ISession } from "../client/smarties";
+import { ISession, QuestionInputType } from "../client/smarties";
 import { createEmptyMask } from "../store/mask";
-import { ChatSession } from "../store/new-chat";
+import { ChatSession } from "../store/enhance-chat";
 
 export const JSONParse = (
   data: string,
@@ -52,6 +52,7 @@ export const ConvertSession = (
         clearContextIndex: null,
         mask: JSONStringify(session.mask) ?? "",
         isDeleted: false,
+        inputType: QuestionInputType.Text,
       };
     case "update":
       return {
@@ -66,6 +67,7 @@ export const ConvertSession = (
         clearContextIndex: session.clearContextIndex,
         mask: JSONStringify(session.mask) ?? "",
         isDeleted: session.isDeleted!,
+        inputType: session.inputType,
       };
     case "delete": {
       return {

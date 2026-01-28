@@ -52,7 +52,7 @@ export const useKidStore = createPersistStore(
             kids: data ?? [],
             isLoading: false,
           });
-        } catch (err) {
+        } catch {
           set({
             kids: [],
             isLoading: false,
@@ -64,7 +64,7 @@ export const useKidStore = createPersistStore(
           set({
             isLoading: true,
           });
-        } catch (err) {}
+        } catch {}
       },
       handleChangeCurrentKidIndex: (kidId: number) => {
         set({
@@ -129,11 +129,10 @@ export const useKidStore = createPersistStore(
 
             callback && callback();
           }
-        } catch (err) {
+        } catch {
           set({
             isFetching: false,
           });
-          console.log(err);
         }
       },
       clearCurrent: () => {
