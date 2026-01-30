@@ -1,8 +1,16 @@
 import { clone, isEmpty, isNil } from "lodash-es";
-import { GetKids, IAIKid, PostUpdateKid, getHeaders } from "../client/smarties";
+import {
+  AiKidSystemSource,
+  GetKids,
+  IAIKid,
+  PostUpdateKid,
+  getHeaders,
+} from "../client/smarties";
 import { createPersistStore } from "../utils/store";
 import { showToast } from "../components/ui-lib";
 import { t } from "i18next";
+import { KidNamelocals } from "../components/kid/component/kid";
+import { useOmeStore } from "./ome";
 
 export enum IType {
   Add,
@@ -48,8 +56,37 @@ export const useKidStore = createPersistStore(
 
           const data = await GetKids(await getHeaders());
 
+          const translateData = data.map((kid) => {
+            if (kid?.isNeedTranslate) {
+              const KidNamelocal = KidNamelocals.find(
+                (item) => item.name.toLowerCase() === kid.name.toLowerCase(),
+              );
+
+              const lang = useOmeStore.getState().language;
+              const description =
+                KidNamelocal?.translations?.[lang] ??
+                KidNamelocal?.translations?.en ??
+                "";
+
+              const newKid = { ...kid };
+
+              if (kid.systemSource === AiKidSystemSource.SmartTalk) {
+                newKid.greeting = description;
+              } else if (
+                kid.systemSource === AiKidSystemSource.DifyLevelAgent ||
+                kid.systemSource === AiKidSystemSource.ToolAgent
+              ) {
+                newKid.description = description;
+              }
+
+              return newKid;
+            }
+
+            return kid;
+          });
+
           set({
-            kids: data ?? [],
+            kids: translateData ?? [],
             isLoading: false,
           });
         } catch {

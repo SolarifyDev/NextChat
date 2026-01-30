@@ -51,6 +51,7 @@ export interface IAIKid {
   createdBy: number;
   createdDate: string;
   sortOrder: number;
+  isNeedTranslate: boolean;
 }
 
 export async function getHeaders() {
