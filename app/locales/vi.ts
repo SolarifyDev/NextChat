@@ -94,6 +94,12 @@ const vi: PartialLocaleType = {
         "Tôi có thể giúp bạn tìm kiếm và trả lời câu hỏi. Hãy hỏi tôi bất cứ điều gì!",
     },
     UploadImageTips: "Chỉ được phép tải lên tối đa ba hình ảnh!",
+    Voice: {
+      HoldToTalk: "Giữ để nói",
+      ReleaseToSendSlideUpToCancel: "Thả để gửi, vuốt lên để hủy",
+      ReleaseToCancel: "Thả để hủy",
+      Processing: "Đang xử lý",
+    },
   },
   Export: {
     Title: "Chia sẻ ghi chép trò chuyện",
