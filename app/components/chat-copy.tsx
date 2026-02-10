@@ -58,6 +58,8 @@ import AppSearchOnlineIcon from "../icons/search-online-app.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
 import MetisIcon from "../icons/metis.png";
 import SendIcon from "../icons/green-send.png";
+import AppFaqIcon from "../icons/faq-app.svg";
+import FaqIcon from "../icons/faq.svg";
 import YuYinIcon from "../icons/yuyin.svg";
 
 import NextImage from "next/image";
@@ -849,20 +851,26 @@ export function ChatActions(props: {
           isClick={showModelSelector}
         />
 
-        <ChatAction
-          onClick={() =>
-            useOmeStore
-              .getState()
-              .setOnlineSearch(!useOmeStore.getState().onlineSearch)
-          }
-          text={t("Chat.InputActions.OnlineSearch")}
-          icon={
-            omeStore.isFromApp ? <AppSearchOnlineIcon /> : <SearchOnlineIcon />
-          }
-          isHaveHover={true}
-          isClick={useOmeStore.getState().onlineSearch}
-          isWebClick={true}
-        />
+        {!useOmeStore.getState()?.faqSearch && (
+          <ChatAction
+            onClick={() =>
+              useOmeStore
+                .getState()
+                .setOnlineSearch(!useOmeStore.getState().onlineSearch)
+            }
+            text={t("Chat.InputActions.OnlineSearch")}
+            icon={
+              omeStore.isFromApp ? (
+                <AppSearchOnlineIcon />
+              ) : (
+                <SearchOnlineIcon />
+              )
+            }
+            isHaveHover={true}
+            isClick={useOmeStore.getState().onlineSearch}
+            isWebClick={true}
+          />
+        )}
 
         {showModelSelector && (
           <Selector
@@ -1014,6 +1022,19 @@ export function ChatActions(props: {
           />
         )}
         {!isMobileScreen && <MCPAction />}
+        <ChatAction
+          onClick={() => {
+            useOmeStore.getState().setOnlineSearch(false);
+            useOmeStore
+              .getState()
+              .setFaqSearch(!useOmeStore.getState().faqSearch);
+          }}
+          text={"FAQ"}
+          icon={omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />}
+          isHaveHover={true}
+          isClick={useOmeStore.getState().faqSearch}
+          isWebClick={true}
+        />
       </>
       <div className={styles["chat-input-actions-end"]}>
         {config.realtimeConfig.enable && (

@@ -19,6 +19,7 @@ export type OmeStoreType = {
   clientSecret: string | null;
   score: string | null;
   isShowHome: boolean | null;
+  faqSearch: boolean;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -37,6 +38,7 @@ export type OmeStoreType = {
   setIsShowHome: (isShowHome: boolean) => void;
   getSourceSystem: () => "" | SourceSystem;
   convertLangToEnum(): LanguageEnum;
+  setFaqSearch: (faqSearch: boolean) => void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -57,6 +59,7 @@ export const useOmeStore = create<OmeStoreType>()(
       clientSecret: null,
       score: null,
       isShowHome: null,
+      faqSearch: false,
       clearCurrent: () => {
         set({
           token: "",
@@ -73,6 +76,7 @@ export const useOmeStore = create<OmeStoreType>()(
           clientSecret: null,
           score: null,
           isShowHome: null,
+          faqSearch: false,
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -193,6 +197,11 @@ export const useOmeStore = create<OmeStoreType>()(
           default:
             return LanguageEnum.SimplyChinese;
         }
+      },
+      setFaqSearch: (faqSearch: boolean) => {
+        set({
+          faqSearch,
+        });
       },
     }),
     {
