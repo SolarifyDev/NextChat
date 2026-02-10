@@ -136,15 +136,8 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
-  const {
-    onlineSearch,
-    userId,
-    from,
-    eventUuid,
-    setOnlineSearch,
-    faqSearch,
-    setFaqSearch,
-  } = useOmeStore();
+  const { onlineSearch, userId, from, eventUuid, setOnlineSearch } =
+    useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
@@ -214,10 +207,6 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
               if (onlineSearch) {
                 setOnlineSearch(false);
-              }
-
-              if (faqSearch) {
-                setFaqSearch(false);
               }
             }}
             onDelete={async () => {

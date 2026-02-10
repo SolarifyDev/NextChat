@@ -70,7 +70,6 @@ export interface RequestPayload {
   max_completion_tokens?: number;
   drop_params?: boolean;
   onlineSearch?: boolean;
-  NeedFaq?: boolean;
   isSummary?: boolean;
 }
 
@@ -255,11 +254,7 @@ export class ChatGPTApi implements LLMApi {
         requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
       }
 
-      requestPayload["onlineSearch"] = useOmeStore.getState().faqSearch
-        ? false
-        : useOmeStore.getState().onlineSearch;
-
-      requestPayload["NeedFaq"] = useOmeStore.getState().faqSearch;
+      requestPayload["onlineSearch"] = useOmeStore.getState().onlineSearch;
 
       requestPayload["isSummary"] = options.isSummary || false;
     }

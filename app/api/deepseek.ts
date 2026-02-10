@@ -76,7 +76,6 @@ async function request(req: NextRequest) {
       "Ome-Metis-Username": req.headers.get("Ome-Metis-Username") || "",
       "Omelink-Metis-Userid": req.headers.get("Omelink-Metis-Userid") || "",
       OnlineSearch: req.headers.get("OnlineSearch") || "0",
-      NeedFaq: req.headers.get("NeedFaq") || "0",
       "Ome-Office-Oa-User-Id": req.headers.get("Ome-Office-Oa-User-Id") || "",
       "Ome-Office-Authorization":
         req.headers.get("Ome-Office-Authorization") || "",
