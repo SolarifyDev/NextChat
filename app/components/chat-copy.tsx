@@ -1019,19 +1019,21 @@ export function ChatActions(props: {
           />
         )}
         {!isMobileScreen && <MCPAction />}
-        <ChatAction
-          onClick={() => {
-            useOmeStore.getState().setOnlineSearch(false);
-            useOmeStore
-              .getState()
-              .setFaqSearch(!useOmeStore.getState().faqSearch);
-          }}
-          text={"FAQ"}
-          icon={omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />}
-          isHaveHover={true}
-          isClick={useOmeStore.getState().faqSearch}
-          isWebClick={true}
-        />
+        {(!omeStore.isFromApp || omeStore?.from?.includes("omeoffice")) && (
+          <ChatAction
+            onClick={() => {
+              useOmeStore.getState().setOnlineSearch(false);
+              useOmeStore
+                .getState()
+                .setFaqSearch(!useOmeStore.getState().faqSearch);
+            }}
+            text={"FAQ"}
+            icon={omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />}
+            isHaveHover={true}
+            isClick={useOmeStore.getState().faqSearch}
+            isWebClick={true}
+          />
+        )}
       </>
       <div className={styles["chat-input-actions-end"]}>
         {config.realtimeConfig.enable && (
