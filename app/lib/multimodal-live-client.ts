@@ -290,9 +290,7 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     // };
 
     const data = {
-      media: {
-        payload: chunks[0].data,
-      },
+      media: { type: message, payload: chunks[0].data },
     };
 
     this._sendDirect(data);
