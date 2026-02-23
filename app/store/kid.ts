@@ -57,7 +57,7 @@ export const useKidStore = createPersistStore(
           const data = await GetKids(await getHeaders());
 
           const translateData = data.map((kid) => {
-            if (kid?.isNeedTranslate) {
+            if (kid?.IsMultilingual) {
               const KidNamelocal = KidNamelocals.find(
                 (item) => item.name.toLowerCase() === kid.name.toLowerCase(),
               );
