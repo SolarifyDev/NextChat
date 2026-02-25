@@ -66,6 +66,7 @@ export interface IAIKid {
   createdBy: number;
   createdDate: string;
   sortOrder: number;
+  IsMultilingual: boolean;
 }
 
 export interface ITopics {
