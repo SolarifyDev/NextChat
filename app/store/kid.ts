@@ -9,8 +9,8 @@ import {
 import { createPersistStore } from "../utils/store";
 import { showToast } from "../components/ui-lib";
 import { t } from "i18next";
-import { KidNamelocals } from "../components/kid/component/kid";
 import { useOmeStore } from "./ome";
+import { KidNamelocals } from "../components/kid/component/kids";
 
 export enum IType {
   Add,
