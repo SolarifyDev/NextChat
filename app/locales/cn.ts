@@ -80,6 +80,7 @@ const cn = {
       Clear: "清除聊天",
       Settings: "对话设置",
       UploadImage: "上传图片",
+      UploadFile: "上传文件",
       OnlineSearch: "联网搜索",
     },
     Rename: "重命名对话",
@@ -108,6 +109,9 @@ const cn = {
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
     UploadImageTips: "最多只允许上传三张图片!",
+    UploadFileTips: "最多允许上传100个附件！",
+    FileTooLarge: "文件超过5MB限制",
+    UploadFailed: "上传失败",
     Voice: {
       HoldToTalk: "按住说话",
       ReleaseToSendSlideUpToCancel: "松开发送，上滑取消",

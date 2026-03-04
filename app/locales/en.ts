@@ -81,6 +81,7 @@ const en: LocaleType = {
       Clear: "Clear Context",
       Settings: "Settings",
       UploadImage: "Upload Images",
+      UploadFile: "Upload Files",
       OnlineSearch: "Online search",
     },
     Rename: "Rename Chat",
@@ -111,6 +112,9 @@ const en: LocaleType = {
     },
     UploadImageTips:
       "A maximum of only three images are allowed to be uploaded!",
+    UploadFileTips: "A maximum of 100 attachments are allowed!",
+    FileTooLarge: "File exceeds the 5MB limit",
+    UploadFailed: "Upload failed",
     Voice: {
       HoldToTalk: "Hold to talk",
       ReleaseToSendSlideUpToCancel: "Release to send, slide up to cancel",

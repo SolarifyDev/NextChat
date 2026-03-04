@@ -42,6 +42,16 @@ export interface MultimodalContent {
   };
 }
 
+export interface Attachment {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url: string;
+  isImage: boolean;
+  status: "uploading" | "success" | "error";
+}
+
 export interface MultimodalContentForAlibaba {
   text?: string;
   image?: string;

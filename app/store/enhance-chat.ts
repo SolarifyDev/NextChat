@@ -15,7 +15,12 @@ import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { Mask, createEmptyMask } from "./mask";
 import { t } from "i18next";
 import { clone, isNil } from "lodash";
-import { ClientApi, getClientApi, MultimodalContent } from "../client/api";
+import {
+  ClientApi,
+  getClientApi,
+  MultimodalContent,
+  Attachment,
+} from "../client/api";
 import {
   DEEPSEEK_SUMMARIZE_MODEL,
   DEFAULT_INPUT_TEMPLATE,
@@ -67,6 +72,7 @@ export type ChatMessage = RequestMessage & {
   tools?: ChatMessageTool[];
   audio_url?: string;
   isMcpResponse?: boolean;
+  attachments?: Attachment[];
 };
 
 // detail
@@ -643,7 +649,7 @@ export const useEnhanceChatStore = createPersistStore(
                       : String(result);
                   get().onUserInput(
                     `\`\`\`json:mcp-response:${mcpRequest.clientId}\n${mcpResponse}\n\`\`\``,
-                    [],
+                    undefined,
                     true,
                   );
                 })
@@ -801,7 +807,7 @@ export const useEnhanceChatStore = createPersistStore(
       },
       async onUserInput(
         content: string,
-        attachImages?: string[],
+        attachments?: Attachment[],
         isMcpResponse?: boolean,
       ) {
         const session = get().currentSession;
@@ -814,20 +820,35 @@ export const useEnhanceChatStore = createPersistStore(
           ? content
           : fillTemplateWith(content, modelConfig);
 
-        if (!isMcpResponse && attachImages && attachImages.length > 0) {
+        // 从 attachments 中提取成功上传的图片构建 MultimodalContent
+        const imageUrls =
+          attachments
+            ?.filter((a) => a.isImage && a.status === "success")
+            .map((a) => a.url) ?? [];
+
+        if (!isMcpResponse && imageUrls.length > 0) {
           mContent = [
             ...(content ? [{ type: "text" as const, text: content }] : []),
-            ...attachImages.map((url) => ({
+            ...imageUrls.map((url) => ({
               type: "image_url" as const,
               image_url: { url },
             })),
           ];
         }
 
+        // 只保存成功上传的附件到消息中
+        const successAttachments = attachments?.filter(
+          (a) => a.status === "success",
+        );
+
         let userMessage: ChatMessage = createMessage({
           role: "user",
           content: mContent,
           isMcpResponse,
+          attachments:
+            successAttachments && successAttachments.length > 0
+              ? successAttachments
+              : undefined,
         });
 
         const botMessage: ChatMessage = createMessage({

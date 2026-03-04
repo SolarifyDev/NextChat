@@ -76,6 +76,7 @@ const jp: PartialLocaleType = {
       Clear: "チャットをクリア",
       Settings: "チャット設定",
       UploadImage: "画像をアップロード",
+      UploadFile: "ファイルをアップロード",
       OnlineSearch: "オンライン検索",
     },
     Rename: "チャットの名前を変更",
@@ -93,6 +94,9 @@ const jp: PartialLocaleType = {
       Content: "検索や質問にお答えできます。何でも聞いてくださいね！",
     },
     UploadImageTips: "アップロードできる画像は最大3枚までです!",
+    UploadFileTips: "アップロードできる添付ファイルは最大100つまでです！",
+    FileTooLarge: "ファイルが5MBの制限を超えています",
+    UploadFailed: "アップロード失敗",
     Voice: {
       HoldToTalk: "押して話す",
       ReleaseToSendSlideUpToCancel: "離して送信、上にスワイプでキャンセル",

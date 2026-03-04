@@ -76,6 +76,7 @@ const id: PartialLocaleType = {
       Clear: "Hapus Obrolan",
       Settings: "Pengaturan Obrolan",
       UploadImage: "Unggah Gambar",
+      UploadFile: "Unggah File",
       OnlineSearch: "Pencarian online",
     },
     Rename: "Ganti Nama Obrolan",
@@ -94,6 +95,9 @@ const id: PartialLocaleType = {
         "Saya bisa membantu Anda mencari dan menjawab pertanyaan. Silakan tanyakan apa saja!",
     },
     UploadImageTips: "Hanya boleh mengunggah maksimal tiga gambar!",
+    UploadFileTips: "Maksimum 100 lampiran diperbolehkan!",
+    FileTooLarge: "File melebihi batas 5MB",
+    UploadFailed: "Gagal mengunggah",
     Voice: {
       HoldToTalk: "Tahan untuk berbicara",
       ReleaseToSendSlideUpToCancel:

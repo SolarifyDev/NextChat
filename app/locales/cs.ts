@@ -76,6 +76,7 @@ const cs: PartialLocaleType = {
       Clear: "Vymazat konverzaci",
       Settings: "Nastavení konverzace",
       UploadImage: "Nahrát obrázek",
+      UploadFile: "Nahrát soubory",
       OnlineSearch: "Online vyhledávání",
     },
     Rename: "Přejmenovat konverzaci",
@@ -94,6 +95,9 @@ const cs: PartialLocaleType = {
         "Mohu vám pomoci s hledáním a odpověďmi na otázky. Ptejte se na cokoliv!",
     },
     UploadImageTips: "Je povoleno nahrát maximálně tři obrázky!",
+    UploadFileTips: "Je povoleno nahrát maximálně 100 příloh!",
+    FileTooLarge: "Soubor přesahuje limit 5 MB",
+    UploadFailed: "Nahrání selhalo",
     Voice: {
       HoldToTalk: "Podržte pro mluvení",
       ReleaseToSendSlideUpToCancel:

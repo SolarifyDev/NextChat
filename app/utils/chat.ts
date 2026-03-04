@@ -164,6 +164,43 @@ export function uploadImage(file: Blob): Promise<string> {
     });
 }
 
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+export const ALLOWED_FILE_ACCEPT =
+  ".png,.jpg,.jpeg,.webp,.heic,.heif,.pdf,.doc,.docx,.xlsx,.ppt,.pptx,.txt,.csv,.json";
+const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".heic", ".heif"];
+
+export function isImageFile(file: File): boolean {
+  const ext = "." + (file.name.split(".").pop()?.toLowerCase() || "");
+  return IMAGE_EXTENSIONS.includes(ext);
+}
+
+function uploadFileRaw(file: File): Promise<string> {
+  const body = new FormData();
+  body.append("file", file);
+  return fetch(UPLOAD_URL, {
+    method: "post",
+    body,
+    mode: "cors",
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res?.code == 0 && res?.data) {
+        return res?.data;
+      }
+      throw Error(`upload Error: ${res?.msg}`);
+    });
+}
+
+// 统一上传入口，后续切换服务端只需修改此函数
+export function uploadAttachment(file: File): Promise<string> {
+  if (isImageFile(file)) {
+    return uploadImage(file);
+  }
+  return uploadFileRaw(file);
+}
+
 export function removeImage(imageUrl: string) {
   return fetch(imageUrl, {
     method: "DELETE",

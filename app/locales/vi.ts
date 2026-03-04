@@ -76,6 +76,7 @@ const vi: PartialLocaleType = {
       Clear: "Xóa cuộc trò chuyện",
       Settings: "Cài đặt trò chuyện",
       UploadImage: "Tải lên hình ảnh",
+      UploadFile: "Tải lên tệp",
       OnlineSearch: "Tìm kiếm trực tuyến",
     },
     Rename: "Đổi tên cuộc trò chuyện",
@@ -94,6 +95,9 @@ const vi: PartialLocaleType = {
         "Tôi có thể giúp bạn tìm kiếm và trả lời câu hỏi. Hãy hỏi tôi bất cứ điều gì!",
     },
     UploadImageTips: "Chỉ được phép tải lên tối đa ba hình ảnh!",
+    UploadFileTips: "Chỉ được phép tải lên tối đa 100 tệp đính kèm!",
+    FileTooLarge: "Tệp vượt quá giới hạn 5MB",
+    UploadFailed: "Tải lên thất bại",
     Voice: {
       HoldToTalk: "Giữ để nói",
       ReleaseToSendSlideUpToCancel: "Thả để gửi, vuốt lên để hủy",

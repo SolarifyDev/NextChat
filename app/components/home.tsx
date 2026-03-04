@@ -38,6 +38,7 @@ import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 import { PostGetToken } from "../client/smarties";
 import { useEnhanceChatStore } from "../store/enhance-chat";
+import { ToastContainer } from "./chat-toast";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -567,6 +568,7 @@ export function Home() {
       <Router>
         <Screen />
       </Router>
+      <ToastContainer />
     </ErrorBoundary>
   );
 }

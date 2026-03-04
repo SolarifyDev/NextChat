@@ -87,7 +87,13 @@ import {
   showPlugins,
 } from "../utils";
 
-import { uploadImage as uploadImageRemote } from "@/app/utils/chat";
+import {
+  uploadAttachment,
+  isImageFile,
+  MAX_FILE_SIZE,
+  ALLOWED_FILE_ACCEPT,
+} from "@/app/utils/chat";
+import { Attachment } from "../client/api";
 
 import dynamic from "next/dynamic";
 
@@ -146,7 +152,14 @@ import {
   useEnhanceChatStore,
 } from "../store/enhance-chat";
 import VoiceChatButton from "./voice";
-import { QuestionInputType } from "../client/smarties";
+import {
+  getHeaders,
+  PostAttachmentUpload,
+  QuestionInputType,
+} from "../client/smarties";
+import { useDragOverlay } from "../hook/use-drag-overlay";
+import UploadOverlay from "./upload-overlay";
+import { toast } from "./chat-toast";
 
 const localStorage = safeLocalStorage();
 
@@ -579,9 +592,7 @@ function useScrollToBottom(
 }
 
 export function ChatActions(props: {
-  uploadImage: () => void;
-  setAttachImages: (images: string[]) => void;
-  setUploading: (uploading: boolean) => void;
+  uploadFiles: () => void;
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
@@ -706,8 +717,6 @@ export function ChatActions(props: {
     const show = isVisionModel(currentModel);
     setShowUploadImage(show);
     if (!show) {
-      props.setAttachImages([]);
-      props.setUploading(false);
     }
 
     // if current model is not available
@@ -766,9 +775,9 @@ export function ChatActions(props: {
 
         {showUploadImage && (
           <ChatAction
-            onClick={props.uploadImage}
-            // text={Locale.Chat.InputActions.UploadImage}
-            text={t("Chat.InputActions.UploadImage")}
+            onClick={props.uploadFiles}
+            // text={Locale.Chat.InputActions.UploadFile}
+            text={t("Chat.InputActions.UploadFile")}
             icon={
               props.uploading ? (
                 <LoadingButtonIcon />
@@ -1103,6 +1112,164 @@ export function DeleteImageButton(props: { deleteImage: () => void }) {
   );
 }
 
+function formatFileSize(size: number): string {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function truncateMiddle(name: string): string {
+  if (name.length <= 14) return name;
+
+  return name.slice(0, 7) + "..." + name.slice(-7);
+}
+
+function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
+  const { t } = useTranslation();
+  const { item, onDelete } = props;
+  const ext = item.name.split(".").pop()?.toUpperCase() || "FILE";
+  const isError = item.status === "error";
+  const isUploading = item.status === "uploading";
+
+  if (item.isImage && item.status === "success") {
+    // 图片：缩略图显示
+    return (
+      <div
+        className={styles["attach-image"]}
+        style={{ backgroundImage: `url("${item.url}")` }}
+      >
+        {onDelete && (
+          <div className={styles["attach-image-mask"]}>
+            <DeleteImageButton deleteImage={onDelete!} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 文件 / 上传中 / 错误状态
+  return (
+    <div
+      className={`${styles["attach-file-card"]} ${
+        isError ? styles["attach-item-error"] : ""
+      }`}
+      title={item.name}
+    >
+      {isUploading && <div className={styles["attach-item-uploading"]} />}
+      {/* <div className={styles["attach-file-icon"]}>{ext}</div> */}
+      <div className={styles["attach-file-info"]}>
+        <div className={styles["attach-file-name"]}>
+          {truncateMiddle(item.name)}
+        </div>
+        <div className={styles["attach-file-size"]}>
+          <div>{ext},</div>
+          {isError ? t("Chat.UploadFailed") : formatFileSize(item.size)}
+        </div>
+      </div>
+      {onDelete && (
+        <div className={styles["attach-file-close"]} onClick={onDelete}>
+          ×
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AttachmentScrollBox(props: {
+  items: Attachment[];
+  onDelete?: (id: string) => void;
+}) {
+  const attachScrollRef = useRef<HTMLDivElement>(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = attachScrollRef.current;
+    if (!el) return;
+    setShowLeft(el.scrollLeft > 0);
+    setShowRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    const el = attachScrollRef.current;
+    if (!el) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      checkScroll();
+    });
+    resizeObserver.observe(el);
+
+    const mutationObserver = new MutationObserver(() => {
+      checkScroll();
+    });
+    mutationObserver.observe(el, { childList: true, subtree: true });
+
+    checkScroll();
+
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, [checkScroll]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      checkScroll();
+    });
+  }, [props.items, checkScroll]);
+
+  const scroll = (direction: "left" | "right") => {
+    const el = attachScrollRef.current;
+    if (!el) return;
+    el.scrollBy({
+      left: direction === "left" ? -150 : 150,
+      behavior: "smooth",
+    });
+  };
+
+  if (props.items.length === 0) return null;
+
+  return (
+    <div className={styles["attach-scroll-wrapper"]}>
+      {showLeft && (
+        <div className={styles["attach-scroll-fade-left"]}>
+          <div
+            className={styles["attach-scroll-arrow"]}
+            onClick={() => scroll("left")}
+          >
+            ‹
+          </div>
+        </div>
+      )}
+      <div
+        ref={attachScrollRef}
+        className={styles["attach-scroll-box"]}
+        onScroll={checkScroll}
+      >
+        {props.items.map((item) => (
+          <AttachmentItem
+            key={item.id}
+            item={item}
+            onDelete={
+              props.onDelete ? () => props.onDelete!(item.id) : undefined
+            }
+          />
+        ))}
+      </div>
+      {showRight && (
+        <div className={styles["attach-scroll-fade-right"]}>
+          <div
+            className={styles["attach-scroll-arrow"]}
+            onClick={() => scroll("right")}
+          >
+            ›
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ShortcutKeyModal(props: { onClose: () => void }) {
   const { t } = useTranslation();
   const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
@@ -1189,6 +1356,21 @@ export function _Chat_NEW() {
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleFileDrop = async (files: File[]) => {
+    console.log("拖入的文件:", files);
+
+    // 示例：上传文件
+    const formData = new FormData();
+    formData.append("file", files[0], "a.txt");
+
+    await PostAttachmentUpload(await getHeaders(), formData, (percent) => {
+      console.log(`上传进度: ${percent}%`);
+    }).then((res) => console.log(res));
+  };
+
+  const showOverlay = useDragOverlay(containerRef, handleFileDrop);
   const [showExport, setShowExport] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -1226,8 +1408,8 @@ export function _Chat_NEW() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
-  const [attachImages, setAttachImages] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const uploading = attachments.some((a) => a.status === "uploading");
 
   // prompt hints
   const promptStore = usePromptStore();
@@ -1298,7 +1480,7 @@ export function _Chat_NEW() {
   };
 
   const doSubmit = async (userInput: string) => {
-    if (userInput.trim() === "" && isEmpty(attachImages)) return;
+    if (userInput.trim() === "" && attachments.length === 0) return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
@@ -1309,9 +1491,9 @@ export function _Chat_NEW() {
     setIsLoading(true);
 
     await newChatStore
-      .onUserInput(userInput, attachImages)
+      .onUserInput(userInput, attachments.length > 0 ? attachments : undefined)
       .then(() => setIsLoading(false));
-    setAttachImages([]);
+    setAttachments([]);
     newChatStore.setLastInput(userInput);
     setUserInput("");
     setPromptHints([]);
@@ -1459,9 +1641,8 @@ export function _Chat_NEW() {
     // resend the message
     setIsLoading(true);
     const textContent = getMessageTextContent(userMessage);
-    const images = getMessageImages(userMessage);
     newChatStore
-      .onUserInput(textContent, images)
+      .onUserInput(textContent, userMessage.attachments)
       .then(() => setIsLoading(false));
     // inputRef.current?.focus();
     textareaRef.current?.focus();
@@ -1712,6 +1893,60 @@ export function _Chat_NEW() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const addAttachments = useCallback(
+    (files: File[]) => {
+      const validFiles = files.filter(
+        (file) =>
+          file.size <= MAX_FILE_SIZE ||
+          (showToast(t("Chat.FileTooLarge")), false),
+      );
+      if (validFiles.length === 0) return;
+
+      const newItems: Attachment[] = validFiles.map((file) => ({
+        id: nanoid(),
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: "",
+        isImage: isImageFile(file),
+        status: "uploading" as const,
+      }));
+
+      setAttachments((prev) => {
+        const total = prev.length + newItems.length;
+        if (total > 100) {
+          showToast(t("Chat.UploadFileTips"));
+          return prev;
+        }
+        return [...prev, ...newItems];
+      });
+
+      // 异步上传每个文件
+      validFiles.forEach((file, idx) => {
+        uploadAttachment(file)
+          .then((url) => {
+            setAttachments((prev) =>
+              prev.map((a) =>
+                a.id === newItems[idx].id
+                  ? { ...a, url, status: "success" as const }
+                  : a,
+              ),
+            );
+          })
+          .catch(() => {
+            setAttachments((prev) =>
+              prev.map((a) =>
+                a.id === newItems[idx].id
+                  ? { ...a, status: "error" as const }
+                  : a,
+              ),
+            );
+          });
+      });
+    },
+    [t],
+  );
+
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
       const currentModel = newChatStore.currentSession!.mask.modelConfig.model;
@@ -1719,105 +1954,33 @@ export function _Chat_NEW() {
         return;
       }
       const items = (event.clipboardData || window.clipboardData).items;
+      const files: File[] = [];
       for (const item of items) {
         if (item.kind === "file" && item.type.startsWith("image/")) {
           event.preventDefault();
           const file = item.getAsFile();
-          if (file) {
-            const images: string[] = [];
-            images.push(...attachImages);
-            images.push(
-              ...(await new Promise<string[]>((res, rej) => {
-                setUploading(true);
-                const imagesData: string[] = [];
-                uploadImageRemote(file)
-                  .then((dataUrl) => {
-                    imagesData.push(dataUrl);
-                    setUploading(false);
-                    res(imagesData);
-                  })
-                  .catch((e) => {
-                    setUploading(false);
-                    rej(e);
-                  });
-              })),
-            );
-            const imagesLength = images.length;
-            if (imagesLength > 3) {
-              images.splice(3, imagesLength - 3);
-            }
-            setAttachImages(images);
-          }
+          if (file) files.push(file);
         }
       }
+      if (files.length > 0) addAttachments(files);
     },
-    [attachImages, newChatStore],
+    [newChatStore, addAttachments],
   );
 
-  async function uploadImage() {
-    if (attachImages.length >= 3) {
-      return showToast(t("Chat.UploadImageTips"));
+  async function uploadFiles() {
+    if (attachments.length >= 100) {
+      return showToast(t("Chat.UploadFileTips"));
     }
-    const images: string[] = [];
-    images.push(...attachImages);
 
-    images.push(
-      ...(await new Promise<string[]>((res, rej) => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept =
-          "image/png, image/jpeg, image/webp, image/heic, image/heif";
-        fileInput.multiple = true;
-        fileInput.onchange = (event: any) => {
-          setUploading(true);
-          const files = event.target.files;
-          const imagesData: string[] = [];
-          const validImageTypes = [
-            "image/png",
-            "image/jpeg",
-            "image/webp",
-            "image/heic",
-            "image/heif",
-          ];
-
-          for (let i = 0; i < files.length; i++) {
-            const file = event.target.files[i];
-
-            if (!validImageTypes.includes(file.type)) {
-              if (i === files.length - 1) {
-                setUploading(false);
-                rej(new Error("No valid images were selected."));
-              } else {
-                continue;
-              }
-            }
-
-            uploadImageRemote(file)
-              .then((dataUrl) => {
-                imagesData.push(dataUrl);
-                if (
-                  imagesData.length === 3 ||
-                  imagesData.length === files.length
-                ) {
-                  setUploading(false);
-                  res(imagesData);
-                }
-              })
-              .catch((e) => {
-                setUploading(false);
-                rej(e);
-              });
-          }
-        };
-        fileInput.click();
-      })),
-    );
-
-    const imagesLength = images.length;
-    if (imagesLength > 3) {
-      images.splice(3, imagesLength - 3);
-    }
-    setAttachImages(images);
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ALLOWED_FILE_ACCEPT;
+    fileInput.multiple = true;
+    fileInput.onchange = (event: any) => {
+      const files: File[] = Array.from(event.target.files || []);
+      addAttachments(files);
+    };
+    fileInput.click();
   }
 
   // 快捷键 shortcut keys
@@ -1937,6 +2100,7 @@ export function _Chat_NEW() {
     <>
       <div
         className={omeStore.isFromApp ? styles["chat-is-app"] : styles.chat}
+        ref={containerRef}
         key={session.id}
       >
         {omeStore.isFromApp ? (
@@ -2352,6 +2516,14 @@ export function _Chat_NEW() {
                                 )}
                               </div>
                             )}
+                            {message.attachments &&
+                              message.attachments.length > 0 && (
+                                <div className={styles["chat-message-files"]}>
+                                  {message.attachments.map((item) => (
+                                    <AttachmentItem key={item.id} item={item} />
+                                  ))}
+                                </div>
+                              )}
                           </div>
                           {message?.audio_url && (
                             <div className={styles["chat-message-audio"]}>
@@ -2421,9 +2593,7 @@ export function _Chat_NEW() {
                 onPromptSelect={onPromptSelect}
               />
               <ChatActions
-                uploadImage={uploadImage}
-                setAttachImages={setAttachImages}
-                setUploading={setUploading}
+                uploadFiles={uploadFiles}
                 showPromptModal={() => setShowPromptModal(true)}
                 scrollToBottom={scrollToBottom}
                 hitBottom={hitBottom}
@@ -2496,33 +2666,16 @@ export function _Chat_NEW() {
                         : undefined,
                       marginRight: 2,
                       border: "none",
-                      marginBottom: attachImages.length != 0 ? "8px" : 0,
+                      marginBottom: attachments.length != 0 ? "8px" : 0,
                     }}
                   />
 
-                  {attachImages.length != 0 && (
-                    <div className={styles["attach-images-app"]}>
-                      {attachImages.map((image, index) => {
-                        return (
-                          <div
-                            key={index}
-                            className={styles["attach-image"]}
-                            style={{ backgroundImage: `url("${image}")` }}
-                          >
-                            <div className={styles["attach-image-mask"]}>
-                              <DeleteImageButton
-                                deleteImage={() => {
-                                  setAttachImages(
-                                    attachImages.filter((_, i) => i !== index),
-                                  );
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <AttachmentScrollBox
+                    items={attachments}
+                    onDelete={(id) =>
+                      setAttachments(attachments.filter((a) => a.id !== id))
+                    }
+                  />
                 </div>
 
                 <div
@@ -2538,7 +2691,7 @@ export function _Chat_NEW() {
                   }}
                 >
                   {omeStore.isFromApp ? (
-                    isEmpty(userInput) && attachImages.length === 0 ? (
+                    isEmpty(userInput) && attachments.length === 0 ? (
                       <NextImage
                         src={GraySendIcon.src}
                         alt=""
@@ -2653,6 +2806,13 @@ export function _Chat_NEW() {
                   }}
                 >
                   <div style={{ width: "100%" }}>
+                    <AttachmentScrollBox
+                      items={attachments}
+                      onDelete={(id) =>
+                        setAttachments(attachments.filter((a) => a.id !== id))
+                      }
+                    />
+
                     <Input.TextArea
                       id="chat-input"
                       ref={textareaRef}
@@ -2686,35 +2846,9 @@ export function _Chat_NEW() {
                           : undefined,
                         marginRight: 2,
                         border: "none",
-                        marginBottom: attachImages.length != 0 ? "8px" : 0,
+                        marginBottom: attachments.length != 0 ? "8px" : 0,
                       }}
                     />
-
-                    {attachImages.length != 0 && (
-                      <div className={styles["attach-images-app"]}>
-                        {attachImages.map((image, index) => {
-                          return (
-                            <div
-                              key={index}
-                              className={styles["attach-image"]}
-                              style={{ backgroundImage: `url("${image}")` }}
-                            >
-                              <div className={styles["attach-image-mask"]}>
-                                <DeleteImageButton
-                                  deleteImage={() => {
-                                    setAttachImages(
-                                      attachImages.filter(
-                                        (_, i) => i !== index,
-                                      ),
-                                    );
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -2734,7 +2868,7 @@ export function _Chat_NEW() {
                   }}
                 >
                   {omeStore.isFromApp ? (
-                    isEmpty(userInput) && attachImages.length === 0 ? (
+                    isEmpty(userInput) && attachments.length === 0 ? (
                       <div
                         style={{
                           width: "32px",
@@ -2767,7 +2901,10 @@ export function _Chat_NEW() {
                         backgroundColor: "var(--primary)",
                         padding: "10px",
                       }}
-                      onClick={() => doSubmit(userInput)}
+                      // onClick={() => doSubmit(userInput)}
+                      onClick={() =>
+                        toast.info("不支持「插画SaaS.svg」图片类型")
+                      }
                     >
                       <SendWhiteIcon />
                       <div
@@ -2808,7 +2945,7 @@ export function _Chat_NEW() {
                     : styles["chat-input-panel-inner"],
                   {
                     [styles["chat-input-panel-inner-attach"]]:
-                      attachImages.length !== 0,
+                      attachments.length !== 0,
                   },
                 )}
                 htmlFor="chat-input"
@@ -2864,31 +3001,12 @@ export function _Chat_NEW() {
                       }}
                     />
 
-                    {attachImages.length != 0 && (
-                      <div className={styles["attach-images"]}>
-                        {attachImages.map((image, index) => {
-                          return (
-                            <div
-                              key={index}
-                              className={styles["attach-image"]}
-                              style={{ backgroundImage: `url("${image}")` }}
-                            >
-                              <div className={styles["attach-image-mask"]}>
-                                <DeleteImageButton
-                                  deleteImage={() => {
-                                    setAttachImages(
-                                      attachImages.filter(
-                                        (_, i) => i !== index,
-                                      ),
-                                    );
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                    <AttachmentScrollBox
+                      items={attachments}
+                      onDelete={(id) =>
+                        setAttachments(attachments.filter((a) => a.id !== id))
+                      }
+                    />
                     <IconButton
                       icon={<SendWhiteIcon />}
                       text={Locale.Chat.Send}
@@ -2936,6 +3054,8 @@ export function _Chat_NEW() {
       {showShortcutKeyModal && (
         <ShortcutKeyModal onClose={() => setShowShortcutKeyModal(false)} />
       )}
+
+      {showOverlay && !omeStore.isFromApp && <UploadOverlay />}
     </>
   );
 }

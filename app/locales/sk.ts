@@ -76,6 +76,8 @@ const sk: PartialLocaleType = {
       Masks: "Masky",
       Clear: "Vymazať kontext",
       Settings: "Nastavenia",
+      UploadImage: "Nahrať obrázok",
+      UploadFile: "Nahrať súbory",
       OnlineSearch: "Online vyhľadávanie",
     },
     Rename: "Premenovať Chat",
@@ -95,6 +97,9 @@ const sk: PartialLocaleType = {
         "Môžem vám pomôcť s vyhľadávaním a odpovedaním na otázky. Spýtajte sa ma na čokoľvek!",
     },
     UploadImageTips: "Povolené je nahrať maximálne tri obrázky!",
+    UploadFileTips: "Povolené je nahrať maximálne 100 príloh!",
+    FileTooLarge: "Súbor presahuje limit 5 MB",
+    UploadFailed: "Nahrávanie zlyhalo",
     Voice: {
       HoldToTalk: "Podržte pre hovorenie",
       ReleaseToSendSlideUpToCancel:
