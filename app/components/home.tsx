@@ -226,6 +226,9 @@ function Screen() {
         if (omeStore.isFromApp) {
           omeStore.setIsShowHome(false);
         }
+
+        if (location.pathname !== Path.Home) return;
+
         navigate(Path.Chat);
       });
     }
@@ -418,29 +421,43 @@ export function Home() {
       } else {
         if (
           !event.origin.includes("omeoffice") &&
+          !event.origin.includes("daoword") &&
           !event.origin.includes("localhost")
         ) {
           return; // 如果不是信任的源，忽略消息
         }
 
-        if (!isEmpty(event?.data?.ometoken)) {
-          console.log(
-            "[OmeToken] got ometoken from iframe",
-            event.data.ometoken,
-          );
-          omeStore.setToken(event.data.ometoken);
+        // if (!isEmpty(event?.data?.ometoken)) {
+        //   console.log(
+        //     "[OmeToken] got ometoken from iframe",
+        //     event.data.ometoken,
+        //   );
+        //   omeStore.setToken(event.data.ometoken);
+        //   useEnhanceChatStore.getState().setIsDown(true);
+        // }
+
+        // if (!isEmpty(event?.data?.omeUserId)) {
+        //   omeStore.setUserId(event?.data?.omeUserId);
+        // }
+
+        // if (!isEmpty(event?.data?.omeUserName)) {
+        //   omeStore.setUserName(event?.data?.omeUserName);
+        // }
+
+        // omeStore.setFrom("omeoffice web");
+
+        // omeStore.setIsFromApp(false);
+
+        if (
+          !isEmpty(event?.data?.omeUserId) &&
+          !isEmpty(event?.data?.omeUserName)
+        ) {
+          omeStore.setUserId(event?.data?.omeUserId);
+          omeStore.setUserName(event?.data?.omeUserName);
+          omeStore.setFrom("omeoffice web");
+          omeStore.setIsFromApp(false);
           useEnhanceChatStore.getState().setIsDown(true);
         }
-
-        if (!isEmpty(event?.data?.omeUserId)) {
-          omeStore.setUserId(event?.data?.omeUserId);
-        }
-
-        if (!isEmpty(event?.data?.omeUserName)) {
-          omeStore.setUserName(event?.data?.omeUserName);
-        }
-        omeStore.setFrom("omeoffice web");
-        omeStore.setIsFromApp(false);
       }
     };
 
