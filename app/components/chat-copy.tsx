@@ -3135,6 +3135,7 @@ export function _Chat_NEW() {
                   display: "flex",
                   justifyContent: "center",
                   marginTop: "1rem",
+                  fontSize: "12px",
                 }}
               >
                 {omeStore.language !== "cn" && omeStore.language !== "tw"
