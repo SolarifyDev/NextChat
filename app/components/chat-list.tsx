@@ -222,9 +222,9 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             }}
             onDelete={async () => {
               if (
-                (!props.narrow && !isMobileScreen) ||
+                // (!props.narrow && !isMobileScreen) ||  web端需要也顯示彈窗
                 // (await showConfirm(Locale.Home.DeleteChat))
-                (await showConfirm(t("Home.DeleteChat")))
+                await showConfirm(t("Home.DeleteChat"))
               ) {
                 deleteSession(item.sessionId!);
               }
