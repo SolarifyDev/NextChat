@@ -181,6 +181,7 @@ export const PostAttachmentUpload = async (
             onUploadProgress(percent);
           }
         : undefined,
+      timeout: 120000,
     })
   ).data;
 };

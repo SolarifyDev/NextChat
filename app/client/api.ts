@@ -50,6 +50,7 @@ export interface Attachment {
   url: string;
   isImage: boolean;
   status: "uploading" | "success" | "error";
+  progress?: number; // 0-100
 }
 
 export interface MultimodalContentForAlibaba {

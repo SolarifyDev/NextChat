@@ -88,7 +88,6 @@ import {
 } from "../utils";
 
 import {
-  uploadAttachment,
   isImageFile,
   MAX_FILE_SIZE,
   ALLOWED_FILE_ACCEPT,
@@ -1124,6 +1123,44 @@ function truncateMiddle(name: string): string {
   return name.slice(0, 7) + "..." + name.slice(-7);
 }
 
+function CircularProgress({
+  percent,
+  size = 24,
+}: {
+  percent: number;
+  size?: number;
+}) {
+  const strokeWidth = 2.5;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percent / 100) * circumference;
+
+  return (
+    <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="rgba(136,136,136,0.2)"
+        strokeWidth={strokeWidth}
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="#6366f1"
+        strokeWidth={strokeWidth}
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap="round"
+        style={{ transition: "stroke-dashoffset 0.2s ease" }}
+      />
+    </svg>
+  );
+}
+
 function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
   const { t } = useTranslation();
   const { item, onDelete } = props;
@@ -1147,6 +1184,20 @@ function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
     );
   }
 
+  // 图片上传中
+  if (item.isImage && isUploading) {
+    return (
+      <div className={styles["attach-image"]}>
+        <div className={styles["attach-item-uploading"]}>
+          <CircularProgress percent={item.progress ?? 0} size={28} />
+          <span className={styles["attach-progress-text"]}>
+            {item.progress ?? 0}%
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   // 文件 / 上传中 / 错误状态
   return (
     <div
@@ -1155,7 +1206,14 @@ function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
       }`}
       title={item.name}
     >
-      {isUploading && <div className={styles["attach-item-uploading"]} />}
+      {isUploading && (
+        <div className={styles["attach-item-uploading"]}>
+          <CircularProgress percent={item.progress ?? 0} size={24} />
+          <span className={styles["attach-progress-text"]}>
+            {item.progress ?? 0}%
+          </span>
+        </div>
+      )}
       {/* <div className={styles["attach-file-icon"]}>{ext}</div> */}
       <div className={styles["attach-file-info"]}>
         <div className={styles["attach-file-name"]}>
@@ -1357,20 +1415,6 @@ export function _Chat_NEW() {
   const fontFamily = config.fontFamily;
 
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleFileDrop = async (files: File[]) => {
-    console.log("拖入的文件:", files);
-
-    // 示例：上传文件
-    const formData = new FormData();
-    formData.append("file", files[0], "a.txt");
-
-    await PostAttachmentUpload(await getHeaders(), formData, (percent) => {
-      console.log(`上传进度: ${percent}%`);
-    }).then((res) => console.log(res));
-  };
-
-  const showOverlay = useDragOverlay(containerRef, handleFileDrop);
   const [showExport, setShowExport] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -1893,6 +1937,12 @@ export function _Chat_NEW() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleFileDrop = async (files: File[]) => {
+    addAttachments(files);
+  };
+
+  const showOverlay = useDragOverlay(containerRef, handleFileDrop);
+
   const addAttachments = useCallback(
     (files: File[]) => {
       const validFiles = files.filter(
@@ -1910,6 +1960,7 @@ export function _Chat_NEW() {
         url: "",
         isImage: isImageFile(file),
         status: "uploading" as const,
+        progress: 0,
       }));
 
       setAttachments((prev) => {
@@ -1921,27 +1972,40 @@ export function _Chat_NEW() {
         return [...prev, ...newItems];
       });
 
-      // 异步上传每个文件
-      validFiles.forEach((file, idx) => {
-        uploadAttachment(file)
-          .then((url) => {
-            setAttachments((prev) =>
-              prev.map((a) =>
-                a.id === newItems[idx].id
-                  ? { ...a, url, status: "success" as const }
-                  : a,
-              ),
-            );
-          })
-          .catch(() => {
-            setAttachments((prev) =>
-              prev.map((a) =>
-                a.id === newItems[idx].id
-                  ? { ...a, status: "error" as const }
-                  : a,
-              ),
-            );
-          });
+      // 异步上传每个文件，使用 PostAttachmentUpload 支持进度
+      validFiles.forEach(async (file, idx) => {
+        const itemId = newItems[idx].id;
+        const formData = new FormData();
+        formData.append("file", file, file.name);
+
+        try {
+          const headers = await getHeaders();
+          const res = await PostAttachmentUpload(
+            headers,
+            formData,
+            (percent) => {
+              setAttachments((prev) =>
+                prev.map((a) =>
+                  a.id === itemId ? { ...a, progress: percent } : a,
+                ),
+              );
+            },
+          );
+          const url = typeof res === "string" ? res : res?.url ?? "";
+          setAttachments((prev) =>
+            prev.map((a) =>
+              a.id === itemId
+                ? { ...a, url, status: "success" as const, progress: 100 }
+                : a,
+            ),
+          );
+        } catch {
+          setAttachments((prev) =>
+            prev.map((a) =>
+              a.id === itemId ? { ...a, status: "error" as const } : a,
+            ),
+          );
+        }
       });
     },
     [t],

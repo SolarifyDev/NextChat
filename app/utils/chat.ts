@@ -164,7 +164,7 @@ export function uploadImage(file: Blob): Promise<string> {
     });
 }
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+export const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
 export const ALLOWED_FILE_ACCEPT =
   ".png,.jpg,.jpeg,.webp,.heic,.heif,.pdf,.doc,.docx,.xlsx,.ppt,.pptx,.txt,.csv,.json";
