@@ -10,9 +10,7 @@ interface UserActivityMonitorOptions {
 
 interface UserActivityStatus {
   isMonitoring: boolean;
-  isPageVisible: boolean;
   timeoutMinutes: number;
-  hasActiveTimer: boolean;
 }
 
 interface GAEventData {
@@ -31,9 +29,9 @@ class UserActivityMonitor {
   private userId: string;
   private eventUuid: string;
 
-  // 状态管理
-  private timer: NodeJS.Timeout | null = null;
-  private isPageVisible: boolean = true;
+  // 状态管理 —— 基于 rAF + 绝对时间戳，零累积漂移
+  private rafId: number | null = null;
+  private lastActivityTime: number = 0;
   private isMonitoring: boolean = false;
 
   // 监听的用户事件
@@ -73,72 +71,57 @@ class UserActivityMonitor {
   }
 
   private bindEvents(): void {
-    // 用户活动事件绑定
     this.activityEvents.forEach((event) => {
       document.addEventListener(event, this.handleUserActivity, true);
     });
-
-    // 只监听 focus 事件，移除 blur
-    window.addEventListener("focus", this.handleUserActivity, true);
 
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
     window.addEventListener("beforeunload", this.cleanup);
   }
 
-  private handleUserActivity(): void {
-    if (!this.isPageVisible) return;
-    this.log("检测到用户活动，重置定时器");
-    this.resetTimer();
+  private handleVisibilityChange(): void {
+    if (!document.hidden) {
+      this.log("页面恢复可见，重置时间戳");
+      this.lastActivityTime = Date.now();
+    }
   }
 
-  private handleVisibilityChange(): void {
-    if (document.hidden) {
-      this.log("页面隐藏，停止监测");
-      this.isPageVisible = false;
-      this.stopMonitoring();
-    } else {
-      this.log("页面显示，重新开始监测");
-      this.isPageVisible = true;
-      this.startMonitoring();
-    }
+  private handleUserActivity(): void {
+    this.log("检测到用户活动，重置时间戳");
+    this.lastActivityTime = Date.now();
   }
 
   private startMonitoring(): void {
-    if (this.isMonitoring) this.clearTimer();
+    if (this.isMonitoring) this.stopRaf();
     this.isMonitoring = true;
-    this.timer = setTimeout(() => {
-      this.handleTimeout();
-    }, this.timeout);
+    this.lastActivityTime = Date.now();
+    this.tick();
     this.log("开始监测：", this.timeout / 1000 / 60, "分钟无活动");
   }
 
+  private tick(): void {
+    if (!this.isMonitoring) return;
+
+    if (Date.now() - this.lastActivityTime >= this.timeout) {
+      this.log("用户无活动超时，触发 GA 事件");
+      this.sendGAEvent();
+      this.lastActivityTime = Date.now();
+    }
+
+    this.rafId = requestAnimationFrame(() => this.tick());
+  }
+
+  private stopRaf(): void {
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  }
+
   private stopMonitoring(): void {
-    this.clearTimer();
+    this.stopRaf();
     this.isMonitoring = false;
     this.log("停止活动监测");
-  }
-
-  private resetTimer(): void {
-    if (!this.isMonitoring) return;
-    this.clearTimer();
-    this.timer = setTimeout(() => {
-      this.handleTimeout();
-    }, this.timeout);
-  }
-
-  private clearTimer(): void {
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
-  }
-
-  private handleTimeout(): void {
-    this.log("用户无活动超时，触发 GA 事件");
-    this.sendGAEvent();
-    if (this.isPageVisible) {
-      this.startMonitoring();
-    }
   }
 
   private sendGAEvent(): void {
@@ -163,21 +146,18 @@ class UserActivityMonitor {
   public getStatus(): UserActivityStatus {
     return {
       isMonitoring: this.isMonitoring,
-      isPageVisible: this.isPageVisible,
       timeoutMinutes: Math.floor(this.timeout / 1000 / 60),
-      hasActiveTimer: !!this.timer,
     };
   }
 
   private cleanup(): void {
-    this.log("清理事件监听和定时器");
+    this.log("清理事件监听和 rAF");
     this.stopMonitoring();
 
     this.activityEvents.forEach((event) => {
       document.removeEventListener(event, this.handleUserActivity, true);
     });
 
-    window.removeEventListener("focus", this.handleUserActivity, true);
     document.removeEventListener(
       "visibilitychange",
       this.handleVisibilityChange,

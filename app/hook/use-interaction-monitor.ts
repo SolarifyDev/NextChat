@@ -1,63 +1,60 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export function useInteractionMonitor(
   onReport?: (interacted: boolean) => void,
 ) {
-  const [isActive, setIsActive] = useState(true);
-  const [countdown, setCountdown] = useState(60);
-  const [totalInteractedTime, setTotalInteractedTime] = useState(0); // 👈 总交互时长（秒）
-
   const interactedRef = useRef(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+  const cycleStartRef = useRef<number>(0);
+  const isActiveRef = useRef(false);
+  const totalInteractedTimeRef = useRef(0); // 总交互时长（秒）
 
   const markInteracted = () => {
-    if (isActive) {
+    if (isActiveRef.current) {
       interactedRef.current = true;
     }
+  };
+
+  const tick = () => {
+    if (!isActiveRef.current) return;
+
+    const elapsed = Date.now() - cycleStartRef.current;
+    if (elapsed >= 60 * 1000) {
+      const interacted = interactedRef.current;
+
+      if (interacted) {
+        totalInteractedTimeRef.current += 60;
+      }
+
+      if (onReport) {
+        onReport(interacted);
+      }
+
+      interactedRef.current = false;
+      cycleStartRef.current = Date.now();
+    }
+
+    rafIdRef.current = requestAnimationFrame(tick);
   };
 
   const startMonitor = () => {
     stopMonitor();
     interactedRef.current = false;
-    setCountdown(60);
-
-    countdownRef.current = setInterval(() => {
-      setCountdown((prev) => {
-        const next = prev - 1;
-        return next <= 0 ? 60 : next;
-      });
-    }, 1000);
-
-    timerRef.current = setInterval(() => {
-      const interacted = interactedRef.current;
-
-      // 👇 如果有交互，就累计60秒
-      if (interacted) {
-        setTotalInteractedTime((prev) => {
-          const updated = prev + 60;
-          return updated;
-        });
-      }
-
-      if (onReport) {
-        onReport(interacted); // 🔔 回调给外部
-      }
-      interactedRef.current = false;
-    }, 60 * 1000);
+    cycleStartRef.current = Date.now();
+    isActiveRef.current = true;
+    rafIdRef.current = requestAnimationFrame(tick);
   };
 
   const stopMonitor = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (countdownRef.current) clearInterval(countdownRef.current);
-    timerRef.current = null;
-    countdownRef.current = null;
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    isActiveRef.current = false;
   };
 
   const handleVisibilityChange = () => {
-    const visible = document.visibilityState === "visible";
-    setIsActive(visible);
-    if (visible) {
+    if (document.visibilityState === "visible") {
       startMonitor();
     } else {
       stopMonitor();
@@ -65,9 +62,10 @@ export function useInteractionMonitor(
   };
 
   const getCurrentInteractedMs = (isAll = false) => {
+    const elapsed = Math.min(Date.now() - cycleStartRef.current, 60 * 1000);
     return (
-      totalInteractedTime * 1000 +
-      (isAll ? (interactedRef.current ? (60 - countdown) * 1000 : 0) : 0)
+      totalInteractedTimeRef.current * 1000 +
+      (isAll ? (interactedRef.current ? elapsed : 0) : 0)
     );
   };
 
