@@ -1,4 +1,4 @@
-import { trackEvent } from "../utils/ga";
+import { postMessageToReactNative } from "../utils/ga";
 
 interface UserActivityMonitorOptions {
   timeout?: number;
@@ -127,14 +127,24 @@ class UserActivityMonitor {
   private sendGAEvent(): void {
     try {
       if (typeof window.gtag === "function") {
-        trackEvent(
-          this.gaEventName,
+        // trackEvent(
+        //   this.gaEventName,
+        //   {
+        //     time: Date.now(),
+        //     userId: this.userId,
+        //     metis_event_id: this.eventUuid,
+        //   },
+        //   this.debug,
+        // );
+
+        postMessageToReactNative(
           {
+            action: this.gaEventName,
             time: Date.now(),
             userId: this.userId,
             metis_event_id: this.eventUuid,
           },
-          this.debug,
+          this.gaEventName,
         );
         return;
       }

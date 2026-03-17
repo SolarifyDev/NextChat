@@ -36,9 +36,9 @@ import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
 import { useOmeStore } from "../store/ome";
 import { MessageEnum } from "../enum";
-import { trackEvent } from "../utils/ga";
 import { useEnhanceChatStore } from "../store/enhance-chat";
 import { isNil } from "lodash";
+import { postMessageToReactNative } from "../utils/ga";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -260,11 +260,21 @@ export function SideBar(props: {
   const { run: addConversation } = useDebounceFn(
     () => {
       if (omeStore.from === "omelinkapp") {
-        trackEvent("click_chat_timestamp", {
-          userId: omeStore.userId,
-          time: Date.now(),
-          metis_event_id: omeStore.eventUuid,
-        });
+        // trackEvent("click_chat_timestamp", {
+        //   userId: omeStore.userId,
+        //   time: Date.now(),
+        //   metis_event_id: omeStore.eventUuid,
+        // });
+
+        postMessageToReactNative(
+          {
+            action: "click_chat_timestamp",
+            userId: omeStore.userId,
+            time: Date.now(),
+            metis_event_id: omeStore.eventUuid,
+          },
+          "click_chat_timestamp",
+        );
       }
 
       newChatStore.newSession(undefined, () => {
