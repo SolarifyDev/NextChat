@@ -15,8 +15,8 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { useOmeStore } from "../store/ome";
-import { trackEvent } from "../utils/ga";
 import { useEnhanceChatStore } from "../store/enhance-chat";
+import { postMessageToReactNative } from "../utils/ga";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -188,11 +188,21 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             selected={item?.sessionId === sessionId}
             onClick={() => {
               if (from === "omelinkapp") {
-                trackEvent("click_chat_timestamp", {
-                  userId: userId,
-                  time: Date.now(),
-                  metis_event_id: eventUuid,
-                });
+                // trackEvent("click_chat_timestamp", {
+                //   userId: userId,
+                //   time: Date.now(),
+                //   metis_event_id: eventUuid,
+                // });
+
+                postMessageToReactNative(
+                  {
+                    action: "click_chat_timestamp",
+                    userId: userId,
+                    time: Date.now(),
+                    metis_event_id: eventUuid,
+                  },
+                  "click_chat_timestamp",
+                );
               }
 
               // selectSession(i);

@@ -38,9 +38,9 @@ import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
 import UserActivityMonitor from "../hook/use-activity";
 import { useInteractionMonitor } from "../hook/use-interaction-monitor";
-import { trackEvent } from "../utils/ga";
 import { PostGetToken } from "../client/smarties";
 import { useEnhanceChatStore } from "../store/enhance-chat";
+import { postMessageToReactNative } from "../utils/ga";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -232,11 +232,21 @@ function Screen() {
     console.log("📤 上传行为埋点 => ", interacted ? "活跃" : "无操作");
 
     if (omeStore.from === "omelinkapp") {
-      trackEvent("app_is_active", {
-        isActive: interacted,
-        userId: omeStore.userId,
-        metis_event_id: omeStore.eventUuid,
-      });
+      // trackEvent("app_is_active", {
+      //   isActive: interacted,
+      //   userId: omeStore.userId,
+      //   metis_event_id: omeStore.eventUuid,
+      // });
+
+      postMessageToReactNative(
+        {
+          action: "app_is_active",
+          isActive: interacted,
+          userId: omeStore.userId,
+          metis_event_id: omeStore.eventUuid,
+        },
+        "app_is_active",
+      );
     }
   });
 

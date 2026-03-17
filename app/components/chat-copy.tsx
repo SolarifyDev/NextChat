@@ -142,7 +142,6 @@ import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
 import { useDebounceFn } from "ahooks";
-import { trackEvent } from "../utils/ga";
 import {
   getBotHello,
   getDefaultTopic,
@@ -150,6 +149,7 @@ import {
 } from "../store/enhance-chat";
 import VoiceChatButton from "./voice";
 import { QuestionInputType } from "../client/smarties";
+import { postMessageToReactNative } from "../utils/ga";
 
 const localStorage = safeLocalStorage();
 
@@ -1304,11 +1304,22 @@ export function _Chat_NEW() {
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
 
     if (omeStore.from === "omelinkapp") {
-      trackEvent("click_send_timestamp", {
-        userId: omeStore.userId,
-        time: Date.now(),
-        metis_event_id: omeStore.eventUuid,
-      });
+      // trackEvent("click_send_timestamp", {
+      //   userId: omeStore.userId,
+      //   time: Date.now(),
+      //   metis_event_id: omeStore.eventUuid,
+      // });
+
+      postMessageToReactNative(
+        {
+          action: "click_send_timestamp",
+          time: Date.now(),
+          metis_event_id: omeStore.eventUuid,
+          userId: omeStore.userId,
+          // debug: true,
+        },
+        "click_send_timestamp",
+      );
     }
 
     const matchCommand = chatCommands.match(userInput);
