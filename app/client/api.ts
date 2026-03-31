@@ -391,7 +391,11 @@ export async function getHeaders(ignoreHeaders: boolean = false) {
     headers["Ome-Metis-Username"] = omeStore.userName || "";
   }
 
-  headers["OnlineSearch"] = (omeStore.onlineSearch ? 1 : 0).toString();
+  headers["OnlineSearch"] = (
+    omeStore.faqSearch ? 0 : omeStore.onlineSearch ? 1 : 0
+  ).toString();
+
+  headers["NeedFaq"] = (omeStore.faqSearch ? 1 : 0).toString();
 
   return headers;
 }
