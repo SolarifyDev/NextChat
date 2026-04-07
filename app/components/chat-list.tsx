@@ -133,7 +133,8 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
-  const { onlineSearch, setOnlineSearch } = useOmeStore();
+  const { onlineSearch, setOnlineSearch, faqSearch, setFaqSearch } =
+    useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
@@ -196,12 +197,16 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
               if (onlineSearch) {
                 setOnlineSearch(false);
               }
+
+              if (faqSearch) {
+                setFaqSearch(false);
+              }
             }}
             onDelete={async () => {
               if (
-                (!props.narrow && !isMobileScreen) ||
+                // (!props.narrow && !isMobileScreen) ||  web端需要也顯示彈窗
                 // (await showConfirm(Locale.Home.DeleteChat))
-                (await showConfirm(t("Home.DeleteChat")))
+                await showConfirm(t("Home.DeleteChat"))
               ) {
                 deleteSession(item.sessionId!);
               }

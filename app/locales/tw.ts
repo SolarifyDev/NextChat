@@ -153,7 +153,7 @@ const tw = {
   },
   Home: {
     NewChat: "開新對話",
-    DeleteChat: "確定要刪除選取的對話嗎？",
+    DeleteChat: "確認刪除選中的對話？",
     DeleteToast: "已刪除對話",
     Revert: "撤銷",
     History: "歷史對話",
