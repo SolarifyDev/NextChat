@@ -1047,7 +1047,7 @@ export function ChatActions(props: {
             isWebClick={true}
           />
         )}
-        {showUploadImage && !omeStore.isFromApp && (
+        {showUploadImage && (
           <ChatAction
             onClick={props.uploadFiles}
             text={t("Chat.InputActions.UploadFile")}
