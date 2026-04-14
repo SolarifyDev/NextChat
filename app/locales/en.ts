@@ -82,6 +82,8 @@ const en: LocaleType = {
       Settings: "Settings",
       UploadImage: "Upload Images",
       UploadFile: "Upload Files",
+      UploadFileTooltip:
+        "Upload attachments (up to 50 files, 100MB each). Supported formats: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "Online search",
     },
     Rename: "Rename Chat",

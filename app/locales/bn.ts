@@ -77,6 +77,8 @@ const bn: PartialLocaleType = {
       Settings: "চ্যাট সেটিংস",
       UploadImage: "চিত্র আপলোড করুন",
       UploadFile: "ফাইল আপলোড করুন",
+      UploadFileTooltip:
+        "সংযুক্তি আপলোড করুন (সর্বোচ্চ ৫০টি ফাইল, প্রতিটি ১০০MB)। সমর্থিত ফরম্যাট: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "অনলাইন অনুসন্ধান",
     },
     Rename: "চ্যাট নাম পরিবর্তন করুন",

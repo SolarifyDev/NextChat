@@ -77,6 +77,8 @@ const pt: PartialLocaleType = {
       Settings: "Configurações",
       UploadImage: "Enviar imagens",
       UploadFile: "Enviar arquivos",
+      UploadFileTooltip:
+        "Enviar anexos (máximo de 50 arquivos, 100 MB cada). Formatos compatíveis: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "Pesquisa online",
     },
     Rename: "Renomear Chat",

@@ -81,6 +81,8 @@ const cn = {
       Settings: "对话设置",
       UploadImage: "上传图片",
       UploadFile: "上传文件",
+      UploadFileTooltip:
+        "上传附件（最多50个，每个100MB），支持的文件格式：pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、png、csv、json",
       OnlineSearch: "联网搜索",
     },
     Rename: "重命名对话",

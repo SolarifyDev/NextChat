@@ -1053,7 +1053,7 @@ export function ChatActions(props: {
             text={t("Chat.InputActions.UploadFile")}
             icon={<PlusOutlined />}
             isHaveHover={true}
-            tooltip="上傳附件（最多50個，每個100MB），支持的文件格式：pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、png、csv、json"
+            tooltip={t("Chat.InputActions.UploadFileTooltip")}
           />
         )}
       </>
