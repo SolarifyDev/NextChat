@@ -1,3 +1,5 @@
+"use client";
+
 import { useDebouncedCallback } from "use-debounce";
 import {
   ExclamationCircleOutlined,
@@ -172,6 +174,7 @@ import {
 } from "../client/smarties";
 import { useDragOverlay } from "../hook/use-drag-overlay";
 import UploadOverlay from "./upload-overlay";
+import { postMessageToReactNative } from "../utils/ga";
 
 const localStorage = safeLocalStorage();
 
@@ -1680,6 +1683,26 @@ export function _Chat_NEW() {
   const doSubmit = async (userInput: string) => {
     if (uploading) return;
     if (userInput.trim() === "" && attachments.length === 0) return;
+
+    if (omeStore.from === "omelinkapp") {
+      // trackEvent("click_send_timestamp", {
+      //   userId: omeStore.userId,
+      //   time: Date.now(),
+      //   metis_event_id: omeStore.eventUuid,
+      // });
+
+      postMessageToReactNative(
+        {
+          action: "click_send_timestamp",
+          time: Date.now(),
+          metis_event_id: omeStore.eventUuid,
+          userId: omeStore.userId,
+          // debug: true,
+        },
+        "click_send_timestamp",
+      );
+    }
+
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
