@@ -824,23 +824,36 @@ export const useEnhanceChatStore = createPersistStore(
         const imageUrls =
           attachments
             ?.filter((a) => a.isImage && a.status === "success")
-            .map((a) => a.url) ?? [];
+            .map((a) => a.url)
+            .filter(Boolean) ?? [];
+        const fileContents =
+          attachments
+            ?.filter((a) => !a.isImage && a.status === "success" && !!a.url)
+            .map((a) => ({
+              type: "file" as const,
+              file_url: {
+                url: a.url,
+              },
+            })) ?? [];
 
-        if (!isMcpResponse && imageUrls.length > 0) {
+        if (
+          !isMcpResponse &&
+          (imageUrls.length > 0 || fileContents.length > 0)
+        ) {
           mContent = [
             ...(content ? [{ type: "text" as const, text: content }] : []),
             ...imageUrls.map((url) => ({
               type: "image_url" as const,
               image_url: { url },
             })),
+            ...fileContents,
           ];
         }
 
         // 只保存成功上传的附件到消息中
-        const successAttachments = attachments?.filter(
-          (a) => a.status === "success",
-        );
-
+        const successAttachments = attachments
+          ?.filter((a) => a.status === "success")
+          .map(({ previewUrl, ...attachment }) => attachment);
         let userMessage: ChatMessage = createMessage({
           role: "user",
           content: mContent,

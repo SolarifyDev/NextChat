@@ -1,4 +1,16 @@
 import { useDebouncedCallback } from "use-debounce";
+import {
+  ExclamationCircleOutlined,
+  FileExcelFilled,
+  LeftCircleFilled,
+  FilePdfFilled,
+  FilePptFilled,
+  RightCircleFilled,
+  FileTextFilled,
+  FileUnknownFilled,
+  FileWordFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
 import React, {
   Fragment,
   RefObject,
@@ -31,7 +43,7 @@ import PinIcon from "../icons/pin.svg";
 import ConfirmIcon from "../icons/confirm.svg";
 import CloseIcon from "../icons/close.svg";
 import CancelIcon from "../icons/cancel.svg";
-import ImageIcon from "../icons/image.svg";
+import { CloseCircleFilled } from "@ant-design/icons";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -49,7 +61,6 @@ import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import ArrowLeftIcon from "../icons/arrow-left.svg";
-import AppImage from "../icons/app-gallery.svg";
 import AppRobot from "../icons/app-robot.svg";
 import SearchOnlineIcon from "../icons/search-online.svg";
 import AppSearchOnlineIcon from "../icons/search-online-app.svg";
@@ -77,6 +88,7 @@ import {
 
 import {
   copyToClipboard,
+  getMessageFiles,
   getMessageImages,
   getMessageTextContent,
   isDalle3,
@@ -160,11 +172,12 @@ import {
 } from "../client/smarties";
 import { useDragOverlay } from "../hook/use-drag-overlay";
 import UploadOverlay from "./upload-overlay";
-import { toast } from "./chat-toast";
 
 const localStorage = safeLocalStorage();
 
 const ttsPlayer = createTTSPlayer();
+const MAX_ATTACHMENTS_COUNT = 20;
+const MAX_ATTACHMENTS_TOTAL_SIZE = 50 * 1024 * 1024;
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -460,6 +473,7 @@ export function ChatAction(props: {
   isClick?: boolean; // 是否需要点击效果
   isWebClick?: boolean; // web端是否有选中样式
   isChangeSvgStroke?: boolean; // svg样式是调整stroke 还是 fill
+  tooltip?: string;
 }) {
   const { isFromApp } = useOmeStore();
   const iconRef = useRef<HTMLDivElement>(null);
@@ -501,6 +515,10 @@ export function ChatAction(props: {
             !isFromApp && props.isClick && props.isWebClick, // 选中
           clickable: !isFromApp, // 设置svg样式
         },
+        {
+          [styles["chat-input-action-with-tooltip"]]:
+            !isFromApp && !isEmpty(props.tooltip),
+        },
       )}
       onClick={onClick}
       onMouseEnter={updateWidth}
@@ -526,6 +544,11 @@ export function ChatAction(props: {
         } as React.CSSProperties
       }
     >
+      {!isFromApp && !isEmpty(props.tooltip) && (
+        <div className={styles["chat-input-action-tooltip"]}>
+          {props.tooltip}
+        </div>
+      )}
       <div
         ref={iconRef}
         // className={clsx(styles["icon"], props.isHaveHover && "is-hover-show")}
@@ -598,7 +621,6 @@ export function ChatActions(props: {
   scrollToBottom: () => void;
   showPromptHints: () => void;
   hitBottom: boolean;
-  uploading: boolean;
   setShowShortcutKeyModal: React.Dispatch<React.SetStateAction<boolean>>;
   setUserInput: (input: string) => void;
   setShowChatSidePanel: React.Dispatch<React.SetStateAction<boolean>>;
@@ -774,23 +796,6 @@ export function ChatActions(props: {
           />
         )}
 
-        {showUploadImage && (
-          <ChatAction
-            onClick={props.uploadFiles}
-            // text={Locale.Chat.InputActions.UploadFile}
-            text={t("Chat.InputActions.UploadFile")}
-            icon={
-              props.uploading ? (
-                <LoadingButtonIcon />
-              ) : omeStore.isFromApp ? (
-                <AppImage />
-              ) : (
-                <ImageIcon />
-              )
-            }
-            isHaveHover={true}
-          />
-        )}
         {!omeStore.isFromApp && (
           <ChatAction
             onClick={nextTheme}
@@ -1042,6 +1047,15 @@ export function ChatActions(props: {
             isWebClick={true}
           />
         )}
+        {showUploadImage && !omeStore.isFromApp && (
+          <ChatAction
+            onClick={props.uploadFiles}
+            text={t("Chat.InputActions.UploadFile")}
+            icon={<PlusOutlined />}
+            isHaveHover={true}
+            tooltip="上傳附件（最多50個，每個100MB），支持的文件格式：pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、png、csv、json"
+          />
+        )}
       </>
       <div className={styles["chat-input-actions-end"]}>
         {config.realtimeConfig.enable && (
@@ -1129,7 +1143,7 @@ export function EditMessageModal(props: { onClose: () => void }) {
 export function DeleteImageButton(props: { deleteImage: () => void }) {
   return (
     <div className={styles["delete-image"]} onClick={props.deleteImage}>
-      <DeleteIcon />
+      <CloseCircleFilled className={styles["attach-delete-icon"]} />
     </div>
   );
 }
@@ -1146,12 +1160,38 @@ function truncateMiddle(name: string): string {
   return name.slice(0, 7) + "..." + name.slice(-7);
 }
 
+function revokeAttachmentPreview(item?: Pick<Attachment, "previewUrl">) {
+  const previewUrl = item?.previewUrl;
+  if (previewUrl?.startsWith("blob:")) {
+    URL.revokeObjectURL(previewUrl);
+  }
+}
+
+function ImageCornerButton(props: {
+  onClick: () => void;
+  icon: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={clsx(styles["image-corner-button"], props.className)}
+      onClick={props.onClick}
+    >
+      {props.icon}
+    </div>
+  );
+}
+
 function CircularProgress({
   percent,
   size = 24,
+  trackColor = "rgba(120, 128, 140, 0.85)",
+  progressColor = "#ffffff",
 }: {
   percent: number;
   size?: number;
+  trackColor?: string;
+  progressColor?: string;
 }) {
   const strokeWidth = 2.5;
   const radius = (size - strokeWidth) / 2;
@@ -1165,7 +1205,7 @@ function CircularProgress({
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="rgba(136,136,136,0.2)"
+        stroke={trackColor}
         strokeWidth={strokeWidth}
       />
       <circle
@@ -1173,7 +1213,7 @@ function CircularProgress({
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke="#6366f1"
+        stroke={progressColor}
         strokeWidth={strokeWidth}
         strokeDasharray={circumference}
         strokeDashoffset={offset}
@@ -1184,39 +1224,105 @@ function CircularProgress({
   );
 }
 
+function getAttachmentFileIcon(ext: string) {
+  const normalizedExt = ext.toLowerCase();
+
+  if (normalizedExt === "pdf") {
+    return (
+      <FilePdfFilled
+        className={styles["attach-file-meta-icon"]}
+        style={{ color: "#ef4444" }}
+      />
+    );
+  }
+
+  if (normalizedExt === "xls" || normalizedExt === "xlsx") {
+    return (
+      <FileExcelFilled
+        className={styles["attach-file-meta-icon"]}
+        style={{ color: "#16a34a" }}
+      />
+    );
+  }
+
+  if (normalizedExt === "doc" || normalizedExt === "docx") {
+    return (
+      <FileWordFilled
+        className={styles["attach-file-meta-icon"]}
+        style={{ color: "#2563eb" }}
+      />
+    );
+  }
+
+  if (normalizedExt === "ppt" || normalizedExt === "pptx") {
+    return (
+      <FilePptFilled
+        className={styles["attach-file-meta-icon"]}
+        style={{ color: "#9ca3af" }}
+      />
+    );
+  }
+
+  if (
+    normalizedExt === "txt" ||
+    normalizedExt === "csv" ||
+    normalizedExt === "json"
+  ) {
+    return (
+      <FileTextFilled
+        className={styles["attach-file-meta-icon"]}
+        style={{ color: "#9ca3af" }}
+      />
+    );
+  }
+
+  return (
+    <FileUnknownFilled
+      className={styles["attach-file-meta-icon"]}
+      style={{ color: "#9ca3af" }}
+    />
+  );
+}
+
 function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
   const { t } = useTranslation();
   const { item, onDelete } = props;
   const ext = item.name.split(".").pop()?.toUpperCase() || "FILE";
   const isError = item.status === "error";
   const isUploading = item.status === "uploading";
+  const imageUrl = item.previewUrl || item.url;
 
-  if (item.isImage && item.status === "success") {
-    // 图片：缩略图显示
+  if (item.isImage && imageUrl) {
     return (
       <div
         className={styles["attach-image"]}
-        style={{ backgroundImage: `url("${item.url}")` }}
+        style={{ backgroundImage: `url("${imageUrl}")` }}
       >
-        {onDelete && (
-          <div className={styles["attach-image-mask"]}>
-            <DeleteImageButton deleteImage={onDelete!} />
+        {isUploading && (
+          <div className={styles["attach-image-uploading"]}>
+            <CircularProgress percent={item.progress ?? 0} size={34} />
           </div>
         )}
-      </div>
-    );
-  }
-
-  // 图片上传中
-  if (item.isImage && isUploading) {
-    return (
-      <div className={styles["attach-image"]}>
-        <div className={styles["attach-item-uploading"]}>
-          <CircularProgress percent={item.progress ?? 0} size={28} />
-          <span className={styles["attach-progress-text"]}>
-            {item.progress ?? 0}%
-          </span>
-        </div>
+        {isError && <div className={styles["attach-image-error"]}>!</div>}
+        {onDelete && isUploading ? (
+          <ImageCornerButton
+            onClick={onDelete}
+            icon={
+              <CloseCircleFilled className={styles["attach-delete-icon"]} />
+            }
+            className={styles["image-corner-button-visible"]}
+          />
+        ) : (
+          onDelete && (
+            <ImageCornerButton
+              onClick={onDelete}
+              icon={
+                <CloseCircleFilled className={styles["attach-delete-icon"]} />
+              }
+              className={styles["image-corner-button-visible"]}
+            />
+          )
+        )}
       </div>
     );
   }
@@ -1231,10 +1337,7 @@ function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
     >
       {isUploading && (
         <div className={styles["attach-item-uploading"]}>
-          <CircularProgress percent={item.progress ?? 0} size={24} />
-          <span className={styles["attach-progress-text"]}>
-            {item.progress ?? 0}%
-          </span>
+          <CircularProgress percent={item.progress ?? 0} size={34} />
         </div>
       )}
       {/* <div className={styles["attach-file-icon"]}>{ext}</div> */}
@@ -1243,13 +1346,25 @@ function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
           {truncateMiddle(item.name)}
         </div>
         <div className={styles["attach-file-size"]}>
-          <div>{ext},</div>
-          {isError ? t("Chat.UploadFailed") : formatFileSize(item.size)}
+          {isError ? (
+            <>
+              <ExclamationCircleOutlined
+                className={styles["attach-file-meta-icon"]}
+              />
+              <span>{t("Chat.UploadFailed")}</span>
+            </>
+          ) : (
+            <>
+              {getAttachmentFileIcon(ext)}
+              <span>{ext},</span>
+              <span>{formatFileSize(item.size)}</span>
+            </>
+          )}
         </div>
       </div>
       {onDelete && (
         <div className={styles["attach-file-close"]} onClick={onDelete}>
-          ×
+          <CloseCircleFilled className={styles["attach-delete-icon"]} />
         </div>
       )}
     </div>
@@ -1318,7 +1433,7 @@ function AttachmentScrollBox(props: {
             className={styles["attach-scroll-arrow"]}
             onClick={() => scroll("left")}
           >
-            ‹
+            <LeftCircleFilled style={{ fontSize: "2rem" }} />
           </div>
         </div>
       )}
@@ -1343,7 +1458,7 @@ function AttachmentScrollBox(props: {
             className={styles["attach-scroll-arrow"]}
             onClick={() => scroll("right")}
           >
-            ›
+            <RightCircleFilled style={{ fontSize: "2rem" }} />
           </div>
         </div>
       )}
@@ -1475,8 +1590,24 @@ export function _Chat_NEW() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
+  const omeStore = useOmeStore();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const uploading = attachments.some((a) => a.status === "uploading");
+
+  const removeAttachment = useCallback((id: string) => {
+    setAttachments((prev) => {
+      const target = prev.find((a) => a.id === id);
+      revokeAttachmentPreview(target);
+      return prev.filter((a) => a.id !== id);
+    });
+  }, []);
+
+  const clearAttachments = useCallback(() => {
+    setAttachments((prev) => {
+      prev.forEach(revokeAttachmentPreview);
+      return [];
+    });
+  }, []);
 
   // prompt hints
   const promptStore = usePromptStore();
@@ -1547,6 +1678,7 @@ export function _Chat_NEW() {
   };
 
   const doSubmit = async (userInput: string) => {
+    if (uploading) return;
     if (userInput.trim() === "" && attachments.length === 0) return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
@@ -1560,7 +1692,7 @@ export function _Chat_NEW() {
     await newChatStore
       .onUserInput(userInput, attachments.length > 0 ? attachments : undefined)
       .then(() => setIsLoading(false));
-    setAttachments([]);
+    clearAttachments();
     newChatStore.setLastInput(userInput);
     setUserInput("");
     setPromptHints([]);
@@ -1637,6 +1769,10 @@ export function _Chat_NEW() {
       return;
     }
     if (shouldSubmit(e) && promptHints.length === 0) {
+      if (uploading) {
+        e.preventDefault();
+        return;
+      }
       doSubmit(userInput);
       e.preventDefault();
     }
@@ -1731,7 +1867,6 @@ export function _Chat_NEW() {
     });
   };
 
-  const omeStore = useOmeStore();
   const accessStore = useAccessStore();
   const [speechStatus, setSpeechStatus] = useState(false);
   const [speechLoading, setSpeechLoading] = useState(false);
@@ -1960,12 +2095,6 @@ export function _Chat_NEW() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleFileDrop = async (files: File[]) => {
-    addAttachments(files);
-  };
-
-  const showOverlay = useDragOverlay(containerRef, handleFileDrop);
-
   const addAttachments = useCallback(
     (files: File[]) => {
       const validFiles = files.filter(
@@ -1975,12 +2104,35 @@ export function _Chat_NEW() {
       );
       if (validFiles.length === 0) return;
 
+      const nextAttachmentCount = attachments.length + validFiles.length;
+      if (nextAttachmentCount > MAX_ATTACHMENTS_COUNT) {
+        showToast(`最多同时上传${MAX_ATTACHMENTS_COUNT}个附件/图片`);
+        return;
+      }
+
+      const currentTotalSize = attachments.reduce(
+        (total, item) => total + item.size,
+        0,
+      );
+      const nextTotalSize =
+        currentTotalSize +
+        validFiles.reduce((total, file) => total + file.size, 0);
+      if (nextTotalSize > MAX_ATTACHMENTS_TOTAL_SIZE) {
+        showToast(
+          `附件和图片总大小不能超过${formatFileSize(
+            MAX_ATTACHMENTS_TOTAL_SIZE,
+          )}`,
+        );
+        return;
+      }
+
       const newItems: Attachment[] = validFiles.map((file) => ({
         id: nanoid(),
         name: file.name,
         size: file.size,
         type: file.type,
         url: "",
+        previewUrl: isImageFile(file) ? URL.createObjectURL(file) : undefined,
         isImage: isImageFile(file),
         status: "uploading" as const,
         progress: 0,
@@ -1988,8 +2140,8 @@ export function _Chat_NEW() {
 
       setAttachments((prev) => {
         const total = prev.length + newItems.length;
-        if (total > 100) {
-          showToast(t("Chat.UploadFileTips"));
+        if (total > MAX_ATTACHMENTS_COUNT) {
+          showToast(`最多同时上传${MAX_ATTACHMENTS_COUNT}个附件/图片`);
           return prev;
         }
         return [...prev, ...newItems];
@@ -2014,13 +2166,25 @@ export function _Chat_NEW() {
               );
             },
           );
-          const url = typeof res === "string" ? res : res?.url ?? "";
+          const attachmentId =
+            typeof res === "string"
+              ? undefined
+              : res?.attachmentId ?? res?.id ?? res?.fileId ?? res?.fileID;
+          const url =
+            typeof res === "string"
+              ? res
+              : res?.url ?? res?.fileUrl ?? res?.fileURL ?? "";
           setAttachments((prev) =>
-            prev.map((a) =>
-              a.id === itemId
-                ? { ...a, url, status: "success" as const, progress: 100 }
-                : a,
-            ),
+            prev.map((a) => {
+              if (a.id !== itemId) return a;
+              return {
+                ...a,
+                attachmentId,
+                url,
+                status: "success" as const,
+                progress: 100,
+              };
+            }),
           );
         } catch {
           setAttachments((prev) =>
@@ -2031,7 +2195,35 @@ export function _Chat_NEW() {
         }
       });
     },
-    [t],
+    [attachments, t],
+  );
+
+  const dragAcceptFormats = useMemo(
+    () =>
+      ALLOWED_FILE_ACCEPT.split(",")
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean),
+    [],
+  );
+
+  const handleFileDrop = useCallback(
+    async (files: File[], rejectedFiles: File[] = []) => {
+      if (rejectedFiles.length > 0) {
+        showToast(
+          "仅支持上传 pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、jpeg、png、webp、heic、heif、csv、json",
+        );
+      }
+      if (files.length > 0) {
+        addAttachments(files);
+      }
+    },
+    [addAttachments],
+  );
+
+  const showOverlay = useDragOverlay(
+    containerRef,
+    handleFileDrop,
+    dragAcceptFormats,
   );
 
   const handlePaste = useCallback(
@@ -2055,8 +2247,8 @@ export function _Chat_NEW() {
   );
 
   async function uploadFiles() {
-    if (attachments.length >= 100) {
-      return showToast(t("Chat.UploadFileTips"));
+    if (attachments.length >= MAX_ATTACHMENTS_COUNT) {
+      return showToast(`最多同时上传${MAX_ATTACHMENTS_COUNT}个附件/图片`);
     }
 
     const fileInput = document.createElement("input");
@@ -2349,6 +2541,15 @@ export function _Chat_NEW() {
                 .map((message, i) => {
                   const isUser = message.role === "user";
                   const isContext = i < context.length;
+                  const messageText = getMessageTextContent(message);
+                  const messageImages = getMessageImages(message);
+                  const messageFileAttachments =
+                    message.attachments?.filter((item) => !item.isImage) ?? [];
+                  const shouldRenderMessageBubble =
+                    messageText.length > 0 ||
+                    ((message.preview || message.streaming) &&
+                      message.content.length === 0 &&
+                      !isUser);
                   const showActions =
                     i > 0 &&
                     !(message.preview || message.content.length === 0) &&
@@ -2387,7 +2588,11 @@ export function _Chat_NEW() {
                                         | string
                                         | MultimodalContent[] = newMessage;
                                       const images = getMessageImages(message);
-                                      if (images.length > 0) {
+                                      const files = getMessageFiles(message);
+                                      if (
+                                        images.length > 0 ||
+                                        files.length > 0
+                                      ) {
                                         newContent = [
                                           { type: "text", text: newMessage },
                                         ];
@@ -2399,6 +2604,12 @@ export function _Chat_NEW() {
                                           newContent.push({
                                             type: "image_url",
                                             image_url: { url: images[i] },
+                                          });
+                                        }
+                                        for (let i = 0; i < files.length; i++) {
+                                          newContent.push({
+                                            type: "file",
+                                            file_url: files[i],
                                           });
                                         }
                                       }
@@ -2481,9 +2692,7 @@ export function _Chat_NEW() {
                                         text={t("Chat.Actions.Copy")}
                                         icon={<CopyIcon />}
                                         onClick={() =>
-                                          copyToClipboard(
-                                            getMessageTextContent(message),
-                                          )
+                                          copyToClipboard(messageText)
                                         }
                                       />
                                       {config.ttsConfig.enable && (
@@ -2504,9 +2713,7 @@ export function _Chat_NEW() {
                                             )
                                           }
                                           onClick={() =>
-                                            openaiSpeech(
-                                              getMessageTextContent(message),
-                                            )
+                                            openaiSpeech(messageText)
                                           }
                                         />
                                       )}
@@ -2543,75 +2750,69 @@ export function _Chat_NEW() {
                               ))}
                             </div>
                           )}
-                          <div
-                            className={
-                              omeStore.isFromApp
-                                ? styles["chat-message-item-is-app"]
-                                : styles["chat-message-item"]
-                            }
-                          >
-                            <Markdown
-                              key={message.streaming ? "loading" : "done"}
-                              content={getMessageTextContent(message)}
-                              loading={
-                                (message.preview || message.streaming) &&
-                                message.content.length === 0 &&
-                                !isUser
-                              }
-                              //   onContextMenu={(e) => onRightClick(e, message)} // hard to use
-                              onDoubleClickCapture={() => {
-                                if (!isMobileScreen) return;
-                                setUserInput(getMessageTextContent(message));
-                              }}
-                              fontSize={fontSize}
-                              fontFamily={fontFamily}
-                              parentRef={scrollRef}
-                              defaultShow={i >= messages.length - 6}
-                            />
-                            {getMessageImages(message).length == 1 && (
-                              <img
-                                className={styles["chat-message-item-image"]}
-                                src={getMessageImages(message)[0]}
-                                alt=""
-                              />
-                            )}
-                            {getMessageImages(message).length > 1 && (
-                              <div
-                                className={styles["chat-message-item-images"]}
-                                style={
-                                  {
-                                    "--image-count":
-                                      getMessageImages(message).length,
-                                  } as React.CSSProperties
-                                }
-                              >
-                                {getMessageImages(message).map(
-                                  (image, index) => {
+                          {(messageImages.length > 0 ||
+                            messageFileAttachments.length > 0) && (
+                            <div className={styles["chat-message-attachments"]}>
+                              {messageImages.length > 0 && (
+                                <div
+                                  className={styles["chat-message-item-images"]}
+                                >
+                                  {messageImages.map((image, index) => {
                                     return (
                                       <img
                                         className={
-                                          styles[
-                                            "chat-message-item-image-multi"
-                                          ]
+                                          styles["chat-message-item-image"]
                                         }
                                         key={index}
                                         src={image}
                                         alt=""
                                       />
                                     );
-                                  },
-                                )}
-                              </div>
-                            )}
-                            {message.attachments &&
-                              message.attachments.length > 0 && (
+                                  })}
+                                </div>
+                              )}
+                              {messageFileAttachments.length > 0 && (
                                 <div className={styles["chat-message-files"]}>
-                                  {message.attachments.map((item) => (
+                                  {messageFileAttachments.map((item) => (
                                     <AttachmentItem key={item.id} item={item} />
                                   ))}
                                 </div>
                               )}
-                          </div>
+                            </div>
+                          )}
+                          {shouldRenderMessageBubble && (
+                            <div
+                              className={
+                                omeStore.isFromApp
+                                  ? styles["chat-message-item-is-app"]
+                                  : styles["chat-message-item"]
+                              }
+                            >
+                              {(messageText.length > 0 ||
+                                ((message.preview || message.streaming) &&
+                                  message.content.length === 0 &&
+                                  !isUser)) && (
+                                <Markdown
+                                  key={message.streaming ? "loading" : "done"}
+                                  content={messageText}
+                                  loading={
+                                    (message.preview || message.streaming) &&
+                                    message.content.length === 0 &&
+                                    !isUser
+                                  }
+                                  //   onContextMenu={(e) => onRightClick(e, message)} // hard to use
+                                  onDoubleClickCapture={() => {
+                                    if (!isMobileScreen) return;
+                                    setUserInput(messageText);
+                                  }}
+                                  fontSize={fontSize}
+                                  fontFamily={fontFamily}
+                                  parentRef={scrollRef}
+                                  defaultShow={i >= messages.length - 6}
+                                />
+                              )}
+                            </div>
+                          )}
                           {message?.audio_url && (
                             <div className={styles["chat-message-audio"]}>
                               <audio src={message.audio_url} controls />
@@ -2684,7 +2885,6 @@ export function _Chat_NEW() {
                 showPromptModal={() => setShowPromptModal(true)}
                 scrollToBottom={scrollToBottom}
                 hitBottom={hitBottom}
-                uploading={uploading}
                 showPromptHints={() => {
                   // Click again to close
                   if (promptHints.length > 0) {
@@ -2759,9 +2959,7 @@ export function _Chat_NEW() {
 
                   <AttachmentScrollBox
                     items={attachments}
-                    onDelete={(id) =>
-                      setAttachments(attachments.filter((a) => a.id !== id))
-                    }
+                    onDelete={removeAttachment}
                   />
                 </div>
 
@@ -2895,9 +3093,7 @@ export function _Chat_NEW() {
                   <div style={{ width: "100%" }}>
                     <AttachmentScrollBox
                       items={attachments}
-                      onDelete={(id) =>
-                        setAttachments(attachments.filter((a) => a.id !== id))
-                      }
+                      onDelete={removeAttachment}
                     />
 
                     <Input.TextArea
@@ -2966,16 +3162,31 @@ export function _Chat_NEW() {
                         <YuYinIcon />
                       </div>
                     ) : (
-                      <NextImage
-                        src={SendIcon.src}
-                        alt=""
-                        width={32}
-                        height={32}
-                        onClick={() => doSubmit(userInput)}
-                      />
+                      <div
+                        style={{
+                          width: "32px",
+                          height: "32px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          opacity: uploading ? 0.45 : 1,
+                          cursor: uploading ? "not-allowed" : "pointer",
+                        }}
+                        onClick={
+                          uploading ? undefined : () => doSubmit(userInput)
+                        }
+                      >
+                        <NextImage
+                          src={SendIcon.src}
+                          alt=""
+                          width={32}
+                          height={32}
+                        />
+                      </div>
                     )
                   ) : (
                     <button
+                      disabled={uploading}
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -2983,15 +3194,13 @@ export function _Chat_NEW() {
                         borderRadius: 10,
                         border: "none",
                         outline: "none",
-                        cursor: "pointer",
+                        cursor: uploading ? "not-allowed" : "pointer",
                         color: "var(--black)",
                         backgroundColor: "var(--primary)",
                         padding: "10px",
+                        opacity: uploading ? 0.45 : 1,
                       }}
-                      // onClick={() => doSubmit(userInput)}
-                      onClick={() =>
-                        toast.info("不支持「插画SaaS.svg」图片类型")
-                      }
+                      onClick={() => doSubmit(userInput)}
                     >
                       <SendWhiteIcon />
                       <div
@@ -3090,9 +3299,7 @@ export function _Chat_NEW() {
 
                     <AttachmentScrollBox
                       items={attachments}
-                      onDelete={(id) =>
-                        setAttachments(attachments.filter((a) => a.id !== id))
-                      }
+                      onDelete={removeAttachment}
                     />
                     <IconButton
                       icon={<SendWhiteIcon />}

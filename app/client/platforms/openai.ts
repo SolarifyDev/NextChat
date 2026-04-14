@@ -189,10 +189,11 @@ export class ChatGPTApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
+    const currentSession = useEnhanceChatStore.getState()?.currentSession;
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useEnhanceChatStore.getState()?.currentSession?.mask?.modelConfig,
+      ...currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,
@@ -271,6 +272,8 @@ export class ChatGPTApi implements LLMApi {
     options.onController?.(controller);
 
     try {
+      const headers = await getHeaders();
+
       let chatPath = "";
       if (modelConfig.providerName === ServiceProvider.Azure) {
         // find model, and get displayName as deployName
@@ -312,7 +315,7 @@ export class ChatGPTApi implements LLMApi {
         streamWithThink(
           chatPath,
           requestPayload,
-          await getHeaders(),
+          headers,
           tools as any,
           funcs,
           controller,
@@ -405,7 +408,7 @@ export class ChatGPTApi implements LLMApi {
           method: "POST",
           body: JSON.stringify(requestPayload),
           signal: controller.signal,
-          headers: await getHeaders(),
+          headers,
         };
 
         // make a fetch request

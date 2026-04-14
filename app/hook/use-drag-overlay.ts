@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, RefObject } from "react";
 
-type OnFileDropCallback = (files: File[]) => void;
+type OnFileDropCallback = (files: File[], rejectedFiles: File[]) => void;
 
 const DEFAULT_ACCEPT = [
   ".pdf",
@@ -32,7 +32,8 @@ export function useDragOverlay(
   const counter = useRef<number>(0);
 
   const stableCallback = useCallback(
-    (files: File[]) => onFileDrop?.(files),
+    (files: File[], rejectedFiles: File[]) =>
+      onFileDrop?.(files, rejectedFiles),
     [onFileDrop],
   );
 
@@ -78,16 +79,8 @@ export function useDragOverlay(
         }
       });
 
-      if (rejectedFiles.length > 0) {
-        console.log(
-          `不支持的文件类型: ${rejectedFiles.map((f) => f.name).join(", ")}，` +
-            `支持的格式: ${accept.join("、")}`,
-        );
-        alert("111");
-      }
-
-      if (validFiles.length > 0) {
-        stableCallback(validFiles);
+      if (validFiles.length > 0 || rejectedFiles.length > 0) {
+        stableCallback(validFiles, rejectedFiles);
       }
     };
 
