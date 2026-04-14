@@ -79,6 +79,8 @@ const es: PartialLocaleType = {
       Settings: "Configuración de conversación",
       UploadImage: "Subir imagen",
       UploadFile: "Subir archivos",
+      UploadFileTooltip:
+        "Sube archivos adjuntos (máximo 50 archivos, 100 MB cada uno). Formatos compatibles: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "Búsqueda en línea",
     },
     Rename: "Renombrar conversación",

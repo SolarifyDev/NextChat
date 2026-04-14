@@ -77,6 +77,8 @@ const tr: PartialLocaleType = {
       Settings: "Sohbet ayarları",
       UploadImage: "Resim yükle",
       UploadFile: "Dosya yükle",
+      UploadFileTooltip:
+        "Ek yükle (en fazla 50 dosya, her biri 100 MB). Desteklenen formatlar: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "Çevrimiçi arama",
     },
     Rename: "Sohbeti yeniden adlandır",

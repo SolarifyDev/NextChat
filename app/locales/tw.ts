@@ -77,6 +77,8 @@ const tw = {
       Settings: "對話設定",
       UploadImage: "上傳圖片",
       UploadFile: "上傳檔案",
+      UploadFileTooltip:
+        "上傳附件（最多50個，每個100MB），支援的檔案格式：pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、png、csv、json",
       OnlineSearch: "聯網搜索",
     },
     Rename: "重新命名對話",

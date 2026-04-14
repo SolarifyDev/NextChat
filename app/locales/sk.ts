@@ -78,6 +78,8 @@ const sk: PartialLocaleType = {
       Settings: "Nastavenia",
       UploadImage: "Nahrať obrázok",
       UploadFile: "Nahrať súbory",
+      UploadFileTooltip:
+        "Nahrať prílohy (max. 50 súborov, každý do 100 MB). Podporované formáty: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "Online vyhľadávanie",
     },
     Rename: "Premenovať Chat",

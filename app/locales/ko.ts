@@ -77,6 +77,8 @@ const ko: PartialLocaleType = {
       Settings: "채팅 설정",
       UploadImage: "이미지 업로드",
       UploadFile: "파일 업로드",
+      UploadFileTooltip:
+        "첨부파일 업로드(최대 50개, 파일당 100MB). 지원 형식: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "온라인 검색",
     },
     Rename: "채팅 이름 변경",

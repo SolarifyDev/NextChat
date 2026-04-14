@@ -79,6 +79,8 @@ const no: PartialLocaleType = {
       Settings: "Samtaleinnstillinger",
       UploadImage: "Last opp bilde",
       UploadFile: "Last opp filer",
+      UploadFileTooltip:
+        "Last opp vedlegg (maks 50 filer, 100 MB per fil). Støttede formater: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "Nett søk",
     },
     Rename: "Gi nytt navn til samtale",

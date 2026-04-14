@@ -77,6 +77,8 @@ const cs: PartialLocaleType = {
       Settings: "Nastavení konverzace",
       UploadImage: "Nahrát obrázek",
       UploadFile: "Nahrát soubory",
+      UploadFileTooltip:
+        "Nahrát přílohy (max. 50 souborů, každý do 100 MB). Podporované formáty: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
       OnlineSearch: "Online vyhledávání",
     },
     Rename: "Přejmenovat konverzaci",
