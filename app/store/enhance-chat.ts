@@ -2,7 +2,12 @@ import { nanoid } from "nanoid";
 import {
   GetHistory,
   GetItemHistory,
+  GetQuestionTopic,
+  GetQuestionTopicUrl,
+  GetRecommendTopics,
+  ITopics,
   PostAddOrUpdateSession,
+  SourceSystem,
   PostTranslationSpeech,
   QuestionInputType,
   getHeaders,
@@ -14,13 +19,13 @@ import { createPersistStore } from "../utils/store";
 import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { Mask, createEmptyMask } from "./mask";
 import { t } from "i18next";
-import { clone, isNil } from "lodash";
 import {
   ClientApi,
   getClientApi,
   MultimodalContent,
   Attachment,
 } from "../client/api";
+import { clone, isEmpty, isNil } from "lodash";
 import {
   DEEPSEEK_SUMMARIZE_MODEL,
   DEFAULT_INPUT_TEMPLATE,
@@ -267,6 +272,8 @@ const defaultSessions: SessionItem[] = [];
 
 const defaultCurrentSession = null as ChatSession | null;
 
+const defaultTopics: ITopics[] = [];
+
 export const useEnhanceChatStore = createPersistStore(
   {
     sessions: defaultSessions, // 左边list
@@ -275,6 +282,7 @@ export const useEnhanceChatStore = createPersistStore(
     isDown: false,
     isLoading: false,
     lastInput: "",
+    topics: defaultTopics,
   },
   (set, _get) => {
     function get() {
@@ -301,6 +309,9 @@ export const useEnhanceChatStore = createPersistStore(
         set({
           lastInput,
         });
+      },
+      setTopics(topics: ITopics[]) {
+        set({ topics });
       },
 
       // 获取左侧聊天List
@@ -337,6 +348,8 @@ export const useEnhanceChatStore = createPersistStore(
 
           get().setCurrentSession(null);
 
+          get().setTopics([]);
+
           const data = await GetItemHistory(await getHeaders(), sessionId);
 
           const newData: ChatSession = {
@@ -345,8 +358,6 @@ export const useEnhanceChatStore = createPersistStore(
             stat: JSONParse(data.stat, "obj"),
             mask: JSONParse(data.mask, "mask"),
           };
-
-          console.log("获取成功");
 
           if (get().sessionId === sessionId) {
             set({
@@ -359,6 +370,23 @@ export const useEnhanceChatStore = createPersistStore(
           set({
             currentSession: null,
             sessionId: 0,
+          });
+        }
+      },
+      getRecommendTopics: async (sessionId?: number) => {
+        try {
+          const data = await GetRecommendTopics(
+            await getHeaders(),
+            useOmeStore.getState().convertLangToEnum(),
+            sessionId,
+          );
+
+          set({
+            topics: data,
+          });
+        } catch (err) {
+          set({
+            topics: [],
           });
         }
       },
@@ -520,6 +548,7 @@ export const useEnhanceChatStore = createPersistStore(
       updateTargetSession: async (
         updater: (session: ChatSession) => void,
         isUpdate: boolean = false,
+        callback?: () => void,
       ) => {
         const currentSession = get().currentSession;
 
@@ -528,6 +557,8 @@ export const useEnhanceChatStore = createPersistStore(
         if (isNil(currentSession)) return;
 
         updater(currentSession!);
+
+        callback?.();
 
         if (isUpdate) {
           // 判断左侧是否存在
@@ -1114,6 +1145,61 @@ export const useEnhanceChatStore = createPersistStore(
 
         return recentMessages;
       },
+      topicClick: async (recommendTopicId: number, callback?: () => void) => {
+        try {
+          const session = get().currentSession;
+
+          const topic = get().topics.filter(
+            (item) => item.id === recommendTopicId,
+          );
+          if (!session || isEmpty(topic)) return;
+
+          const modelConfig = session.mask.modelConfig;
+
+          let userMessage: ChatMessage = createMessage({
+            role: "user",
+            content: topic[0].title,
+          });
+
+          const botMessage: ChatMessage = createMessage({
+            role: "assistant",
+            content: topic[0].answer,
+            model: modelConfig.model,
+          });
+
+          get().updateTargetSession(
+            (session) => {
+              session.messages = session.messages.concat([
+                userMessage,
+                botMessage,
+              ]);
+            },
+            true,
+            callback,
+          );
+
+          const systemSoure = useOmeStore.getState().getSourceSystem();
+
+          GetQuestionTopic(
+            await getHeaders(),
+            recommendTopicId,
+            systemSoure as SourceSystem,
+          );
+        } catch (err) {
+          console.log(err);
+        }
+      },
+      topicUrlClick: async (url: string) => {
+        try {
+          const systemSoure = useOmeStore.getState().getSourceSystem();
+
+          await GetQuestionTopicUrl(
+            await getHeaders(),
+            url,
+            systemSoure as SourceSystem,
+          );
+        } catch {}
+      },
       translateAudio: async (audioBlob: Blob): Promise<string> => {
         const formData = new FormData();
         formData.append("file", audioBlob, "recording.webm");
@@ -1132,6 +1218,7 @@ export const useEnhanceChatStore = createPersistStore(
           sessionId: 0,
           isDown: false,
           lastInput: "",
+          topics: defaultTopics,
         });
       },
       async clearAllData() {
