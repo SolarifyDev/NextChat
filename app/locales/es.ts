@@ -80,7 +80,7 @@ const es: PartialLocaleType = {
       UploadImage: "Subir imagen",
       UploadFile: "Subir archivos",
       UploadFileTooltip:
-        "Sube archivos adjuntos (máximo 50 archivos, 100 MB cada uno). Formatos compatibles: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Sube archivos adjuntos, el tamaño total no debe superar los 50 MB. Formatos compatibles: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Búsqueda en línea",
     },
     Rename: "Renombrar conversación",

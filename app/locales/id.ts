@@ -78,7 +78,7 @@ const id: PartialLocaleType = {
       UploadImage: "Unggah Gambar",
       UploadFile: "Unggah File",
       UploadFileTooltip:
-        "Unggah lampiran (maks. 50 file, masing-masing 100MB). Format yang didukung: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Unggah lampiran, total ukuran tidak boleh melebihi 50MB. Format yang didukung: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Pencarian online",
     },
     Rename: "Ganti Nama Obrolan",

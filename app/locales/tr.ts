@@ -78,7 +78,7 @@ const tr: PartialLocaleType = {
       UploadImage: "Resim yükle",
       UploadFile: "Dosya yükle",
       UploadFileTooltip:
-        "Ek yükle (en fazla 50 dosya, her biri 100 MB). Desteklenen formatlar: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Ek yükle, toplam boyut 50 MB'ı aşmamalıdır. Desteklenen formatlar: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Çevrimiçi arama",
     },
     Rename: "Sohbeti yeniden adlandır",

@@ -78,7 +78,7 @@ const jp: PartialLocaleType = {
       UploadImage: "画像をアップロード",
       UploadFile: "ファイルをアップロード",
       UploadFileTooltip:
-        "添付ファイルをアップロード（最大50件、各100MB）。対応形式: pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、png、csv、json",
+        "添付ファイルをアップロード、合計サイズは50MB以内。対応形式: doc、docx、xlsx、ppt、pptx、jpg、png、txt、pdf",
       OnlineSearch: "オンライン検索",
     },
     Rename: "チャットの名前を変更",

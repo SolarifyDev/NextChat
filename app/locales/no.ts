@@ -80,7 +80,7 @@ const no: PartialLocaleType = {
       UploadImage: "Last opp bilde",
       UploadFile: "Last opp filer",
       UploadFileTooltip:
-        "Last opp vedlegg (maks 50 filer, 100 MB per fil). Støttede formater: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Last opp vedlegg, total størrelse må ikke overstige 50 MB. Støttede formater: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Nett søk",
     },
     Rename: "Gi nytt navn til samtale",

@@ -166,13 +166,44 @@ export function uploadImage(file: Blob): Promise<string> {
 
 export const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
-export const ALLOWED_FILE_ACCEPT =
-  ".png,.jpg,.jpeg,.webp,.heic,.heif,.pdf,.doc,.docx,.xlsx,.ppt,.pptx,.txt,.csv,.json";
-const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".heic", ".heif"];
+export const ALLOWED_ATTACHMENT_EXTENSIONS = [
+  ".doc",
+  ".docx",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".jpg",
+  ".png",
+  ".txt",
+  ".pdf",
+] as const;
+
+export const ALLOWED_FILE_ACCEPT = ALLOWED_ATTACHMENT_EXTENSIONS.join(",");
+const IMAGE_EXTENSIONS = [".jpg", ".png"];
+const IMAGE_MIME_TYPES = ["image/jpeg", "image/png"];
+
+export function getFileExtension(fileName: string) {
+  const ext = fileName.split(".").pop()?.toLowerCase();
+  return ext ? `.${ext}` : "";
+}
+
+export function isSupportedAttachmentFile(file: Pick<File, "name" | "type">) {
+  const ext = getFileExtension(file.name);
+  if (ALLOWED_ATTACHMENT_EXTENSIONS.includes(ext as any)) {
+    return true;
+  }
+
+  // Clipboard images may not have a filename extension.
+  return IMAGE_MIME_TYPES.includes(file.type.toLowerCase());
+}
 
 export function isImageFile(file: File): boolean {
-  const ext = "." + (file.name.split(".").pop()?.toLowerCase() || "");
-  return IMAGE_EXTENSIONS.includes(ext);
+  const ext = getFileExtension(file.name);
+  if (IMAGE_EXTENSIONS.includes(ext as any)) {
+    return true;
+  }
+
+  return IMAGE_MIME_TYPES.includes(file.type.toLowerCase());
 }
 
 function uploadFileRaw(file: File): Promise<string> {

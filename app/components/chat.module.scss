@@ -17,7 +17,7 @@
   min-width: 54px;
   height: 54px;
   border: rgba($color: #888, $alpha: 0.2) 1px solid;
-  border-radius: 5px;
+  border-radius: 8px;
   background-size: cover;
   background-position: center;
   background-color: var(--white);
@@ -75,8 +75,8 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  width: 18px;
-  height: 18px;
+  width: 16.67px;
+  height: 16.67px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -104,6 +104,7 @@
   align-items: center;
   width: 100%;
   overflow: hidden;
+  margin-bottom: 13px;
 }
 
 .attach-scroll-box {
@@ -112,7 +113,7 @@
   overflow-x: scroll;
   overflow-y: hidden;
   flex: 1;
-  padding: 4px 0;
+  padding: 3px 0 3px 3px;
   flex-wrap: nowrap;
 
   &::-webkit-scrollbar {
@@ -263,9 +264,9 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  width: 18px;
-  height: 18px;
-  min-width: 18px;
+  width: 16.67px;
+  height: 16.67px;
+  min-width: 16.67px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,7 +275,7 @@
 }
 
 .attach-delete-icon {
-  font-size: 18px;
+  font-size: 16.67px;
   color: rgba(43, 43, 51, 0.6);
 }
 
@@ -283,9 +284,9 @@
   max-width: min(70vw, calc(100vw - 120px));
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 0;
   align-self: flex-start;
 }
 
@@ -727,7 +728,7 @@
 }
 
 .chat-message-header {
-  margin-top: 20px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
 
@@ -812,14 +813,14 @@
   font-size: 12px;
   color: #aaa;
   line-height: 1.5;
-  margin-top: 5px;
+  margin-top: 8px;
 }
 
 .chat-message-tools {
   font-size: 12px;
   color: #aaa;
   line-height: 1.5;
-  margin-top: 5px;
+  margin-top: 8px;
   .chat-message-tool {
     display: flex;
     align-items: flex-end;
@@ -833,7 +834,7 @@
 .chat-message-item {
   box-sizing: border-box;
   max-width: 100%;
-  margin-top: 10px;
+  margin-top: 8px;
   border-radius: 10px;
   background-color: #f2f3f5;
   padding: 10px;
@@ -850,7 +851,7 @@
 .chat-message-item-is-app {
   box-sizing: border-box;
   max-width: 100%;
-  margin-top: 10px;
+  margin-top: 8px;
   border-radius: 10px;
   background-color: #f2f3f5;
   padding: 10px;
@@ -872,7 +873,7 @@
   border: var(--border-in-light);
   position: relative;
   transition: all ease 0.3s;
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: 14px;
   user-select: text;
   word-break: break-word;
@@ -883,8 +884,8 @@
 }
 
 .chat-message-item-image {
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
   object-fit: cover;
   flex: 0 0 auto;
 }
@@ -910,23 +911,23 @@
 .chat-message-item-image,
 .chat-message-item-image-multi {
   box-sizing: border-box;
-  border-radius: 10px;
+  border-radius: 16px;
   border: rgba($color: #888, $alpha: 0.2) 1px solid;
 }
 
 @media only screen and (max-width: 600px) {
   .chat-message-item-image,
   .chat-message-item-image-multi {
-    width: 76px;
-    height: 76px;
+    width: 96px;
+    height: 96px;
   }
 }
 
 @media screen and (min-width: 600px) {
   .chat-message-item-image,
   .chat-message-item-image-multi {
-    width: 88px;
-    height: 88px;
+    width: 96px;
+    height: 96px;
   }
 }
 

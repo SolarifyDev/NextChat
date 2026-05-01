@@ -78,7 +78,9 @@ const tw = {
       UploadImage: "上傳圖片",
       UploadFile: "上傳檔案",
       UploadFileTooltip:
-        "上傳附件（最多50個，每個100MB），支援的檔案格式：pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、png、csv、json",
+        "上傳附件，總大小不超50MB，支援的檔案格式：doc、docx、xlsx、ppt、pptx、jpg、png、txt、pdf",
+      UnsupportedImageType: "不支援「{{name}}」圖片類型",
+      UnsupportedFileType: "不支援「{{name}}」檔案類型",
       OnlineSearch: "聯網搜索",
     },
     Rename: "重新命名對話",
@@ -105,7 +107,7 @@ const tw = {
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
     UploadImageTips: "最多只允許上傳三張圖片",
-    UploadFileTips: "最多只允許上傳100個附件",
+    UploadFileTips: "最多只允許上傳20個附件",
     FileTooLarge: "檔案超過5MB限制",
     UploadFailed: "上傳失敗",
     Voice: {

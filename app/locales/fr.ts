@@ -79,7 +79,7 @@ const fr: PartialLocaleType = {
       UploadImage: "Télécharger une image",
       UploadFile: "Télécharger des fichiers",
       UploadFileTooltip:
-        "Téléverser des pièces jointes (50 fichiers maximum, 100 Mo chacun). Formats pris en charge : pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Téléverser des pièces jointes, la taille totale ne doit pas dépasser 50 Mo. Formats pris en charge : doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Recherche en ligne",
     },
     Rename: "Renommer la discussion",

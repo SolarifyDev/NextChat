@@ -79,7 +79,7 @@ const de: PartialLocaleType = {
       UploadImage: "Bild hochladen",
       UploadFile: "Dateien hochladen",
       UploadFileTooltip:
-        "Anhänge hochladen (max. 50 Dateien, je 100 MB). Unterstützte Formate: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Anhänge hochladen, Gesamtgröße darf 50 MB nicht überschreiten. Unterstützte Formate: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Online-Suche",
     },
     Rename: "Gespräch umbenennen",

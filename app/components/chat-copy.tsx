@@ -1,14 +1,8 @@
 import { useDebouncedCallback } from "use-debounce";
 import {
   ExclamationCircleOutlined,
-  FileExcelFilled,
   LeftCircleFilled,
-  FilePdfFilled,
-  FilePptFilled,
   RightCircleFilled,
-  FileTextFilled,
-  FileUnknownFilled,
-  FileWordFilled,
   PlusOutlined,
 } from "@ant-design/icons";
 import React, {
@@ -67,6 +61,11 @@ import AppSearchOnlineIcon from "../icons/search-online-app.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
 import MetisIcon from "../icons/metis.png";
 import SendIcon from "../icons/green-send.png";
+import PdfFileIcon from "../icons/file-icons/pdf.png";
+import XlsxFileIcon from "../icons/file-icons/xlsx.png";
+import DocFileIcon from "../icons/file-icons/docdocx.png";
+import PptFileIcon from "../icons/file-icons/pptpptx.png";
+import TxtFileIcon from "../icons/file-icons/txt.png";
 import AppFaqIcon from "../icons/faq-app.svg";
 import FaqIcon from "../icons/faq.svg";
 import YuYinIcon from "../icons/yuyin.svg";
@@ -103,6 +102,7 @@ import {
 
 import {
   isImageFile,
+  isSupportedAttachmentFile,
   MAX_FILE_SIZE,
   ALLOWED_FILE_ACCEPT,
 } from "@/app/utils/chat";
@@ -172,6 +172,7 @@ import {
 } from "../client/smarties";
 import { useDragOverlay } from "../hook/use-drag-overlay";
 import UploadOverlay from "./upload-overlay";
+import { showFileToast } from "./file-toast";
 
 const localStorage = safeLocalStorage();
 
@@ -1185,42 +1186,45 @@ function ImageCornerButton(props: {
 function CircularProgress({
   percent,
   size = 24,
-  trackColor = "rgba(120, 128, 140, 0.85)",
-  progressColor = "#ffffff",
+  trackColor = "#57576A",
+  progressColor = "#FFFFFF",
 }: {
   percent: number;
   size?: number;
   trackColor?: string;
   progressColor?: string;
 }) {
-  const strokeWidth = 2.5;
+  const clampedPercent = Math.max(0, Math.min(100, percent));
+  const strokeWidth = 3;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percent / 100) * circumference;
+  const dashOffset = circumference - (clampedPercent / 100) * circumference;
 
   return (
-    <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke={trackColor}
-        strokeWidth={strokeWidth}
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke={progressColor}
-        strokeWidth={strokeWidth}
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        strokeLinecap="round"
-        style={{ transition: "stroke-dashoffset 0.2s ease" }}
-      />
-    </svg>
+    <div className="no-dark" style={{ lineHeight: 0 }}>
+      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={trackColor}
+          strokeWidth={strokeWidth}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={progressColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDashoffset={dashOffset}
+          strokeLinecap="round"
+          style={{ transition: "stroke-dashoffset 0.2s ease" }}
+        />
+      </svg>
+    </div>
   );
 }
 
@@ -1229,59 +1233,65 @@ function getAttachmentFileIcon(ext: string) {
 
   if (normalizedExt === "pdf") {
     return (
-      <FilePdfFilled
+      <NextImage
         className={styles["attach-file-meta-icon"]}
-        style={{ color: "#ef4444" }}
+        src={PdfFileIcon}
+        alt=""
+        width={14}
+        height={14}
       />
     );
   }
 
   if (normalizedExt === "xls" || normalizedExt === "xlsx") {
     return (
-      <FileExcelFilled
+      <NextImage
         className={styles["attach-file-meta-icon"]}
-        style={{ color: "#16a34a" }}
+        src={XlsxFileIcon}
+        alt=""
+        width={14}
+        height={14}
       />
     );
   }
 
   if (normalizedExt === "doc" || normalizedExt === "docx") {
     return (
-      <FileWordFilled
+      <NextImage
         className={styles["attach-file-meta-icon"]}
-        style={{ color: "#2563eb" }}
+        src={DocFileIcon}
+        alt=""
+        width={14}
+        height={14}
       />
     );
   }
 
   if (normalizedExt === "ppt" || normalizedExt === "pptx") {
     return (
-      <FilePptFilled
+      <NextImage
         className={styles["attach-file-meta-icon"]}
-        style={{ color: "#9ca3af" }}
+        src={PptFileIcon}
+        alt=""
+        width={14}
+        height={14}
       />
     );
   }
 
-  if (
-    normalizedExt === "txt" ||
-    normalizedExt === "csv" ||
-    normalizedExt === "json"
-  ) {
+  if (normalizedExt === "txt") {
     return (
-      <FileTextFilled
+      <NextImage
         className={styles["attach-file-meta-icon"]}
-        style={{ color: "#9ca3af" }}
+        src={TxtFileIcon}
+        alt=""
+        width={14}
+        height={14}
       />
     );
   }
 
-  return (
-    <FileUnknownFilled
-      className={styles["attach-file-meta-icon"]}
-      style={{ color: "#9ca3af" }}
-    />
-  );
+  return null;
 }
 
 function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
@@ -1300,7 +1310,7 @@ function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
       >
         {isUploading && (
           <div className={styles["attach-image-uploading"]}>
-            <CircularProgress percent={item.progress ?? 0} size={34} />
+            <CircularProgress percent={item.progress ?? 0} size={19.5} />
           </div>
         )}
         {isError && <div className={styles["attach-image-error"]}>!</div>}
@@ -1337,7 +1347,7 @@ function AttachmentItem(props: { item: Attachment; onDelete?: () => void }) {
     >
       {isUploading && (
         <div className={styles["attach-item-uploading"]}>
-          <CircularProgress percent={item.progress ?? 0} size={34} />
+          <CircularProgress percent={item.progress ?? 0} size={19.5} />
         </div>
       )}
       {/* <div className={styles["attach-file-icon"]}>{ext}</div> */}
@@ -2097,7 +2107,30 @@ export function _Chat_NEW() {
 
   const addAttachments = useCallback(
     (files: File[]) => {
-      const validFiles = files.filter(
+      const unsupportedFiles = files.filter(
+        (file) => !isSupportedAttachmentFile(file),
+      );
+      if (unsupportedFiles.length > 0) {
+        unsupportedFiles.forEach((file) => {
+          const isImageType = file.type.startsWith("image/");
+          showFileToast(
+            isImageType
+              ? t("Chat.InputActions.UnsupportedImageType", {
+                  name: file.name,
+                })
+              : t("Chat.InputActions.UnsupportedFileType", {
+                  name: file.name,
+                }),
+          );
+        });
+      }
+
+      const supportedFiles = files.filter((file) =>
+        isSupportedAttachmentFile(file),
+      );
+      if (supportedFiles.length === 0) return;
+
+      const validFiles = supportedFiles.filter(
         (file) =>
           file.size <= MAX_FILE_SIZE ||
           (showToast(t("Chat.FileTooLarge")), false),
@@ -2106,7 +2139,7 @@ export function _Chat_NEW() {
 
       const nextAttachmentCount = attachments.length + validFiles.length;
       if (nextAttachmentCount > MAX_ATTACHMENTS_COUNT) {
-        showToast(`最多同时上传${MAX_ATTACHMENTS_COUNT}个附件/图片`);
+        showFileToast(t("Chat.UploadFileTips"));
         return;
       }
 
@@ -2141,7 +2174,7 @@ export function _Chat_NEW() {
       setAttachments((prev) => {
         const total = prev.length + newItems.length;
         if (total > MAX_ATTACHMENTS_COUNT) {
-          showToast(`最多同时上传${MAX_ATTACHMENTS_COUNT}个附件/图片`);
+          showFileToast(t("Chat.UploadFileTips"));
           return prev;
         }
         return [...prev, ...newItems];
@@ -2209,9 +2242,18 @@ export function _Chat_NEW() {
   const handleFileDrop = useCallback(
     async (files: File[], rejectedFiles: File[] = []) => {
       if (rejectedFiles.length > 0) {
-        showToast(
-          "仅支持上传 pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、jpeg、png、webp、heic、heif、csv、json",
-        );
+        rejectedFiles.forEach((file) => {
+          const isImageType = file.type.startsWith("image/");
+          showFileToast(
+            isImageType
+              ? t("Chat.InputActions.UnsupportedImageType", {
+                  name: file.name,
+                })
+              : t("Chat.InputActions.UnsupportedFileType", {
+                  name: file.name,
+                }),
+          );
+        });
       }
       if (files.length > 0) {
         addAttachments(files);
@@ -2248,7 +2290,7 @@ export function _Chat_NEW() {
 
   async function uploadFiles() {
     if (attachments.length >= MAX_ATTACHMENTS_COUNT) {
-      return showToast(`最多同时上传${MAX_ATTACHMENTS_COUNT}个附件/图片`);
+      return showFileToast(t("Chat.UploadFileTips"));
     }
 
     const fileInput = document.createElement("input");
@@ -3043,8 +3085,15 @@ export function _Chat_NEW() {
                         borderRadius: "32px",
                         display: "flex",
                         flexDirection: "row",
+                        position: "relative",
                       }
-                    : { padding: "10px 10px", position: "relative" }
+                    : {
+                        padding:
+                          attachments.length > 0
+                            ? "3px 10px 10px 3px"
+                            : "10px 10px",
+                        position: "relative",
+                      }
                 }
               >
                 <div
@@ -3090,7 +3139,13 @@ export function _Chat_NEW() {
                     alignItems: "center",
                   }}
                 >
-                  <div style={{ width: "100%" }}>
+                  <div
+                    style={{
+                      width: "100%",
+                      paddingRight:
+                        omeStore.isFromApp && isMobileScreen ? "40px" : 0,
+                    }}
+                  >
                     <AttachmentScrollBox
                       items={attachments}
                       onDelete={removeAttachment}
@@ -3118,7 +3173,11 @@ export function _Chat_NEW() {
                       onPaste={handlePaste}
                       autoFocus={autoFocus}
                       autoSize={{
-                        minRows: omeStore.isFromApp ? 1 : 2,
+                        minRows: omeStore.isFromApp
+                          ? 1
+                          : attachments.length > 0
+                          ? 1
+                          : 2,
                         maxRows: 6,
                       }}
                       style={{
@@ -3129,7 +3188,7 @@ export function _Chat_NEW() {
                           : undefined,
                         marginRight: 2,
                         border: "none",
-                        marginBottom: attachments.length != 0 ? "8px" : 0,
+                        marginBottom: 0,
                       }}
                     />
                   </div>
@@ -3138,16 +3197,37 @@ export function _Chat_NEW() {
                 <div
                   style={{
                     maxHeight: omeStore.isFromApp ? 30 : undefined,
-                    marginLeft: 4,
+                    marginLeft: omeStore.isFromApp && isMobileScreen ? 0 : 4,
                     display:
                       session.inputType === QuestionInputType.Voice
                         ? "none"
                         : "flex",
                     justifyContent: "center",
-                    alignItems: omeStore.isFromApp ? "center" : "end",
-                    position: !omeStore.isFromApp ? "absolute" : undefined,
-                    right: !omeStore.isFromApp ? "20px" : undefined,
-                    bottom: !omeStore.isFromApp ? "10px" : undefined,
+                    alignItems:
+                      omeStore.isFromApp && isMobileScreen
+                        ? "flex-end"
+                        : omeStore.isFromApp
+                        ? "center"
+                        : "end",
+                    position:
+                      !omeStore.isFromApp ||
+                      (omeStore.isFromApp && isMobileScreen)
+                        ? "absolute"
+                        : undefined,
+                    right:
+                      !omeStore.isFromApp ||
+                      (omeStore.isFromApp && isMobileScreen)
+                        ? omeStore.isFromApp
+                          ? "16px"
+                          : "20px"
+                        : undefined,
+                    bottom:
+                      !omeStore.isFromApp ||
+                      (omeStore.isFromApp && isMobileScreen)
+                        ? omeStore.isFromApp
+                          ? "18px"
+                          : "10px"
+                        : undefined,
                   }}
                 >
                   {omeStore.isFromApp ? (
