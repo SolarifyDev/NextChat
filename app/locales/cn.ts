@@ -82,7 +82,9 @@ const cn = {
       UploadImage: "上传图片",
       UploadFile: "上传文件",
       UploadFileTooltip:
-        "上传附件（最多50个，每个100MB），支持的文件格式：pdf、doc、docx、xlsx、ppt、pptx、txt、jpg、png、csv、json",
+        "上传附件，总大小不超50MB，支持的文件格式：doc、docx、xlsx、ppt、pptx、jpg、png、txt、pdf",
+      UnsupportedImageType: "不支持「{{name}}」图片类型",
+      UnsupportedFileType: "不支持「{{name}}」文件类型",
       OnlineSearch: "联网搜索",
     },
     Rename: "重命名对话",
@@ -111,7 +113,7 @@ const cn = {
       Content: "我可以幫你搜索、答疑，請把你的疑問交給我吧~",
     },
     UploadImageTips: "最多只允许上传三张图片!",
-    UploadFileTips: "最多允许上传100个附件！",
+    UploadFileTips: "最多允许上传20个附件！",
     FileTooLarge: "文件超过5MB限制",
     UploadFailed: "上传失败",
     Voice: {

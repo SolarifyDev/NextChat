@@ -80,7 +80,7 @@ const da: PartialLocaleType = {
       UploadImage: "Upload billeder",
       UploadFile: "Upload filer",
       UploadFileTooltip:
-        "Upload vedhæftninger (maks. 50 filer, 100 MB pr. fil). Understøttede formater: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Upload vedhæftninger, samlet størrelse må ikke overstige 50 MB. Understøttede formater: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Online søgning",
     },
     Rename: "Omdøb chat",

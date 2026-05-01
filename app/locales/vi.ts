@@ -78,7 +78,7 @@ const vi: PartialLocaleType = {
       UploadImage: "Tải lên hình ảnh",
       UploadFile: "Tải lên tệp",
       UploadFileTooltip:
-        "Tải lên tệp đính kèm (tối đa 50 tệp, mỗi tệp 100MB). Định dạng hỗ trợ: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Tải lên tệp đính kèm, tổng dung lượng không vượt quá 50MB. Định dạng hỗ trợ: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Tìm kiếm trực tuyến",
     },
     Rename: "Đổi tên cuộc trò chuyện",

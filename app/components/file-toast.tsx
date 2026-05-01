@@ -12,11 +12,11 @@ function FileToastItem({
   return (
     <div className={styles.item} role="alert" aria-live="polite">
       <span className={styles.icon} aria-hidden>
-        !
+        i
       </span>
       <span className={styles.text}>{text}</span>
       <button className={styles.close} onClick={onClose} aria-label="Close">
-        x
+        ×
       </button>
     </div>
   );

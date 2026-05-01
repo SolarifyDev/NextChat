@@ -1,6 +1,6 @@
 import React from "react";
 import NextImage from "next/image";
-import DragOverlayImage from "../icons/Frame 1597883581.png";
+import DragOverlayImage from "../icons/drag-upload.png";
 import styles from "./upload-overlay.module.scss";
 
 const UploadOverlay: React.FC = () => {

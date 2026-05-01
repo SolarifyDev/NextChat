@@ -78,7 +78,7 @@ const ru: PartialLocaleType = {
       UploadImage: "Загрузить изображение",
       UploadFile: "Загрузить файлы",
       UploadFileTooltip:
-        "Загрузить вложения (до 50 файлов, по 100 МБ каждый). Поддерживаемые форматы: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Загрузить вложения, общий размер не должен превышать 50 МБ. Поддерживаемые форматы: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Онлайн-поиск",
     },
     Rename: "Переименовать чат",

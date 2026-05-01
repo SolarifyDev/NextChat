@@ -79,7 +79,7 @@ const it: PartialLocaleType = {
       UploadImage: "Carica immagine",
       UploadFile: "Carica file",
       UploadFileTooltip:
-        "Carica allegati (massimo 50 file, 100 MB ciascuno). Formati supportati: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "Carica allegati, la dimensione totale non deve superare 50 MB. Formati supportati: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Ricerca online",
     },
     Rename: "Rinomina conversazione",

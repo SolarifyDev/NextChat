@@ -78,7 +78,7 @@ const ar: PartialLocaleType = {
       UploadImage: "تحميل صورة",
       UploadFile: "تحميل ملفات",
       UploadFileTooltip:
-        "رفع المرفقات (بحد أقصى 50 ملفًا، 100MB لكل ملف). التنسيقات المدعومة: pdf, doc, docx, xlsx, ppt, pptx, txt, jpg, png, csv, json",
+        "رفع المرفقات، بإجمالي حجم لا يتجاوز 50MB. التنسيقات المدعومة: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "بحث عبر الإنترنت",
     },
     Rename: "إعادة تسمية الدردشة",

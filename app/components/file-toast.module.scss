@@ -1,69 +1,75 @@
 .container {
   position: fixed;
-  top: 18px;
+  top: 104px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 99999;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   pointer-events: none;
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: linear-gradient(180deg, rgba(255, 239, 230, 0.98), rgba(255, 228, 214, 0.98));
-  color: #5a2a1a;
-  padding: 10px 14px;
-  border-radius: 12px;
+  gap: 12px;
+  background: rgba(97, 97, 101, 0.92);
+  color: #ffffff;
+  padding: 14px 18px;
+  border-radius: 18px;
   font-size: 14px;
   pointer-events: all;
   white-space: nowrap;
-  max-width: 520px;
-  border: 1px solid rgba(214, 120, 90, 0.35);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(10px);
+  max-width: min(720px, calc(100vw - 32px));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(12px);
   animation: file-toast-in 0.28s ease-out forwards;
 }
 
 .icon {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: rgba(217, 90, 50, 0.15);
-  border: 1px solid rgba(217, 90, 50, 0.35);
-  color: #c24a22;
+  background: rgba(255, 255, 255, 0.98);
+  color: #666874;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1;
+  text-transform: lowercase;
 }
 
 .text {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .close {
   flex-shrink: 0;
   cursor: pointer;
-  opacity: 0.65;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(90, 42, 26, 0.15);
-  color: #5a2a1a;
-  font-size: 13px;
+  opacity: 0.92;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 22px;
   line-height: 1;
-  padding: 4px 6px;
-  border-radius: 8px;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     opacity: 1;
-    background: #fff;
   }
 }
 
@@ -80,7 +86,7 @@
 
 @media (max-width: 720px) {
   .container {
-    top: 12px;
+    top: 72px;
     left: 12px;
     right: 12px;
     transform: none;

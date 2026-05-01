@@ -3,17 +3,15 @@ import { useState, useEffect, useRef, useCallback, RefObject } from "react";
 type OnFileDropCallback = (files: File[], rejectedFiles: File[]) => void;
 
 const DEFAULT_ACCEPT = [
-  ".pdf",
   ".doc",
   ".docx",
   ".xlsx",
   ".ppt",
   ".pptx",
-  ".txt",
   ".jpg",
   ".png",
-  ".csv",
-  ".json",
+  ".txt",
+  ".pdf",
 ];
 
 /**
