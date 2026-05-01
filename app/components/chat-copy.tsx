@@ -3512,7 +3512,7 @@ export function _Chat_NEW() {
                     style={{
                       width: "100%",
                       paddingRight:
-                        omeStore.isFromApp && isMobileScreen ? "56px" : 0,
+                        omeStore.isFromApp && isMobileScreen ? "64px" : 0,
                     }}
                   >
                     <AttachmentScrollBox
@@ -3587,7 +3587,7 @@ export function _Chat_NEW() {
                       !omeStore.isFromApp ||
                       (omeStore.isFromApp && isMobileScreen)
                         ? omeStore.isFromApp
-                          ? "20px"
+                          ? "24px"
                           : "20px"
                         : undefined,
                     bottom:

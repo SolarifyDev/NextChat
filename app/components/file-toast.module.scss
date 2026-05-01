@@ -35,20 +35,53 @@
   height: 22px;
   display: grid;
   place-items: center;
-  border-radius: 999px;
   background: rgba(255, 255, 255, 0.98);
-  color: #666874;
-  font-weight: 700;
-  font-size: 13px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 14px;
   line-height: 1;
-  text-transform: lowercase;
+
+  svg {
+    display: block;
+  }
+}
+
+.icon-desktop {
+  display: grid;
+  position: relative;
+  color: #ffffff;
+  font-size: 18.33px;
+}
+
+.icon-desktop-glyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7d7d84;
+  font-size: 13px;
+  font-weight: 600;
+  font-family:
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    sans-serif;
+  line-height: 1;
+  transform: translateY(-0.2px);
+}
+
+.icon-mobile {
+  display: none;
 }
 
 .icon-error {
+  color: #7d7d84;
   font-size: 15px;
 }
 
 .icon-info {
+  color: #7d7d84;
   font-size: 14px;
 }
 
@@ -67,11 +100,11 @@
   background: transparent;
   border: none;
   color: #ffffff;
-  font-size: 22px;
+  font-size: 8.49px;
   line-height: 1;
   padding: 0;
-  width: 18px;
-  height: 18px;
+  width: 8.49px;
+  height: 8.49px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,6 +145,31 @@
     border-radius: 16px;
     white-space: nowrap;
     box-sizing: border-box;
+  }
+
+  .icon {
+    background: transparent;
+    border-radius: 0;
+    color: #ffffff;
+  }
+
+  .icon-desktop {
+    display: none;
+    color: #ffffff;
+    font-size: inherit;
+  }
+
+  .icon-desktop-glyph {
+    display: none;
+  }
+
+  .icon-mobile {
+    display: grid;
+  }
+
+  .icon-error,
+  .icon-info {
+    color: #ffffff;
   }
 
   .text {
