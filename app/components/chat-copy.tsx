@@ -1385,6 +1385,7 @@ function AttachmentScrollBox(props: {
   items: Attachment[];
   onDelete?: (id: string) => void;
 }) {
+  const isMobileScreen = useMobileScreen();
   const attachScrollRef = useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
@@ -1437,7 +1438,7 @@ function AttachmentScrollBox(props: {
 
   return (
     <div className={styles["attach-scroll-wrapper"]}>
-      {showLeft && (
+      {!isMobileScreen && showLeft && (
         <div className={styles["attach-scroll-fade-left"]}>
           <div
             className={styles["attach-scroll-arrow"]}
@@ -1462,7 +1463,7 @@ function AttachmentScrollBox(props: {
           />
         ))}
       </div>
-      {showRight && (
+      {!isMobileScreen && showRight && (
         <div className={styles["attach-scroll-fade-right"]}>
           <div
             className={styles["attach-scroll-arrow"]}
@@ -2121,6 +2122,8 @@ export function _Chat_NEW() {
               : t("Chat.InputActions.UnsupportedFileType", {
                   name: file.name,
                 }),
+            4000,
+            "error",
           );
         });
       }
@@ -2139,7 +2142,7 @@ export function _Chat_NEW() {
 
       const nextAttachmentCount = attachments.length + validFiles.length;
       if (nextAttachmentCount > MAX_ATTACHMENTS_COUNT) {
-        showFileToast(t("Chat.UploadFileTips"));
+        showFileToast(t("Chat.UploadFileTips"), 4000, "info");
         return;
       }
 
@@ -2174,7 +2177,7 @@ export function _Chat_NEW() {
       setAttachments((prev) => {
         const total = prev.length + newItems.length;
         if (total > MAX_ATTACHMENTS_COUNT) {
-          showFileToast(t("Chat.UploadFileTips"));
+          showFileToast(t("Chat.UploadFileTips"), 4000, "info");
           return prev;
         }
         return [...prev, ...newItems];
@@ -2252,6 +2255,8 @@ export function _Chat_NEW() {
               : t("Chat.InputActions.UnsupportedFileType", {
                   name: file.name,
                 }),
+            4000,
+            "error",
           );
         });
       }
@@ -2290,7 +2295,7 @@ export function _Chat_NEW() {
 
   async function uploadFiles() {
     if (attachments.length >= MAX_ATTACHMENTS_COUNT) {
-      return showFileToast(t("Chat.UploadFileTips"));
+      return showFileToast(t("Chat.UploadFileTips"), 4000, "info");
     }
 
     const fileInput = document.createElement("input");
@@ -3143,7 +3148,7 @@ export function _Chat_NEW() {
                     style={{
                       width: "100%",
                       paddingRight:
-                        omeStore.isFromApp && isMobileScreen ? "40px" : 0,
+                        omeStore.isFromApp && isMobileScreen ? "56px" : 0,
                     }}
                   >
                     <AttachmentScrollBox
@@ -3218,7 +3223,7 @@ export function _Chat_NEW() {
                       !omeStore.isFromApp ||
                       (omeStore.isFromApp && isMobileScreen)
                         ? omeStore.isFromApp
-                          ? "16px"
+                          ? "20px"
                           : "20px"
                         : undefined,
                     bottom:
