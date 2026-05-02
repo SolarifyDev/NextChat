@@ -125,29 +125,33 @@
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
   .container {
     top: auto;
     bottom: 156px;
     left: 50%;
     right: auto;
-    transform: none;
     transform: translateX(-50%);
     align-items: center;
     gap: 10px;
+    width: min(320px, calc(100vw - 48px));
+    max-width: calc(100vw - 48px);
   }
 
   .item {
-    width: min(292px, calc(100vw - 64px));
-    max-width: min(292px, calc(100vw - 64px));
+    width: 100%;
+    max-width: 100%;
     min-height: 52px;
     padding: 0 18px;
     border-radius: 16px;
     white-space: nowrap;
     box-sizing: border-box;
+    gap: 10px;
   }
 
   .icon {
+    width: 18px;
+    height: 18px;
     background: transparent;
     border-radius: 0;
     color: #ffffff;
@@ -170,10 +174,14 @@
   .icon-error,
   .icon-info {
     color: #ffffff;
+    font-size: 18px;
   }
 
   .text {
     white-space: nowrap;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 1.35;
   }
 
   .close {
