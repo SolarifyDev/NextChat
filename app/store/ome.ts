@@ -19,6 +19,7 @@ export type OmeStoreType = {
   score: string | null;
   isShowHome: boolean | null;
   faqSearch: boolean;
+  translateText: string;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -35,6 +36,7 @@ export type OmeStoreType = {
   setClient: (clientId: string, clientSecret: string, score: string) => void;
   setIsShowHome: (isShowHome: boolean) => void;
   setFaqSearch: (faqSearch: boolean) => void;
+  setTranslateText(translateText: string): void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -55,6 +57,7 @@ export const useOmeStore = create<OmeStoreType>()(
       score: null,
       isShowHome: null,
       faqSearch: false,
+      translateText: "",
       clearCurrent: () => {
         set({
           token: "",
@@ -71,6 +74,7 @@ export const useOmeStore = create<OmeStoreType>()(
           score: null,
           isShowHome: null,
           faqSearch: false,
+          translateText: "",
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -146,6 +150,11 @@ export const useOmeStore = create<OmeStoreType>()(
       setFaqSearch: (faqSearch: boolean) => {
         set({
           faqSearch,
+        });
+      },
+      setTranslateText(translateText: string) {
+        set({
+          translateText,
         });
       },
     }),

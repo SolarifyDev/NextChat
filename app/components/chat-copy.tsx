@@ -1927,6 +1927,19 @@ export function _Chat_NEW() {
     }
   }, [omeStore.isFromApp]);
 
+  useEffect(() => {
+    if (
+      omeStore.from === "omelinkapp" &&
+      session.isAdd &&
+      !isEmpty(omeStore.translateText) &&
+      !isNil(omeStore.translateText)
+    ) {
+      doSubmit(omeStore.translateText);
+
+      omeStore.setTranslateText("");
+    }
+  }, [omeStore.translateText, session.isAdd, omeStore.from]);
+
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
   const { run: debouncedAction } = useDebounceFn(
