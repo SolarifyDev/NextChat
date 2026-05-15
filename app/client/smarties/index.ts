@@ -162,7 +162,7 @@ export const PostTranslationSpeech = async (
   data: FormData,
 ) => {
   return (
-    await api.post("/api/Translation/speech/to/text", data, {
+    await api.post("/api/Translation/speech/to/text/whisper", data, {
       headers,
     })
   ).data;
