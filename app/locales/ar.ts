@@ -76,6 +76,9 @@ const ar: PartialLocaleType = {
       Clear: "مسح الدردشة",
       Settings: "إعدادات الدردشة",
       UploadImage: "تحميل صورة",
+      UploadFile: "تحميل ملفات",
+      UploadFileTooltip:
+        "رفع المرفقات، بإجمالي حجم لا يتجاوز 50MB. التنسيقات المدعومة: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "بحث عبر الإنترنت",
     },
     Rename: "إعادة تسمية الدردشة",
@@ -94,6 +97,9 @@ const ar: PartialLocaleType = {
         "يمكنني مساعدتك في البحث والإجابة على الأسئلة. اسألني عن أي شيء!",
     },
     UploadImageTips: "يُسمح بتحميل ثلاث صور كحد أقصى فقط!",
+    UploadFileTips: "يُسمح بحد أقصى 100 مرفقات!",
+    FileTooLarge: "الملف يتجاوز حد 5 ميجابايت",
+    UploadFailed: "فشل التحميل",
     Voice: {
       HoldToTalk: "اضغط مع الاستمرار للتحدث",
       ReleaseToSendSlideUpToCancel: "حرّر للإرسال، اسحب للأعلى للإلغاء",

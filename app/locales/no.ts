@@ -78,6 +78,9 @@ const no: PartialLocaleType = {
       Clear: "Rydd samtale",
       Settings: "Samtaleinnstillinger",
       UploadImage: "Last opp bilde",
+      UploadFile: "Last opp filer",
+      UploadFileTooltip:
+        "Last opp vedlegg, total størrelse må ikke overstige 50 MB. Støttede formater: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Nett søk",
     },
     Rename: "Gi nytt navn til samtale",
@@ -97,6 +100,9 @@ const no: PartialLocaleType = {
         "Jeg kan hjelpe deg med å søke og svare på spørsmål. Spør meg om hva som helst!",
     },
     UploadImageTips: "Bare maksimalt tre bilete kan lastast opp!",
+    UploadFileTips: "Maksimalt 100 vedlegg er tillatt!",
+    FileTooLarge: "Filen overstiger grensen på 5 MB",
+    UploadFailed: "Opplasting mislyktes",
     Voice: {
       HoldToTalk: "Hold inne for å snakke",
       ReleaseToSendSlideUpToCancel: "Slipp for å sende, dra opp for å avbryte",

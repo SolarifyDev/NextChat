@@ -76,6 +76,9 @@ const bn: PartialLocaleType = {
       Clear: "চ্যাট পরিষ্কার করুন",
       Settings: "চ্যাট সেটিংস",
       UploadImage: "চিত্র আপলোড করুন",
+      UploadFile: "ফাইল আপলোড করুন",
+      UploadFileTooltip:
+        "সংযুক্তি আপলোড করুন, মোট আকার 50MB-এর বেশি নয়। সমর্থিত ফরম্যাট: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "অনলাইন অনুসন্ধান",
     },
     Rename: "চ্যাট নাম পরিবর্তন করুন",
@@ -94,6 +97,9 @@ const bn: PartialLocaleType = {
         "আমি আপনাকে অনুসন্ধান করতে এবং প্রশ্নের উত্তর দিতে সাহায্য করতে পারি। আমাকে যেকোনো কিছু জিজ্ঞাসা করুন!",
     },
     UploadImageTips: "সর্বাধিক তিনটি ছবি আপলোড করার অনুমতি দেওয়া হয়!",
+    UploadFileTips: "সর্বাধিক 100টি সংযুক্তি আপলোড করার অনুমতি দেওয়া হয়!",
+    FileTooLarge: "ফাইল 5MB সীমা অতিক্রম করেছে",
+    UploadFailed: "আপলোড ব্যর্থ",
     Voice: {
       HoldToTalk: "কথা বলতে ধরে রাখুন",
       ReleaseToSendSlideUpToCancel:

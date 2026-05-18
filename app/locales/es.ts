@@ -78,6 +78,9 @@ const es: PartialLocaleType = {
       Clear: "Limpiar chat",
       Settings: "Configuración de conversación",
       UploadImage: "Subir imagen",
+      UploadFile: "Subir archivos",
+      UploadFileTooltip:
+        "Sube archivos adjuntos, el tamaño total no debe superar los 50 MB. Formatos compatibles: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Búsqueda en línea",
     },
     Rename: "Renombrar conversación",
@@ -97,6 +100,9 @@ const es: PartialLocaleType = {
         "Puedo ayudarte a buscar y responder preguntas. ¡Pregúntame lo que quieras!",
     },
     UploadImageTips: "¡Solo se permite subir un máximo de tres imágenes!",
+    UploadFileTips: "¡Se permite un máximo de 100 archivos adjuntos!",
+    FileTooLarge: "El archivo supera el límite de 5 MB",
+    UploadFailed: "Error al subir",
     Voice: {
       HoldToTalk: "Mantén pulsado",
       ReleaseToSendSlideUpToCancel:

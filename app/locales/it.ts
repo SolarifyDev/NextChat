@@ -77,6 +77,9 @@ const it: PartialLocaleType = {
       Clear: "Pulisci chat",
       Settings: "Impostazioni conversazione",
       UploadImage: "Carica immagine",
+      UploadFile: "Carica file",
+      UploadFileTooltip:
+        "Carica allegati, la dimensione totale non deve superare 50 MB. Formati supportati: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Ricerca online",
     },
     Rename: "Rinomina conversazione",
@@ -96,6 +99,9 @@ const it: PartialLocaleType = {
         "Posso aiutarti a cercare e rispondere alle domande. Chiedimi qualsiasi cosa!",
     },
     UploadImageTips: "È consentito caricare un massimo di tre immagini!",
+    UploadFileTips: "È consentito un massimo di 100 allegati!",
+    FileTooLarge: "Il file supera il limite di 5 MB",
+    UploadFailed: "Caricamento fallito",
     Voice: {
       HoldToTalk: "Tieni premuto per parlare",
       ReleaseToSendSlideUpToCancel:

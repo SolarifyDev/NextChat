@@ -76,6 +76,9 @@ const ko: PartialLocaleType = {
       Clear: "채팅 지우기",
       Settings: "채팅 설정",
       UploadImage: "이미지 업로드",
+      UploadFile: "파일 업로드",
+      UploadFileTooltip:
+        "첨부파일 업로드, 총 용량은 50MB를 초과할 수 없습니다. 지원 형식: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "온라인 검색",
     },
     Rename: "채팅 이름 변경",
@@ -93,6 +96,9 @@ const ko: PartialLocaleType = {
       Content: "검색과 질문에 답해드릴 수 있어요. 무엇이든 물어보세요!",
     },
     UploadImageTips: "최대 세 장의 이미지만 업로드할 수 있습니다!",
+    UploadFileTips: "최대 100개의 첨부파일만 업로드할 수 있습니다!",
+    FileTooLarge: "파일이 5MB 제한을 초과합니다",
+    UploadFailed: "업로드 실패",
     Voice: {
       HoldToTalk: "누르고 말하기",
       ReleaseToSendSlideUpToCancel: "놓으면 전송, 위로 밀면 취소",
