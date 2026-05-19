@@ -168,6 +168,25 @@ export const PostTranslationSpeech = async (
   ).data;
 };
 
+export const PostAttachmentUpload = async (
+  headers: { [key: string]: string },
+  data: FormData,
+  onUploadProgress?: (percent: number) => void,
+) => {
+  return (
+    await api.post("/api/Attachment/upload", data, {
+      headers,
+      onUploadProgress: onUploadProgress
+        ? (e) => {
+            const percent = Math.round((e.loaded / (e.total ?? 1)) * 100);
+            onUploadProgress(percent);
+          }
+        : undefined,
+      timeout: 120000,
+    })
+  ).data;
+};
+
 const authApi = axios.create({
   timeout: 120000,
 });

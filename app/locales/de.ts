@@ -77,6 +77,9 @@ const de: PartialLocaleType = {
       Clear: "Chat löschen",
       Settings: "Gesprächseinstellungen",
       UploadImage: "Bild hochladen",
+      UploadFile: "Dateien hochladen",
+      UploadFileTooltip:
+        "Anhänge hochladen, Gesamtgröße darf 50 MB nicht überschreiten. Unterstützte Formate: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Online-Suche",
     },
     Rename: "Gespräch umbenennen",
@@ -95,6 +98,9 @@ const de: PartialLocaleType = {
         "Ich kann dir bei der Suche helfen und Fragen beantworten. Frag mich einfach alles!",
     },
     UploadImageTips: "Es dürfen maximal drei Bilder hochgeladen werden!",
+    UploadFileTips: "Es sind maximal 100 Anhänge erlaubt!",
+    FileTooLarge: "Datei überschreitet das 5-MB-Limit",
+    UploadFailed: "Upload fehlgeschlagen",
     Voice: {
       HoldToTalk: "Gedrückt halten zum Sprechen",
       ReleaseToSendSlideUpToCancel:

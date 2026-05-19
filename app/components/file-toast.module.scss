@@ -1,0 +1,190 @@
+.container {
+  position: fixed;
+  top: 104px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(97, 97, 101, 0.92);
+  color: #ffffff;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 14px;
+  pointer-events: all;
+  white-space: nowrap;
+  max-width: min(720px, calc(100vw - 32px));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(12px);
+  animation: file-toast-in 0.28s ease-out forwards;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1;
+
+  svg {
+    display: block;
+  }
+}
+
+.icon-desktop {
+  display: grid;
+  position: relative;
+  color: #ffffff;
+  font-size: 18.33px;
+}
+
+.icon-desktop-glyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7d7d84;
+  font-size: 13px;
+  font-weight: 600;
+  font-family:
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    sans-serif;
+  line-height: 1;
+  transform: translateY(-0.2px);
+}
+
+.icon-mobile {
+  display: none;
+}
+
+.icon-error {
+  color: #7d7d84;
+  font-size: 15px;
+}
+
+.icon-info {
+  color: #7d7d84;
+  font-size: 14px;
+}
+
+.text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.close {
+  flex-shrink: 0;
+  cursor: pointer;
+  opacity: 0.92;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 8.49px;
+  line-height: 1;
+  padding: 0;
+  width: 8.49px;
+  height: 8.49px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+@keyframes file-toast-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .container {
+    top: auto;
+    bottom: 156px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: 10px;
+    width: min(320px, calc(100vw - 48px));
+    max-width: calc(100vw - 48px);
+  }
+
+  .item {
+    width: 100%;
+    max-width: 100%;
+    min-height: 52px;
+    padding: 0 18px;
+    border-radius: 16px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    gap: 10px;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    background: transparent;
+    border-radius: 0;
+    color: #ffffff;
+  }
+
+  .icon-desktop {
+    display: none;
+    color: #ffffff;
+    font-size: inherit;
+  }
+
+  .icon-desktop-glyph {
+    display: none;
+  }
+
+  .icon-mobile {
+    display: grid;
+  }
+
+  .icon-error,
+  .icon-info {
+    color: #ffffff;
+    font-size: 18px;
+  }
+
+  .text {
+    white-space: nowrap;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .close {
+    display: none;
+  }
+}

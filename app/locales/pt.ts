@@ -75,6 +75,10 @@ const pt: PartialLocaleType = {
       Masks: "Máscaras",
       Clear: "Limpar Contexto",
       Settings: "Configurações",
+      UploadImage: "Enviar imagens",
+      UploadFile: "Enviar arquivos",
+      UploadFileTooltip:
+        "Enviar anexos, o tamanho total não pode exceder 50MB. Formatos compatíveis: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Pesquisa online",
     },
     Rename: "Renomear Chat",
@@ -94,6 +98,9 @@ const pt: PartialLocaleType = {
         "Posso ajudar você a pesquisar e responder perguntas. Pergunte-me qualquer coisa!",
     },
     UploadImageTips: "É permitido enviar no máximo três imagens!",
+    UploadFileTips: "É permitido no máximo 100 anexos!",
+    FileTooLarge: "O arquivo excede o limite de 5 MB",
+    UploadFailed: "Falha no envio",
     Voice: {
       HoldToTalk: "Mantenha pressionado para falar",
       ReleaseToSendSlideUpToCancel:

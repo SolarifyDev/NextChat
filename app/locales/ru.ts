@@ -76,6 +76,9 @@ const ru: PartialLocaleType = {
       Clear: "Очистить чат",
       Settings: "Настройки чата",
       UploadImage: "Загрузить изображение",
+      UploadFile: "Загрузить файлы",
+      UploadFileTooltip:
+        "Загрузить вложения, общий размер не должен превышать 50 МБ. Поддерживаемые форматы: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Онлайн-поиск",
     },
     Rename: "Переименовать чат",
@@ -94,6 +97,9 @@ const ru: PartialLocaleType = {
         "Я могу помочь вам с поиском и ответами на вопросы. Спрашивайте меня о чем угодно!",
     },
     UploadImageTips: "Максимально разрешено загружать только три изображения!",
+    UploadFileTips: "Максимально разрешено 100 вложений!",
+    FileTooLarge: "Файл превышает лимит 5 МБ",
+    UploadFailed: "Ошибка загрузки",
     Voice: {
       HoldToTalk: "Удерживайте, чтобы говорить",
       ReleaseToSendSlideUpToCancel:

@@ -40,6 +40,7 @@ import UserActivityMonitor from "../hook/use-activity";
 import { useInteractionMonitor } from "../hook/use-interaction-monitor";
 import { PostGetToken } from "../client/smarties";
 import { useEnhanceChatStore } from "../store/enhance-chat";
+import { ToastContainer } from "./chat-toast";
 import { postMessageToReactNative } from "../utils/ga";
 
 export function Loading(props: { noLogo?: boolean }) {
@@ -628,6 +629,7 @@ export function Home() {
       <Router>
         <Screen />
       </Router>
+      <ToastContainer />
     </ErrorBoundary>
   );
 }

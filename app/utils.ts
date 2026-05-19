@@ -287,6 +287,15 @@ export function getMessageImages(message: RequestMessage): string[] {
   return urls;
 }
 
+export function getMessageFiles(message: RequestMessage) {
+  if (typeof message.content === "string") {
+    return [];
+  }
+  return message.content
+    .filter((c) => c.type === "file" && !!c.file_url?.url)
+    .map((c) => c.file_url!);
+}
+
 export function isVisionModel(model: string) {
   const visionModels = useAccessStore.getState().visionModels;
   const envVisionModels = visionModels?.split(",").map((m) => m.trim());
