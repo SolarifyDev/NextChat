@@ -1,3 +1,5 @@
+"use client";
+
 import { useDebouncedCallback } from "use-debounce";
 import {
   ExclamationCircleOutlined,
@@ -165,6 +167,7 @@ import {
   useEnhanceChatStore,
 } from "../store/enhance-chat";
 import VoiceChatButton from "./voice";
+import { postMessageToReactNative } from "../utils/ga";
 import {
   getHeaders,
   PostAttachmentUpload,
@@ -1691,6 +1694,26 @@ export function _Chat_NEW() {
   const doSubmit = async (userInput: string) => {
     if (uploading) return;
     if (userInput.trim() === "" && attachments.length === 0) return;
+
+    if (omeStore.from === "omelinkapp") {
+      // trackEvent("click_send_timestamp", {
+      //   userId: omeStore.userId,
+      //   time: Date.now(),
+      //   metis_event_id: omeStore.eventUuid,
+      // });
+
+      postMessageToReactNative(
+        {
+          action: "click_send_timestamp",
+          time: Date.now(),
+          metis_event_id: omeStore.eventUuid,
+          userId: omeStore.userId,
+          // debug: true,
+        },
+        "click_send_timestamp",
+      );
+    }
+
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");

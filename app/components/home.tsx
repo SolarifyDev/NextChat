@@ -36,9 +36,12 @@ import i18next from "i18next";
 import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
 import { LiveAPIProvider } from "../contexts/LiveAPIContext";
+import UserActivityMonitor from "../hook/use-activity";
+import { useInteractionMonitor } from "../hook/use-interaction-monitor";
 import { PostGetToken } from "../client/smarties";
 import { useEnhanceChatStore } from "../store/enhance-chat";
 import { ToastContainer } from "./chat-toast";
+import { postMessageToReactNative } from "../utils/ga";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -208,6 +211,60 @@ function Screen() {
   const shouldTightBorder =
     getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
 
+  useEffect(() => {
+    let monitor: UserActivityMonitor;
+
+    if (omeStore.from === "omelinkapp") {
+      monitor = new UserActivityMonitor({
+        timeout: 30 * 60 * 1000,
+        gaEventName: "exit_app_timestamp",
+        userId: omeStore.userId,
+        debug: false,
+        eventUuid: omeStore.eventUuid,
+      });
+    }
+
+    return () => {
+      if (monitor) monitor.destroy();
+    };
+  }, []);
+
+  const { getCurrentInteractedMs } = useInteractionMonitor((interacted) => {
+    console.log("📤 上传行为埋点 => ", interacted ? "活跃" : "无操作");
+
+    if (omeStore.from === "omelinkapp") {
+      // trackEvent("app_is_active", {
+      //   isActive: interacted,
+      //   userId: omeStore.userId,
+      //   metis_event_id: omeStore.eventUuid,
+      // });
+
+      postMessageToReactNative(
+        {
+          action: "app_is_active",
+          isActive: interacted,
+          userId: omeStore.userId,
+          metis_event_id: omeStore.eventUuid,
+        },
+        "app_is_active",
+      );
+    }
+  });
+
+  // 传递切换事件给父
+  useEffect(() => {
+    try {
+      if (window?.ReactNativeWebView) {
+        const message = {
+          data: { path: location.pathname },
+          msg: "pathname",
+          type: MessageEnum.Path,
+        };
+        window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      }
+    } catch {}
+  }, [location.pathname]);
+
   // useEffect(() => {
   //   loadAsyncGoogleFont();
   // }, []);
@@ -255,6 +312,7 @@ function Screen() {
               ? omeStore.isShowHome && isHome
               : isHome,
           })}
+          getCurrentInteractedMs={getCurrentInteractedMs}
         />
         <WindowContent>
           <Routes>
@@ -417,6 +475,9 @@ export function Home() {
           }
           if (!isEmpty(params?.lanauge)) {
             omeStore.setLanguage(params?.lanauge);
+          }
+          if (!isEmpty(params?.eventUuid)) {
+            omeStore.setEventUuid(params.eventUuid);
           }
         } catch {}
       } else {

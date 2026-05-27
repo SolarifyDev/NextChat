@@ -11,6 +11,7 @@ export type OmeStoreType = {
   isFromApp: boolean | null;
   language: Lang;
   onlineSearch: boolean;
+  eventUuid: string; // ga
   ticket: string;
   refreshToken: string;
   expiresIn: null | number;
@@ -27,6 +28,7 @@ export type OmeStoreType = {
   setFrom: (from: string) => void;
   setIsFromApp: (isFromApp: boolean) => void;
   setLanguage: (language: Lang) => void;
+  setEventUuid: (eventUuid: string) => void;
   setTicket: (ticket: string) => void;
   setRefreshToken: (refreshToken: string) => void;
   setExpiresIn: (expiresIn: number) => void;
@@ -47,6 +49,7 @@ export const useOmeStore = create<OmeStoreType>()(
       isFromApp: null,
       language: "cn",
       onlineSearch: false,
+      eventUuid: "",
       ticket: "",
       refreshToken: "",
       expiresIn: null,
@@ -63,6 +66,7 @@ export const useOmeStore = create<OmeStoreType>()(
           from: "",
           isFromApp: null,
           onlineSearch: false,
+          eventUuid: "",
           ticket: "",
           refreshToken: "",
           expiresIn: null,
@@ -93,6 +97,9 @@ export const useOmeStore = create<OmeStoreType>()(
       },
       setLanguage: (language: Lang) => {
         set({ language });
+      },
+      setEventUuid: (eventUuid: string) => {
+        set({ eventUuid });
       },
       setTicket: (ticket: string) => {
         set({ ticket });
