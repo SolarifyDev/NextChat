@@ -1,3 +1,5 @@
+"use client";
+
 import DeleteIcon from "../icons/delete.svg";
 
 import styles from "./home.module.scss";
@@ -14,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { useOmeStore } from "../store/ome";
 import { useEnhanceChatStore } from "../store/enhance-chat";
+import { postMessageToReactNative } from "../utils/ga";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -133,8 +136,15 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
-  const { onlineSearch, setOnlineSearch, faqSearch, setFaqSearch } =
-    useOmeStore();
+  const {
+    onlineSearch,
+    userId,
+    from,
+    eventUuid,
+    setOnlineSearch,
+    faqSearch,
+    setFaqSearch,
+  } = useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
@@ -184,6 +194,24 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
             // selected={i === currentSessionIndex}
             selected={item?.sessionId === sessionId}
             onClick={() => {
+              if (from === "omelinkapp") {
+                // trackEvent("click_chat_timestamp", {
+                //   userId: userId,
+                //   time: Date.now(),
+                //   metis_event_id: eventUuid,
+                // });
+
+                postMessageToReactNative(
+                  {
+                    action: "click_chat_timestamp",
+                    userId: userId,
+                    time: Date.now(),
+                    metis_event_id: eventUuid,
+                  },
+                  "click_chat_timestamp",
+                );
+              }
+
               // selectSession(i);
 
               // if (sessionId === item.sessionId) {

@@ -78,6 +78,9 @@ const da: PartialLocaleType = {
       Clear: "Ryd kontekst",
       Settings: "Indstillinger",
       UploadImage: "Upload billeder",
+      UploadFile: "Upload filer",
+      UploadFileTooltip:
+        "Upload vedhæftninger, samlet størrelse må ikke overstige 50 MB. Understøttede formater: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Online søgning",
     },
     Rename: "Omdøb chat",
@@ -108,6 +111,9 @@ const da: PartialLocaleType = {
         "Jeg kan hjælpe dig med at søge og besvare spørgsmål. Spørg mig hvad som helst!",
     },
     UploadImageTips: "Der må kun uploades maksimalt tre billeder!",
+    UploadFileTips: "Der må kun uploades maksimalt 100 vedhæftninger!",
+    FileTooLarge: "Filen overstiger grænsen på 5 MB",
+    UploadFailed: "Upload mislykkedes",
     Voice: {
       HoldToTalk: "Hold nede for at tale",
       ReleaseToSendSlideUpToCancel:

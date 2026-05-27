@@ -3,4 +3,5 @@ export enum MessageEnum {
   Quit,
   Path,
   Navigate,
+  GA, // google analytics
 }

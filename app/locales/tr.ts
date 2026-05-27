@@ -76,6 +76,9 @@ const tr: PartialLocaleType = {
       Clear: "Sohbeti temizle",
       Settings: "Sohbet ayarları",
       UploadImage: "Resim yükle",
+      UploadFile: "Dosya yükle",
+      UploadFileTooltip:
+        "Ek yükle, toplam boyut 50 MB'ı aşmamalıdır. Desteklenen formatlar: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Çevrimiçi arama",
     },
     Rename: "Sohbeti yeniden adlandır",
@@ -94,6 +97,9 @@ const tr: PartialLocaleType = {
         "Arama yapabilir ve sorularınızı yanıtlayabilirim. Bana istediğinizi sorabilirsiniz!",
     },
     UploadImageTips: "En fazla üç resim yüklenebilir!",
+    UploadFileTips: "En fazla 100 ek yüklenebilir!",
+    FileTooLarge: "Dosya 5MB sınırını aşıyor",
+    UploadFailed: "Yükleme başarısız",
     Voice: {
       HoldToTalk: "Konuşmak için basılı tutun",
       ReleaseToSendSlideUpToCancel:

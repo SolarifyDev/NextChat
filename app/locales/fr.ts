@@ -77,6 +77,9 @@ const fr: PartialLocaleType = {
       Clear: "Effacer la discussion",
       Settings: "Paramètres de la discussion",
       UploadImage: "Télécharger une image",
+      UploadFile: "Télécharger des fichiers",
+      UploadFileTooltip:
+        "Téléverser des pièces jointes, la taille totale ne doit pas dépasser 50 Mo. Formats pris en charge : doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
       OnlineSearch: "Recherche en ligne",
     },
     Rename: "Renommer la discussion",
@@ -97,6 +100,9 @@ const fr: PartialLocaleType = {
     },
     UploadImageTips:
       "Il est permis de télécharger un maximum de trois images seulement !",
+    UploadFileTips: "Un maximum de 100 pièces jointes est autorisé !",
+    FileTooLarge: "Le fichier dépasse la limite de 5 Mo",
+    UploadFailed: "Échec du téléchargement",
     Voice: {
       HoldToTalk: "Maintenez pour parler",
       ReleaseToSendSlideUpToCancel:
