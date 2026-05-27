@@ -25,6 +25,7 @@ export function useDragOverlay(
   containerRef: RefObject<HTMLElement | null>,
   onFileDrop?: OnFileDropCallback,
   accept: string[] = DEFAULT_ACCEPT,
+  enabled = true,
 ): boolean {
   const [visible, setVisible] = useState<boolean>(false);
   const counter = useRef<number>(0);
@@ -37,7 +38,11 @@ export function useDragOverlay(
 
   useEffect(() => {
     const el = containerRef.current;
-    if (!el) return;
+    if (!el || !enabled) {
+      counter.current = 0;
+      setVisible(false);
+      return;
+    }
 
     const enter = (e: DragEvent): void => {
       e.preventDefault();
@@ -97,7 +102,7 @@ export function useDragOverlay(
       el.removeEventListener("drop", drop);
       el.removeEventListener("dragover", over);
     };
-  }, [containerRef, stableCallback, accept]);
+  }, [containerRef, stableCallback, accept, enabled]);
 
   return visible;
 }

@@ -1607,6 +1607,8 @@ export function _Chat_NEW() {
   const omeStore = useOmeStore();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const uploading = attachments.some((a) => a.status === "uploading");
+  const currentModel = session.mask.modelConfig.model;
+  const canUploadAttachments = isVisionModel(currentModel);
 
   const removeAttachment = useCallback((id: string) => {
     setAttachments((prev) => {
@@ -1622,6 +1624,12 @@ export function _Chat_NEW() {
       return [];
     });
   }, []);
+
+  useEffect(() => {
+    if (!canUploadAttachments && attachments.length > 0) {
+      clearAttachments();
+    }
+  }, [attachments.length, canUploadAttachments, clearAttachments]);
 
   // prompt hints
   const promptStore = usePromptStore();
@@ -2267,6 +2275,7 @@ export function _Chat_NEW() {
 
   const handleFileDrop = useCallback(
     async (files: File[], rejectedFiles: File[] = []) => {
+      if (!canUploadAttachments) return;
       if (rejectedFiles.length > 0) {
         rejectedFiles.forEach((file) => {
           const isImageType = file.type.startsWith("image/");
@@ -2287,19 +2296,19 @@ export function _Chat_NEW() {
         addAttachments(files);
       }
     },
-    [addAttachments],
+    [addAttachments, canUploadAttachments, t],
   );
 
   const showOverlay = useDragOverlay(
     containerRef,
     handleFileDrop,
     dragAcceptFormats,
+    canUploadAttachments,
   );
 
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const currentModel = newChatStore.currentSession!.mask.modelConfig.model;
-      if (!isVisionModel(currentModel)) {
+      if (!canUploadAttachments) {
         return;
       }
       const items = (event.clipboardData || window.clipboardData).items;
@@ -2313,10 +2322,11 @@ export function _Chat_NEW() {
       }
       if (files.length > 0) addAttachments(files);
     },
-    [newChatStore, addAttachments],
+    [addAttachments, canUploadAttachments],
   );
 
   async function uploadFiles() {
+    if (!canUploadAttachments) return;
     if (attachments.length >= MAX_ATTACHMENTS_COUNT) {
       return showFileToast(t("Chat.UploadFileTips"), 4000, "info");
     }
