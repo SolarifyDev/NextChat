@@ -71,6 +71,7 @@ export interface RequestPayload {
   drop_params?: boolean;
   onlineSearch?: boolean;
   NeedFaq?: boolean;
+  needApool?: boolean;
   isSummary?: boolean;
 }
 
@@ -256,11 +257,14 @@ export class ChatGPTApi implements LLMApi {
         requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
       }
 
-      requestPayload["onlineSearch"] = useOmeStore.getState().faqSearch
-        ? false
-        : useOmeStore.getState().onlineSearch;
+      const { apoolSearch, faqSearch, onlineSearch } = useOmeStore.getState();
 
-      requestPayload["NeedFaq"] = useOmeStore.getState().faqSearch;
+      requestPayload["onlineSearch"] =
+        faqSearch || apoolSearch ? false : onlineSearch;
+
+      requestPayload["NeedFaq"] = faqSearch;
+
+      requestPayload["needApool"] = apoolSearch;
 
       requestPayload["isSummary"] = options.isSummary || false;
     }
@@ -305,6 +309,12 @@ export class ChatGPTApi implements LLMApi {
           isDalle3 ? OpenaiPath.ImagePath : OpenaiPath.ChatPath,
         );
       }
+
+      const { omeTenantId } = useOmeStore.getState();
+      if (!isDalle3 && chatPath.includes(OpenaiPath.ChatPath) && omeTenantId) {
+        headers["tenant-id"] = omeTenantId;
+      }
+
       if (shouldStream) {
         let index = -1;
         const [tools, funcs] = usePluginStore.getState().getAsTools(

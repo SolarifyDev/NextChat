@@ -730,7 +730,7 @@ export function ChatActions(props: {
   const [showFaqSelector, setShowFaqSelector] = useState(false);
   const [selectedFaqMode, setSelectedFaqMode] = useState<
     "FAQ" | "APOOL" | null
-  >(omeStore.faqSearch ? "FAQ" : null);
+  >(omeStore.apoolSearch ? "APOOL" : omeStore.faqSearch ? "FAQ" : null);
 
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [showQualitySelector, setShowQualitySelector] = useState(false);
@@ -772,7 +772,8 @@ export function ChatActions(props: {
       icon: renderApoolIcon(),
     },
   ];
-  const isFaqModeSelected = selectedFaqMode !== null || omeStore.faqSearch;
+  const isFaqModeSelected =
+    selectedFaqMode !== null || omeStore.faqSearch || omeStore.apoolSearch;
   const currentFaqMode = selectedFaqMode ?? "FAQ";
   const currentFaqIcon =
     currentFaqMode === "APOOL" ? (
@@ -787,7 +788,8 @@ export function ChatActions(props: {
 
   useEffect(() => {
     setShowFaqSelector(false);
-    setSelectedFaqMode(useOmeStore.getState().faqSearch ? "FAQ" : null);
+    const { apoolSearch, faqSearch } = useOmeStore.getState();
+    setSelectedFaqMode(apoolSearch ? "APOOL" : faqSearch ? "FAQ" : null);
   }, [session.sessionId]);
 
   useEffect(() => {
@@ -1107,11 +1109,13 @@ export function ChatActions(props: {
               if (selectedFaqMode === mode) {
                 useOmeStore.getState().setOnlineSearch(false);
                 useOmeStore.getState().setFaqSearch(false);
+                useOmeStore.getState().setApoolSearch(false);
                 setSelectedFaqMode(null);
                 return;
               }
               useOmeStore.getState().setOnlineSearch(false);
               useOmeStore.getState().setFaqSearch(mode === "FAQ");
+              useOmeStore.getState().setApoolSearch(mode === "APOOL");
               setSelectedFaqMode(mode);
               showToast(mode);
             }}
