@@ -31,6 +31,7 @@ import { RequestPayload } from "./openai";
 
 import { fetch } from "@/app/utils/stream";
 import { useEnhanceChatStore } from "@/app/store/enhance-chat";
+import { useOmeStore } from "@/app/store/ome";
 
 export interface SiliconFlowListModelResponse {
   object: string;
@@ -107,6 +108,8 @@ export class SiliconflowApi implements LLMApi {
       },
     };
 
+    const { apoolSearch, faqSearch, onlineSearch } = useOmeStore.getState();
+
     const requestPayload: RequestPayload = {
       messages,
       stream: options.config.stream,
@@ -115,6 +118,10 @@ export class SiliconflowApi implements LLMApi {
       presence_penalty: modelConfig.presence_penalty,
       frequency_penalty: modelConfig.frequency_penalty,
       top_p: modelConfig.top_p,
+      onlineSearch: faqSearch || apoolSearch ? false : onlineSearch,
+      NeedFaq: faqSearch,
+      needApool: apoolSearch,
+      isSummary: options.isSummary || false,
       // max_tokens: Math.max(modelConfig.max_tokens, 1024),
       // Please do not ask me why not send max_tokens, no reason, this param is just shit, I dont want to explain anymore.
     };
