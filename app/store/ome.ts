@@ -3,8 +3,6 @@ import { persist } from "zustand/middleware";
 import { Lang } from "../locales";
 import { PostGetToken } from "../client/smarties";
 
-const DEFAULT_OME_TENANT_ID = "9ba75185-c64b-40fb-ba19-f6471c4fed9a";
-
 export type OmeStoreType = {
   token: string;
   userId: string;
@@ -63,7 +61,7 @@ export const useOmeStore = create<OmeStoreType>()(
       clientSecret: null,
       score: null,
       isShowHome: null,
-      omeTenantId: DEFAULT_OME_TENANT_ID,
+      omeTenantId: "",
       faqSearch: false,
       apoolSearch: false,
       clearCurrent: () => {
@@ -82,7 +80,7 @@ export const useOmeStore = create<OmeStoreType>()(
           clientSecret: null,
           score: null,
           isShowHome: null,
-          omeTenantId: DEFAULT_OME_TENANT_ID,
+          omeTenantId: "",
           faqSearch: false,
           apoolSearch: false,
         });

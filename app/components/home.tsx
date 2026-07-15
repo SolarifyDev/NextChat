@@ -406,13 +406,6 @@ export function Home() {
   }, [useAccessStore.getState()._hasHydrated]);
 
   useEffect(() => {
-    const setOmeTenantIdFromParams = (params: any) => {
-      const omeTenantId = params?.omeTenantld;
-      if (!isNil(omeTenantId) && `${omeTenantId}` !== "") {
-        omeStore.setOmeTenantId(`${omeTenantId}`);
-      }
-    };
-
     const handleMessage = async (event: any) => {
       const data = event.data;
 
@@ -421,7 +414,10 @@ export function Home() {
       if (window.ReactNativeWebView) {
         try {
           const params = JSON.parse(data);
-          setOmeTenantIdFromParams(params);
+
+          if (!isEmpty(params?.omeTenantld)) {
+            omeStore.setOmeTenantId(params?.omeTenantld ?? "");
+          }
 
           if (!isEmpty(params?.from)) {
             omeStore.setFrom(params.from ?? "");
@@ -497,7 +493,9 @@ export function Home() {
           return; // 如果不是信任的源，忽略消息
         }
 
-        setOmeTenantIdFromParams(event.data);
+        if (!isEmpty(event?.data?.omeTenantld)) {
+          omeStore.setOmeTenantId(event?.data?.omeTenantld ?? "");
+        }
 
         // if (!isEmpty(event?.data?.ometoken)) {
         //   console.log(
@@ -540,7 +538,9 @@ export function Home() {
         if (isEmpty(data) || (typeof response === "string" && response === ""))
           return;
 
-        setOmeTenantIdFromParams(data);
+        if (!isEmpty(data?.omeTenantld)) {
+          omeStore.setOmeTenantId(data?.omeTenantld ?? "");
+        }
 
         if (!isEmpty(data?.from)) {
           omeStore.setFrom(data.from ?? "");
