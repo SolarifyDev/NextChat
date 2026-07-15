@@ -415,8 +415,8 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
-          if (!isEmpty(params?.omeTenantld)) {
-            omeStore.setOmeTenantId(params?.omeTenantld ?? "");
+          if (!isEmpty(params?.omeTenantId)) {
+            omeStore.setOmeTenantId(params?.omeTenantId ?? "");
           }
 
           if (!isEmpty(params?.from)) {
@@ -493,8 +493,8 @@ export function Home() {
           return; // 如果不是信任的源，忽略消息
         }
 
-        if (!isEmpty(event?.data?.omeTenantld)) {
-          omeStore.setOmeTenantId(event?.data?.omeTenantld ?? "");
+        if (!isEmpty(event?.data?.omeTenantId)) {
+          omeStore.setOmeTenantId(event?.data?.omeTenantId ?? "");
         }
 
         // if (!isEmpty(event?.data?.ometoken)) {
@@ -538,8 +538,8 @@ export function Home() {
         if (isEmpty(data) || (typeof response === "string" && response === ""))
           return;
 
-        if (!isEmpty(data?.omeTenantld)) {
-          omeStore.setOmeTenantId(data?.omeTenantld ?? "");
+        if (!isEmpty(data?.omeTenantId)) {
+          omeStore.setOmeTenantId(data?.omeTenantId ?? "");
         }
 
         if (!isEmpty(data?.from)) {
