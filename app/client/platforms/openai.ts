@@ -310,11 +310,6 @@ export class ChatGPTApi implements LLMApi {
         );
       }
 
-      const { omeTenantId } = useOmeStore.getState();
-      if (!isDalle3 && chatPath.includes(OpenaiPath.ChatPath) && omeTenantId) {
-        headers["tenant-id"] = omeTenantId;
-      }
-
       if (shouldStream) {
         let index = -1;
         const [tools, funcs] = usePluginStore.getState().getAsTools(

@@ -799,15 +799,15 @@ export function ChatActions(props: {
   })();
   const isFaqModeSelected =
     selectedFaqMode !== null || omeStore.faqSearch || omeStore.apoolSearch;
-  const currentFaqMode: "FAQ/APOOL" | "FAQ" | "APOOL" = omeStore.apoolSearch
+  const currentFaqMode: "" | "FAQ" | "APOOL" = omeStore.apoolSearch
     ? "APOOL"
     : omeStore.faqSearch
     ? "FAQ"
-    : selectedFaqMode ?? "FAQ/APOOL";
+    : selectedFaqMode ?? "";
   const currentFaqIcon =
     currentFaqMode === "APOOL" ? (
       renderApoolIcon()
-    ) : currentFaqMode === "FAQ/APOOL" ? (
+    ) : currentFaqMode === "" ? (
       <BookIcon className={styles["knowledge-base-icon"]} />
     ) : omeStore.isFromApp ? (
       <AppFaqIcon />

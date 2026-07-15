@@ -417,6 +417,10 @@ export async function getHeaders(ignoreHeaders: boolean = false) {
 
   headers["NeedFaq"] = (omeStore.faqSearch ? 1 : 0).toString();
 
+  if (omeStore.omeTenantId) {
+    headers["tenant-id"] = omeStore.omeTenantId;
+  }
+
   return headers;
 }
 
