@@ -415,8 +415,15 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
-          if (!isEmpty(params?.omeTenantId)) {
-            omeStore.setOmeTenantId(params?.omeTenantId ?? "");
+          const omeTenantId = params?.omeTenantId ?? params?.omeTenantld;
+          console.log("[OmeTenantId] ReactNative params:", {
+            omeTenantId: params?.omeTenantId,
+            omeTenantld: params?.omeTenantld,
+            resolved: omeTenantId,
+          });
+
+          if (!isEmpty(omeTenantId)) {
+            omeStore.setOmeTenantId(omeTenantId ?? "");
           }
 
           if (!isEmpty(params?.from)) {
@@ -493,8 +500,16 @@ export function Home() {
           return; // 如果不是信任的源，忽略消息
         }
 
-        if (!isEmpty(event?.data?.omeTenantId)) {
-          omeStore.setOmeTenantId(event?.data?.omeTenantId ?? "");
+        const omeTenantId =
+          event?.data?.omeTenantId ?? event?.data?.omeTenantld;
+        console.log("[OmeTenantId] postMessage event.data:", {
+          omeTenantId: event?.data?.omeTenantId,
+          omeTenantld: event?.data?.omeTenantld,
+          resolved: omeTenantId,
+        });
+
+        if (!isEmpty(omeTenantId)) {
+          omeStore.setOmeTenantId(omeTenantId ?? "");
         }
 
         // if (!isEmpty(event?.data?.ometoken)) {
@@ -538,8 +553,15 @@ export function Home() {
         if (isEmpty(data) || (typeof response === "string" && response === ""))
           return;
 
-        if (!isEmpty(data?.omeTenantId)) {
-          omeStore.setOmeTenantId(data?.omeTenantId ?? "");
+        const omeTenantId = data?.omeTenantId ?? data?.omeTenantld;
+        console.log("[OmeTenantId] receiveFromNative data:", {
+          omeTenantId: data?.omeTenantId,
+          omeTenantld: data?.omeTenantld,
+          resolved: omeTenantId,
+        });
+
+        if (!isEmpty(omeTenantId)) {
+          omeStore.setOmeTenantId(omeTenantId ?? "");
         }
 
         if (!isEmpty(data?.from)) {
