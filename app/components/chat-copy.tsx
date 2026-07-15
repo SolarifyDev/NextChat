@@ -785,7 +785,7 @@ export function ChatActions(props: {
         icon: omeStore.isFromApp ? <AppFaqIcon /> : renderFaqSelectorIcon(),
       },
     ];
-    const canShowApool = ["omeofficeapp", "omeoffice 2.0"].includes(
+    const canShowApool = ["omeoffice web", "omeoffice 2.0"].includes(
       omeStore.from.toLowerCase(),
     );
     if (canShowApool) {
