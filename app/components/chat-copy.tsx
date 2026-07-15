@@ -72,6 +72,7 @@ import AppFaqIcon from "../icons/faq-app.svg";
 import FaqIcon from "../icons/faq.svg";
 import ApoolIcon from "../icons/apool.png";
 import YuYinIcon from "../icons/yuyin.svg";
+import BookIcon from "../icons/book.svg";
 
 import NextImage from "next/image";
 
@@ -742,6 +743,18 @@ export function ChatActions(props: {
     session.mask.modelConfig?.size ?? ("1024x1024" as ModelSize);
   const currentQuality = session.mask.modelConfig?.quality ?? "standard";
   const currentStyle = session.mask.modelConfig?.style ?? "vivid";
+
+  const renderFaqSelectorIcon = () => (
+    <FaqIcon
+      style={{
+        width: 16,
+        height: 16,
+        fill: "#5692A9",
+        display: "block",
+      }}
+    />
+  );
+
   const renderApoolIcon = () => (
     <NextImage
       src={ApoolIcon}
@@ -769,7 +782,7 @@ export function ChatActions(props: {
       {
         title: "FAQ",
         value: "FAQ",
-        icon: omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />,
+        icon: omeStore.isFromApp ? <AppFaqIcon /> : renderFaqSelectorIcon(),
       },
     ];
     const canShowApool = ["omeofficeapp", "omeoffice 2.0"].includes(
@@ -786,10 +799,16 @@ export function ChatActions(props: {
   })();
   const isFaqModeSelected =
     selectedFaqMode !== null || omeStore.faqSearch || omeStore.apoolSearch;
-  const currentFaqMode = selectedFaqMode ?? "FAQ";
+  const currentFaqMode: "FAQ/APOOL" | "FAQ" | "APOOL" = omeStore.apoolSearch
+    ? "APOOL"
+    : omeStore.faqSearch
+    ? "FAQ"
+    : selectedFaqMode ?? "FAQ/APOOL";
   const currentFaqIcon =
     currentFaqMode === "APOOL" ? (
       renderApoolIcon()
+    ) : currentFaqMode === "FAQ/APOOL" ? (
+      <BookIcon className={styles["knowledge-base-icon"]} />
     ) : omeStore.isFromApp ? (
       <AppFaqIcon />
     ) : (
