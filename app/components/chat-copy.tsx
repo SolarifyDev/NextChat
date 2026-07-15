@@ -760,18 +760,30 @@ export function ChatActions(props: {
     title: "FAQ" | "APOOL";
     value: "FAQ" | "APOOL";
     icon: JSX.Element;
-  }> = [
-    {
-      title: "FAQ",
-      value: "FAQ",
-      icon: omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />,
-    },
-    {
-      title: "APOOL",
-      value: "APOOL",
-      icon: renderApoolIcon(),
-    },
-  ];
+  }> = (() => {
+    const options: Array<{
+      title: "FAQ" | "APOOL";
+      value: "FAQ" | "APOOL";
+      icon: JSX.Element;
+    }> = [
+      {
+        title: "FAQ",
+        value: "FAQ",
+        icon: omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />,
+      },
+    ];
+    const canShowApool = ["omeofficeapp", "omeoffice 2.0"].includes(
+      omeStore.from.toLowerCase(),
+    );
+    if (canShowApool) {
+      options.push({
+        title: "APOOL",
+        value: "APOOL",
+        icon: renderApoolIcon(),
+      });
+    }
+    return options;
+  })();
   const isFaqModeSelected =
     selectedFaqMode !== null || omeStore.faqSearch || omeStore.apoolSearch;
   const currentFaqMode = selectedFaqMode ?? "FAQ";
@@ -785,6 +797,16 @@ export function ChatActions(props: {
     );
 
   const isMobileScreen = useMobileScreen();
+
+  useEffect(() => {
+    const canShowApool = ["omeofficeapp", "omeoffice 2.0"].includes(
+      omeStore.from.toLowerCase(),
+    );
+    if (!canShowApool && useOmeStore.getState().apoolSearch) {
+      useOmeStore.getState().setApoolSearch(false);
+      setSelectedFaqMode(useOmeStore.getState().faqSearch ? "FAQ" : null);
+    }
+  }, [omeStore.from]);
 
   useEffect(() => {
     setShowFaqSelector(false);
