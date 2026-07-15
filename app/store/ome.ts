@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware";
 import { Lang } from "../locales";
 import { LanguageEnum, PostGetToken, SourceSystem } from "../client/smarties";
 
+const DEFAULT_OME_TENANT_ID = "9ba75185-c64b-40fb-ba19-f6471c4fed9a";
+
 export type OmeStoreType = {
   token: string;
   userId: string;
@@ -19,7 +21,9 @@ export type OmeStoreType = {
   clientSecret: string | null;
   score: string | null;
   isShowHome: boolean | null;
+  omeTenantId: string;
   faqSearch: boolean;
+  apoolSearch: boolean;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -38,7 +42,9 @@ export type OmeStoreType = {
   setIsShowHome: (isShowHome: boolean) => void;
   getSourceSystem: () => "" | SourceSystem;
   convertLangToEnum(): LanguageEnum;
+  setOmeTenantId: (omeTenantId: string) => void;
   setFaqSearch: (faqSearch: boolean) => void;
+  setApoolSearch: (apoolSearch: boolean) => void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -59,7 +65,9 @@ export const useOmeStore = create<OmeStoreType>()(
       clientSecret: null,
       score: null,
       isShowHome: null,
+      omeTenantId: DEFAULT_OME_TENANT_ID,
       faqSearch: false,
+      apoolSearch: false,
       clearCurrent: () => {
         set({
           token: "",
@@ -76,7 +84,9 @@ export const useOmeStore = create<OmeStoreType>()(
           clientSecret: null,
           score: null,
           isShowHome: null,
+          omeTenantId: DEFAULT_OME_TENANT_ID,
           faqSearch: false,
+          apoolSearch: false,
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -198,9 +208,17 @@ export const useOmeStore = create<OmeStoreType>()(
             return LanguageEnum.SimplyChinese;
         }
       },
+      setOmeTenantId: (omeTenantId: string) => {
+        set({ omeTenantId });
+      },
       setFaqSearch: (faqSearch: boolean) => {
         set({
           faqSearch,
+        });
+      },
+      setApoolSearch: (apoolSearch: boolean) => {
+        set({
+          apoolSearch,
         });
       },
     }),

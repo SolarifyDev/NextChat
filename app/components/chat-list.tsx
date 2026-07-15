@@ -144,6 +144,8 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
     setOnlineSearch,
     faqSearch,
     setFaqSearch,
+    apoolSearch,
+    setApoolSearch,
   } = useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
@@ -228,6 +230,10 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
 
               if (faqSearch) {
                 setFaqSearch(false);
+              }
+
+              if (apoolSearch) {
+                setApoolSearch(false);
               }
             }}
             onDelete={async () => {

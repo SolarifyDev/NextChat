@@ -568,6 +568,7 @@ export function Selector<T>(props: {
     title: string;
     subTitle?: string;
     value: T;
+    icon?: JSX.Element;
     disable?: boolean;
     releaseDate?: string;
   }>;
@@ -614,7 +615,7 @@ export function Selector<T>(props: {
                 title={item.title}
                 subTitle={item.subTitle}
                 releaseDate={item.releaseDate}
-                icon={<Avatar model={item.value as string} />}
+                icon={item.icon ?? <Avatar model={item.value as string} />}
                 onClick={(e) => {
                   if (item.disable) {
                     e.stopPropagation();

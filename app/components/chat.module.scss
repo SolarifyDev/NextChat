@@ -491,6 +491,19 @@
     }
   }
 
+  .knowledge-base-icon {
+    fill: none !important;
+    stroke: #6e6c8a !important;
+    stroke-width: 1.1;
+
+    path,
+    line {
+      fill: none !important;
+      stroke: #6e6c8a !important;
+      stroke-width: 1.1;
+    }
+  }
+
   .chat-input-action-clicked {
     @extend .chat-input-action-base;
 
