@@ -104,7 +104,6 @@ export class DoubaoApi implements LLMApi {
     };
 
     const shouldStream = !!options.config.stream;
-
     const requestPayload: RequestPayloadForByteDance = {
       messages,
       stream: shouldStream,
