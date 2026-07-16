@@ -21,7 +21,6 @@ import { preProcessImageContent } from "@/app/utils/chat";
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
 import { useEnhanceChatStore } from "@/app/store/enhance-chat";
-import { useOmeStore } from "@/app/store/ome";
 
 export class XAIApi implements LLMApi {
   private disableListModels = true;
@@ -78,8 +77,6 @@ export class XAIApi implements LLMApi {
       },
     };
 
-    const { apoolSearch, faqSearch, onlineSearch } = useOmeStore.getState();
-
     const requestPayload: RequestPayload = {
       messages,
       stream: options.config.stream,
@@ -88,10 +85,6 @@ export class XAIApi implements LLMApi {
       presence_penalty: modelConfig.presence_penalty,
       frequency_penalty: modelConfig.frequency_penalty,
       top_p: modelConfig.top_p,
-      onlineSearch: faqSearch || apoolSearch ? false : onlineSearch,
-      NeedFaq: faqSearch,
-      needApool: apoolSearch,
-      isSummary: options.isSummary || false,
     };
 
     console.log("[Request] xai payload: ", requestPayload);

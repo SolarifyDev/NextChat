@@ -25,7 +25,6 @@ import {
 } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
 import { useEnhanceChatStore } from "@/app/store/enhance-chat";
-import { useOmeStore } from "@/app/store/ome";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -48,10 +47,6 @@ interface RequestPayloadForByteDance {
   frequency_penalty: number;
   top_p: number;
   max_tokens?: number;
-  onlineSearch?: boolean;
-  NeedFaq?: boolean;
-  needApool?: boolean;
-  isSummary?: boolean;
 }
 
 export class DoubaoApi implements LLMApi {
@@ -109,8 +104,6 @@ export class DoubaoApi implements LLMApi {
     };
 
     const shouldStream = !!options.config.stream;
-    const { apoolSearch, faqSearch, onlineSearch } = useOmeStore.getState();
-
     const requestPayload: RequestPayloadForByteDance = {
       messages,
       stream: shouldStream,
@@ -119,10 +112,6 @@ export class DoubaoApi implements LLMApi {
       presence_penalty: modelConfig.presence_penalty,
       frequency_penalty: modelConfig.frequency_penalty,
       top_p: modelConfig.top_p,
-      onlineSearch: faqSearch || apoolSearch ? false : onlineSearch,
-      NeedFaq: faqSearch,
-      needApool: apoolSearch,
-      isSummary: options.isSummary || false,
     };
 
     const controller = new AbortController();
