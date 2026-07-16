@@ -42,6 +42,7 @@ import { PostGetToken } from "../client/smarties";
 import { useEnhanceChatStore } from "../store/enhance-chat";
 import { ToastContainer } from "./chat-toast";
 import { postMessageToReactNative } from "../utils/ga";
+import { showToast } from "./ui-lib";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -415,15 +416,10 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
-          const omeTenantId = params?.omeTenantId ?? params?.omeTenantld;
-          console.log("[OmeTenantId] ReactNative params:", {
-            omeTenantId: params?.omeTenantId,
-            omeTenantld: params?.omeTenantld,
-            resolved: omeTenantId,
-          });
+          showToast(params?.omeTenantId ?? "");
 
-          if (!isEmpty(omeTenantId)) {
-            omeStore.setOmeTenantId(omeTenantId ?? "");
+          if (!isEmpty(params?.omeTenantId)) {
+            omeStore.setOmeTenantId(params?.omeTenantId ?? "");
           }
 
           if (!isEmpty(params?.from)) {
@@ -500,18 +496,6 @@ export function Home() {
           return; // 如果不是信任的源，忽略消息
         }
 
-        const omeTenantId =
-          event?.data?.omeTenantId ?? event?.data?.omeTenantld;
-        console.log("[OmeTenantId] postMessage event.data:", {
-          omeTenantId: event?.data?.omeTenantId,
-          omeTenantld: event?.data?.omeTenantld,
-          resolved: omeTenantId,
-        });
-
-        if (!isEmpty(omeTenantId)) {
-          omeStore.setOmeTenantId(omeTenantId ?? "");
-        }
-
         // if (!isEmpty(event?.data?.ometoken)) {
         //   console.log(
         //     "[OmeToken] got ometoken from iframe",
@@ -541,6 +525,20 @@ export function Home() {
           omeStore.setUserName(event?.data?.omeUserName);
           omeStore.setFrom("omeoffice web");
           omeStore.setIsFromApp(false);
+
+          const omeTenantId = event?.data?.omeTenantId;
+
+          console.log("[OmeTenantId] postMessage event.data:", event?.data);
+
+          console.log("[OmeTenantId] postMessage event.data:", {
+            omeTenantId: event?.data?.omeTenantId,
+            resolved: omeTenantId,
+          });
+
+          if (!isEmpty(omeTenantId)) {
+            omeStore.setOmeTenantId(omeTenantId ?? "");
+          }
+
           useEnhanceChatStore.getState().setIsDown(true);
         }
       }
@@ -553,12 +551,13 @@ export function Home() {
         if (isEmpty(data) || (typeof response === "string" && response === ""))
           return;
 
-        const omeTenantId = data?.omeTenantId ?? data?.omeTenantld;
+        const omeTenantId = data?.omeTenantId;
         console.log("[OmeTenantId] receiveFromNative data:", {
           omeTenantId: data?.omeTenantId,
-          omeTenantld: data?.omeTenantld,
           resolved: omeTenantId,
         });
+
+        showToast(data?.omeTenantId ?? "");
 
         if (!isEmpty(omeTenantId)) {
           omeStore.setOmeTenantId(omeTenantId ?? "");
