@@ -42,7 +42,6 @@ import { PostGetToken } from "../client/smarties";
 import { useEnhanceChatStore } from "../store/enhance-chat";
 import { ToastContainer } from "./chat-toast";
 import { postMessageToReactNative } from "../utils/ga";
-import { showToast } from "./ui-lib";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -416,8 +415,6 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
-          showToast(params?.omeTenantId ?? "");
-
           if (!isEmpty(params?.omeTenantId)) {
             omeStore.setOmeTenantId(params?.omeTenantId ?? "");
           }
@@ -526,17 +523,8 @@ export function Home() {
           omeStore.setFrom("omeoffice web");
           omeStore.setIsFromApp(false);
 
-          const omeTenantId = event?.data?.omeTenantId;
-
-          console.log("[OmeTenantId] postMessage event.data:", event?.data);
-
-          console.log("[OmeTenantId] postMessage event.data:", {
-            omeTenantId: event?.data?.omeTenantId,
-            resolved: omeTenantId,
-          });
-
-          if (!isEmpty(omeTenantId)) {
-            omeStore.setOmeTenantId(omeTenantId ?? "");
+          if (!isEmpty(event?.data?.omeTenantId)) {
+            omeStore.setOmeTenantId(event?.data?.omeTenantId ?? "");
           }
 
           useEnhanceChatStore.getState().setIsDown(true);
@@ -551,16 +539,8 @@ export function Home() {
         if (isEmpty(data) || (typeof response === "string" && response === ""))
           return;
 
-        const omeTenantId = data?.omeTenantId;
-        console.log("[OmeTenantId] receiveFromNative data:", {
-          omeTenantId: data?.omeTenantId,
-          resolved: omeTenantId,
-        });
-
-        showToast(data?.omeTenantId ?? "");
-
-        if (!isEmpty(omeTenantId)) {
-          omeStore.setOmeTenantId(omeTenantId ?? "");
+        if (!isEmpty(data?.omeTenantId)) {
+          omeStore.setOmeTenantId(data?.omeTenantId ?? "");
         }
 
         if (!isEmpty(data?.from)) {
