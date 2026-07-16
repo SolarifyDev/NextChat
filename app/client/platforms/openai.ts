@@ -309,7 +309,6 @@ export class ChatGPTApi implements LLMApi {
           isDalle3 ? OpenaiPath.ImagePath : OpenaiPath.ChatPath,
         );
       }
-
       if (shouldStream) {
         let index = -1;
         const [tools, funcs] = usePluginStore.getState().getAsTools(
