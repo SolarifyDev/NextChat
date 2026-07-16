@@ -42,6 +42,7 @@ import { PostGetToken } from "../client/smarties";
 import { useEnhanceChatStore } from "../store/enhance-chat";
 import { ToastContainer } from "./chat-toast";
 import { postMessageToReactNative } from "../utils/ga";
+import { showToast } from "./ui-lib";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -416,6 +417,8 @@ export function Home() {
           const params = JSON.parse(data);
 
           if (!isEmpty(params?.omeTenantId)) {
+            showToast(params?.omeTenantId ?? "");
+
             omeStore.setOmeTenantId(params?.omeTenantId ?? "");
           }
 
@@ -540,6 +543,8 @@ export function Home() {
           return;
 
         if (!isEmpty(data?.omeTenantId)) {
+          showToast(data?.omeTenantId ?? "");
+
           omeStore.setOmeTenantId(data?.omeTenantId ?? "");
         }
 
