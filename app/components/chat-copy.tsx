@@ -755,6 +755,17 @@ export function ChatActions(props: {
     />
   );
 
+  const renderAppFaqSelectorIcon = () => (
+    <AppFaqIcon
+      style={{
+        width: 16,
+        height: 16,
+        fill: "#6E6C8A",
+        display: "block",
+      }}
+    />
+  );
+
   const renderApoolIcon = () => (
     <NextImage
       src={ApoolIcon}
@@ -782,7 +793,9 @@ export function ChatActions(props: {
       {
         title: "FAQ",
         value: "FAQ",
-        icon: omeStore.isFromApp ? <AppFaqIcon /> : renderFaqSelectorIcon(),
+        icon: omeStore.isFromApp
+          ? renderAppFaqSelectorIcon()
+          : renderFaqSelectorIcon(),
       },
     ];
     const canShowApool = ["omeoffice web", "omeoffice 2.0"].includes(
