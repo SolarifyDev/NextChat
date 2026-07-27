@@ -38,7 +38,7 @@ export const nameLocales: NameLocale[] = [
     },
   },
   {
-    name: "metis-reasoner",
+    name: "metis-thinking",
     translations: {
       cn: "METIS 的思考模型，攻克复杂逻辑难题",
       tw: "METIS 的思考模型，攻克複雜邏輯難題",
