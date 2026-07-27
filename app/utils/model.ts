@@ -29,7 +29,7 @@ export const nameLocales: NameLocale[] = [
     },
   },
   {
-    name: "metis-chat",
+    name: "metis-instruct",
     translations: {
       cn: "METIS 的综合基座，胜任标准语言任务",
       tw: "METIS 的綜合基座，勝任標準語言任務",
