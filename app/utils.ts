@@ -321,7 +321,7 @@ export function getTimeoutMSByModel(model: string) {
     model.startsWith("o3") ||
     model.includes("deepseek-r") ||
     model.includes("-thinking") ||
-    model.includes("metis-reasoner")
+    model.includes("metis-thinking")
   )
     return REQUEST_TIMEOUT_MS_FOR_THINKING;
   return REQUEST_TIMEOUT_MS;
