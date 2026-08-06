@@ -427,6 +427,9 @@ export function Home() {
           if (!isEmpty(params?.omeUserName)) {
             omeStore.setUserName(params?.omeUserName ?? "");
           }
+          if (!isEmpty(params?.translateText)) {
+            omeStore.setTranslateText(params?.translateText ?? "");
+          }
           if (!isEmpty(params?.ticket)) {
             omeStore.setTicket(params?.ticket ?? "");
 
@@ -541,6 +544,9 @@ export function Home() {
         }
         if (!isEmpty(data?.omeUserName)) {
           omeStore.setUserName(data?.omeUserName ?? "");
+        }
+        if (!isEmpty(data?.translateText)) {
+          omeStore.setTranslateText(data?.translateText ?? "");
         }
         omeStore.setIsFromApp(true);
         useEnhanceChatStore.getState().setIsDown(true);
