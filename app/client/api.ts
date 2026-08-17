@@ -408,10 +408,18 @@ export async function getHeaders(ignoreHeaders: boolean = false) {
   }
 
   headers["OnlineSearch"] = (
-    omeStore.faqSearch ? 0 : omeStore.onlineSearch ? 1 : 0
+    omeStore.faqSearch || omeStore.apoolSearch
+      ? 0
+      : omeStore.onlineSearch
+      ? 1
+      : 0
   ).toString();
 
   headers["NeedFaq"] = (omeStore.faqSearch ? 1 : 0).toString();
+
+  if (omeStore.omeTenantId) {
+    headers["tenant-id"] = omeStore.omeTenantId;
+  }
 
   return headers;
 }

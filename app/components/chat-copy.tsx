@@ -70,7 +70,9 @@ import PptFileIcon from "../icons/file-icons/pptpptx.png";
 import TxtFileIcon from "../icons/file-icons/txt.png";
 import AppFaqIcon from "../icons/faq-app.svg";
 import FaqIcon from "../icons/faq.svg";
+import ApoolIcon from "../icons/apool.png";
 import YuYinIcon from "../icons/yuyin.svg";
+import BookIcon from "../icons/book.svg";
 
 import NextImage from "next/image";
 
@@ -726,6 +728,10 @@ export function ChatActions(props: {
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [showPluginSelector, setShowPluginSelector] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
+  const [showFaqSelector, setShowFaqSelector] = useState(false);
+  const [selectedFaqMode, setSelectedFaqMode] = useState<
+    "FAQ" | "APOOL" | null
+  >(omeStore.apoolSearch ? "APOOL" : omeStore.faqSearch ? "FAQ" : null);
 
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [showQualitySelector, setShowQualitySelector] = useState(false);
@@ -738,7 +744,107 @@ export function ChatActions(props: {
   const currentQuality = session.mask.modelConfig?.quality ?? "standard";
   const currentStyle = session.mask.modelConfig?.style ?? "vivid";
 
+  const renderFaqSelectorIcon = () => (
+    <FaqIcon
+      style={{
+        width: 16,
+        height: 16,
+        fill: "#5692A9",
+        display: "block",
+      }}
+    />
+  );
+
+  const renderAppFaqSelectorIcon = () => (
+    <AppFaqIcon
+      style={{
+        width: 16,
+        height: 16,
+        fill: "#6E6C8A",
+        display: "block",
+      }}
+    />
+  );
+
+  const renderApoolIcon = () => (
+    <NextImage
+      src={ApoolIcon}
+      alt="APOOL"
+      width={16}
+      height={16}
+      style={{
+        width: 16,
+        height: 16,
+        objectFit: "contain",
+        display: "block",
+      }}
+    />
+  );
+  const faqModeOptions: Array<{
+    title: "FAQ" | "APOOL";
+    value: "FAQ" | "APOOL";
+    icon: JSX.Element;
+  }> = (() => {
+    const options: Array<{
+      title: "FAQ" | "APOOL";
+      value: "FAQ" | "APOOL";
+      icon: JSX.Element;
+    }> = [
+      {
+        title: "FAQ",
+        value: "FAQ",
+        icon: omeStore.isFromApp
+          ? renderAppFaqSelectorIcon()
+          : renderFaqSelectorIcon(),
+      },
+    ];
+    const canShowApool = ["omeoffice web", "omeoffice 2.0"].includes(
+      omeStore.from.toLowerCase(),
+    );
+    if (canShowApool) {
+      options.push({
+        title: "APOOL",
+        value: "APOOL",
+        icon: renderApoolIcon(),
+      });
+    }
+    return options;
+  })();
+  const isFaqModeSelected =
+    selectedFaqMode !== null || omeStore.faqSearch || omeStore.apoolSearch;
+  const currentFaqMode: "" | "FAQ" | "APOOL" = omeStore.apoolSearch
+    ? "APOOL"
+    : omeStore.faqSearch
+    ? "FAQ"
+    : selectedFaqMode ?? "";
+  const currentFaqIcon =
+    currentFaqMode === "APOOL" ? (
+      renderApoolIcon()
+    ) : currentFaqMode === "" ? (
+      <BookIcon className={styles["knowledge-base-icon"]} />
+    ) : omeStore.isFromApp ? (
+      <AppFaqIcon />
+    ) : (
+      <FaqIcon />
+    );
+
   const isMobileScreen = useMobileScreen();
+
+  useEffect(() => {
+    const canShowApool = ["omeofficeapp", "omeoffice 2.0"].includes(
+      omeStore.from.toLowerCase(),
+    );
+    if (!canShowApool && useOmeStore.getState().apoolSearch) {
+      useOmeStore.getState().setApoolSearch(false);
+      setSelectedFaqMode(useOmeStore.getState().faqSearch ? "FAQ" : null);
+    }
+  }, [omeStore.from]);
+
+  useEffect(() => {
+    setShowFaqSelector(false);
+    const { apoolSearch, faqSearch } = useOmeStore.getState();
+    setSelectedFaqMode(apoolSearch ? "APOOL" : faqSearch ? "FAQ" : null);
+  }, [session.sessionId]);
 
   useEffect(() => {
     const show = isVisionModel(currentModel);
@@ -865,7 +971,7 @@ export function ChatActions(props: {
           isClick={showModelSelector}
         />
 
-        {!useOmeStore.getState()?.faqSearch && (
+        {!isFaqModeSelected && (
           <ChatAction
             onClick={() =>
               useOmeStore
@@ -1037,17 +1143,35 @@ export function ChatActions(props: {
         {!isMobileScreen && <MCPAction />}
         {(!omeStore.isFromApp || omeStore?.from?.includes("omeoffice")) && (
           <ChatAction
-            onClick={() => {
-              useOmeStore.getState().setOnlineSearch(false);
-              useOmeStore
-                .getState()
-                .setFaqSearch(!useOmeStore.getState().faqSearch);
-            }}
-            text={"FAQ"}
-            icon={omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />}
+            onClick={() => setShowFaqSelector(true)}
+            text={currentFaqMode}
+            icon={currentFaqIcon}
             isHaveHover={true}
-            isClick={useOmeStore.getState().faqSearch}
+            isClick={isFaqModeSelected || showFaqSelector}
             isWebClick={true}
+          />
+        )}
+        {showFaqSelector && (
+          <Selector
+            defaultSelectedValue={selectedFaqMode ?? undefined}
+            items={faqModeOptions}
+            onClose={() => setShowFaqSelector(false)}
+            onSelection={(s) => {
+              if (s.length === 0) return;
+              const mode = s[0];
+              if (selectedFaqMode === mode) {
+                useOmeStore.getState().setOnlineSearch(false);
+                useOmeStore.getState().setFaqSearch(false);
+                useOmeStore.getState().setApoolSearch(false);
+                setSelectedFaqMode(null);
+                return;
+              }
+              useOmeStore.getState().setOnlineSearch(false);
+              useOmeStore.getState().setFaqSearch(mode === "FAQ");
+              useOmeStore.getState().setApoolSearch(mode === "APOOL");
+              setSelectedFaqMode(mode);
+              showToast(mode);
+            }}
           />
         )}
         {showUploadImage && (
