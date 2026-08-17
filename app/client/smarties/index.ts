@@ -7,6 +7,21 @@ export enum AiKidVoiceType {
   Female,
 }
 
+export enum SourceSystem {
+  WeChat,
+  OMEv1,
+  OMELink,
+  OMEv2,
+  OMEApp,
+}
+
+export enum LanguageEnum {
+  SimplyChinese = 1,
+  TraditionalChinese = 2,
+  English = 3,
+  Spanish = 4,
+}
+
 export enum AiKidSystemSource {
   SmartTalk,
   ToolAgent,
@@ -52,6 +67,15 @@ export interface IAIKid {
   createdDate: string;
   sortOrder: number;
   isMultilingual: boolean;
+}
+
+export interface ITopics {
+  id: number;
+  title: string;
+  answer: string;
+  language: number;
+  createTime: string;
+  topicCutLineText: string;
 }
 
 export async function getHeaders() {
@@ -133,6 +157,69 @@ export const PostAddOrUpdateSession = async (
     await api.post("/api/v1/history/addOrUpdate", data, {
       headers,
     })
+  ).data;
+};
+
+export const GetRecommendTopics = async (
+  headers: {
+    [key: string]: string;
+  },
+  language: LanguageEnum,
+  sessionId?: number,
+): Promise<ITopics[]> => {
+  const params = new URLSearchParams();
+  params.append("Language", language.toString());
+
+  if (sessionId) {
+    params.append("SessionId", sessionId.toString());
+  }
+
+  return (
+    await api.get(`/api/v1/recommend/topics?${params.toString()}`, {
+      headers,
+    })
+  ).data;
+};
+
+export const GetQuestionTopic = async (
+  headers: {
+    [key: string]: string;
+  },
+  recommendTopicId: number,
+  systemSource: SourceSystem,
+) => {
+  return (
+    await api.post(
+      "/api/v1/faqs/question/topic",
+      {
+        recommendTopicId,
+        systemSource,
+      },
+      {
+        headers,
+      },
+    )
+  ).data;
+};
+
+export const GetQuestionTopicUrl = async (
+  headers: {
+    [key: string]: string;
+  },
+  url: string,
+  systemSource: SourceSystem,
+) => {
+  return (
+    await api.post(
+      "/api/v1/faqs/question/topic/url",
+      {
+        url,
+        systemSource,
+      },
+      {
+        headers,
+      },
+    )
   ).data;
 };
 
