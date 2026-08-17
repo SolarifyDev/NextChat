@@ -84,6 +84,12 @@
     throttle-debounce "^5.0.0"
 
 "@babel/code-frame@^7.0.0":
+"@arms/js-sdk@^1.8.36-beta.13":
+  version "1.8.36-beta.13"
+  resolved "https://registry.yarnpkg.com/@arms/js-sdk/-/js-sdk-1.8.36-beta.13.tgz#8a55b44d8e0a405bea915cc321ba8b58e41089cc"
+  integrity sha512-R/634KKi52NHMf/NWSHItSaNfuq6fYRGiyde3Lr0P7GEC7KxSlUet2QXrKbVrCWLcYbFN67JGEQow9LcD7eSAQ==
+
+"@babel/code-frame@^7.0.0", "@babel/code-frame@^7.18.6":
   version "7.18.6"
   resolved "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.18.6.tgz"
   integrity sha512-TDCmlK5eOvH+eH7cdAFlNXeVJqWIQ7gW9tY1GJIpUtFb6CmjVyq2VM3u71bOyR8CRihcCgMUYoDNyLXao3+70Q==
@@ -4695,6 +4701,11 @@ esutils@^2.0.2:
   version "2.0.3"
   resolved "https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
+
+eventemitter3@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
+  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
 events@^3.2.0:
   version "3.3.0"

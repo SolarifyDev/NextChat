@@ -43,6 +43,13 @@ import { useEnhanceChatStore } from "../store/enhance-chat";
 import { ToastContainer } from "./chat-toast";
 import { postMessageToReactNative } from "../utils/ga";
 
+const ArmsProvider = dynamic(
+  async () => (await import("../hook/arms-provider")).ArmsProvider,
+  {
+    ssr: false,
+  },
+);
+
 export function Loading(props: { noLogo?: boolean }) {
   return (
     <div className={clsx("no-dark", styles["loading-content"])}>
@@ -381,6 +388,8 @@ export function Home() {
 
   const omeStore = useOmeStore();
 
+  const chatStore = useNewChatStore();
+
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
 
@@ -533,6 +542,12 @@ export function Home() {
 
           useEnhanceChatStore.getState().setIsDown(true);
         }
+        omeStore.setIsFromApp(false);
+        if (!isEmpty(event?.data?.from)) {
+          omeStore.setFrom(event?.data?.from ?? "");
+        } else {
+          omeStore.setFrom("omeoffice web");
+        }
       }
     };
 
@@ -639,6 +654,15 @@ export function Home() {
       document.documentElement.lang = lang;
     }
   }, [omeStore.language]);
+
+  useEffect(() => {
+    if (chatStore.isDown && !isEmpty(omeStore.from)) {
+      (window as any).__bl.setConfig({
+        tag: omeStore.from,
+      });
+      console.log("成功赋予值");
+    }
+  }, [omeStore.from, chatStore.isDown]);
 
   if (!useHasHydrated() || isNil(omeStore.isFromApp)) {
     return <Loading />;
