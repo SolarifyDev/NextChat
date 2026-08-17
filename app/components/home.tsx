@@ -415,6 +415,10 @@ export function Home() {
         try {
           const params = JSON.parse(data);
 
+          if (!isEmpty(params?.omeTenantId)) {
+            omeStore.setOmeTenantId(params?.omeTenantId ?? "");
+          }
+
           if (!isEmpty(params?.from)) {
             omeStore.setFrom(params.from ?? "");
           }
@@ -518,6 +522,11 @@ export function Home() {
           omeStore.setUserName(event?.data?.omeUserName);
           omeStore.setFrom("omeoffice web");
           omeStore.setIsFromApp(false);
+
+          if (!isEmpty(event?.data?.omeTenantId)) {
+            omeStore.setOmeTenantId(event?.data?.omeTenantId ?? "");
+          }
+
           useEnhanceChatStore.getState().setIsDown(true);
         }
       }
@@ -529,6 +538,10 @@ export function Home() {
 
         if (isEmpty(data) || (typeof response === "string" && response === ""))
           return;
+
+        if (!isEmpty(data?.omeTenantId)) {
+          omeStore.setOmeTenantId(data?.omeTenantId ?? "");
+        }
 
         if (!isEmpty(data?.from)) {
           omeStore.setFrom(data.from ?? "");

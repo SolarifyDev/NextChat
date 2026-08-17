@@ -70,7 +70,9 @@ import PptFileIcon from "../icons/file-icons/pptpptx.png";
 import TxtFileIcon from "../icons/file-icons/txt.png";
 import AppFaqIcon from "../icons/faq-app.svg";
 import FaqIcon from "../icons/faq.svg";
+import ApoolIcon from "../icons/apool.png";
 import YuYinIcon from "../icons/yuyin.svg";
+import BookIcon from "../icons/book.svg";
 
 import NextImage from "next/image";
 
@@ -157,17 +159,16 @@ import clsx from "clsx";
 import { getAvailableClientsCount, isMcpEnabled } from "../mcp/actions";
 import { nanoid } from "nanoid";
 import { TextAreaRef } from "antd/es/input/TextArea";
-import { Input } from "antd";
+import { Divider, Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useOmeStore } from "../store/ome";
-import { useDebounceFn } from "ahooks";
+import { useDebounceFn, useUpdateEffect } from "ahooks";
 import {
   getBotHello,
   getDefaultTopic,
   useEnhanceChatStore,
 } from "../store/enhance-chat";
 import VoiceChatButton from "./voice";
-import { postMessageToReactNative } from "../utils/ga";
 import {
   getHeaders,
   PostAttachmentUpload,
@@ -175,6 +176,7 @@ import {
 } from "../client/smarties";
 import { useDragOverlay } from "../hook/use-drag-overlay";
 import UploadOverlay from "./upload-overlay";
+import { postMessageToReactNative } from "../utils/ga";
 import { showFileToast } from "./file-toast";
 
 const localStorage = safeLocalStorage();
@@ -726,6 +728,10 @@ export function ChatActions(props: {
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [showPluginSelector, setShowPluginSelector] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
+  const [showFaqSelector, setShowFaqSelector] = useState(false);
+  const [selectedFaqMode, setSelectedFaqMode] = useState<
+    "FAQ" | "APOOL" | null
+  >(omeStore.apoolSearch ? "APOOL" : omeStore.faqSearch ? "FAQ" : null);
 
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [showQualitySelector, setShowQualitySelector] = useState(false);
@@ -738,7 +744,107 @@ export function ChatActions(props: {
   const currentQuality = session.mask.modelConfig?.quality ?? "standard";
   const currentStyle = session.mask.modelConfig?.style ?? "vivid";
 
+  const renderFaqSelectorIcon = () => (
+    <FaqIcon
+      style={{
+        width: 16,
+        height: 16,
+        fill: "#5692A9",
+        display: "block",
+      }}
+    />
+  );
+
+  const renderAppFaqSelectorIcon = () => (
+    <AppFaqIcon
+      style={{
+        width: 16,
+        height: 16,
+        fill: "#6E6C8A",
+        display: "block",
+      }}
+    />
+  );
+
+  const renderApoolIcon = () => (
+    <NextImage
+      src={ApoolIcon}
+      alt="APOOL"
+      width={16}
+      height={16}
+      style={{
+        width: 16,
+        height: 16,
+        objectFit: "contain",
+        display: "block",
+      }}
+    />
+  );
+  const faqModeOptions: Array<{
+    title: "FAQ" | "APOOL";
+    value: "FAQ" | "APOOL";
+    icon: JSX.Element;
+  }> = (() => {
+    const options: Array<{
+      title: "FAQ" | "APOOL";
+      value: "FAQ" | "APOOL";
+      icon: JSX.Element;
+    }> = [
+      {
+        title: "FAQ",
+        value: "FAQ",
+        icon: omeStore.isFromApp
+          ? renderAppFaqSelectorIcon()
+          : renderFaqSelectorIcon(),
+      },
+    ];
+    const canShowApool = ["omeoffice web", "omeoffice 2.0"].includes(
+      omeStore.from.toLowerCase(),
+    );
+    if (canShowApool) {
+      options.push({
+        title: "APOOL",
+        value: "APOOL",
+        icon: renderApoolIcon(),
+      });
+    }
+    return options;
+  })();
+  const isFaqModeSelected =
+    selectedFaqMode !== null || omeStore.faqSearch || omeStore.apoolSearch;
+  const currentFaqMode: "" | "FAQ" | "APOOL" = omeStore.apoolSearch
+    ? "APOOL"
+    : omeStore.faqSearch
+    ? "FAQ"
+    : selectedFaqMode ?? "";
+  const currentFaqIcon =
+    currentFaqMode === "APOOL" ? (
+      renderApoolIcon()
+    ) : currentFaqMode === "" ? (
+      <BookIcon className={styles["knowledge-base-icon"]} />
+    ) : omeStore.isFromApp ? (
+      <AppFaqIcon />
+    ) : (
+      <FaqIcon />
+    );
+
   const isMobileScreen = useMobileScreen();
+
+  useEffect(() => {
+    const canShowApool = ["omeofficeapp", "omeoffice 2.0"].includes(
+      omeStore.from.toLowerCase(),
+    );
+    if (!canShowApool && useOmeStore.getState().apoolSearch) {
+      useOmeStore.getState().setApoolSearch(false);
+      setSelectedFaqMode(useOmeStore.getState().faqSearch ? "FAQ" : null);
+    }
+  }, [omeStore.from]);
+
+  useEffect(() => {
+    setShowFaqSelector(false);
+    const { apoolSearch, faqSearch } = useOmeStore.getState();
+    setSelectedFaqMode(apoolSearch ? "APOOL" : faqSearch ? "FAQ" : null);
+  }, [session.sessionId]);
 
   useEffect(() => {
     const show = isVisionModel(currentModel);
@@ -865,7 +971,7 @@ export function ChatActions(props: {
           isClick={showModelSelector}
         />
 
-        {!useOmeStore.getState()?.faqSearch && (
+        {!isFaqModeSelected && (
           <ChatAction
             onClick={() =>
               useOmeStore
@@ -1037,17 +1143,35 @@ export function ChatActions(props: {
         {!isMobileScreen && <MCPAction />}
         {(!omeStore.isFromApp || omeStore?.from?.includes("omeoffice")) && (
           <ChatAction
-            onClick={() => {
-              useOmeStore.getState().setOnlineSearch(false);
-              useOmeStore
-                .getState()
-                .setFaqSearch(!useOmeStore.getState().faqSearch);
-            }}
-            text={"FAQ"}
-            icon={omeStore.isFromApp ? <AppFaqIcon /> : <FaqIcon />}
+            onClick={() => setShowFaqSelector(true)}
+            text={currentFaqMode}
+            icon={currentFaqIcon}
             isHaveHover={true}
-            isClick={useOmeStore.getState().faqSearch}
+            isClick={isFaqModeSelected || showFaqSelector}
             isWebClick={true}
+          />
+        )}
+        {showFaqSelector && (
+          <Selector
+            defaultSelectedValue={selectedFaqMode ?? undefined}
+            items={faqModeOptions}
+            onClose={() => setShowFaqSelector(false)}
+            onSelection={(s) => {
+              if (s.length === 0) return;
+              const mode = s[0];
+              if (selectedFaqMode === mode) {
+                useOmeStore.getState().setOnlineSearch(false);
+                useOmeStore.getState().setFaqSearch(false);
+                useOmeStore.getState().setApoolSearch(false);
+                setSelectedFaqMode(null);
+                return;
+              }
+              useOmeStore.getState().setOnlineSearch(false);
+              useOmeStore.getState().setFaqSearch(mode === "FAQ");
+              useOmeStore.getState().setApoolSearch(mode === "APOOL");
+              setSelectedFaqMode(mode);
+              showToast(mode);
+            }}
           />
         )}
         {showUploadImage && (
@@ -2425,6 +2549,198 @@ export function _Chat_NEW() {
     }
   }, [omeStore.isFromApp]);
 
+  const [isShowTopic, setIsShowTopic] = useState<boolean>(false);
+
+  const topicCLick = (recommendTopicId: number) => {
+    setIsShowTopic(false);
+    newChatStore.topicClick(recommendTopicId, scrollDomToBottom);
+  };
+
+  // useEffect(() => {
+  //   const checkTimeGap = () => {
+  //     console.log(896);
+  //     if (session.isAdd) {
+  //       if ((session?.messages?.length ?? 0) <= 0) {
+  //         console.log("屬於Add,觸發");
+
+  //         setIsShowTopic((prev) => {
+  //           if (prev) {
+  //             return prev;
+  //           }
+  //           return true;
+  //         });
+  //       } else {
+  //         setIsShowTopic((prev) => {
+  //           if (!prev) {
+  //             return prev;
+  //           }
+  //           return false;
+  //         });
+  //         console.log("屬於Add,但未觸發");
+  //       }
+  //     } else {
+  //       const messgaesLength = session?.messages?.length ?? 0;
+
+  //       if (messgaesLength <= 0) {
+  //         console.log("屬於Update,觸發");
+
+  //         setIsShowTopic((prev) => {
+  //           if (prev) {
+  //             return prev;
+  //           }
+  //           return true;
+  //         });
+  //       } else {
+  //         const lastMessage = session?.messages[messgaesLength - 1];
+
+  //         // 解析日期字符串 "2025/10/18 12:25:51"
+  //         const lastMessageDate = new Date(lastMessage.date);
+  //         const currentDate = new Date();
+
+  //         // 计算时间差（毫秒）
+  //         const timeDiff = currentDate.getTime() - lastMessageDate.getTime();
+
+  //         // 转换为分钟
+  //         const minutesDiff = timeDiff / (1000 * 60);
+
+  //         console.log(minutesDiff, "分钟数");
+
+  //         if (minutesDiff > 30) {
+  //           console.log("屬於Update,觸發");
+
+  //           setIsShowTopic((prev) => {
+  //             if (prev) {
+  //               return prev;
+  //             }
+  //             return true;
+  //           });
+  //         } else {
+  //           setIsShowTopic((prev) => {
+  //             if (!prev) {
+  //               return prev;
+  //             }
+  //             return false;
+  //           });
+  //           console.log("屬於Update,未觸發");
+  //         }
+  //       }
+  //     }
+  //   };
+
+  //   checkTimeGap(); // 👈 立即执行一次
+  //   const interval = setInterval(checkTimeGap, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  useEffect(() => {
+    let animationFrameId: number | undefined;
+    let lastCheckTime = 0;
+    const CHECK_INTERVAL = 1000; // 1秒检查一次
+
+    const checkTimeGap = () => {
+      const currentTime = Date.now();
+
+      // 节流控制：只有在超过指定间隔时才执行检查逻辑
+      if (currentTime - lastCheckTime >= CHECK_INTERVAL) {
+        const session = useEnhanceChatStore.getState().currentSession;
+
+        if (!session) return;
+
+        lastCheckTime = currentTime;
+
+        if (session.isAdd) {
+          if ((session?.messages?.length ?? 0) <= 0) {
+            setIsShowTopic(true);
+          } else {
+            setIsShowTopic(false);
+          }
+        } else {
+          const messgaesLength = session?.messages?.length ?? 0;
+
+          if (messgaesLength <= 0) {
+            setIsShowTopic(true);
+          } else {
+            const lastMessage = session?.messages?.[messgaesLength - 1];
+
+            // 添加安全检查
+            if (!lastMessage?.date) {
+              setIsShowTopic(false);
+              return;
+            }
+
+            // 解析日期字符串 "2025/10/18 12:25:51"
+            const lastMessageDate = new Date(lastMessage.date);
+            const currentDate = new Date();
+
+            // 检查日期是否有效
+            if (isNaN(lastMessageDate.getTime())) {
+              setIsShowTopic(false);
+              return;
+            }
+
+            // 计算时间差（毫秒）
+            const timeDiff = currentDate.getTime() - lastMessageDate.getTime();
+
+            // 转换为分钟
+            const minutesDiff = timeDiff / (1000 * 60);
+
+            if (minutesDiff > 30) {
+              setIsShowTopic(true);
+            } else {
+              setIsShowTopic(false);
+            }
+          }
+        }
+      }
+
+      // 只在标签页可见时继续循环
+      if (!document.hidden) {
+        animationFrameId = requestAnimationFrame(checkTimeGap);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // 标签页变为可见时立即检查一次
+        lastCheckTime = 0; // 重置时间，确保立即执行
+        checkTimeGap();
+      } else {
+        // 标签页隐藏时停止检查
+        if (animationFrameId !== undefined) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = undefined;
+        }
+      }
+    };
+
+    // 初始启动 - 只有在页面可见时才启动
+    if (!document.hidden) {
+      checkTimeGap();
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      if (animationFrameId !== undefined) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []); // ✅ 空依赖数组，只在组件挂载时执行一次
+
+  useUpdateEffect(() => {
+    if (isShowTopic) {
+      newChatStore.getRecommendTopics();
+    }
+  }, [isShowTopic]);
+
+  useUpdateEffect(() => {
+    if (newChatStore?.topics?.length > 0) {
+      session && scrollDomToBottom();
+    }
+  }, [newChatStore?.topics]);
+
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
   const { run: debouncedAction } = useDebounceFn(
@@ -2945,7 +3261,156 @@ export function _Chat_NEW() {
                     {/* {Locale.Chat.Metis.Content} */}
                     {t("Chat.Metis.Content")}
                   </div>
+
+                  {(newChatStore?.topics ?? []).map((item, index) => (
+                    <Fragment key={index}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div
+                          className={
+                            omeStore.isFromApp
+                              ? styles["chat-topic-item-is-app"]
+                              : styles["chat-topic-item"]
+                          }
+                          style={{
+                            cursor: "pointer",
+                            border: "1px solid #E8E7F5",
+                          }}
+                          onClick={() => {
+                            topicCLick(item.id);
+                          }}
+                        >
+                          {item.title}
+                        </div>
+                      </div>
+                    </Fragment>
+                  ))}
                 </div>
+              )}
+
+              {isShowTopic && !isNil(omeStore.isFromApp) && (
+                <>
+                  {omeStore.isFromApp ? (
+                    <>
+                      {messages?.length > 0 && (
+                        <>
+                          {!session.isAdd &&
+                            (newChatStore?.topics ?? []).length > 0 && (
+                              <div
+                                style={{
+                                  width: "100%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  margin: "0 auto",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    color: "rgb(222, 222, 222)",
+                                    fontSize: "16px",
+                                  }}
+                                >
+                                  {newChatStore?.topics[0]?.topicCutLineText ??
+                                    ""}
+                                </div>
+                              </div>
+                            )}
+
+                          {(newChatStore?.topics ?? []).map((item, index) => (
+                            <Fragment key={index}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "row",
+                                }}
+                              >
+                                <div
+                                  className={
+                                    omeStore.isFromApp
+                                      ? styles["chat-topic-item-is-app"]
+                                      : styles["chat-topic-item"]
+                                  }
+                                  style={{
+                                    cursor: "pointer",
+                                    border: "1px solid #E8E7F5",
+                                  }}
+                                  onClick={() => {
+                                    topicCLick(item.id);
+                                  }}
+                                >
+                                  {item.title}
+                                </div>
+                              </div>
+                            </Fragment>
+                          ))}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {!session.isAdd &&
+                        (newChatStore?.topics ?? []).length > 0 && (
+                          <div
+                            style={{
+                              width: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              margin: "0 auto",
+                            }}
+                          >
+                            <Divider
+                              style={{ borderColor: "rgb(222, 222, 222)" }}
+                            >
+                              <div
+                                style={{
+                                  color: "rgb(222, 222, 222)",
+                                  fontSize: "16px",
+                                }}
+                              >
+                                {newChatStore?.topics[0]?.topicCutLineText ??
+                                  ""}
+                              </div>
+                            </Divider>
+                          </div>
+                        )}
+
+                      {(newChatStore?.topics ?? []).map((item, index) => (
+                        <Fragment key={index}>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <div
+                              className={
+                                omeStore.isFromApp
+                                  ? styles["chat-topic-item-is-app"]
+                                  : styles["chat-topic-item"]
+                              }
+                              style={{
+                                cursor: "pointer",
+                              }}
+                              onClick={() => {
+                                topicCLick(item.id);
+                              }}
+                            >
+                              {item.title}
+                            </div>
+                          </div>
+                        </Fragment>
+                      ))}
+                    </>
+                  )}
+                </>
               )}
             </div>
             <div

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Lang } from "../locales";
-import { PostGetToken } from "../client/smarties";
+import { LanguageEnum, PostGetToken, SourceSystem } from "../client/smarties";
 
 export type OmeStoreType = {
   token: string;
@@ -19,7 +19,9 @@ export type OmeStoreType = {
   clientSecret: string | null;
   score: string | null;
   isShowHome: boolean | null;
+  omeTenantId: string;
   faqSearch: boolean;
+  apoolSearch: boolean;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -36,7 +38,11 @@ export type OmeStoreType = {
   shouldRefreshToken: () => boolean;
   setClient: (clientId: string, clientSecret: string, score: string) => void;
   setIsShowHome: (isShowHome: boolean) => void;
+  getSourceSystem: () => "" | SourceSystem;
+  convertLangToEnum(): LanguageEnum;
+  setOmeTenantId: (omeTenantId: string) => void;
   setFaqSearch: (faqSearch: boolean) => void;
+  setApoolSearch: (apoolSearch: boolean) => void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -57,7 +63,9 @@ export const useOmeStore = create<OmeStoreType>()(
       clientSecret: null,
       score: null,
       isShowHome: null,
+      omeTenantId: "",
       faqSearch: false,
+      apoolSearch: false,
       clearCurrent: () => {
         set({
           token: "",
@@ -74,7 +82,9 @@ export const useOmeStore = create<OmeStoreType>()(
           clientSecret: null,
           score: null,
           isShowHome: null,
+          omeTenantId: "",
           faqSearch: false,
+          apoolSearch: false,
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -150,9 +160,63 @@ export const useOmeStore = create<OmeStoreType>()(
       setIsShowHome: (isShowHome: boolean | null) => {
         set({ isShowHome });
       },
+      getSourceSystem: () => {
+        switch (get().from) {
+          case "omeoffice web":
+            return SourceSystem.OMEv1;
+          case "omelinkapp":
+            return SourceSystem.OMELink;
+          case "omeoffice 1.0":
+            return SourceSystem.OMEApp;
+          case "omeoffice 2.0":
+            return SourceSystem.OMEv2;
+          default:
+            return "";
+        }
+      },
+      convertLangToEnum() {
+        switch (get().language) {
+          case "cn":
+            return LanguageEnum.SimplyChinese; // 简体中文
+          case "tw":
+            return LanguageEnum.TraditionalChinese; // 繁体中文
+          case "en":
+            return LanguageEnum.English; // 英语
+          case "es":
+            return LanguageEnum.Spanish; // 西班牙语
+
+          // 以下语种没有直接对应的枚举，使用默认的简体中文
+          case "pt": // 葡萄牙语
+          case "da": // 丹麦语
+          case "jp": // 日语
+          case "ko": // 韩语
+          case "id": // 印尼语
+          case "fr": // 法语
+          case "it": // 意大利语
+          case "tr": // 土耳其语
+          case "de": // 德语
+          case "vi": // 越南语
+          case "ru": // 俄语
+          case "cs": // 捷克语
+          case "no": // 挪威语
+          case "ar": // 阿拉伯语
+          case "bn": // 孟加拉语
+          case "sk": // 斯洛伐克语
+          default:
+            return LanguageEnum.SimplyChinese;
+        }
+      },
+      setOmeTenantId: (omeTenantId: string) => {
+        set({ omeTenantId });
+      },
       setFaqSearch: (faqSearch: boolean) => {
         set({
           faqSearch,
+        });
+      },
+      setApoolSearch: (apoolSearch: boolean) => {
+        set({
+          apoolSearch,
         });
       },
     }),
