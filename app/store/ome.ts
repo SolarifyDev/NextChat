@@ -22,6 +22,7 @@ export type OmeStoreType = {
   omeTenantId: string;
   faqSearch: boolean;
   apoolSearch: boolean;
+  translateText: string;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -41,6 +42,7 @@ export type OmeStoreType = {
   setOmeTenantId: (omeTenantId: string) => void;
   setFaqSearch: (faqSearch: boolean) => void;
   setApoolSearch: (apoolSearch: boolean) => void;
+  setTranslateText(translateText: string): void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -64,6 +66,7 @@ export const useOmeStore = create<OmeStoreType>()(
       omeTenantId: "",
       faqSearch: false,
       apoolSearch: false,
+      translateText: "",
       clearCurrent: () => {
         set({
           token: "",
@@ -83,6 +86,7 @@ export const useOmeStore = create<OmeStoreType>()(
           omeTenantId: "",
           faqSearch: false,
           apoolSearch: false,
+          translateText: "",
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -169,6 +173,11 @@ export const useOmeStore = create<OmeStoreType>()(
       setApoolSearch: (apoolSearch: boolean) => {
         set({
           apoolSearch,
+        });
+      },
+      setTranslateText(translateText: string) {
+        set({
+          translateText,
         });
       },
     }),
