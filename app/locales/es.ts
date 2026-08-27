@@ -78,11 +78,16 @@ const es: PartialLocaleType = {
       Clear: "Limpiar chat",
       Settings: "Configuración de conversación",
       UploadImage: "Subir imagen",
+      UploadFile: "Subir archivos",
+      UploadFileTooltip:
+        "Sube archivos adjuntos, el tamaño total no debe superar los 50 MB. Formatos compatibles: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
+      OnlineSearch: "Búsqueda en línea",
     },
     Rename: "Renombrar conversación",
     Typing: "Escribiendo…",
     Input:
       "{{submitKey}} para enviar，/ para activar autocompletado，: para activar comandos",
+    AppInput: "¡Empecemos a charlar~",
     Send: "Enviar",
     Config: {
       Reset: "Borrar memoria",
@@ -93,6 +98,17 @@ const es: PartialLocaleType = {
       Title: "Hola~ Soy METIS",
       Content:
         "Puedo ayudarte a buscar y responder preguntas. ¡Pregúntame lo que quieras!",
+    },
+    UploadImageTips: "¡Solo se permite subir un máximo de tres imágenes!",
+    UploadFileTips: "¡Se permite un máximo de 100 archivos adjuntos!",
+    FileTooLarge: "El archivo supera el límite de 5 MB",
+    UploadFailed: "Error al subir",
+    Voice: {
+      HoldToTalk: "Mantén pulsado",
+      ReleaseToSendSlideUpToCancel:
+        "Suelta para enviar, desliza arriba para cancelar",
+      ReleaseToCancel: "Suelta para cancelar",
+      Processing: "Procesando",
     },
   },
   Export: {
@@ -139,6 +155,7 @@ const es: PartialLocaleType = {
     DeleteChat: "¿Confirmar la eliminación de la conversación seleccionada?",
     DeleteToast: "Conversación eliminada",
     Revert: "Deshacer",
+    History: "diálogo histórico",
   },
   Settings: {
     Title: "Configuración",
@@ -593,6 +610,53 @@ const es: PartialLocaleType = {
     Messages: "Mensajes",
     Topic: "Tema",
     Time: "Hora",
+  },
+  Kid: {
+    NoKidText: "Aún no tienes un AI Kid~",
+    InstructionText:
+      "Haz clic en el botón「+」de abajo para invocar tu propio AI Kid~",
+    Create: "Crear",
+  },
+  SelectVoice: {
+    Title: "Seleccionar Voz",
+    Recommended: "Recomendado",
+    Female: "Voz Femenina",
+    Male: "Voz Masculina",
+    Dialect: "Dialecto",
+    MatureMale: "Voz Masculina Madura",
+    GentleFemale: "Voz Femenina Suave",
+    YoungMale: "Hombre | Joven",
+    YoungFemale: "Mujer | Joven",
+    Confirm: "Completar",
+    Selected: "Seleccionado",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Crear",
+    Edit: "Editar",
+    Name: "Nombre",
+    VoicePreference: "Preferencia de Voz",
+    InputName: "Ingrese Nombre",
+    CreateCustomVoice: "Crear Voz Personalizada",
+    AbilitySettings: "Configuración de Habilidades",
+    Polish: "Refinar",
+    Introduction: "Introducción",
+    IntroduceYourAiKid: "Presenta tu AI Kid",
+    OpeningLine: "Línea de Apertura",
+    OpeningLineDescription:
+      "Se usará como el primer mensaje al iniciar el chat",
+    CreateMyAiKid: "Crear Mi AI Kid",
+    Save: "Guardar",
+    NotImageTypeError: "¡No has seleccionado un tipo de imagen!",
+    NoNameTips: "Por favor, introduce un nombre",
+  },
+  Realtime: {
+    StartSpeaking: "Puedes empezar a hablar",
+    Listening: "Escuchando...",
+    Interrupt: "Puedes interrumpirme en cualquier momento",
+    ConnectionFailed: "¡Error de conexión, por favor inténtalo de nuevo!",
+    Connecting: "Conectando...",
+    PermissionPrompt:
+      "Error al acceder al micrófono, por favor habilite el permiso del micrófono manualmente",
   },
 };
 

@@ -1,3 +1,5 @@
+"use client";
+
 import DeleteIcon from "../icons/delete.svg";
 
 import styles from "./home.module.scss";
@@ -10,9 +12,11 @@ import { Mask } from "../store/mask";
 import { showConfirm } from "./ui-lib";
 import { useMobileScreen } from "../utils";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
+import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
+import { postMessageToReactNative } from "../utils/ga";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -45,7 +49,22 @@ export function ChatItem(props: {
       className={clsx(styles["chat-item"], {
         [styles["chat-item-selected"]]:
           props.selected &&
-          (currentPath === Path.Chat || currentPath === Path.Home),
+          (currentPath === Path.Chat ||
+            currentPath === Path.Home ||
+            currentPath === Path.AIKid ||
+            currentPath === Path.SelectVoice ||
+            currentPath === Path.AddOrUpdateKid ||
+            currentPath === Path.Realtime) &&
+          !props.isFromApp,
+        [styles["chat-item-selected-is-app"]]:
+          props.selected &&
+          (currentPath === Path.Chat ||
+            currentPath === Path.Home ||
+            currentPath === Path.AIKid ||
+            currentPath === Path.SelectVoice ||
+            currentPath === Path.AddOrUpdateKid ||
+            currentPath === Path.Realtime) &&
+          props.isFromApp,
       })}
       onClick={props.onClick}
       // ref={(ele) => {
@@ -82,18 +101,20 @@ export function ChatItem(props: {
         </>
       )}
 
-      {!props?.isFromApp && (
-        <div
-          className={styles["chat-item-delete"]}
-          onClickCapture={(e) => {
-            props.onDelete?.();
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <DeleteIcon />
-        </div>
-      )}
+      <div
+        className={
+          props.isFromApp
+            ? styles["chat-item-delete-is-app"]
+            : styles["chat-item-delete"]
+        }
+        onClickCapture={(e) => {
+          props.onDelete?.();
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <DeleteIcon />
+      </div>
     </div>
     //   )}
     // </Draggable>
@@ -102,16 +123,28 @@ export function ChatItem(props: {
 
 export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
   const {
-    currentSessionIndex,
     sessions,
-    selectSession,
-    deleteSession,
     isLoading,
-  } = useNewChatStore();
+    sessionId,
+    getCurrentSession,
+    deleteSession,
+    setSessionId,
+    setCurrentSession,
+  } = useEnhanceChatStore();
+
   const { t } = useTranslation();
 
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
+  const {
+    onlineSearch,
+    userId,
+    from,
+    eventUuid,
+    setOnlineSearch,
+    faqSearch,
+    setFaqSearch,
+  } = useOmeStore();
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
@@ -138,7 +171,7 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
       // ref={provided.innerRef}
       // {...provided.droppableProps}
     >
-      {props.isFromApp && isLoading && (
+      {isLoading && (
         <Spin
           style={{
             position: "absolute",
@@ -153,22 +186,57 @@ export function ChatList(props: { narrow?: boolean; isFromApp?: boolean }) {
           <ChatItem
             title={item.topic}
             time={new Date(item.lastUpdate).toLocaleString()}
-            count={item?.messages?.length ?? 0}
-            key={item.id}
-            id={item.id}
+            // count={item?.messages?.length ?? 0}
+            count={item?.messagesLength ?? 0}
+            key={item.sessionId}
+            id={item.sessionId!.toString()}
             index={i}
-            selected={i === currentSessionIndex}
+            // selected={i === currentSessionIndex}
+            selected={item?.sessionId === sessionId}
             onClick={() => {
+              if (from === "omelinkapp") {
+                // trackEvent("click_chat_timestamp", {
+                //   userId: userId,
+                //   time: Date.now(),
+                //   metis_event_id: eventUuid,
+                // });
+
+                postMessageToReactNative(
+                  {
+                    action: "click_chat_timestamp",
+                    userId: userId,
+                    time: Date.now(),
+                    metis_event_id: eventUuid,
+                  },
+                  "click_chat_timestamp",
+                );
+              }
+
+              // selectSession(i);
+
+              // if (sessionId === item.sessionId) {
+              //   setSessionId(0);
+              //   setCurrentSession(null);
+              // } else {
               navigate(Path.Chat);
-              selectSession(i);
+              getCurrentSession(item?.sessionId!);
+              // }
+
+              if (onlineSearch) {
+                setOnlineSearch(false);
+              }
+
+              if (faqSearch) {
+                setFaqSearch(false);
+              }
             }}
             onDelete={async () => {
               if (
-                (!props.narrow && !isMobileScreen) ||
+                // (!props.narrow && !isMobileScreen) ||  web端需要也顯示彈窗
                 // (await showConfirm(Locale.Home.DeleteChat))
-                (await showConfirm(t("Home.DeleteChat")))
+                await showConfirm(t("Home.DeleteChat"))
               ) {
-                deleteSession(i);
+                deleteSession(item.sessionId!);
               }
             }}
             narrow={props.narrow}

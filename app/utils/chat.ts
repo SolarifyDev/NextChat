@@ -3,7 +3,7 @@ import {
   UPLOAD_URL,
   REQUEST_TIMEOUT_MS,
 } from "@/app/constant";
-import { RequestMessage } from "@/app/client/api";
+import { MultimodalContent, RequestMessage } from "@/app/client/api";
 import {
   EventStreamContentType,
   fetchEventSource,
@@ -70,8 +70,9 @@ export function compressImage(file: Blob, maxSize: number): Promise<string> {
   });
 }
 
-export async function preProcessImageContent(
+export async function preProcessImageContentBase(
   content: RequestMessage["content"],
+  transformImageUrl: (url: string) => Promise<{ [key: string]: any }>,
 ) {
   if (typeof content === "string") {
     return content;
@@ -81,7 +82,7 @@ export async function preProcessImageContent(
     if (part?.type == "image_url" && part?.image_url?.url) {
       try {
         const url = await cacheImageToBase64Image(part?.image_url?.url);
-        result.push({ type: part.type, image_url: { url } });
+        result.push(await transformImageUrl(url));
       } catch (error) {
         console.error("Error processing image URL:", error);
       }
@@ -90,6 +91,23 @@ export async function preProcessImageContent(
     }
   }
   return result;
+}
+
+export async function preProcessImageContent(
+  content: RequestMessage["content"],
+) {
+  return preProcessImageContentBase(content, async (url) => ({
+    type: "image_url",
+    image_url: { url },
+  })) as Promise<MultimodalContent[] | string>;
+}
+
+export async function preProcessImageContentForAlibabaDashScope(
+  content: RequestMessage["content"],
+) {
+  return preProcessImageContentBase(content, async (url) => ({
+    image: url,
+  }));
 }
 
 const imageCaches: Record<string, string> = {};
@@ -144,6 +162,74 @@ export function uploadImage(file: Blob): Promise<string> {
       }
       throw Error(`upload Error: ${res?.msg}`);
     });
+}
+
+export const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
+export const ALLOWED_ATTACHMENT_EXTENSIONS = [
+  ".doc",
+  ".docx",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".jpg",
+  ".png",
+  ".txt",
+  ".pdf",
+] as const;
+
+export const ALLOWED_FILE_ACCEPT = ALLOWED_ATTACHMENT_EXTENSIONS.join(",");
+const IMAGE_EXTENSIONS = [".jpg", ".png"];
+const IMAGE_MIME_TYPES = ["image/jpeg", "image/png"];
+
+export function getFileExtension(fileName: string) {
+  const ext = fileName.split(".").pop()?.toLowerCase();
+  return ext ? `.${ext}` : "";
+}
+
+export function isSupportedAttachmentFile(file: Pick<File, "name" | "type">) {
+  const ext = getFileExtension(file.name);
+  if (ALLOWED_ATTACHMENT_EXTENSIONS.includes(ext as any)) {
+    return true;
+  }
+
+  // Clipboard images may not have a filename extension.
+  return IMAGE_MIME_TYPES.includes(file.type.toLowerCase());
+}
+
+export function isImageFile(file: File): boolean {
+  const ext = getFileExtension(file.name);
+  if (IMAGE_EXTENSIONS.includes(ext as any)) {
+    return true;
+  }
+
+  return IMAGE_MIME_TYPES.includes(file.type.toLowerCase());
+}
+
+function uploadFileRaw(file: File): Promise<string> {
+  const body = new FormData();
+  body.append("file", file);
+  return fetch(UPLOAD_URL, {
+    method: "post",
+    body,
+    mode: "cors",
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res?.code == 0 && res?.data) {
+        return res?.data;
+      }
+      throw Error(`upload Error: ${res?.msg}`);
+    });
+}
+
+// 统一上传入口，后续切换服务端只需修改此函数
+export function uploadAttachment(file: File): Promise<string> {
+  if (isImageFile(file)) {
+    return uploadImage(file);
+  }
+  return uploadFileRaw(file);
 }
 
 export function removeImage(imageUrl: string) {

@@ -78,11 +78,16 @@ const no: PartialLocaleType = {
       Clear: "Rydd samtale",
       Settings: "Samtaleinnstillinger",
       UploadImage: "Last opp bilde",
+      UploadFile: "Last opp filer",
+      UploadFileTooltip:
+        "Last opp vedlegg, total størrelse må ikke overstige 50 MB. Støttede formater: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
+      OnlineSearch: "Nett søk",
     },
     Rename: "Gi nytt navn til samtale",
     Typing: "Skriver…",
     Input:
       "{{submitKey}} send，/ for å utløse autoutfylling, : for å utløse kommando",
+    AppInput: "La oss starte å prate~",
     Send: "Send",
     Config: {
       Reset: "Fjern minne",
@@ -93,6 +98,16 @@ const no: PartialLocaleType = {
       Title: "Hei~ Jeg er METIS",
       Content:
         "Jeg kan hjelpe deg med å søke og svare på spørsmål. Spør meg om hva som helst!",
+    },
+    UploadImageTips: "Bare maksimalt tre bilete kan lastast opp!",
+    UploadFileTips: "Maksimalt 100 vedlegg er tillatt!",
+    FileTooLarge: "Filen overstiger grensen på 5 MB",
+    UploadFailed: "Opplasting mislyktes",
+    Voice: {
+      HoldToTalk: "Hold inne for å snakke",
+      ReleaseToSendSlideUpToCancel: "Slipp for å sende, dra opp for å avbryte",
+      ReleaseToCancel: "Slipp for å avbryte",
+      Processing: "Behandler",
     },
   },
   Export: {
@@ -586,6 +601,52 @@ const no: PartialLocaleType = {
     Messages: "Meldinger",
     Topic: "Emne",
     Time: "Tid",
+  },
+  Kid: {
+    NoKidText: "Du har ikke en AI Kid ennå~",
+    InstructionText: "Klikk på「+」under for å tilkalle din egen AI Kid~",
+    Create: "Opprett",
+  },
+  SelectVoice: {
+    Title: "Velg Stemme",
+    Recommended: "Anbefalt",
+    Female: "Kvinnestemme",
+    Male: "Mannestemme",
+    Dialect: "Dialekt",
+    MatureMale: "Moden Mannestemme",
+    GentleFemale: "Myk Kvinnestemme",
+    YoungMale: "Mann | Ung",
+    YoungFemale: "Kvinne | Ung",
+    Confirm: "Fullfør",
+    Selected: "Valgt",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Opprett",
+    Edit: "Rediger",
+    Name: "Navn",
+    VoicePreference: "Stemmeinnstilling",
+    InputName: "Skriv inn navn",
+    CreateCustomVoice: "Opprett tilpasset stemme",
+    AbilitySettings: "Evneinnstillinger",
+    Polish: "Forbedring",
+    Introduction: "Introduksjon",
+    IntroduceYourAiKid: "Introduser din AI Kid",
+    OpeningLine: "Åpningslinje",
+    OpeningLineDescription:
+      "Vil bli brukt som den første meldingen ved start av chat",
+    CreateMyAiKid: "Opprett Min AI Kid",
+    Save: "Lagre",
+    NotImageTypeError: "Du har ikke valgt et bilde!",
+    NoNameTips: "Vennligst skriv inn navn",
+  },
+  Realtime: {
+    StartSpeaking: "Du kan begynne å snakke",
+    Listening: "Lytter...",
+    Interrupt: "Du kan avbryte meg når som helst",
+    ConnectionFailed: "Tilkobling mislyktes, vennligst prøv igjen!",
+    Connecting: "Kobler til...",
+    PermissionPrompt:
+      "Mikrofontilgang mislyktes, vennligst aktiver mikrofontillatelse manuelt",
   },
 };
 

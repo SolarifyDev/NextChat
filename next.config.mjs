@@ -8,6 +8,7 @@ console.log("[Next] build with chunk: ", !disableChunk);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
@@ -29,6 +30,10 @@ const nextConfig = {
   output: mode,
   images: {
     unoptimized: mode === "export",
+    domains: [
+      "smartiesprd.oss-cn-hongkong.aliyuncs.com",
+      "smartiestest.oss-cn-hongkong.aliyuncs.com",
+    ],
   },
   experimental: {
     forceSwcTransforms: true,

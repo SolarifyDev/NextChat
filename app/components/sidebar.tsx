@@ -1,3 +1,5 @@
+"use client";
+
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./home.module.scss";
@@ -30,16 +32,20 @@ import dynamic from "next/dynamic";
 import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
 import { useDebounceFn } from "ahooks";
+import { useOmeStore } from "../store/ome";
+import { MessageEnum } from "../enum";
+import { useEnhanceChatStore } from "../store/enhance-chat";
+import { isNil } from "lodash";
+import { postMessageToReactNative } from "../utils/ga";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
 });
 
 export function useHotKey() {
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -125,10 +131,7 @@ export function useDragSideBar() {
     document.documentElement.style.setProperty("--sidebar-width", sideBarWidth);
   }, [config.sidebarWidth, isMobileScreen, shouldNarrow]);
 
-  return {
-    onDragStart,
-    shouldNarrow,
-  };
+  return { onDragStart, shouldNarrow };
 }
 
 export function SideBarContainer(props: {
@@ -231,8 +234,11 @@ export function SideBarTail(props: {
   );
 }
 
-export function SideBar(props: { className?: string }) {
-  const { i18n, t } = useTranslation();
+export function SideBar(props: {
+  getCurrentInteractedMs: (isAll?: boolean) => number;
+  className?: string;
+}) {
+  const { t } = useTranslation();
 
   const DISCOVERY = [
     // { name: Locale.Plugin.Name, path: Path.Plugins },
@@ -247,14 +253,69 @@ export function SideBar(props: { className?: string }) {
   const [showDiscoverySelector, setshowDiscoverySelector] = useState(false);
   const navigate = useNavigate();
   const config = useAppConfig();
-  const chatStore = useNewChatStore();
+  const newChatStore = useEnhanceChatStore();
+  const omeStore = useOmeStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
-
-  const { getSession } = useNewChatStore();
 
   const { run: addConversation } = useDebounceFn(
     () => {
-      chatStore.newSession(undefined, () => navigate(Path.Chat));
+      if (omeStore.from === "omelinkapp") {
+        // trackEvent("click_chat_timestamp", {
+        //   userId: omeStore.userId,
+        //   time: Date.now(),
+        //   metis_event_id: omeStore.eventUuid,
+        // });
+
+        postMessageToReactNative(
+          {
+            action: "click_chat_timestamp",
+            userId: omeStore.userId,
+            time: Date.now(),
+            metis_event_id: omeStore.eventUuid,
+          },
+          "click_chat_timestamp",
+        );
+      }
+
+      newChatStore.newSession(undefined, () => {
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
+        navigate(Path.Chat);
+      });
+    },
+    { wait: 100 },
+  );
+
+  const { run: quitMetis } = useDebounceFn(
+    () => {
+      try {
+        if (omeStore.isFromApp) {
+          if (!isNil(newChatStore.currentSession)) {
+            omeStore.setIsShowHome(false);
+            navigate(Path.Chat);
+          } else {
+            addConversation();
+          }
+        } else {
+          const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
+          if (window?.ReactNativeWebView) {
+            if (omeStore.from === "omelinkapp") {
+              const ms = props.getCurrentInteractedMs(true);
+
+              message.data = { time: ms };
+            }
+
+            window.ReactNativeWebView.postMessage(JSON.stringify(message));
+          } else if ((window as any)?.webkit?.messageHandlers?.nativeListener) {
+            (
+              window as any
+            )?.webkit?.messageHandlers?.nativeListener.postMessage(
+              JSON.stringify(message),
+            );
+          }
+        }
+      } catch {}
     },
     { wait: 300 },
   );
@@ -269,20 +330,26 @@ export function SideBar(props: { className?: string }) {
     checkMcpStatus();
   }, []);
 
+  // useEffect(() => {
+  //   if (chatStore.isDown) {
+  //     getSession();
+  //   }
+  // }, [chatStore.isDown]);
+
   useEffect(() => {
-    if (config._hasHydrated && chatStore.isDown) {
-      getSession();
+    if (newChatStore.isDown) {
+      newChatStore.getSessions();
     }
-  }, [config._hasHydrated, chatStore.isDown]);
+  }, [newChatStore.isDown]);
 
   return (
     <SideBarContainer
-      onDragStart={!config.isFromApp ? onDragStart : () => {}}
+      onDragStart={!omeStore.isFromApp ? onDragStart : () => {}}
       shouldNarrow={shouldNarrow}
-      isFromApp={config.isFromApp}
+      isFromApp={omeStore.isFromApp!}
       {...props}
     >
-      {!config.isFromApp ? (
+      {!omeStore.isFromApp ? (
         <SideBarHeader
           title="NextChat"
           subTitle="Build your own AI assistant."
@@ -329,10 +396,7 @@ export function SideBar(props: { className?: string }) {
             <Selector
               items={[
                 ...DISCOVERY.map((item) => {
-                  return {
-                    title: item.name,
-                    value: item.path,
-                  };
+                  return { title: item.name, value: item.path };
                 }),
               ]}
               onClose={() => setshowDiscoverySelector(false)}
@@ -360,9 +424,7 @@ export function SideBar(props: { className?: string }) {
               top: "50%",
               transform: "translateY(-50%)",
             }}
-            onClick={() => {
-              console.log("click");
-            }}
+            onClick={() => quitMetis()}
           >
             <ArrowLeftIcon />
           </div>
@@ -377,14 +439,15 @@ export function SideBar(props: { className?: string }) {
           }
         }}
       >
-        <ChatList narrow={shouldNarrow} isFromApp={config.isFromApp} />
+        <ChatList narrow={shouldNarrow} isFromApp={omeStore.isFromApp!} />
       </SideBarBody>
-      {config.isFromApp ? (
+      {omeStore.isFromApp ? (
         <div
           style={{
             width: "100%",
             display: "flex",
             justifyContent: "center",
+            paddingBottom: "8px",
           }}
         >
           <div
@@ -418,7 +481,7 @@ export function SideBar(props: { className?: string }) {
                   onClick={async () => {
                     // if (await showConfirm(Locale.Home.DeleteChat)) {
                     if (await showConfirm(t("Home.DeleteChat"))) {
-                      chatStore.deleteSession(chatStore.currentSessionIndex);
+                      // chatStore.deleteSession(chatStore.currentSessionIndex);
                     }
                   }}
                 />
@@ -442,7 +505,12 @@ export function SideBar(props: { className?: string }) {
               text={shouldNarrow ? undefined : t("Home.NewChat")}
               onClick={() => {
                 if (config.dontShowMaskSplashScreen) {
-                  chatStore.newSession(undefined, () => navigate(Path.Chat));
+                  newChatStore.newSession(undefined, () => {
+                    if (omeStore.isFromApp) {
+                      omeStore.setIsShowHome(false);
+                    }
+                    navigate(Path.Chat);
+                  });
                 } else {
                   navigate(Path.NewChat);
                 }

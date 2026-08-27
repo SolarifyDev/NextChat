@@ -14,13 +14,12 @@ import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
 import ErrorBoundary from "./error";
 
-import { Lang, changeLang, getISOLang, getLang } from "../locales";
-
 import {
   HashRouter as Router,
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
@@ -31,10 +30,18 @@ import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
 import isEmpty from "lodash-es/isEmpty";
-import { useNewChatStore } from "../store/new-chat";
 import "../locales/i18n";
+import { useOmeStore } from "../store/ome";
 import i18next from "i18next";
+import { MessageEnum } from "../enum";
 import { isNil } from "lodash-es";
+import { LiveAPIProvider } from "../contexts/LiveAPIContext";
+import UserActivityMonitor from "../hook/use-activity";
+import { useInteractionMonitor } from "../hook/use-interaction-monitor";
+import { PostGetToken } from "../client/smarties";
+import { useEnhanceChatStore } from "../store/enhance-chat";
+import { ToastContainer } from "./chat-toast";
+import { postMessageToReactNative } from "../utils/ga";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -54,7 +61,7 @@ const Settings = dynamic(async () => (await import("./settings")).Settings, {
 });
 
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
-  loading: () => <Loading noLogo />,
+  loading: () => null,
 });
 
 const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
@@ -71,9 +78,7 @@ const PluginPage = dynamic(async () => (await import("./plugin")).PluginPage, {
 
 const SearchChat = dynamic(
   async () => (await import("./search-chat")).SearchChatPage,
-  {
-    loading: () => <Loading noLogo />,
-  },
+  { loading: () => <Loading noLogo /> },
 );
 
 const Sd = dynamic(async () => (await import("./sd")).Sd, {
@@ -82,9 +87,31 @@ const Sd = dynamic(async () => (await import("./sd")).Sd, {
 
 const McpMarketPage = dynamic(
   async () => (await import("./mcp-market")).McpMarketPage,
-  {
-    loading: () => <Loading noLogo />,
-  },
+  { loading: () => <Loading noLogo /> },
+);
+
+const HomeTab = dynamic(async () => (await import("./home-tab")).HomeTab, {
+  loading: () => null,
+});
+
+const SelectVoice = dynamic(
+  async () => (await import("./kid/component/select-voice")).SelectVoice,
+  { loading: () => null },
+);
+
+const AddOrUpdateKid = dynamic(
+  async () =>
+    (await import("./kid/component/add-or-update-kid")).AddOrUpdateKid,
+  { loading: () => null },
+);
+
+const Kid = dynamic(async () => (await import("./kid/component/kid")).Kid, {
+  loading: () => null,
+});
+
+const Realtime = dynamic(
+  async () => (await import("./kid/component/realtime")).Realtime,
+  { loading: () => null },
 );
 
 export function useSwitchTheme() {
@@ -119,8 +146,14 @@ export function useSwitchTheme() {
 }
 
 function useHtmlLang() {
+  const { language } = useOmeStore();
   useEffect(() => {
-    const lang = getISOLang();
+    const isoLangString: Record<string, string> = {
+      cn: "zh-Hans",
+      tw: "zh-Hant",
+    };
+
+    const lang = isoLangString[language] ?? language;
     const htmlLang = document.documentElement.lang;
 
     if (lang !== htmlLang) {
@@ -165,6 +198,9 @@ export function WindowContent(props: { children: React.ReactNode }) {
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
+  const navigate = useNavigate();
+  const omeStore = useOmeStore();
+  const chatStore = useEnhanceChatStore();
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
@@ -174,6 +210,60 @@ function Screen() {
   const isMobileScreen = useMobileScreen();
   const shouldTightBorder =
     getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
+
+  useEffect(() => {
+    let monitor: UserActivityMonitor;
+
+    if (omeStore.from === "omelinkapp") {
+      monitor = new UserActivityMonitor({
+        timeout: 30 * 60 * 1000,
+        gaEventName: "exit_app_timestamp",
+        userId: omeStore.userId,
+        debug: false,
+        eventUuid: omeStore.eventUuid,
+      });
+    }
+
+    return () => {
+      if (monitor) monitor.destroy();
+    };
+  }, []);
+
+  const { getCurrentInteractedMs } = useInteractionMonitor((interacted) => {
+    console.log("📤 上传行为埋点 => ", interacted ? "活跃" : "无操作");
+
+    if (omeStore.from === "omelinkapp") {
+      // trackEvent("app_is_active", {
+      //   isActive: interacted,
+      //   userId: omeStore.userId,
+      //   metis_event_id: omeStore.eventUuid,
+      // });
+
+      postMessageToReactNative(
+        {
+          action: "app_is_active",
+          isActive: interacted,
+          userId: omeStore.userId,
+          metis_event_id: omeStore.eventUuid,
+        },
+        "app_is_active",
+      );
+    }
+  });
+
+  // 传递切换事件给父
+  useEffect(() => {
+    try {
+      if (window?.ReactNativeWebView) {
+        const message = {
+          data: { path: location.pathname },
+          msg: "pathname",
+          type: MessageEnum.Path,
+        };
+        window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      }
+    } catch {}
+  }, [location.pathname]);
 
   // useEffect(() => {
   //   loadAsyncGoogleFont();
@@ -188,6 +278,20 @@ function Screen() {
     document.head.appendChild(linkEl);
   }, []);
 
+  useEffect(() => {
+    if (chatStore._hasHydrated && omeStore.isFromApp) {
+      chatStore.newSession(undefined, () => {
+        if (omeStore.isFromApp) {
+          omeStore.setIsShowHome(false);
+        }
+
+        if (location.pathname !== Path.Home) return;
+
+        navigate(Path.Chat);
+      });
+    }
+  }, [omeStore.isFromApp, chatStore._hasHydrated]);
+
   if (isArtifact) {
     return (
       <Routes>
@@ -195,6 +299,7 @@ function Screen() {
       </Routes>
     );
   }
+
   const renderContent = () => {
     if (isAuth) return <AuthPage />;
     if (isSd) return <Sd />;
@@ -203,19 +308,38 @@ function Screen() {
       <>
         <SideBar
           className={clsx({
-            [styles["sidebar-show"]]: isHome,
+            [styles["sidebar-show"]]: omeStore.isFromApp
+              ? omeStore.isShowHome && isHome
+              : isHome,
           })}
+          getCurrentInteractedMs={getCurrentInteractedMs}
         />
         <WindowContent>
           <Routes>
-            <Route path={Path.Home} element={<Chat />} />
+            {/* <Route path={Path.Home} element={<Chat />} /> */}
             <Route path={Path.NewChat} element={<NewChat />} />
             <Route path={Path.Masks} element={<MaskPage />} />
             <Route path={Path.Plugins} element={<PluginPage />} />
             <Route path={Path.SearchChat} element={<SearchChat />} />
-            <Route path={Path.Chat} element={<Chat />} />
+            {/* <Route path={Path.Chat} element={<Chat />} /> */}
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
+            <Route path={Path.SelectVoice} element={<SelectVoice />} />
+            <Route path={Path.AddOrUpdateKid} element={<AddOrUpdateKid />} />
+            <Route
+              path={Path.Realtime}
+              element={
+                <LiveAPIProvider>
+                  <Realtime />
+                </LiveAPIProvider>
+              }
+            />
+
+            <Route element={<HomeTab />}>
+              <Route path={Path.Home} element={<Chat />} />
+              <Route path={Path.AIKid} element={<Kid />} />
+              <Route path={Path.Chat} element={<Chat />} />
+            </Route>
           </Routes>
         </WindowContent>
       </>
@@ -226,7 +350,7 @@ function Screen() {
     <div
       className={clsx(styles.container, {
         [styles["tight-container"]]: shouldTightBorder,
-        [styles["rtl-screen"]]: getLang() === "ar",
+        [styles["rtl-screen"]]: omeStore.language === "ar",
       })}
     >
       {renderContent()}
@@ -251,13 +375,14 @@ export function useLoadData() {
 export function Home() {
   useSwitchTheme();
   useLoadData();
-  useHtmlLang();
+  // useHtmlLang();
 
   const appConfig = useAppConfig();
 
+  const omeStore = useOmeStore();
+
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
-    useAccessStore.getState().fetch();
 
     const initMcp = async () => {
       try {
@@ -275,7 +400,13 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    const handleMessage = (event: any) => {
+    if (useAccessStore.getState()._hasHydrated) {
+      useAccessStore.getState().fetch();
+    }
+  }, [useAccessStore.getState()._hasHydrated]);
+
+  useEffect(() => {
+    const handleMessage = async (event: any) => {
       const data = event.data;
 
       if (isEmpty(data) || (typeof data === "string" && data === "")) return;
@@ -285,52 +416,146 @@ export function Home() {
           const params = JSON.parse(data);
 
           if (!isEmpty(params?.from)) {
-            appConfig.setFrom(params.from ?? "");
+            omeStore.setFrom(params.from ?? "");
           }
           if (!isEmpty(params?.ometoken)) {
-            appConfig.setOmeToken(params?.ometoken ?? "");
+            omeStore.setToken(params?.ometoken ?? "");
           }
           if (!isEmpty(params?.omeUserId)) {
-            appConfig.setOmeUserId(params?.omeUserId ?? "");
+            omeStore.setUserId(params?.omeUserId ?? "");
           }
           if (!isEmpty(params?.omeUserName)) {
-            appConfig.setOmeUserName(params?.omeUserName ?? "");
+            omeStore.setUserName(params?.omeUserName ?? "");
           }
-          appConfig.setIsFromApp(true);
-          useNewChatStore.getState().setIsDown(true);
+          if (!isEmpty(params?.ticket)) {
+            omeStore.setTicket(params?.ticket ?? "");
+
+            try {
+              const res = await fetch("/api/omeAccount");
+              const config = await res.json();
+
+              omeStore.setClient(
+                config?.clientId || "",
+                config?.clientSecret || "",
+                config?.score || "",
+              );
+            } catch {
+              const message = {
+                data: {},
+                msg: "quit",
+                type: MessageEnum.Quit,
+              };
+
+              window.ReactNativeWebView.postMessage(JSON.stringify(message));
+            }
+
+            await PostGetToken("get", {
+              grant_type: "ticket",
+              ticket: params?.ticket ?? "",
+            })
+              .then((res) => {
+                omeStore.setToken(res.access_token ?? "");
+                omeStore.setRefreshToken(res.refresh_token ?? "");
+
+                omeStore.setIsFromApp(true);
+                useEnhanceChatStore.getState().setIsDown(true);
+              })
+              .catch(() => {
+                const message = {
+                  data: {},
+                  msg: "quit",
+                  type: MessageEnum.Quit,
+                };
+
+                window.ReactNativeWebView.postMessage(JSON.stringify(message));
+              });
+          } else {
+            omeStore.setIsFromApp(true);
+            useEnhanceChatStore.getState().setIsDown(true);
+          }
           if (!isEmpty(params?.lanauge)) {
-            changeLang(params?.lanauge);
+            omeStore.setLanguage(params?.lanauge);
+          }
+          if (!isEmpty(params?.eventUuid)) {
+            omeStore.setEventUuid(params.eventUuid);
           }
         } catch {}
       } else {
         if (
           !event.origin.includes("omeoffice") &&
+          !event.origin.includes("daoword") &&
+          event.origin.toLowerCase().includes("daodaoagi") &&
           !event.origin.includes("localhost")
         ) {
           return; // 如果不是信任的源，忽略消息
         }
 
-        const lang = localStorage.getItem("lang");
+        // if (!isEmpty(event?.data?.ometoken)) {
+        //   console.log(
+        //     "[OmeToken] got ometoken from iframe",
+        //     event.data.ometoken,
+        //   );
+        //   omeStore.setToken(event.data.ometoken);
+        //   useEnhanceChatStore.getState().setIsDown(true);
+        // }
 
-        if (lang !== i18next.language && !isNil(lang)) {
-          changeLang(lang as Lang);
+        // if (!isEmpty(event?.data?.omeUserId)) {
+        //   omeStore.setUserId(event?.data?.omeUserId);
+        // }
+
+        // if (!isEmpty(event?.data?.omeUserName)) {
+        //   omeStore.setUserName(event?.data?.omeUserName);
+        // }
+
+        // omeStore.setFrom("omeoffice web");
+
+        // omeStore.setIsFromApp(false);
+
+        if (
+          !isEmpty(event?.data?.omeUserId) &&
+          !isEmpty(event?.data?.omeUserName)
+        ) {
+          omeStore.setUserId(event?.data?.omeUserId);
+          omeStore.setUserName(event?.data?.omeUserName);
+          omeStore.setFrom("omeoffice web");
+          omeStore.setIsFromApp(false);
+          useEnhanceChatStore.getState().setIsDown(true);
         }
+      }
+    };
 
-        if (!isEmpty(event?.data?.ometoken)) {
-          console.log(
-            "[OmeToken] got ometoken from iframe",
-            event.data.ometoken,
+    (window as any).receiveFromNative = (response: string) => {
+      try {
+        const data = JSON.parse(response);
+
+        if (isEmpty(data) || (typeof response === "string" && response === ""))
+          return;
+
+        if (!isEmpty(data?.from)) {
+          omeStore.setFrom(data.from ?? "");
+        }
+        if (!isEmpty(data?.ometoken)) {
+          omeStore.setToken(data?.ometoken ?? "");
+        }
+        if (!isEmpty(data?.omeUserId)) {
+          omeStore.setUserId(data?.omeUserId ?? "");
+        }
+        if (!isEmpty(data?.omeUserName)) {
+          omeStore.setUserName(data?.omeUserName ?? "");
+        }
+        omeStore.setIsFromApp(true);
+        useEnhanceChatStore.getState().setIsDown(true);
+
+        if (!isEmpty(data?.lanauge)) {
+          omeStore.setLanguage(data?.lanauge);
+        }
+      } catch (error) {
+        const message = { data: {}, msg: "quit", type: MessageEnum.Quit };
+
+        if (window?.webkit?.messageHandlers?.nativeListener) {
+          window?.webkit?.messageHandlers?.nativeListener.postMessage(
+            JSON.stringify(message),
           );
-          appConfig.setOmeToken(event.data.ometoken);
-          useNewChatStore.getState().setIsDown(true);
-        }
-
-        if (!isEmpty(event?.data?.omeUserId)) {
-          appConfig.setOmeUserId(event?.data?.omeUserId);
-        }
-
-        if (!isEmpty(event?.data?.omeUserName)) {
-          appConfig.setOmeUserName(event?.data?.omeUserName);
         }
       }
     };
@@ -339,19 +564,38 @@ export function Home() {
 
     return () => {
       window.removeEventListener("message", handleMessage);
+
+      if ((window as any).receiveFromNative) {
+        delete (window as any).receiveFromNative;
+      }
     };
   }, []);
 
   useEffect(() => {
+    try {
+      if (localStorage.getItem("lang")) {
+        localStorage.removeItem("lang");
+        console.log("lang 已从 localStorage 中删除");
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     if (appConfig._hasHydrated) {
+      const message = {
+        data: {},
+        msg: "omemetis is ready",
+        type: MessageEnum.Send,
+      };
+
       if (window.ReactNativeWebView) {
         try {
-          const message = {
-            data: "omemetis is ready",
-            url: location.origin,
-          };
           window.ReactNativeWebView.postMessage(JSON.stringify(message));
         } catch {}
+      } else if (window?.webkit?.messageHandlers?.nativeListener) {
+        window?.webkit?.messageHandlers?.nativeListener.postMessage(
+          JSON.stringify(message),
+        );
       } else {
         window.parent.postMessage("omemetis is ready", "*");
       }
@@ -360,7 +604,24 @@ export function Home() {
     }
   }, [appConfig._hasHydrated]);
 
-  if (!useHasHydrated()) {
+  useEffect(() => {
+    localStorage.setItem("metis_lanuage", omeStore.language);
+    i18next.changeLanguage(omeStore.language);
+
+    const isoLangString: Record<string, string> = {
+      cn: "zh-Hans",
+      tw: "zh-Hant",
+    };
+
+    const lang = isoLangString[omeStore.language] ?? omeStore.language;
+    const htmlLang = document.documentElement.lang;
+
+    if (lang !== htmlLang) {
+      document.documentElement.lang = lang;
+    }
+  }, [omeStore.language]);
+
+  if (!useHasHydrated() || isNil(omeStore.isFromApp)) {
     return <Loading />;
   }
 
@@ -369,6 +630,7 @@ export function Home() {
       <Router>
         <Screen />
       </Router>
+      <ToastContainer />
     </ErrorBoundary>
   );
 }

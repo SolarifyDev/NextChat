@@ -24,7 +24,8 @@ import { DeepSeekApi } from "./platforms/deepseek";
 import { XAIApi } from "./platforms/xai";
 import { ChatGLMApi } from "./platforms/glm";
 import { SiliconflowApi } from "./platforms/siliconflow";
-import { useNewChatStore } from "../store/new-chat";
+import { useOmeStore } from "../store/ome";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -34,11 +35,32 @@ export const TTSModels = ["tts-1", "tts-1-hd"] as const;
 export type ChatModel = ModelType;
 
 export interface MultimodalContent {
-  type: "text" | "image_url";
+  type: "text" | "image_url" | "file";
   text?: string;
   image_url?: {
     url: string;
   };
+  file_url?: {
+    url: string;
+  };
+}
+
+export interface Attachment {
+  id: string;
+  attachmentId?: string | number;
+  name: string;
+  size: number;
+  type: string;
+  url: string;
+  previewUrl?: string;
+  isImage: boolean;
+  status: "uploading" | "success" | "error";
+  progress?: number; // 0-100
+}
+
+export interface MultimodalContentForAlibaba {
+  text?: string;
+  image?: string;
 }
 
 export interface RequestMessage {
@@ -78,6 +100,8 @@ export interface ChatOptions {
   onController?: (controller: AbortController) => void;
   onBeforeTool?: (tool: ChatMessageTool) => void;
   onAfterTool?: (tool: ChatMessageTool) => void;
+
+  isSummary?: boolean; // 给接口控制当前是否是总结
 }
 
 export interface LLMUsage {
@@ -233,11 +257,12 @@ export function validString(x: string): boolean {
   return x?.length > 0;
 }
 
-export function getHeaders(ignoreHeaders: boolean = false) {
+export async function getHeaders(ignoreHeaders: boolean = false) {
   const appConfig = useAppConfig.getState();
+  const omeStore = useOmeStore.getState();
   const accessStore = useAccessStore.getState();
   // const chatStore = useChatStore.getState();
-  const chatStore = useNewChatStore.getState();
+  const chatStore = useEnhanceChatStore.getState();
   let headers: Record<string, string> = {};
   if (!ignoreHeaders) {
     headers = {
@@ -249,7 +274,7 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   const clientConfig = getClientConfig();
 
   function getConfig() {
-    const modelConfig = chatStore.getCurrentSession()?.mask?.modelConfig;
+    const modelConfig = chatStore.currentSession?.mask?.modelConfig;
     const isGoogle = modelConfig?.providerName === ServiceProvider.Google;
     const isAzure = modelConfig?.providerName === ServiceProvider.Azure;
     const isAnthropic = modelConfig?.providerName === ServiceProvider.Anthropic;
@@ -351,27 +376,42 @@ export function getHeaders(ignoreHeaders: boolean = false) {
     );
   }
   // console.log("Headers.[`OME-METIS-Authorization`]", appConfig.omeToken);
+  if (omeStore.shouldRefreshToken()) {
+    await omeStore.refreshAccessToken();
+  }
 
-  if (appConfig.isFromApp) {
-    switch (appConfig.from.toLowerCase()) {
+  if (omeStore.isFromApp) {
+    switch (omeStore.from.toLowerCase()) {
       case "omeofficeapp":
-        headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
+        headers["OME-METIS-Authorization"] = omeStore.token || "";
 
-        headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
+        headers["OME-METIS-UserId"] = omeStore.userId || "";
 
-        headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+        headers["Ome-Metis-Username"] = omeStore.userName || "";
         break;
-      case "omelink":
-        headers["Omelink-Metis-Userid"] = appConfig.omeUserId || "";
+      case "omelinkapp":
+        headers["Omelink-Metis-Userid"] = omeStore.userId || "";
+        break;
+      case "omeoffice 1.0":
+        headers["Ome-Office-Oa-User-Id"] = omeStore.userId || "";
+        break;
+      case "omeoffice 2.0":
+        headers["Ome-Office-Authorization"] = "Bearer " + omeStore.token || "";
         break;
     }
   } else {
-    headers["OME-METIS-Authorization"] = appConfig.omeToken || "";
+    headers["OME-METIS-Authorization"] = omeStore.token || "";
 
-    headers["OME-METIS-UserId"] = appConfig.omeUserId || "";
+    headers["OME-METIS-UserId"] = omeStore.userId || "";
 
-    headers["Ome-Metis-Username"] = appConfig.omeUserName || "";
+    headers["Ome-Metis-Username"] = omeStore.userName || "";
   }
+
+  headers["OnlineSearch"] = (
+    omeStore.faqSearch ? 0 : omeStore.onlineSearch ? 1 : 0
+  ).toString();
+
+  headers["NeedFaq"] = (omeStore.faqSearch ? 1 : 0).toString();
 
   return headers;
 }

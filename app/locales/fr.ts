@@ -77,11 +77,16 @@ const fr: PartialLocaleType = {
       Clear: "Effacer la discussion",
       Settings: "Paramètres de la discussion",
       UploadImage: "Télécharger une image",
+      UploadFile: "Télécharger des fichiers",
+      UploadFileTooltip:
+        "Téléverser des pièces jointes, la taille totale ne doit pas dépasser 50 Mo. Formats pris en charge : doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
+      OnlineSearch: "Recherche en ligne",
     },
     Rename: "Renommer la discussion",
     Typing: "En train d'écrire…",
     Input:
       "{{submitKey}} pour envoyer，/ pour compléter, : pour déclencher des commandes",
+    AppInput: "Commençons à discuter~",
     Send: "Envoyer",
     Config: {
       Reset: "Effacer la mémoire",
@@ -92,6 +97,18 @@ const fr: PartialLocaleType = {
       Title: "Salut~ Je suis METIS",
       Content:
         "Je peux vous aider à rechercher et à répondre aux questions. Posez-moi toutes vos questions !",
+    },
+    UploadImageTips:
+      "Il est permis de télécharger un maximum de trois images seulement !",
+    UploadFileTips: "Un maximum de 100 pièces jointes est autorisé !",
+    FileTooLarge: "Le fichier dépasse la limite de 5 Mo",
+    UploadFailed: "Échec du téléchargement",
+    Voice: {
+      HoldToTalk: "Maintenez pour parler",
+      ReleaseToSendSlideUpToCancel:
+        "Relâchez pour envoyer, faites glisser vers le haut pour annuler",
+      ReleaseToCancel: "Relâchez pour annuler",
+      Processing: "Traitement en cours",
     },
   },
   Export: {
@@ -596,6 +613,53 @@ const fr: PartialLocaleType = {
     Messages: "Messages",
     Topic: "Sujet",
     Time: "Temps",
+  },
+  Kid: {
+    NoKidText: "Vous n'avez pas encore d'AI Kid~",
+    InstructionText:
+      "Cliquez sur le「+」ci-dessous pour invoquer votre propre AI Kid~",
+    Create: "Créer",
+  },
+  SelectVoice: {
+    Title: "Sélectionner la voix",
+    Recommended: "Recommandé",
+    Female: "Voix féminine",
+    Male: "Voix masculine",
+    Dialect: "Dialecte",
+    MatureMale: "Voix masculine mûre",
+    GentleFemale: "Voix féminine douce",
+    YoungMale: "Homme | Jeune",
+    YoungFemale: "Femme | Jeune",
+    Confirm: "Terminer",
+    Selected: "Sélectionné",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Créer",
+    Edit: "Modifier",
+    Name: "Nom",
+    VoicePreference: "Préférence de Voix",
+    InputName: "Entrez le Nom",
+    CreateCustomVoice: "Créer une Voix Personnalisée",
+    AbilitySettings: "Paramètres des Capacités",
+    Polish: "Améliorer",
+    Introduction: "Introduction",
+    IntroduceYourAiKid: "Présentez votre AI Kid",
+    OpeningLine: "Message d'Ouverture",
+    OpeningLineDescription:
+      "Sera utilisé comme premier message lors du démarrage d'une conversation",
+    CreateMyAiKid: "Créer Mon AI Kid",
+    Save: "Enregistrer",
+    NotImageTypeError: "Vous n'avez pas sélectionné un type d'image !",
+    NoNameTips: "Veuillez entrer un nom",
+  },
+  Realtime: {
+    StartSpeaking: "Vous pouvez commencer à parler",
+    Listening: "J'écoute...",
+    Interrupt: "Vous pouvez m'interrompre à tout moment",
+    ConnectionFailed: "Échec de la connexion, veuillez réessayer !",
+    Connecting: "Connexion en cours...",
+    PermissionPrompt:
+      "Échec de l'accès au microphone, veuillez activer manuellement les permissions du microphone",
   },
 };
 

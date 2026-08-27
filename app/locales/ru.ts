@@ -76,10 +76,15 @@ const ru: PartialLocaleType = {
       Clear: "Очистить чат",
       Settings: "Настройки чата",
       UploadImage: "Загрузить изображение",
+      UploadFile: "Загрузить файлы",
+      UploadFileTooltip:
+        "Загрузить вложения, общий размер не должен превышать 50 МБ. Поддерживаемые форматы: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
+      OnlineSearch: "Онлайн-поиск",
     },
     Rename: "Переименовать чат",
     Typing: "Печатает…",
     Input: "{{submitKey}} Отправить，/ для автозаполнения，: для команд",
+    AppInput: "Давайте начнём общаться～",
     Send: "Отправить",
     Config: {
       Reset: "Очистить память",
@@ -90,6 +95,17 @@ const ru: PartialLocaleType = {
       Title: "Привет~ Я METIS",
       Content:
         "Я могу помочь вам с поиском и ответами на вопросы. Спрашивайте меня о чем угодно!",
+    },
+    UploadImageTips: "Максимально разрешено загружать только три изображения!",
+    UploadFileTips: "Максимально разрешено 100 вложений!",
+    FileTooLarge: "Файл превышает лимит 5 МБ",
+    UploadFailed: "Ошибка загрузки",
+    Voice: {
+      HoldToTalk: "Удерживайте, чтобы говорить",
+      ReleaseToSendSlideUpToCancel:
+        "Отпустите для отправки, проведите вверх для отмены",
+      ReleaseToCancel: "Отпустите для отмены",
+      Processing: "Обработка",
     },
   },
   Export: {
@@ -585,6 +601,52 @@ const ru: PartialLocaleType = {
     Messages: "Сообщения",
     Topic: "Тема",
     Time: "Время",
+  },
+  Kid: {
+    NoKidText: "У вас еще нет AI Kid~",
+    InstructionText: "Нажмите「+」ниже, чтобы вызвать своего AI Kid~",
+    Create: "Создать",
+  },
+  SelectVoice: {
+    Title: "Выбрать Голос",
+    Recommended: "Рекомендуется",
+    Female: "Женский Голос",
+    Male: "Мужской Голос",
+    Dialect: "Диалект",
+    MatureMale: "Зрелый Мужской Голос",
+    GentleFemale: "Нежный Женский Голос",
+    YoungMale: "Мужчина | Молодой",
+    YoungFemale: "Женщина | Молодая",
+    Confirm: "Завершить",
+    Selected: "Выбрано",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Создать",
+    Edit: "Редактировать",
+    Name: "Имя",
+    VoicePreference: "Настройки голоса",
+    InputName: "Введите имя",
+    CreateCustomVoice: "Создать пользовательский голос",
+    AbilitySettings: "Настройки способностей",
+    Polish: "Улучшить",
+    Introduction: "Введение",
+    IntroduceYourAiKid: "Представьте вашего AI Kid",
+    OpeningLine: "Начальная фраза",
+    OpeningLineDescription:
+      "Будет использоваться как первое сообщение при начале чата",
+    CreateMyAiKid: "Создать моего AI Kid",
+    Save: "Сохранить",
+    NotImageTypeError: "Вы выбрали не тип изображения！",
+    NoNameTips: "Пожалуйста, введите имя",
+  },
+  Realtime: {
+    StartSpeaking: "Вы можете начать говорить",
+    Listening: "Слушаю...",
+    Interrupt: "Вы можете прервать меня в любой момент",
+    ConnectionFailed: "Ошибка соединения, пожалуйста, попробуйте снова!",
+    Connecting: "Подключение...",
+    PermissionPrompt:
+      "Не удалось получить доступ к микрофону, пожалуйста, включите разрешение микрофона вручную",
   },
 };
 

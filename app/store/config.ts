@@ -105,11 +105,11 @@ export const DEFAULT_CONFIG = {
     temperature: 0.9,
     voice: "alloy" as Voice,
   },
-  omeToken: "",
-  omeUserId: "",
-  omeUserName: "",
-  from: "",
-  isFromApp: false,
+  // omeToken: "",
+  // omeUserId: "",
+  // omeUserName: "",
+  // from: "",
+  // isFromApp: false,
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;
@@ -171,22 +171,29 @@ export const useAppConfig = createPersistStore(
   { ...DEFAULT_CONFIG },
   (set, get) => ({
     reset() {
-      const { omeToken, omeUserId, omeUserName, isFromApp, from } = get();
+      // const { omeToken, omeUserId, omeUserName, isFromApp, from } = get();
+
+      // set(() => ({
+      //   ...DEFAULT_CONFIG,
+      //   omeToken,
+      //   omeUserId,
+      //   omeUserName,
+      //   isFromApp,
+      //   from,
+      // }));
 
       set(() => ({
         ...DEFAULT_CONFIG,
-        omeToken,
-        omeUserId,
-        omeUserName,
-        isFromApp,
-        from,
       }));
     },
 
     setDefaultModel() {
       const { modelConfig } = get();
 
-      if (!modelConfig.model.toLowerCase().includes("deepseek"))
+      if (
+        !modelConfig?.model?.toLowerCase().includes("deepseek") ||
+        !modelConfig?.providerName?.toLowerCase().includes("deepseek")
+      )
         set(() => ({
           ...DEFAULT_CONFIG,
           modelConfig: {
@@ -197,25 +204,25 @@ export const useAppConfig = createPersistStore(
         }));
     },
 
-    setOmeUserName(omeUserName: string) {
-      set(() => ({ omeUserName }));
-    },
+    // setOmeUserName(omeUserName: string) {
+    //   set(() => ({ omeUserName }));
+    // },
 
-    setOmeToken(omeToken: string) {
-      set(() => ({ omeToken }));
-    },
+    // setOmeToken(omeToken: string) {
+    //   set(() => ({ omeToken }));
+    // },
 
-    setOmeUserId(omeUserId: string) {
-      set(() => ({ omeUserId }));
-    },
+    // setOmeUserId(omeUserId: string) {
+    //   set(() => ({ omeUserId }));
+    // },
 
-    setIsFromApp(isFromApp: boolean) {
-      set(() => ({ isFromApp }));
-    },
+    // setIsFromApp(isFromApp: boolean) {
+    //   set(() => ({ isFromApp }));
+    // },
 
-    setFrom(from: string) {
-      set(() => ({ from }));
-    },
+    // setFrom(from: string) {
+    //   set(() => ({ from }));
+    // },
 
     mergeModels(newModels: LLMModel[]) {
       if (!newModels || newModels.length === 0) {

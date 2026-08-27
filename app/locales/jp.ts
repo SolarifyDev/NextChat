@@ -76,10 +76,15 @@ const jp: PartialLocaleType = {
       Clear: "チャットをクリア",
       Settings: "チャット設定",
       UploadImage: "画像をアップロード",
+      UploadFile: "ファイルをアップロード",
+      UploadFileTooltip:
+        "添付ファイルをアップロード、合計サイズは50MB以内。対応形式: doc、docx、xlsx、ppt、pptx、jpg、png、txt、pdf",
+      OnlineSearch: "オンライン検索",
     },
     Rename: "チャットの名前を変更",
     Typing: "入力中…",
     Input: "{{submitKey}}で送信、/で補完をトリガー、:でコマンドをトリガー",
+    AppInput: "チャットを始めましょう～",
     Send: "送信",
     Config: {
       Reset: "メモリをクリア",
@@ -89,6 +94,16 @@ const jp: PartialLocaleType = {
     Metis: {
       Title: "こんにちは~私はMETISです",
       Content: "検索や質問にお答えできます。何でも聞いてくださいね！",
+    },
+    UploadImageTips: "アップロードできる画像は最大3枚までです!",
+    UploadFileTips: "アップロードできる添付ファイルは最大100つまでです！",
+    FileTooLarge: "ファイルが5MBの制限を超えています",
+    UploadFailed: "アップロード失敗",
+    Voice: {
+      HoldToTalk: "押して話す",
+      ReleaseToSendSlideUpToCancel: "離して送信、上にスワイプでキャンセル",
+      ReleaseToCancel: "離してキャンセル",
+      Processing: "処理中",
     },
   },
   Export: {
@@ -576,6 +591,53 @@ const jp: PartialLocaleType = {
     Messages: "メッセージ",
     Topic: "テーマ",
     Time: "時間",
+  },
+  Kid: {
+    NoKidText: "まだAI Kidがいません~",
+    InstructionText:
+      "下の「+」をクリックして、あなただけのAI Kidを呼び出しましょう~",
+    Create: "作成",
+  },
+  SelectVoice: {
+    Title: "音声を選択",
+    Recommended: "おすすめ",
+    Female: "女性の声",
+    Male: "男性の声",
+    Dialect: "方言",
+    MatureMale: "成熟した男性の声",
+    GentleFemale: "優しい女性の声",
+    YoungMale: "男性 | 若者",
+    YoungFemale: "女性 | 若者",
+    Confirm: "完了",
+    Selected: "選択済み",
+  },
+  AddOrUpdateAiKid: {
+    Create: "作成",
+    Edit: "編集",
+    Name: "名前",
+    VoicePreference: "音声設定",
+    InputName: "名前を入力",
+    CreateCustomVoice: "カスタム音声を作成",
+    AbilitySettings: "能力設定",
+    Polish: "調整",
+    Introduction: "紹介",
+    IntroduceYourAiKid: "AI KIDの紹介",
+    OpeningLine: "オープニングメッセージ",
+    OpeningLineDescription:
+      "チャット開始時の最初のメッセージとして使用されます",
+    CreateMyAiKid: "My AI Kidを作成",
+    Save: "保存",
+    NotImageTypeError: "画像タイプを選択していません！",
+    NoNameTips: "名前を入力してください",
+  },
+  Realtime: {
+    StartSpeaking: "話し始めることができます",
+    Listening: "聞いています...",
+    Interrupt: "いつでも話を中断できます",
+    ConnectionFailed: "接続に失敗しました。もう一度お試しください！",
+    Connecting: "接続中...",
+    PermissionPrompt:
+      "マイクへのアクセスに失敗しました。マイクの権限を手動で有効にしてください",
   },
 };
 

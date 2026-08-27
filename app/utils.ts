@@ -287,6 +287,15 @@ export function getMessageImages(message: RequestMessage): string[] {
   return urls;
 }
 
+export function getMessageFiles(message: RequestMessage) {
+  if (typeof message.content === "string") {
+    return [];
+  }
+  return message.content
+    .filter((c) => c.type === "file" && !!c.file_url?.url)
+    .map((c) => c.file_url!);
+}
+
 export function isVisionModel(model: string) {
   const visionModels = useAccessStore.getState().visionModels;
   const envVisionModels = visionModels?.split(",").map((m) => m.trim());
@@ -311,7 +320,8 @@ export function getTimeoutMSByModel(model: string) {
     model.startsWith("o1") ||
     model.startsWith("o3") ||
     model.includes("deepseek-r") ||
-    model.includes("-thinking")
+    model.includes("-thinking") ||
+    model.includes("metis-thinking")
   )
     return REQUEST_TIMEOUT_MS_FOR_THINKING;
   return REQUEST_TIMEOUT_MS;

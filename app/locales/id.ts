@@ -76,10 +76,15 @@ const id: PartialLocaleType = {
       Clear: "Hapus Obrolan",
       Settings: "Pengaturan Obrolan",
       UploadImage: "Unggah Gambar",
+      UploadFile: "Unggah File",
+      UploadFileTooltip:
+        "Unggah lampiran, total ukuran tidak boleh melebihi 50MB. Format yang didukung: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
+      OnlineSearch: "Pencarian online",
     },
     Rename: "Ganti Nama Obrolan",
     Typing: "Sedang Mengetik…",
     Input: "{{submitKey}} kirim，/ untuk melengkapi, : untuk memicu perintah",
+    AppInput: "Mari mulai mengobrol~",
     Send: "Kirim",
     Config: {
       Reset: "Hapus Memori",
@@ -90,6 +95,17 @@ const id: PartialLocaleType = {
       Title: "Hai~ Saya METIS",
       Content:
         "Saya bisa membantu Anda mencari dan menjawab pertanyaan. Silakan tanyakan apa saja!",
+    },
+    UploadImageTips: "Hanya boleh mengunggah maksimal tiga gambar!",
+    UploadFileTips: "Maksimum 100 lampiran diperbolehkan!",
+    FileTooLarge: "File melebihi batas 5MB",
+    UploadFailed: "Gagal mengunggah",
+    Voice: {
+      HoldToTalk: "Tahan untuk berbicara",
+      ReleaseToSendSlideUpToCancel:
+        "Lepaskan untuk mengirim, geser ke atas untuk membatalkan",
+      ReleaseToCancel: "Lepaskan untuk membatalkan",
+      Processing: "Sedang diproses",
     },
   },
   Export: {
@@ -582,6 +598,52 @@ const id: PartialLocaleType = {
     Messages: "Pesan",
     Topic: "Topik",
     Time: "Waktu",
+  },
+  Kid: {
+    NoKidText: "Anda belum memiliki AI Kid~",
+    InstructionText: "Klik「+」di bawah untuk memanggil AI Kid Anda sendiri~",
+    Create: "Buat",
+  },
+  SelectVoice: {
+    Title: "Pilih Suara",
+    Recommended: "Direkomendasikan",
+    Female: "Suara Perempuan",
+    Male: "Suara Laki-laki",
+    Dialect: "Dialek",
+    MatureMale: "Suara Laki-laki Dewasa",
+    GentleFemale: "Suara Perempuan Lembut",
+    YoungMale: "Laki-laki | Muda",
+    YoungFemale: "Perempuan | Muda",
+    Confirm: "Selesai",
+    Selected: "Dipilih",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Buat",
+    Edit: "Edit",
+    Name: "Nama",
+    VoicePreference: "Preferensi Suara",
+    InputName: "Masukkan Nama",
+    CreateCustomVoice: "Buat Suara Kustom",
+    AbilitySettings: "Pengaturan Kemampuan",
+    Polish: "Perbaikan",
+    Introduction: "Pengantar",
+    IntroduceYourAiKid: "Perkenalkan AI Kid Anda",
+    OpeningLine: "Pembuka",
+    OpeningLineDescription:
+      "Akan digunakan sebagai pesan pertama saat memulai obrolan",
+    CreateMyAiKid: "Buat AI Kid Saya",
+    Save: "Simpan",
+    NotImageTypeError: "Anda tidak memilih jenis gambar!",
+    NoNameTips: "Silakan masukkan nama",
+  },
+  Realtime: {
+    StartSpeaking: "Anda dapat mulai berbicara",
+    Listening: "Mendengarkan...",
+    Interrupt: "Anda dapat menyela saya kapan saja",
+    ConnectionFailed: "Koneksi gagal, silakan coba lagi!",
+    Connecting: "Menghubungkan...",
+    PermissionPrompt:
+      "Akses mikrofon gagal, silakan aktifkan izin mikrofon secara manual",
   },
 };
 

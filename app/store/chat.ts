@@ -9,6 +9,7 @@ import { indexedDBStorage } from "@/app/utils/indexedDB-storage";
 import { nanoid } from "nanoid";
 import type {
   ClientApi,
+  Attachment,
   MultimodalContent,
   RequestMessage,
 } from "../client/api";
@@ -64,6 +65,7 @@ export type ChatMessage = RequestMessage & {
   tools?: ChatMessageTool[];
   audio_url?: string;
   isMcpResponse?: boolean;
+  attachments?: Attachment[];
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {

@@ -39,8 +39,8 @@ import { type ClientApi, getClientApi } from "../client/api";
 import { getMessageTextContent } from "../utils";
 import { MaskAvatar } from "./mask";
 import clsx from "clsx";
-import { useNewChatStore } from "../store/new-chat";
 import { useTranslation } from "react-i18next";
+import { useEnhanceChatStore } from "../store/enhance-chat";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -172,35 +172,38 @@ export function MessageExporter() {
   }
 
   // const chatStore = useChatStore();
-  const chatStore = useNewChatStore();
+  const chatStore = useEnhanceChatStore();
   // const session = chatStore.currentSession();
-  const session = chatStore.getCurrentSession();
+  const session = chatStore.currentSession;
   const { selection, updateSelection } = useMessageSelector();
   const selectedMessages = useMemo(() => {
     const ret: ChatMessage[] = [];
     if (exportConfig.includeContext) {
-      ret.push(...session.mask.context);
+      ret.push(...(session?.mask?.context ?? []));
     }
-    ret.push(...session.messages.filter((m) => selection.has(m.id)));
+    ret.push(...(session?.messages ?? []).filter((m) => selection.has(m.id)));
     return ret;
   }, [
     exportConfig.includeContext,
-    session.messages,
-    session.mask.context,
+    session?.messages,
+    session?.mask?.context,
     selection,
   ]);
   function preview() {
     if (exportConfig.format === "text") {
       return (
-        <MarkdownPreviewer messages={selectedMessages} topic={session.topic} />
+        <MarkdownPreviewer
+          messages={selectedMessages}
+          topic={session?.topic!}
+        />
       );
     } else if (exportConfig.format === "json") {
       return (
-        <JsonPreviewer messages={selectedMessages} topic={session.topic} />
+        <JsonPreviewer messages={selectedMessages} topic={session?.topic!} />
       );
     } else {
       return (
-        <ImagePreviewer messages={selectedMessages} topic={session.topic} />
+        <ImagePreviewer messages={selectedMessages} topic={session?.topic!} />
       );
     }
   }
@@ -432,9 +435,9 @@ export function ImagePreviewer(props: {
   const { t } = useTranslation();
   // const chatStore = useChatStore();
   // const session = chatStore.currentSession();
-  const chatStore = useNewChatStore();
-  const session = chatStore.getCurrentSession();
-  const mask = session.mask;
+  const chatStore = useEnhanceChatStore();
+  const session = chatStore.currentSession!;
+  const mask = session?.mask;
   const config = useAppConfig();
 
   const previewRef = useRef<HTMLDivElement>(null);

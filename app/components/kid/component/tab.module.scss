@@ -1,0 +1,105 @@
+// Tab组件样式文件
+.tab-container {
+  width: 100%;
+  height: 100%;
+  background-color: var(--kid-select-voice);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  // 显示滚动条
+  &.show-scrollbar {
+    .tab-content {
+      overflow-y: auto;
+    }
+  }
+
+  // 隐藏滚动条
+  &.hide-scrollbar {
+    .tab-content {
+      overflow-y: auto;
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+
+      &::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+      }
+    }
+  }
+}
+
+// Tab标题栏
+.tab-header {
+  border-top: 1px solid #e5e7eb;
+  background-color: var(--kid-select-voice);
+  flex-shrink: 0;
+}
+
+.tab-nav {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 1rem;
+  height: 40px;
+}
+
+// Tab按钮
+.tab-button {
+  padding: 6px 8px;
+  font-weight: 500;
+  font-size: 16px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--kid-tab-title-color);
+  position: relative;
+  transform: translateZ(0);
+
+  &:hover {
+    color: #374151;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50%;
+      height: 2px;
+      background-color: #d1d5db;
+    }
+  }
+
+  &.active {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--black);
+    background-color: var(--kid-select-voice);
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50%;
+      height: 2px;
+      background-color: #28b446;
+    }
+  }
+
+  &:focus {
+    outline: none;
+    // box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  }
+}
+
+// Tab内容区域
+.tab-content {
+  flex: 1;
+}
+
+.tab-panel {
+  padding: 12px 13.5px;
+}

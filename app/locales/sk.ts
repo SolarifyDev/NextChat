@@ -76,11 +76,17 @@ const sk: PartialLocaleType = {
       Masks: "Masky",
       Clear: "Vymazať kontext",
       Settings: "Nastavenia",
+      UploadImage: "Nahrať obrázok",
+      UploadFile: "Nahrať súbory",
+      UploadFileTooltip:
+        "Nahrať prílohy, celková veľkosť nesmie presiahnuť 50 MB. Podporované formáty: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
+      OnlineSearch: "Online vyhľadávanie",
     },
     Rename: "Premenovať Chat",
     Typing: "Písanie…",
     Input:
       "{{submitKey}} na odoslanie, / na vyhľadávanie výziev, : na použitie príkazov",
+    AppInput: "Poďme si pokecať~",
     Send: "Odoslať",
     Config: {
       Reset: "Resetovať na predvolené",
@@ -91,6 +97,17 @@ const sk: PartialLocaleType = {
       Title: "Ahoj~ Ja som METIS",
       Content:
         "Môžem vám pomôcť s vyhľadávaním a odpovedaním na otázky. Spýtajte sa ma na čokoľvek!",
+    },
+    UploadImageTips: "Povolené je nahrať maximálne tri obrázky!",
+    UploadFileTips: "Povolené je nahrať maximálne 100 príloh!",
+    FileTooLarge: "Súbor presahuje limit 5 MB",
+    UploadFailed: "Nahrávanie zlyhalo",
+    Voice: {
+      HoldToTalk: "Podržte pre hovorenie",
+      ReleaseToSendSlideUpToCancel:
+        "Uvoľnite pre odoslanie, potiahnite nahor pre zrušenie",
+      ReleaseToCancel: "Uvoľnite pre zrušenie",
+      Processing: "Spracováva sa",
     },
   },
   Export: {
@@ -531,6 +548,51 @@ const sk: PartialLocaleType = {
   URLCommand: {
     Code: "Zistený prístupový kód z URL, potvrdiť na aplikovanie?",
     Settings: "Zistené nastavenia z URL, potvrdiť na aplikovanie?",
+  },
+  Kid: {
+    NoKidText: "Ešte nemáš AI Kid~",
+    InstructionText: "Klikni na「+」nižšie a privolaj si vlastného AI Kid~",
+    Create: "Vytvoriť",
+  },
+  SelectVoice: {
+    Title: "Vybrať Hlas",
+    Recommended: "Odporúčané",
+    Female: "Ženský Hlas",
+    Male: "Mužský Hlas",
+    Dialect: "Nárečie",
+    MatureMale: "Zrelý Mužský Hlas",
+    GentleFemale: "Jemný Ženský Hlas",
+    YoungMale: "Muž | Mladý",
+    YoungFemale: "Žena | Mladá",
+    Confirm: "Dokončiť",
+    Selected: "Vybraté",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Vytvoriť",
+    Edit: "Upraviť",
+    Name: "Meno",
+    VoicePreference: "Nastavenie Hlasu",
+    InputName: "Zadajte Meno",
+    CreateCustomVoice: "Vytvoriť Vlastný Hlas",
+    AbilitySettings: "Nastavenia Schopností",
+    Polish: "Vylepšiť",
+    Introduction: "Úvod",
+    IntroduceYourAiKid: "Predstavte Svoje AI Kid",
+    OpeningLine: "Úvodná Správa",
+    OpeningLineDescription: "Bude použitá ako prvá správa pri spustení chatu",
+    CreateMyAiKid: "Vytvoriť Moje AI Kid",
+    Save: "Uložiť",
+    NotImageTypeError: "Vybrali ste nie obrazový typ！",
+    NoNameTips: "Prosím, zadajte meno",
+  },
+  Realtime: {
+    StartSpeaking: "Môžete začať hovoriť",
+    Listening: "Počúvam...",
+    Interrupt: "Môžete ma kedykoľvek prerušiť",
+    ConnectionFailed: "Pripojenie zlyhalo, skúste to prosím znova!",
+    Connecting: "Pripájanie...",
+    PermissionPrompt:
+      "Prístup k mikrofónu zlyhal, prosím, povolte povolenie mikrofónu manuálne",
   },
 };
 

@@ -76,10 +76,15 @@ const tr: PartialLocaleType = {
       Clear: "Sohbeti temizle",
       Settings: "Sohbet ayarları",
       UploadImage: "Resim yükle",
+      UploadFile: "Dosya yükle",
+      UploadFileTooltip:
+        "Ek yükle, toplam boyut 50 MB'ı aşmamalıdır. Desteklenen formatlar: doc, docx, xlsx, ppt, pptx, jpg, png, txt, pdf",
+      OnlineSearch: "Çevrimiçi arama",
     },
     Rename: "Sohbeti yeniden adlandır",
     Typing: "Yazıyor…",
     Input: "{{submitKey}} gönder, / tamamlama için, : komutlar için",
+    AppInput: "Hadi sohbet edelim~",
     Send: "Gönder",
     Config: {
       Reset: "Hafızayı temizle",
@@ -90,6 +95,17 @@ const tr: PartialLocaleType = {
       Title: "Merhaba~ Ben METIS",
       Content:
         "Arama yapabilir ve sorularınızı yanıtlayabilirim. Bana istediğinizi sorabilirsiniz!",
+    },
+    UploadImageTips: "En fazla üç resim yüklenebilir!",
+    UploadFileTips: "En fazla 100 ek yüklenebilir!",
+    FileTooLarge: "Dosya 5MB sınırını aşıyor",
+    UploadFailed: "Yükleme başarısız",
+    Voice: {
+      HoldToTalk: "Konuşmak için basılı tutun",
+      ReleaseToSendSlideUpToCancel:
+        "Göndermek için bırakın, iptal etmek için yukarı kaydırın",
+      ReleaseToCancel: "İptal etmek için bırakın",
+      Processing: "İşleniyor",
     },
   },
   Export: {
@@ -583,6 +599,53 @@ const tr: PartialLocaleType = {
     Messages: "Mesajlar",
     Topic: "Konu",
     Time: "Zaman",
+  },
+  Kid: {
+    NoKidText: "Henüz bir AI Kid'in yok~",
+    InstructionText:
+      "Aşağıdaki「+」simgesine tıklayarak kendi AI Kid'ini çağırabilirsin~",
+    Create: "Oluştur",
+  },
+  SelectVoice: {
+    Title: "Ses Seç",
+    Recommended: "Önerilen",
+    Female: "Kadın Sesi",
+    Male: "Erkek Sesi",
+    Dialect: "Lehçe",
+    MatureMale: "Olgun Erkek Sesi",
+    GentleFemale: "Nazik Kadın Sesi",
+    YoungMale: "Erkek | Genç",
+    YoungFemale: "Kadın | Genç",
+    Confirm: "Tamamla",
+    Selected: "Seçildi",
+  },
+  AddOrUpdateAiKid: {
+    Create: "Oluştur",
+    Edit: "Düzenle",
+    Name: "İsim",
+    VoicePreference: "Ses Tercihi",
+    InputName: "İsim Girin",
+    CreateCustomVoice: "Özel Ses Oluştur",
+    AbilitySettings: "Yetenek Ayarları",
+    Polish: "İyileştir",
+    Introduction: "Tanıtım",
+    IntroduceYourAiKid: "AI Kid'inizi Tanıtın",
+    OpeningLine: "Açılış Mesajı",
+    OpeningLineDescription:
+      "Sohbet başlatıldığında ilk mesaj olarak kullanılacak",
+    CreateMyAiKid: "AI Kid'imi Oluştur",
+    Save: "Kaydet",
+    NotImageTypeError: "Seçtiğiniz şey bir resim türü değil！",
+    NoNameTips: "Lütfen isim girin",
+  },
+  Realtime: {
+    StartSpeaking: "Konuşmaya başlayabilirsiniz",
+    Listening: "Dinliyorum...",
+    Interrupt: "Beni istediğiniz zaman kesebilirsiniz",
+    ConnectionFailed: "Bağlantı başarısız, lütfen tekrar deneyin!",
+    Connecting: "Bağlanıyor...",
+    PermissionPrompt:
+      "Mikrofon erişimi başarısız oldu, lütfen mikrofon iznini manuel olarak etkinleştirin",
   },
 };
 

@@ -1,5 +1,88 @@
 import { DEFAULT_MODELS, ServiceProvider } from "../constant";
 import { LLMModel } from "../client/api";
+import { Lang } from "../locales";
+
+interface NameLocale {
+  name: string;
+  translations: Partial<Record<Lang, string>>;
+  releaseDateDev?: string; // 测试环境
+  releaseDateProd?: string; // 正式环境
+}
+
+export const nameLocales: NameLocale[] = [
+  {
+    name: "deepseek-chat",
+    translations: {
+      cn: "擅长多轮对话与内容创作的高性能通用模型",
+      tw: "擅長多輪對話與內容創作的高性能通用模型",
+      en: "General model for chat & content",
+      es: "Modelo general para chat y contenido",
+    },
+  },
+  {
+    name: "deepseek-reasoner",
+    translations: {
+      cn: "专攻数学代码与复杂逻辑的深度推理模型",
+      tw: "專攻數學代碼與複雜邏輯的深度推理模型",
+      en: "Advanced model for math & logic",
+      es: "Modelo avanzado para matemáticas y lógica",
+    },
+  },
+  {
+    name: "metis-instruct",
+    translations: {
+      cn: "METIS 的综合基座，胜任标准语言任务",
+      tw: "METIS 的綜合基座，勝任標準語言任務",
+      en: "METIS core for language tasks",
+      es: "Núcleo METIS para tareas lingüísticas",
+    },
+  },
+  {
+    name: "metis-thinking",
+    translations: {
+      cn: "METIS 的思考模型，攻克复杂逻辑难题",
+      tw: "METIS 的思考模型，攻克複雜邏輯難題",
+      en: "METIS logic reasoning model",
+      es: "Modelo lógico de razonamiento METIS",
+    },
+  },
+  {
+    name: "gpt-5.1",
+    translations: {
+      cn: "具备自适应思考与顶尖智能的旗舰级模型",
+      tw: "具備自適應思考與頂尖智能的旗艦級模型",
+      en: "Flagship adaptive intelligence",
+      es: "Inteligencia adaptativa insignia",
+    },
+    releaseDateDev: "2025-12-25",
+    releaseDateProd: "2026-01-06",
+  },
+  {
+    name: "gpt-5-mini",
+    translations: {
+      cn: "兼顾速度与成本，高响应的轻量级模型",
+      tw: "兼顧速度與成本，高響應的輕量級模型",
+      en: "Fast, lightweight, cost-effective model",
+      es: "Modelo rápido, ligero y económico",
+    },
+    releaseDateDev: "2025-12-25",
+    releaseDateProd: "2026-01-06",
+  },
+];
+
+export function isWithinReleasePeriod(releaseDate?: string): boolean {
+  if (!releaseDate) return false;
+
+  const release = new Date(releaseDate);
+  const today = new Date();
+
+  // 往后推 30 天
+  const endDate = new Date(release);
+  endDate.setDate(endDate.getDate() + 30);
+
+  // 判断今天是否在 [releaseDate, releaseDate + 30天] 区间内
+  return today >= release && today <= endDate;
+}
 
 const CustomSeq = {
   val: -1000, //To ensure the custom model located at front, start from -1000, refer to constant.ts
@@ -61,6 +144,8 @@ export function collectModelTable(
       sorted: number;
       provider?: LLMModel["provider"]; // Marked as optional
       isDefault?: boolean;
+      releaseDate?: string;
+      description?: string;
     }
   > = {};
 
@@ -240,10 +325,10 @@ export function isModelNotavailableInServer(
     return true;
   }
 
-  if(modelName.toLowerCase().includes('metis')){
+  if (modelName.toLowerCase().includes("metis")) {
     return false;
   }
-  
+
   const modelTable = collectModelTable(DEFAULT_MODELS, customModels);
 
   const providerNamesArray = Array.isArray(providerNames)

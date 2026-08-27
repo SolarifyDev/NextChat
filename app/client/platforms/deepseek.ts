@@ -23,7 +23,8 @@ import {
 } from "@/app/utils";
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
-import { useNewChatStore } from "@/app/store/new-chat";
+import { useOmeStore } from "@/app/store/ome";
+import { useEnhanceChatStore } from "@/app/store/enhance-chat";
 
 export class DeepSeekApi implements LLMApi {
   private disableListModels = true;
@@ -75,10 +76,29 @@ export class DeepSeekApi implements LLMApi {
       }
     }
 
+    // 检测并修复消息顺序，确保除system外的第一个消息是user
+    const filteredMessages: ChatOptions["messages"] = [];
+    let hasFoundFirstUser = false;
+
+    for (const msg of messages) {
+      if (msg.role === "system") {
+        // Keep all system messages
+        filteredMessages.push(msg);
+      } else if (msg.role === "user") {
+        // User message directly added
+        filteredMessages.push(msg);
+        hasFoundFirstUser = true;
+      } else if (hasFoundFirstUser) {
+        // After finding the first user message, all subsequent non-system messages are retained.
+        filteredMessages.push(msg);
+      }
+      // If hasFoundFirstUser is false and it is not a system message, it will be skipped.
+    }
+
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       // ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...useNewChatStore.getState()?.getCurrentSession()?.mask?.modelConfig,
+      ...useEnhanceChatStore.getState()?.currentSession?.mask?.modelConfig,
       ...{
         model: options.config.model,
         providerName: options.config.providerName,
@@ -86,13 +106,18 @@ export class DeepSeekApi implements LLMApi {
     };
 
     const requestPayload: RequestPayload = {
-      messages,
+      messages: filteredMessages,
       stream: options.config.stream,
       model: modelConfig.model,
       temperature: modelConfig.temperature,
       presence_penalty: modelConfig.presence_penalty,
       frequency_penalty: modelConfig.frequency_penalty,
       top_p: modelConfig.top_p,
+      onlineSearch: useOmeStore.getState().faqSearch
+        ? false
+        : useOmeStore.getState().onlineSearch,
+      NeedFaq: useOmeStore.getState().faqSearch,
+      isSummary: options.isSummary || false,
       // max_tokens: Math.max(modelConfig.max_tokens, 1024),
       // Please do not ask me why not send max_tokens, no reason, this param is just shit, I dont want to explain anymore.
     };
@@ -109,7 +134,7 @@ export class DeepSeekApi implements LLMApi {
         method: "POST",
         body: JSON.stringify(requestPayload),
         signal: controller.signal,
-        headers: getHeaders(),
+        headers: await getHeaders(),
       };
 
       // make a fetch request
@@ -121,12 +146,12 @@ export class DeepSeekApi implements LLMApi {
       if (shouldStream) {
         const [tools, funcs] = usePluginStore.getState().getAsTools(
           // useChatStore.getState().currentSession().mask?.plugin || [],
-          useNewChatStore.getState().getCurrentSession().mask?.plugin || [],
+          useEnhanceChatStore.getState().currentSession!.mask?.plugin || [],
         );
         return streamWithThink(
           chatPath,
           requestPayload,
-          getHeaders(),
+          await getHeaders(),
           tools as any,
           funcs,
           controller,
