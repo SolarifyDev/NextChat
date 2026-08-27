@@ -484,7 +484,7 @@ export function Home() {
         if (
           !event.origin.includes("omeoffice") &&
           !event.origin.includes("daoword") &&
-          event.origin.toLowerCase().includes("daodaoagi") &&
+          !event.origin.toLowerCase().includes("daodaoagi") &&
           !event.origin.includes("localhost")
         ) {
           return; // 如果不是信任的源，忽略消息
