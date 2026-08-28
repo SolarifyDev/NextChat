@@ -1136,7 +1136,6 @@ export function ChatActions(props: {
         {!isMobileScreen && (
           <ChatAction
             onClick={() => props.setShowShortcutKeyModal(true)}
-            // text={Locale.Chat.ShortcutKey.Title}
             text={t("Chat.ShortcutKey.Title")}
             icon={<ShortcutkeyIcon />}
           />
