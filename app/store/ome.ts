@@ -19,7 +19,9 @@ export type OmeStoreType = {
   clientSecret: string | null;
   score: string | null;
   isShowHome: boolean | null;
+  omeTenantId: string;
   faqSearch: boolean;
+  apoolSearch: boolean;
   clearCurrent: () => void;
   setOnlineSearch: (onlineSearch: boolean) => void;
   setToken: (token: string) => void;
@@ -36,7 +38,9 @@ export type OmeStoreType = {
   shouldRefreshToken: () => boolean;
   setClient: (clientId: string, clientSecret: string, score: string) => void;
   setIsShowHome: (isShowHome: boolean) => void;
+  setOmeTenantId: (omeTenantId: string) => void;
   setFaqSearch: (faqSearch: boolean) => void;
+  setApoolSearch: (apoolSearch: boolean) => void;
 };
 
 export const useOmeStore = create<OmeStoreType>()(
@@ -57,7 +61,9 @@ export const useOmeStore = create<OmeStoreType>()(
       clientSecret: null,
       score: null,
       isShowHome: null,
+      omeTenantId: "",
       faqSearch: false,
+      apoolSearch: false,
       clearCurrent: () => {
         set({
           token: "",
@@ -74,7 +80,9 @@ export const useOmeStore = create<OmeStoreType>()(
           clientSecret: null,
           score: null,
           isShowHome: null,
+          omeTenantId: "",
           faqSearch: false,
+          apoolSearch: false,
         });
       },
       setOnlineSearch: (onlineSearch: boolean) => {
@@ -150,9 +158,17 @@ export const useOmeStore = create<OmeStoreType>()(
       setIsShowHome: (isShowHome: boolean | null) => {
         set({ isShowHome });
       },
+      setOmeTenantId: (omeTenantId: string) => {
+        set({ omeTenantId });
+      },
       setFaqSearch: (faqSearch: boolean) => {
         set({
           faqSearch,
+        });
+      },
+      setApoolSearch: (apoolSearch: boolean) => {
+        set({
+          apoolSearch,
         });
       },
     }),
